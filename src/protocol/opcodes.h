@@ -11,6 +11,7 @@
 #define OP_SRV_MESSAGE			(8)
 #define OP_SRV_LOGOUT			(9)
 #define OP_SRV_SHOW_DESIGN		(239)
+#define OP_SRV_STATS			(243)
 #define OP_SRV_INIT_PLANE		(244)
 #define OP_SRV_PLAYER_APPEARANCE	(250)
 #define OP_SRV_PLAYER_MOVEMENT		(255)

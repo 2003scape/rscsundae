@@ -10,9 +10,19 @@
 
 #define MAX_KNOWN_PLAYERS	(255)
 #define MAX_PUBLIC_CHAT_LEN	(80)
+#define MAX_SKILL_ID		(16)
 #define WALK_QUEUE_LEN		(16)
 
 struct server;
+
+enum skills {
+	SKILL_ATTACK		= 0,
+	SKILL_DEFENSE		= 1,
+	SKILL_STRENGTH		= 2,
+	SKILL_HITS		= 3,
+	SKILL_RANGED		= 4,
+	SKILL_PRAYER		= 5,
+};
 
 /* TODO: expand with a they/them option */
 enum mobgender {
@@ -71,6 +81,7 @@ struct player {
 	uint16_t outbuf_written;
 	int64_t session_id;
 	int64_t name;
+	uint8_t stats_changed;
 	uint8_t appearance_changed;
 	uint8_t plane_changed;
 	uint8_t moved;
@@ -94,6 +105,10 @@ struct player {
 	uint8_t ui_design_open;
 	uint8_t logout_confirmed;
 	uint64_t last_packet;
+	uint8_t cur_stats[MAX_SKILL_ID];
+	uint8_t base_stats[MAX_SKILL_ID];
+	uint32_t experience[MAX_SKILL_ID];
+	uint8_t quest_points;
 };
 
 struct bound {
@@ -128,5 +143,6 @@ int player_send_appearance_update(struct player *);
 int player_send_design_ui(struct player *);
 int player_send_logout(struct player *);
 int player_send_message(struct player *, const char *);
+int player_send_stats_update(struct player *);
 
 #endif

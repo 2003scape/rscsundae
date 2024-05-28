@@ -57,6 +57,9 @@ server_tick(void)
 		if (s.players[i]->plane_changed) {
 			player_send_plane_init(s.players[i]);
 		}
+		if (s.players[i]->stats_changed) {
+			player_send_stats_update(s.players[i]);
+		}
 		player_send_movement(s.players[i]);
 		player_send_appearance_update(s.players[i]);
 		net_player_send(s.players[i]);
@@ -69,6 +72,7 @@ server_tick(void)
 		s.players[i]->public_chat_len = 0;
 		s.players[i]->appearance_changed = false;
 		s.players[i]->plane_changed = false;
+		s.players[i]->stats_changed = false;
 		s.players[i]->moved = false;
 		s.players[i]->mob.prev_dir = s.players[i]->mob.dir;
 	}

@@ -343,6 +343,42 @@ player_send_logout(struct player *p)
 }
 
 int
+player_send_stats_update(struct player *p)
+{
+	size_t offset = 0;
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, OP_SRV_STATS);
+
+	for (int i = 0; i < MAX_SKILL_ID; ++i) {
+		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+				p->cur_stats[i]) == -1) {
+			return -1;
+		}
+	}
+
+	for (int i = 0; i < MAX_SKILL_ID; ++i) {
+		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+				p->base_stats[i]) == -1) {
+			return -1;
+		}
+	}
+
+	for (int i = 0; i < MAX_SKILL_ID; ++i) {
+		if (buf_putu32(p->tmpbuf, offset, PLAYER_BUFSIZE,
+				p->experience[i]) == -1) {
+			return -1;
+		}
+		offset += 4;
+	}
+
+	if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+			p->quest_points) == -1) {
+		return -1;
+	}
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
 player_send_appearance_update(struct player *p)
 {
 	uint16_t update_count = 0;

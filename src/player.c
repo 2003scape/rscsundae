@@ -71,10 +71,18 @@ player_accept(struct server *s, int sock)
 	p->session_id = session_id;
 	p->sock = sock;
 
+	for (int i = 0; i < MAX_SKILL_ID; ++i) {
+		p->cur_stats[i] = 1;
+		p->base_stats[i] = 1;
+	}
+	p->cur_stats[SKILL_HITS] = 10;
+	p->base_stats[SKILL_HITS] = 10;
+	p->experience[SKILL_HITS] = 4000;
 	p->sprites[ANIM_SLOT_HEAD] = ANIM_FHEAD1 + 1;
 	p->sprites[ANIM_SLOT_BODY] = ANIM_FBODY1 + 1;
 	p->sprites[ANIM_SLOT_LEGS] = ANIM_LEGS1 + 1;
 	p->combat_level = 3;
+	p->stats_changed = true;
 	p->appearance_changed = true;
 	p->plane_changed = true;
 	p->ui_design_open = true;
