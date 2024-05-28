@@ -2,6 +2,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 #include "config/anim.h"
 #include "protocol/opcodes.h"
 #include "server.h"
@@ -77,6 +78,7 @@ player_accept(struct server *s, int sock)
 	p->appearance_changed = true;
 	p->plane_changed = true;
 	p->ui_design_open = true;
+	p->last_packet = s->tick_counter;
 
 	p->mob.server = s;
 	p->mob.x = 120;
@@ -84,6 +86,7 @@ player_accept(struct server *s, int sock)
 	s->players[slot] = p;
 
 	player_send_design_ui(p);
+	player_send_message(p, "@que@Welcome to RSCSundae!");
 	loop_add_player(p);
 	return p;
 }
@@ -159,4 +162,16 @@ player_close_ui(struct player *p)
 	p->ui_dialog_open = false;
 	p->ui_design_open = false;
 	p->ui_bank_open = false;
+}
+
+void
+player_destroy(struct player *p) {
+	for (int i = 0; i < p->known_player_count; ++i) {
+		p->known_players[i]->mob.refcount--;
+	}
+	if (p->sock != -1) {
+		close(p->sock);
+		p->sock = -1;
+	}
+	free(p);
 }

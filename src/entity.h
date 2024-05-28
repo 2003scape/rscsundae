@@ -35,6 +35,7 @@ struct mob {
 	struct server *server;
 	uint16_t x, y;
 	uint16_t id;
+	uint32_t refcount;
 	uint8_t dir;
 	uint8_t prev_dir;
 	uint8_t moved;
@@ -91,6 +92,8 @@ struct player {
 	uint8_t ui_dialog_open;
 	uint8_t ui_bank_open;
 	uint8_t ui_design_open;
+	uint8_t logout_confirmed;
+	uint64_t last_packet;
 };
 
 struct bound {
@@ -113,6 +116,7 @@ size_t get_nearby_players(struct mob *, struct player **, size_t, int);
 struct player *player_accept(struct server *, int);
 void player_process_walk_queue(struct player *);
 void player_close_ui(struct player *);
+void player_destroy(struct player *);
 
 /* incoming.c */
 int player_parse_incoming(struct player *);
@@ -122,5 +126,7 @@ int player_send_plane_init(struct player *);
 int player_send_movement(struct player *);
 int player_send_appearance_update(struct player *);
 int player_send_design_ui(struct player *);
+int player_send_logout(struct player *);
+int player_send_message(struct player *, const char *);
 
 #endif

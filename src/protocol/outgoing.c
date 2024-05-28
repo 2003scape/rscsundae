@@ -93,7 +93,9 @@ player_send_movement(struct player *p)
 	size_t offset = 0;
 	size_t bitpos;
 	struct player *nearby[MAX_KNOWN_PLAYERS];
+	struct player *new_known[MAX_KNOWN_PLAYERS];
 	size_t nearby_count = 0;
+	size_t new_known_count = 0;
 
 	nearby_count = get_nearby_players(&p->mob, nearby,
 	    MAX_KNOWN_PLAYERS, UPDATE_RADIUS);
@@ -119,10 +121,11 @@ player_send_movement(struct player *p)
 		    PLAYER_BUFSIZE, 8, p->known_player_count);
 	bitpos += 8;
 
-	printf("number of known players is %d\n", p->known_player_count);
-
 	/* players the client already knows */
 	for (size_t i = 0; i < p->known_player_count; ++i) {
+		if (p->known_players[i] == NULL) {
+			continue;
+		}
 		if (p->known_players[i]->moved) {
 			if (buf_putbits(p->tmpbuf, bitpos++,
 					PLAYER_BUFSIZE, 1, 1) == -1) {
@@ -141,10 +144,18 @@ player_send_movement(struct player *p)
 		} else if (p->known_players[i]->mob.dir !=
 			    p->known_players[i]->mob.prev_dir) {
 			if (buf_putbits(p->tmpbuf, bitpos,
-					PLAYER_BUFSIZE, 4,
+					PLAYER_BUFSIZE, 3,
 					p->known_players[i]->mob.dir) == -1) {
 				return -1;
 			}
+			bitpos += 3;
+		} else if (p->known_players[i]->logout_confirmed) {
+			if (buf_putbits(p->tmpbuf, bitpos,
+					PLAYER_BUFSIZE, 4, 12) == -1) {
+				return -1;
+			}
+			p->known_players[i]->mob.refcount--;
+			p->known_players[i] = NULL;
 			bitpos += 4;
 		} else {
 			if (buf_putbits(p->tmpbuf, bitpos++,
@@ -152,20 +163,24 @@ player_send_movement(struct player *p)
 				return -1;
 			}
 		}
-		bitpos++;
+		if (p->known_players[i] != NULL) {
+			new_known[new_known_count++] = p->known_players[i];
+		}
 	}
+
+	memset(p->known_players_seen, 0, new_known_count * sizeof(uint8_t));
 
 	/* players the client doesn't know about yet */
 	for (size_t i = 0; i < nearby_count; ++i) {
 		if (p->known_player_count >= MAX_KNOWN_PLAYERS) {
 			break;
 		}
-		if (nearby[i] == p) {
+		if (nearby[i] == p || nearby[i]->logout_confirmed) {
 			continue;
 		}
 		bool known = false;
-		for (size_t j = 0; j < p->known_player_count; ++j) {
-			if (p->known_players[j] == nearby[i]) {
+		for (size_t j = 0; j < new_known_count; ++j) {
+			if (new_known[j] == nearby[i]) {
 				known = true;
 				break;
 			}
@@ -203,8 +218,14 @@ player_send_movement(struct player *p)
 		}
 		bitpos++;
 
-		p->known_players[p->known_player_count++] = nearby[i];
+		p->mob.refcount++;
+		p->known_players_seen[new_known_count] = false;
+		new_known[new_known_count++] = nearby[i];
 	}
+
+	memcpy(p->known_players, new_known,
+	    new_known_count * sizeof(struct player *));
+	p->known_player_count = new_known_count;
 
 	offset = (bitpos + 7) / 8;
 
@@ -295,6 +316,33 @@ player_send_design_ui(struct player *p)
 }
 
 int
+player_send_message(struct player *p, const char *s)
+{
+	size_t offset = 0;
+	size_t len = strlen(s);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_MESSAGE);
+	if (buf_putdata(p->tmpbuf, offset, PLAYER_BUFSIZE,
+			(void *)s, len) != -1) {
+		offset += len;
+		return player_write_packet(p, p->tmpbuf, offset);
+	}
+	return -1;
+}
+
+int
+player_send_logout(struct player *p)
+{
+	size_t offset = 0;
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_LOGOUT);
+
+	p->logout_confirmed = true;
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
 player_send_appearance_update(struct player *p)
 {
 	uint16_t update_count = 0;
@@ -319,6 +367,9 @@ player_send_appearance_update(struct player *p)
 
 	for (int i = 0; i < p->known_player_count; ++i) {
 		struct player *p2 = p->known_players[i];
+		if (p2 == NULL || p2->logout_confirmed) {
+			continue;
+		}
 		if (p2->public_chat_len > 0) {
 			if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
 				       p2->mob.id) == -1) {

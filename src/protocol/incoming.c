@@ -6,6 +6,7 @@
 #include "../config/anim.h"
 #include "../buffer.h"
 #include "../entity.h"
+#include "../server.h"
 
 #define MAX_PACKETS_PER_TICK		(10)
 #define MAX_PLAYER_HAIR_COLOUR		(9)
@@ -87,6 +88,8 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 
 	printf("process packet opcode %d len %d\n", opcode, len);
 
+	p->last_packet = p->mob.server->tick_counter;
+
 	switch (opcode) {
 	case OP_CLI_LOGIN:
 		{
@@ -109,6 +112,11 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			p->name = name;
 		}
 		break;
+	case OP_CLI_LOGOUT:
+		{
+			player_send_logout(p);
+		}
+		break;
 	case OP_CLI_PUBLIC_CHAT:
 		{
 			/* want to eventually decode this to moderate */
@@ -121,7 +129,6 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 		break;
 	case OP_CLI_PING:
 		{
-			/* TODO */
 		}
 		break;
 	case OP_CLI_WALK_TILE:
