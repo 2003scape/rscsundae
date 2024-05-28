@@ -131,6 +131,50 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 		{
 		}
 		break;
+	case OP_CLI_PRIVACY_SETTINGS:
+		{
+			uint8_t hide_online;
+			uint8_t block_public;
+			uint8_t block_private;
+			uint8_t block_trade;
+			uint8_t block_duel;
+
+			if (buf_getu8(data, offset++, len, &hide_online) == -1) {
+				return;
+			}
+			if (buf_getu8(data, offset++, len, &block_public) == -1) {
+				return;
+			}
+			if (buf_getu8(data, offset++, len, &block_private) == -1) {
+				return;
+			}
+			if (buf_getu8(data, offset++, len, &block_trade) == -1) {
+				return;
+			}
+			if (buf_getu8(data, offset++, len, &block_duel) == -1) {
+				return;
+			}
+			p->block_public = block_public;
+			p->block_private = block_private || hide_online;
+			p->block_trade = block_trade;
+			p->block_duel = block_duel;
+		}
+		break;
+	case OP_CLI_SAVE_SETTING:
+		{
+			uint8_t id, value;
+
+			if (buf_getu8(data, offset++, len, &id) == -1) {
+				return;
+			}
+			if (buf_getu8(data, offset++, len, &value) == -1) {
+				return;
+			}
+			if (id <= MAX_CLIENT_SETTINGS) {
+				p->client_settings[id] = value;
+			}
+		}
+		break;
 	case OP_CLI_FOLLOW_PLAYER:
 		{
 			struct player *p2;

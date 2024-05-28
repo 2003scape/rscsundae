@@ -343,6 +343,44 @@ player_send_logout(struct player *p)
 }
 
 int
+player_send_client_settings(struct player *p)
+{
+	size_t offset = 0;
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_CLIENT_SETTINGS);
+
+	for (int i = 0; i < MAX_CLIENT_SETTINGS; ++i) {
+		(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+				p->client_settings[i]);
+	}
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
+player_send_privacy_settings(struct player *p)
+{
+	size_t offset = 0;
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_PRIVACY_SETTINGS);
+	/*
+	 * first one is "hide online status", unique to these earlier
+	 * revisions, but we treat it identically to private block
+	 */
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        p->block_private);
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        p->block_public);
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        p->block_private);
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        p->block_trade);
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        p->block_duel);
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
 player_send_stats_update(struct player *p)
 {
 	size_t offset = 0;
@@ -406,7 +444,7 @@ player_send_appearance_update(struct player *p)
 		if (p2 == NULL || p2->logout_confirmed) {
 			continue;
 		}
-		if (p2->public_chat_len > 0) {
+		if (!p->block_public && p2->public_chat_len > 0) {
 			if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
 				       p2->mob.id) == -1) {
 				return -1;

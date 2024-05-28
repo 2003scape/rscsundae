@@ -11,6 +11,7 @@
 #define MAX_KNOWN_PLAYERS	(255)
 #define MAX_PUBLIC_CHAT_LEN	(80)
 #define MAX_SKILL_ID		(16)
+#define MAX_CLIENT_SETTINGS	(3)
 #define WALK_QUEUE_LEN		(16)
 
 struct server;
@@ -87,6 +88,7 @@ struct player {
 	uint8_t plane_changed;
 	uint8_t moved;
 	uint8_t sprites[12];
+	uint8_t client_settings[MAX_CLIENT_SETTINGS];
 	uint8_t gender;
 	uint8_t hair_colour;
 	uint8_t top_colour;
@@ -104,6 +106,10 @@ struct player {
 	uint8_t ui_dialog_open;
 	uint8_t ui_bank_open;
 	uint8_t ui_design_open;
+	uint8_t block_public;
+	uint8_t block_private;
+	uint8_t block_trade;
+	uint8_t block_duel;
 	uint8_t logout_confirmed;
 	uint64_t last_packet;
 	uint8_t cur_stats[MAX_SKILL_ID];
