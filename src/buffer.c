@@ -107,12 +107,34 @@ buf_putu16(void *b, size_t offset, size_t buflen, uint16_t in)
 int
 buf_putu32(void *b, size_t offset, size_t buflen, uint32_t in)
 {
-	uint8_t *buffer = b;
+	uint8_t *buffer;
 
 	if (offset > (SSIZE_MAX - 4) ||
 	    ((ssize_t)buflen - (ssize_t)offset) < 4) {
 		return -1;
 	}
+	buffer = b + offset;
+	*(buffer++) = (uint8_t)(in >> 24);
+	*(buffer++) = (uint8_t)(in >> 16);
+	*(buffer++) = (uint8_t)(in >> 8);
+	*(buffer++) = (uint8_t)in;
+	return 0;
+}
+
+int
+buf_putu64(void *b, size_t offset, size_t buflen, uint64_t in)
+{
+	uint8_t *buffer;
+
+	if (offset > (SSIZE_MAX - 8) ||
+	    ((ssize_t)buflen - (ssize_t)offset) < 8) {
+		return -1;
+	}
+	buffer = b + offset;
+	*(buffer++) = (uint8_t)(in >> 56);
+	*(buffer++) = (uint8_t)(in >> 48);
+	*(buffer++) = (uint8_t)(in >> 40);
+	*(buffer++) = (uint8_t)(in >> 32);
 	*(buffer++) = (uint8_t)(in >> 24);
 	*(buffer++) = (uint8_t)(in >> 16);
 	*(buffer++) = (uint8_t)(in >> 8);

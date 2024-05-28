@@ -6,6 +6,8 @@
 
 #define PLANE_LEVEL_INC		(944)
 
+#define MAX_KNOWN_PLAYERS	(256)
+
 struct mob {
 	uint16_t x, y;
 	uint16_t id;
@@ -14,9 +16,27 @@ struct mob {
 	uint8_t moved;
 };
 
+enum animslot {
+	ANIM_SLOT_HEAD		= 0,
+	ANIM_SLOT_BODY		= 1,
+	ANIM_SLOT_LEGS		= 2,
+	ANIM_SLOT_OFFHAND	= 3,
+	ANIM_SLOT_HAND		= 4,
+	ANIM_SLOT_HELMET	= 5,
+	ANIM_SLOT_SHIRT		= 6,
+	ANIM_SLOT_TROUSERS	= 7,
+	ANIM_SLOT_NECK		= 8,
+	ANIM_SLOT_SHOES		= 9,
+	ANIM_SLOT_GLOVES	= 10,
+	ANIM_SLOT_CAPE		= 11,
+};
+
 struct player {
 	struct mob mob;
 	int sock;
+	struct player *known_players[MAX_KNOWN_PLAYERS];
+	uint8_t known_players_seen[MAX_KNOWN_PLAYERS];
+	uint16_t known_player_count;
 	uint8_t tmpbuf[PLAYER_BUFSIZE]; /* used for packet construction */
 	uint8_t inbuf[PLAYER_BUFSIZE];
 	uint16_t inbuf_len;
@@ -26,6 +46,15 @@ struct player {
 	uint16_t outbuf_written;
 	int64_t session_id;
 	int64_t name;
+	uint8_t appearance_changed;
+	uint8_t plane_changed;
+	uint8_t sprites[12];
+	uint8_t hair_colour;
+	uint8_t top_colour;
+	uint8_t leg_colour;
+	uint8_t skin_colour;
+	uint8_t combat_level;
+	uint8_t skulled;
 };
 
 struct bound {

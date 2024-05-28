@@ -80,10 +80,10 @@ net_player_send(struct player *p)
 	size_t to_write = p->outbuf_len - p->outbuf_written;
 
 	if (to_write > 0) {
-		printf("send %zu bytes, off %zu\n", to_write, p->outbuf_written);
 		ssize_t len = send(p->sock,
 			p->outbuf + p->outbuf_written, to_write, 0);
 		if (len > 0) {
+			printf("sent %zd bytes, off %zu\n", len, p->outbuf_written);
 			p->outbuf_written += len;
 		}
 	}
