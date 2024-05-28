@@ -1,14 +1,19 @@
 #ifndef ENTITY_H
 #define ENTITY_H
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #define PLAYER_BUFSIZE		(5000)
 
 #define PLANE_LEVEL_INC		(944)
 
-#define MAX_KNOWN_PLAYERS	(256)
+#define MAX_KNOWN_PLAYERS	(255)
+
+struct server;
 
 struct mob {
+	struct server *server;
 	uint16_t x, y;
 	uint16_t id;
 	uint8_t dir;
@@ -69,7 +74,9 @@ struct loc {
 	uint8_t dir;
 };
 
-struct server;
+/* mob.c */
+bool mob_within_range(struct mob *, int, int, int);
+size_t get_nearby_players(struct mob *, struct player **, size_t, int);
 
 /* player.c */
 struct player *player_accept(struct server *, int);
@@ -80,5 +87,6 @@ int player_parse_incoming(struct player *);
 /* outgoing.c */
 int player_send_plane_init(struct player *);
 int player_send_movement(struct player *);
+
 
 #endif

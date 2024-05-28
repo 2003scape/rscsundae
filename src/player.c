@@ -85,6 +85,7 @@ player_accept(struct server *s, int sock)
 	p->appearance_changed = 1;
 	p->plane_changed = 1;
 
+	p->mob.server = s;
 	p->mob.x = 120;
 	p->mob.y = 648;
 	s->players[slot] = p;

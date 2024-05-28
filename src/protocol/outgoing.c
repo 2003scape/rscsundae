@@ -6,6 +6,8 @@
 #include "../buffer.h"
 #include "../entity.h"
 
+#define UPDATE_RADIUS	(32)
+
 enum player_update_type {
 	PLAYER_UPDATE_BUBBLE		= 0,
 	PLAYER_UPDATE_CHAT		= 1,
@@ -50,7 +52,7 @@ player_write_packet(struct player *p, void *b, size_t len)
 	if (off > (SSIZE_MAX - len) ||
 	    ((ptrdiff_t)PLAYER_BUFSIZE - (ptrdiff_t)off) < len) {
 		return -1;
-	} 
+	}
 	memcpy(p->outbuf + off, b, len);
 	off += len;
 	p->outbuf_len += (off - orig_off);
@@ -90,6 +92,11 @@ player_send_movement(struct player *p)
 {
 	size_t offset = 0;
 	size_t bitpos;
+	struct player *nearby[MAX_KNOWN_PLAYERS];
+	size_t nearby_count = 0;
+
+	nearby_count = get_nearby_players(&p->mob, nearby,
+	    MAX_KNOWN_PLAYERS, UPDATE_RADIUS);
 
 	buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 		  OP_SRV_PLAYER_MOVEMENT);
@@ -108,9 +115,70 @@ player_send_movement(struct player *p)
 	            PLAYER_BUFSIZE, 4, p->mob.dir);
 	bitpos += 4;
 
-	buf_putbits(p->tmpbuf, bitpos, 
-		    PLAYER_BUFSIZE, 8, 0);
+	buf_putbits(p->tmpbuf, bitpos,
+		    PLAYER_BUFSIZE, 8, p->known_player_count);
 	bitpos += 8;
+
+	/* players the client already knows */
+	for (size_t i = 0; i < p->known_player_count; ++i) {
+		/* not moved */
+		if (buf_putbits(p->tmpbuf, bitpos,
+				PLAYER_BUFSIZE, 1, 0) == -1) {
+			return -1;
+		}
+		bitpos++;
+	}
+
+	/* players the client doesn't know about yet */
+	for (size_t i = 0; i < nearby_count; ++i) {
+		if (p->known_player_count >= MAX_KNOWN_PLAYERS) {
+			break;
+		}
+		if (nearby[i] == p) {
+			continue;
+		}
+		bool known = false;
+		for (size_t j = 0; j < p->known_player_count; ++j) {
+			if (p->known_players[j] == nearby[i]) {
+				known = true;
+				break;
+			}
+		}
+		if (known) {
+			continue;
+		}
+
+		if (buf_putbits(p->tmpbuf, bitpos,
+				PLAYER_BUFSIZE, 11, nearby[i]->mob.id) == -1) {
+			return -1;
+		}
+		bitpos += 11;
+
+		if (buf_putbits(p->tmpbuf, bitpos, PLAYER_BUFSIZE, 5,
+				(int)p->mob.x - (int)nearby[i]->mob.x) == -1) {
+			return -1;
+		}
+		bitpos += 5;
+
+		if (buf_putbits(p->tmpbuf, bitpos, PLAYER_BUFSIZE, 5,
+				(int)p->mob.y - (int)nearby[i]->mob.y) == -1) {
+			return -1;
+		}
+		bitpos += 5;
+
+		if (buf_putbits(p->tmpbuf, bitpos, PLAYER_BUFSIZE, 4,
+				nearby[i]->mob.dir) == -1) {
+			return -1;
+		}
+		bitpos += 4;
+
+		if (buf_putbits(p->tmpbuf, bitpos, PLAYER_BUFSIZE, 1, 0) == -1) {
+			return -1;
+		}
+		bitpos++;
+
+		p->known_players[p->known_player_count++] = nearby[i];
+	}
 
 	offset = (bitpos + 7) / 8;
 

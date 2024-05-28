@@ -7,6 +7,7 @@ OBJS+=	player.o
 OBJS+=	incoming.o
 OBJS+=	outgoing.o
 OBJS+=	utility.o
+OBJS+=	mob.o
 
 CFLAGS+=	-I/usr/pkg/include/ev
 LDFLAGS+=	-L/usr/pkg/lib/ev
