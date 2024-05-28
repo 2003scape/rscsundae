@@ -111,12 +111,6 @@ player_process_walk_queue(struct player *p)
 	}
 	int cur_x = p->mob.x;
 	int cur_y = p->mob.y;
-	if (cur_x == p->walk_queue_x[pos] &&
-	    cur_y == p->walk_queue_y[pos]) {
-		p->walk_queue_pos = 0;
-		p->walk_queue_len = 0;
-		return;
-	}
 	int dif_x = cur_x - (int)p->walk_queue_x[pos];
 	int dif_y = cur_y - (int)p->walk_queue_y[pos];
 
@@ -156,12 +150,16 @@ player_process_walk_queue(struct player *p)
 		}
 	}
 
+	if (p->mob.x == p->walk_queue_x[pos] &&
+	    p->mob.y == p->walk_queue_y[pos]) {
+		p->walk_queue_pos++;
+	}
+
 	if (p->mob.x != cur_x || p->mob.y != cur_y) {
 		player_close_ui(p);
 		p->moved = true;
 	}
 
-	p->walk_queue_pos++;
 }
 
 void
