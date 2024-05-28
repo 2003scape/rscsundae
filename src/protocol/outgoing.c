@@ -155,13 +155,13 @@ player_send_movement(struct player *p)
 		bitpos += 11;
 
 		if (buf_putbits(p->tmpbuf, bitpos, PLAYER_BUFSIZE, 5,
-				(int)p->mob.x - (int)nearby[i]->mob.x) == -1) {
+				(int)nearby[i]->mob.x - (int)p->mob.x) == -1) {
 			return -1;
 		}
 		bitpos += 5;
 
 		if (buf_putbits(p->tmpbuf, bitpos, PLAYER_BUFSIZE, 5,
-				(int)p->mob.y - (int)nearby[i]->mob.y) == -1) {
+				(int)nearby[i]->mob.y - (int)p->mob.y) == -1) {
 			return -1;
 		}
 		bitpos += 5;
