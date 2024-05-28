@@ -131,6 +131,30 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 		{
 		}
 		break;
+	case OP_CLI_FOLLOW_PLAYER:
+		{
+			struct player *p2;
+			char name[32], message[64];
+			uint16_t target;
+
+			if (buf_getu16(data, offset, len, &target) == -1) {
+				return;
+			}
+			offset += 2;
+			if (target >= MAXPLAYERS) {
+				return;
+			}
+			p2 = p->mob.server->players[target];
+			if (p2 == NULL) {
+				return;
+			}
+			mod37_namedec(p2->name, name);
+			(void)snprintf(message, sizeof(message),
+					"Following %s", name);
+			player_send_message(p, message);
+			p->following_player = (int16_t)target;
+		}
+		break;
 	case OP_CLI_WALK_TILE:
 		{
 			size_t steps;
@@ -140,7 +164,6 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			steps = (len - 5) / 2;
-			printf("number of steps is %d\n", steps);
 			if (buf_getu16(data, offset, len, &p->walk_queue_x[0]) == -1) {
 				return;
 			}
@@ -170,7 +193,8 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				p->walk_queue_y[i + 1] = (uint16_t)new_y;
 			}
 			p->walk_queue_len = steps + 1;
-			p->walk_queue_pos = 0 ;
+			p->walk_queue_pos = 0;
+			p->following_player = -1;
 		}
 		break;
 	case OP_CLI_ACCEPT_DESIGN:

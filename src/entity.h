@@ -81,6 +81,7 @@ struct player {
 	uint16_t outbuf_written;
 	int64_t session_id;
 	int64_t name;
+	int16_t following_player;
 	uint8_t stats_changed;
 	uint8_t appearance_changed;
 	uint8_t plane_changed;

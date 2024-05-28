@@ -86,6 +86,7 @@ player_accept(struct server *s, int sock)
 	p->appearance_changed = true;
 	p->plane_changed = true;
 	p->ui_design_open = true;
+	p->following_player = -1;
 	p->last_packet = s->tick_counter;
 
 	p->mob.server = s;
@@ -102,6 +103,22 @@ player_accept(struct server *s, int sock)
 void
 player_process_walk_queue(struct player *p)
 {
+	if (p->following_player != -1) {
+		struct player *p2;
+
+		p2 = p->mob.server->players[p->following_player];
+		if (p2 != NULL) {
+			if (mob_within_range(&p->mob, p2->mob.x, p2->mob.y, 2)) {
+				return;
+			}
+			p->walk_queue_x[0] = p2->mob.x;
+			p->walk_queue_y[0] = p2->mob.y;
+			p->walk_queue_pos = 0;
+			p->walk_queue_len = 1;
+		} else {
+			p->following_player = -1;
+		}
+	}
 	int pos = p->walk_queue_pos;
 	int remaining = p->walk_queue_len - pos;
 	if (remaining == 0) {

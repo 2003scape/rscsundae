@@ -5,6 +5,7 @@
 #define OP_CLI_PUBLIC_CHAT	(3)
 #define OP_CLI_PING		(5)
 #define OP_CLI_LOGOUT		(6)
+#define OP_CLI_FOLLOW_PLAYER	(214)
 #define OP_CLI_ACCEPT_DESIGN	(236)
 #define OP_CLI_WALK_TILE	(255)
 
