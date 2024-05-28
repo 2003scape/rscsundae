@@ -122,14 +122,44 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 		break;
 	case OP_CLI_WALK_TILE:
 		{
-			if (buf_getu16(data, offset, len, &p->mob.x) == -1) {
+			size_t steps;
+			int start_x, start_y;
+
+			if (len < 5) {
+				return;
+			}
+			steps = (len - 5) / 2;
+			printf("number of steps is %d\n", steps);
+			if (buf_getu16(data, offset, len, &p->walk_queue_x[0]) == -1) {
 				return;
 			}
 			offset += 2;
-			if (buf_getu16(data, offset, len, &p->mob.y) == -1) {
+			if (buf_getu16(data, offset, len, &p->walk_queue_y[0]) == -1) {
 				return;
 			}
 			offset += 2;
+			start_x = p->walk_queue_x[0];
+			start_y = p->walk_queue_y[0];
+			if (steps > (WALK_QUEUE_LEN - 1)) {
+				steps = WALK_QUEUE_LEN - 1;
+			}
+			for (size_t i = 0; i < steps; ++i) {
+				uint8_t off_x, off_y;
+				int new_x, new_y;
+
+				if (buf_getu8(data, offset++, len, &off_x) == -1) {
+					return;
+				}
+				if (buf_getu8(data, offset++, len, &off_y) == -1) {
+					return;
+				}
+				new_x = start_x + (int8_t)off_x;
+				new_y = start_y + (int8_t)off_y;
+				p->walk_queue_x[i + 1] = (uint16_t)new_x;
+				p->walk_queue_y[i + 1] = (uint16_t)new_y;
+			}
+			p->walk_queue_len = steps + 1;
+			p->walk_queue_pos = 0 ;
 		}
 		break;
 	}

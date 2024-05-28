@@ -92,3 +92,67 @@ player_accept(struct server *s, int sock)
 	loop_add_player(p);
 	return p;
 }
+
+void
+player_process_walk_queue(struct player *p)
+{
+	int pos = p->walk_queue_pos;
+	int remaining = p->walk_queue_len - pos;
+	if (remaining == 0) {
+		p->walk_queue_pos = 0;
+		p->walk_queue_len = 0;
+		return;
+	}
+	int cur_x = p->mob.x;
+	int cur_y = p->mob.y;
+	if (cur_x == p->walk_queue_x[pos] &&
+	    cur_y == p->walk_queue_y[pos]) {
+		p->walk_queue_pos = 0;
+		p->walk_queue_len = 0;
+		return;
+	}
+	int dif_x = cur_x - (int)p->walk_queue_x[pos];
+	int dif_y = cur_y - (int)p->walk_queue_y[pos];
+
+	if (dif_x == 0) {
+		if (dif_y > 0) {
+			p->mob.dir = MOB_DIR_NORTH;
+			p->mob.y = cur_y - 1;
+		} else if (dif_y < 0) {
+			p->mob.dir = MOB_DIR_SOUTH;
+			p->mob.y = cur_y + 1;
+		}
+	} else if (dif_x < 0) {
+		if (dif_y == 0) {
+			p->mob.dir = MOB_DIR_WEST;
+			p->mob.x = cur_x + 1;
+		} else if (dif_y < 0) {
+			p->mob.dir = MOB_DIR_SOUTHWEST;
+			p->mob.x = cur_x + 1;
+			p->mob.y = cur_y + 1;
+		} else if (dif_y > 0) {
+			p->mob.dir = MOB_DIR_NORTHWEST;
+			p->mob.x = cur_x + 1;
+			p->mob.y = cur_y - 1;
+		}
+	} else if (dif_x > 0) {
+		if (dif_y == 0) {
+			p->mob.dir = MOB_DIR_EAST;
+			p->mob.x = cur_x - 1;
+		} else if (dif_y < 0) {
+			p->mob.dir = MOB_DIR_SOUTHEAST;
+			p->mob.x = cur_x - 1;
+			p->mob.y = cur_y + 1;
+		} else if (dif_y > 0) {
+			p->mob.dir = MOB_DIR_NORTHEAST;
+			p->mob.x = cur_x - 1;
+			p->mob.y = cur_y - 1;
+		}
+	}
+
+	if (p->mob.x != cur_x || p->mob.y != cur_y) {
+		p->moved = true;
+	}
+
+	p->walk_queue_pos++;
+}

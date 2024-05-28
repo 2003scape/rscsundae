@@ -68,7 +68,6 @@ net_player_recv(struct player *p)
 	ssize_t n = recv(p->sock, p->inbuf + p->inbuf_len, max, 0);
 
 	if (n > 0) {
-		printf("read %d bytes\n", n);
 		p->inbuf_len += n;
 	}
 	return 0;
@@ -83,7 +82,6 @@ net_player_send(struct player *p)
 		ssize_t len = send(p->sock,
 			p->outbuf + p->outbuf_written, to_write, 0);
 		if (len > 0) {
-			printf("sent %zd bytes, off %zu\n", len, p->outbuf_written);
 			p->outbuf_written += len;
 		}
 	}

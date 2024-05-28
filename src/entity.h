@@ -10,8 +10,20 @@
 
 #define MAX_KNOWN_PLAYERS	(255)
 #define MAX_PUBLIC_CHAT_LEN	(80)
+#define WALK_QUEUE_LEN		(16)
 
 struct server;
+
+enum mobdir {
+	MOB_DIR_NORTH		= 0,
+	MOB_DIR_NORTHWEST	= 1,
+	MOB_DIR_WEST		= 2,
+	MOB_DIR_SOUTHWEST	= 3,
+	MOB_DIR_SOUTH		= 4,
+	MOB_DIR_SOUTHEAST	= 5,
+	MOB_DIR_EAST		= 6,
+	MOB_DIR_NORTHEAST	= 7
+};
 
 struct mob {
 	struct server *server;
@@ -54,6 +66,7 @@ struct player {
 	int64_t name;
 	uint8_t appearance_changed;
 	uint8_t plane_changed;
+	uint8_t moved;
 	uint8_t sprites[12];
 	uint8_t hair_colour;
 	uint8_t top_colour;
@@ -63,6 +76,10 @@ struct player {
 	uint8_t skulled;
 	char public_chat_enc[MAX_PUBLIC_CHAT_LEN];
 	size_t public_chat_len;
+	uint16_t walk_queue_x[WALK_QUEUE_LEN];
+	uint16_t walk_queue_y[WALK_QUEUE_LEN];
+	uint16_t walk_queue_pos;
+	uint16_t walk_queue_len;
 };
 
 struct bound {
@@ -83,6 +100,7 @@ size_t get_nearby_players(struct mob *, struct player **, size_t, int);
 
 /* player.c */
 struct player *player_accept(struct server *, int);
+void player_process_walk_queue(struct player *);
 
 /* incoming.c */
 int player_parse_incoming(struct player *);
@@ -90,6 +108,6 @@ int player_parse_incoming(struct player *);
 /* outgoing.c */
 int player_send_plane_init(struct player *);
 int player_send_movement(struct player *);
-
+int player_send_appearance_update(struct player *);
 
 #endif

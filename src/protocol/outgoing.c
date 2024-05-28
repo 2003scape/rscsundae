@@ -119,12 +119,38 @@ player_send_movement(struct player *p)
 		    PLAYER_BUFSIZE, 8, p->known_player_count);
 	bitpos += 8;
 
+	printf("number of known players is %d\n", p->known_player_count);
+
 	/* players the client already knows */
 	for (size_t i = 0; i < p->known_player_count; ++i) {
-		/* not moved */
-		if (buf_putbits(p->tmpbuf, bitpos,
-				PLAYER_BUFSIZE, 1, 0) == -1) {
-			return -1;
+		if (p->known_players[i]->moved) {
+			if (buf_putbits(p->tmpbuf, bitpos++,
+					PLAYER_BUFSIZE, 1, 1) == -1) {
+				return -1;
+			}
+			if (buf_putbits(p->tmpbuf, bitpos++,
+					PLAYER_BUFSIZE, 1, 0) == -1) {
+				return -1;
+			}
+			if (buf_putbits(p->tmpbuf, bitpos,
+					PLAYER_BUFSIZE, 3,
+					p->known_players[i]->mob.dir) == -1) {
+				return -1;
+			}
+			bitpos += 3;
+		} else if (p->known_players[i]->mob.dir !=
+			    p->known_players[i]->mob.prev_dir) {
+			if (buf_putbits(p->tmpbuf, bitpos,
+					PLAYER_BUFSIZE, 4,
+					p->known_players[i]->mob.dir) == -1) {
+				return -1;
+			}
+			bitpos += 4;
+		} else {
+			if (buf_putbits(p->tmpbuf, bitpos++,
+					PLAYER_BUFSIZE, 1, 0) == -1) {
+				return -1;
+			}
 		}
 		bitpos++;
 	}

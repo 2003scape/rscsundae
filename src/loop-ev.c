@@ -15,7 +15,6 @@ struct server *serv;
 void
 tick_cb(EV_P_ ev_timer *w, int revents)
 {
-	printf("tick called\n");
 	server_tick();
 }
 
