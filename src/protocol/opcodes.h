@@ -2,6 +2,7 @@
 #define OPCODES_H
 
 #define OP_CLI_LOGIN		(0)
+#define OP_CLI_PUBLIC_CHAT	(3)
 #define OP_CLI_PING		(5)
 #define OP_CLI_WALK_TILE	(255)
 

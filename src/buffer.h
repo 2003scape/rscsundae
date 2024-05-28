@@ -8,6 +8,7 @@ int buf_getu16(void *, size_t, size_t, uint16_t *);
 int buf_getu32(void *, size_t, size_t, uint32_t *);
 int buf_gets64(void *, size_t, size_t, int64_t *);
 
+int buf_putdata(void *, size_t, size_t, void *, size_t);
 int buf_putu8(void *, size_t, size_t, uint8_t);
 int buf_putu16(void *, size_t, size_t, uint16_t);
 int buf_putu32(void *, size_t, size_t, uint32_t);

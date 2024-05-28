@@ -1,5 +1,6 @@
 #include <sys/types.h>
 #include <limits.h>
+#include <string.h>
 #include "buffer.h"
 
 static const uint32_t bitmasks[] = {
@@ -74,6 +75,19 @@ buf_gets64(void *b, size_t offset, size_t buflen, int64_t *out)
 		((int64_t)(buffer[offset + 5] & 0xff) << 16) |
 		((int64_t)(buffer[offset + 6] & 0xff) << 8) |
 	        (int64_t)(buffer[offset + 7] & 0xff);
+	return 0;
+}
+
+int
+buf_putdata(void *b, size_t offset, size_t buflen, void *in, size_t inlen)
+{
+	uint8_t *buffer = b;
+
+	if (offset > (SSIZE_MAX - (ssize_t)inlen) ||
+	    ((ssize_t)buflen - (ssize_t)offset) < (ssize_t)inlen) {
+		return -1;
+	}
+	memcpy(buffer + offset, in, inlen);
 	return 0;
 }
 

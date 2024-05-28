@@ -105,6 +105,16 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			p->name = name;
 		}
 		break;
+	case OP_CLI_PUBLIC_CHAT:
+		{
+			/* want to eventually decode this to moderate */
+			size_t msglen = len - 1;
+			if (msglen <= MAX_PUBLIC_CHAT_LEN) {
+				memcpy(p->public_chat_enc, data + offset, msglen);
+				p->public_chat_len = msglen;
+			}
+		}
+		break;
 	case OP_CLI_PING:
 		{
 			/* TODO */

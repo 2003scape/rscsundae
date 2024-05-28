@@ -282,6 +282,27 @@ player_send_appearance_update(struct player *p)
 
 	for (int i = 0; i < p->known_player_count; ++i) {
 		struct player *p2 = p->known_players[i];
+		if (p2->public_chat_len > 0) {
+			if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
+				       p2->mob.id) == -1) {
+				return -1;
+			}
+			offset += 2;
+			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+				      PLAYER_UPDATE_CHAT) == -1) {
+				return -1;
+			}
+			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+				      p2->public_chat_len) == -1) {
+				return -1;
+			}
+			if (buf_putdata(p->tmpbuf, offset, PLAYER_BUFSIZE,
+			      p2->public_chat_enc, p2->public_chat_len) == -1) {
+				return -1;
+			}
+			offset += p2->public_chat_len;
+			update_count++;
+		}
 		if (p2->appearance_changed || !p->known_players_seen[i]) {
 			tmpofs = player_send_appearance(p2, p->tmpbuf, offset);
 			if (tmpofs == -1) {
@@ -289,6 +310,7 @@ player_send_appearance_update(struct player *p)
 			}
 			offset = tmpofs;
 			update_count++;
+			p->known_players_seen[i] = true;
 		}
 	}
 

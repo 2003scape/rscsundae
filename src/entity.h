@@ -9,6 +9,7 @@
 #define PLANE_LEVEL_INC		(944)
 
 #define MAX_KNOWN_PLAYERS	(255)
+#define MAX_PUBLIC_CHAT_LEN	(80)
 
 struct server;
 
@@ -60,6 +61,8 @@ struct player {
 	uint8_t skin_colour;
 	uint8_t combat_level;
 	uint8_t skulled;
+	char public_chat_enc[MAX_PUBLIC_CHAT_LEN];
+	size_t public_chat_len;
 };
 
 struct bound {
