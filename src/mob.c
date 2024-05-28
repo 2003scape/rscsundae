@@ -24,6 +24,9 @@ get_nearby_players(struct mob *mob,
 		if (p2 == NULL) {
 			continue;
 		}
+		if (p2->name == -1) {
+			continue;
+		}
 		if (count >= max) {
 			break;
 		}
