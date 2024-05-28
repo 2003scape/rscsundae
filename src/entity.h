@@ -14,6 +14,12 @@
 
 struct server;
 
+/* TODO: expand with a they/them option */
+enum mobgender {
+	MOB_GENDER_MALE		= 1,
+	MOB_GENDER_FEMALE	= 2,
+};
+
 enum mobdir {
 	MOB_DIR_NORTH		= 0,
 	MOB_DIR_NORTHWEST	= 1,
@@ -68,10 +74,12 @@ struct player {
 	uint8_t plane_changed;
 	uint8_t moved;
 	uint8_t sprites[12];
+	uint8_t gender;
 	uint8_t hair_colour;
 	uint8_t top_colour;
 	uint8_t leg_colour;
 	uint8_t skin_colour;
+	uint8_t rpg_class;
 	uint8_t combat_level;
 	uint8_t skulled;
 	char public_chat_enc[MAX_PUBLIC_CHAT_LEN];
@@ -80,6 +88,9 @@ struct player {
 	uint16_t walk_queue_y[WALK_QUEUE_LEN];
 	uint16_t walk_queue_pos;
 	uint16_t walk_queue_len;
+	uint8_t ui_dialog_open;
+	uint8_t ui_bank_open;
+	uint8_t ui_design_open;
 };
 
 struct bound {
@@ -101,6 +112,7 @@ size_t get_nearby_players(struct mob *, struct player **, size_t, int);
 /* player.c */
 struct player *player_accept(struct server *, int);
 void player_process_walk_queue(struct player *);
+void player_close_ui(struct player *);
 
 /* incoming.c */
 int player_parse_incoming(struct player *);
@@ -109,5 +121,6 @@ int player_parse_incoming(struct player *);
 int player_send_plane_init(struct player *);
 int player_send_movement(struct player *);
 int player_send_appearance_update(struct player *);
+int player_send_design_ui(struct player *);
 
 #endif

@@ -3,10 +3,14 @@
 #include <string.h>
 #include "opcodes.h"
 #include "utility.h"
+#include "../config/anim.h"
 #include "../buffer.h"
 #include "../entity.h"
 
-#define MAX_PACKETS_PER_TICK	(10)
+#define MAX_PACKETS_PER_TICK		(10)
+#define MAX_PLAYER_HAIR_COLOUR		(9)
+#define MAX_PLAYER_SKIN_COLOUR		(4)
+#define MAX_PLAYER_CLOTHING_COLOUR	(14)
 
 static void
 process_packet(struct player *, uint8_t *, size_t);
@@ -160,6 +164,62 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			}
 			p->walk_queue_len = steps + 1;
 			p->walk_queue_pos = 0 ;
+		}
+		break;
+	case OP_CLI_ACCEPT_DESIGN:
+		{
+			if (!p->ui_design_open) {
+				return;
+			}
+			(void)buf_getu8(data, offset++, len, &p->gender);
+			(void)buf_getu8(data, offset++, len, &p->sprites[ANIM_SLOT_HEAD]);
+			if (p->sprites[ANIM_SLOT_HEAD] != ANIM_HEAD1 &&
+			    p->sprites[ANIM_SLOT_HEAD] != ANIM_HEAD2 &&
+			    p->sprites[ANIM_SLOT_HEAD] != ANIM_HEAD3 &&
+			    p->sprites[ANIM_SLOT_HEAD] != ANIM_HEAD4 &&
+			    p->sprites[ANIM_SLOT_HEAD] != ANIM_FHEAD1) {
+				p->sprites[ANIM_SLOT_HEAD] = ANIM_HEAD1;
+			}
+			p->sprites[ANIM_SLOT_HEAD]++;
+
+			(void)buf_getu8(data, offset++, len, &p->sprites[ANIM_SLOT_BODY]);
+			if (p->sprites[ANIM_SLOT_BODY] != ANIM_BODY1 &&
+			    p->sprites[ANIM_SLOT_BODY] != ANIM_FBODY1) {
+				p->sprites[ANIM_SLOT_BODY] = ANIM_BODY1;
+			}
+			p->sprites[ANIM_SLOT_BODY]++;
+
+			(void)buf_getu8(data, offset++, len, &p->sprites[ANIM_SLOT_LEGS]);
+			/* authentically only one choice of leg */
+			if (p->sprites[ANIM_SLOT_LEGS] != ANIM_LEGS1) {
+				p->sprites[ANIM_SLOT_LEGS] = ANIM_LEGS1;
+			}
+			p->sprites[ANIM_SLOT_LEGS]++;
+
+			(void)buf_getu8(data, offset++, len, &p->hair_colour);
+			if (p->hair_colour > MAX_PLAYER_HAIR_COLOUR) {
+				p->hair_colour= 0;
+			}
+
+			(void)buf_getu8(data, offset++, len, &p->top_colour);
+			if (p->top_colour > MAX_PLAYER_CLOTHING_COLOUR) {
+				p->top_colour= 0;
+			}
+
+			(void)buf_getu8(data, offset++, len, &p->leg_colour);
+			if (p->leg_colour > MAX_PLAYER_CLOTHING_COLOUR) {
+				p->leg_colour= 0;
+			}
+
+			(void)buf_getu8(data, offset++, len, &p->skin_colour);
+			if (p->skin_colour > MAX_PLAYER_SKIN_COLOUR) {
+				p->skin_colour = 0;
+			}
+
+			(void)buf_getu8(data, offset++, len, &p->rpg_class);
+
+			p->appearance_changed = true;
+			p->ui_design_open = false;
 		}
 		break;
 	}

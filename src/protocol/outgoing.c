@@ -284,6 +284,17 @@ player_send_appearance(struct player *p, void *tmpbuf, size_t offset)
 }
 
 int
+player_send_design_ui(struct player *p)
+{
+	size_t offset = 0;
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_SHOW_DESIGN);
+
+	p->ui_design_open = true;
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
 player_send_appearance_update(struct player *p)
 {
 	uint16_t update_count = 0;
