@@ -395,6 +395,7 @@ player_process_combat(struct player *p)
 
 			int depth = mob_wilderness_level(&target->mob);
 			if (depth <= 0) {
+				mob_combat_reset(&p->mob);
 				return;
 			}
 
