@@ -425,27 +425,36 @@ player_process_combat(struct player *p)
 
 			if (mob_within_range(&p->mob,
 			    target->mob.x, target->mob.y, 3)) {
+				/* successful catch, combat lock the target */
 				target->walk_queue_len = 0;
 				target->walk_queue_pos = 0;
 			}
 
 			if (p->mob.x != target->mob.x ||
 			    p->mob.y != target->mob.y) {
-				if (p->walk_queue_len == 0) {
+				if (p->walk_queue_len != 1 ||
+				    p->walk_queue_x[0] != target->mob.x ||
+				    p->walk_queue_y[0] != target->mob.y) {
 					mob_combat_reset(&p->mob);
+					return;
 				}
-				return;
+				/*
+				 * walk queue is ready, locked into combat
+				 * XXX when checking whether tile is unwalkable,
+				 * need to reset combat state
+				 */
+			} else {
+				p->mob.dir = MOB_DIR_COMBAT_RIGHT;
+				p->walk_queue_len = 0;
+				p->walk_queue_pos = 0;
 			}
 
 			p->following_player = -1;
-			p->walk_queue_len = 0;
-			p->walk_queue_pos = 0;
 			p->mob.target_player = target->mob.id;
 			p->mob.target_npc = -1;
 			p->mob.in_combat = true;
 			p->mob.combat_next_hit = 0;
 			p->mob.combat_rounds = 0;
-			p->mob.dir = MOB_DIR_COMBAT_RIGHT;
 
 			target->following_player = -1;
 			target->walk_queue_len = 0;
@@ -462,6 +471,16 @@ player_process_combat(struct player *p)
 			player_send_message(target, "You are under attack!");
 		}
 		return;
+	}
+
+	/*
+	 * assume the target was "combat locked" as we were running towards
+	 * this allows the smooth "glide" into combat after a successful
+	 * catch.
+	 */
+	if (p->mob.dir != MOB_DIR_COMBAT_RIGHT &&
+	    p->mob.dir != MOB_DIR_COMBAT_LEFT) {
+		p->mob.dir = MOB_DIR_COMBAT_RIGHT;
 	}
 
 	if (p->mob.server->tick_counter < p->mob.combat_next_hit) {
