@@ -136,7 +136,7 @@ player_send_movement(struct player *p)
 		    !mob_within_range(&known_player->mob,
 			p->mob.x, p->mob.y, UPDATE_RADIUS)) {
 			if (buf_putbits(p->tmpbuf, bitpos,
-					PLAYER_BUFSIZE, 4, 12) == -1) {
+					PLAYER_BUFSIZE, 4, 15) == -1) {
 				return -1;
 			}
 			p->known_players[i] = -1;
@@ -661,5 +661,15 @@ player_send_pm(struct player *p, int64_t from, uint8_t *encoded, size_t len)
 		return -1;
 	}
 	offset += len;
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
+player_send_death(struct player *p)
+{
+	size_t offset = 0;
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_DEATH);
 	return player_write_packet(p, p->tmpbuf, offset);
 }
