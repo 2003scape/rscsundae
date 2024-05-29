@@ -12,6 +12,11 @@
 #define MAX_PUBLIC_CHAT_LEN	(80)
 #define MAX_SKILL_ID		(16)
 #define MAX_CLIENT_SETTINGS	(3)
+
+/* final client supports 100 ignore and 200 friend entries */
+#define MAX_FRIENDS		(200)
+#define MAX_IGNORE		(100)
+
 #define WALK_QUEUE_LEN		(16)
 
 struct server;
@@ -116,6 +121,10 @@ struct player {
 	uint8_t base_stats[MAX_SKILL_ID];
 	uint32_t experience[MAX_SKILL_ID];
 	uint8_t quest_points;
+	int64_t friend_list[MAX_FRIENDS];
+	int64_t ignore_list[MAX_IGNORE];
+	uint16_t friend_count;
+	uint16_t ignore_count;
 };
 
 struct bound {
@@ -139,6 +148,14 @@ struct player *player_accept(struct server *, int);
 void player_process_walk_queue(struct player *);
 void player_close_ui(struct player *);
 void player_destroy(struct player *);
+bool player_has_ignore(struct player *, int64_t);
+bool player_has_friend(struct player *, int64_t);
+bool player_public_chat_visible(struct player *, int64_t);
+bool player_is_blocked(struct player *, int64_t, bool);
+int player_add_ignore(struct player *, int64_t);
+int player_add_friend(struct player *, int64_t);
+int player_remove_ignore(struct player *, int64_t);
+int player_remove_friend(struct player *, int64_t);
 
 /* incoming.c */
 int player_parse_incoming(struct player *);
@@ -151,5 +168,11 @@ int player_send_design_ui(struct player *);
 int player_send_logout(struct player *);
 int player_send_message(struct player *, const char *);
 int player_send_stats_update(struct player *);
+int player_send_client_settings(struct player *);
+int player_send_privacy_settings(struct player *);
+int player_send_init_friends(struct player *);
+int player_send_init_ignore(struct player *);
+int player_notify_friend_online(struct player *, int64_t);
+int player_notify_friend_offline(struct player *, int64_t);
 
 #endif

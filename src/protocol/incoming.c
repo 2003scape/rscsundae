@@ -97,6 +97,9 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			uint16_t ver;
 			int64_t name;
 
+			if (p->name != -1) {
+				return;
+			}
 			if (buf_getu16(data, offset, len, &ver) == -1) {
 				return;
 			}
@@ -110,6 +113,15 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			printf("got username: %lld %s\n", name, mod37_namedec(name, namestr));
 
 			p->name = name;
+
+			player_send_design_ui(p);
+			player_send_message(p, "@que@Welcome to RSCSundae!");
+			player_send_client_settings(p);
+			player_send_privacy_settings(p);
+			player_send_init_friends(p);
+			player_send_init_ignore(p);
+
+			server_register_login(p->name);
 		}
 		break;
 	case OP_CLI_LOGOUT:
@@ -129,6 +141,51 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 		break;
 	case OP_CLI_PING:
 		{
+		}
+		break;
+	case OP_CLI_ADD_FRIEND:
+		{
+			int64_t target;
+
+			if (buf_gets64(data, offset, len, &target) == -1) {
+				return;
+			}
+			offset += 8;
+			printf("add friend %lld\n", target);
+			player_add_friend(p, target);
+		}
+		break;
+	case OP_CLI_REMOVE_FRIEND:
+		{
+			int64_t target;
+
+			if (buf_gets64(data, offset, len, &target) == -1) {
+				return;
+			}
+			offset += 8;
+			player_remove_friend(p, target);
+		}
+		break;
+	case OP_CLI_ADD_IGNORE:
+		{
+			int64_t target;
+
+			if (buf_gets64(data, offset, len, &target) == -1) {
+				return;
+			}
+			offset += 8;
+			player_add_ignore(p, target);
+		}
+		break;
+	case OP_CLI_REMOVE_IGNORE:
+		{
+			int64_t target;
+
+			if (buf_gets64(data, offset, len, &target) == -1) {
+				return;
+			}
+			offset += 8;
+			player_remove_ignore(p, target);
 		}
 		break;
 	case OP_CLI_PRIVACY_SETTINGS:
@@ -153,6 +210,11 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			}
 			if (buf_getu8(data, offset++, len, &block_duel) == -1) {
 				return;
+			}
+			if (!p->block_private && block_private) {
+				server_register_hide_status(p);
+			} else if (p->block_private && !block_private) {
+				server_register_unhide_status(p);
 			}
 			p->block_public = block_public;
 			p->block_private = block_private || hide_online;

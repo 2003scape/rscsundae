@@ -5,6 +5,7 @@
 #include "opcodes.h"
 #include "../buffer.h"
 #include "../entity.h"
+#include "../server.h"
 
 #define UPDATE_RADIUS	(32)
 
@@ -444,7 +445,8 @@ player_send_appearance_update(struct player *p)
 		if (p2 == NULL || p2->logout_confirmed) {
 			continue;
 		}
-		if (!p->block_public && p2->public_chat_len > 0) {
+		if (p2->public_chat_len > 0 &&
+		    !player_is_blocked(p, p2->name, p->block_public)) {
 			if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
 				       p2->mob.id) == -1) {
 				return -1;
@@ -482,4 +484,96 @@ player_send_appearance_update(struct player *p)
 		return player_write_packet(p, p->tmpbuf, offset);
 	}
 	return 0;
+}
+
+int
+player_send_init_friends(struct player *p)
+{
+	size_t offset = 0;
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_INIT_FRIENDS);
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+			p->friend_count);
+
+	for (int i = 0; i < p->friend_count; ++i) {
+		struct player *p2;
+
+		if (buf_putu64(p->tmpbuf, offset, PLAYER_BUFSIZE,
+				p->friend_list[i]) == -1) {
+			return -1;
+		}
+		offset += 8;
+		p2 = server_find_player_name37(p->friend_list[i]);
+		if (p2 == NULL || player_is_blocked(p2, p->name, p2->block_private)) {
+			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, 0) == -1) {
+				return -1;
+			}
+		} else {
+			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, 1) == -1) {
+				return -1;
+			}
+		}
+	}
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
+player_send_init_ignore(struct player *p)
+{
+	size_t offset = 0;
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_INIT_IGNORE);
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+			p->ignore_count);
+
+	for (int i = 0; i < p->ignore_count; ++i) {
+		if (buf_putu64(p->tmpbuf, offset, PLAYER_BUFSIZE,
+				p->ignore_list[i]) == -1) {
+			return -1;
+		}
+		offset += 8;
+	}
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
+player_notify_friend_online(struct player *p, int64_t friend)
+{
+	size_t offset = 0;
+	struct player *p2;
+
+	p2 = server_find_player_name37(friend);
+	if (p2 != NULL && player_is_blocked(p2, p->name, p2->block_private)) {
+		return 0;
+	}
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_FRIEND_UPDATE);
+	(void)buf_putu64(p->tmpbuf, offset, PLAYER_BUFSIZE, friend);
+	offset += 8;
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, 1);
+
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
+player_notify_friend_offline(struct player *p, int64_t friend)
+{
+	size_t offset = 0;
+	struct player *p2;
+
+	p2 = server_find_player_name37(friend);
+	if (p2 != NULL && player_is_blocked(p2, p->name, p2->block_private)) {
+		return 0;
+	}
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_FRIEND_UPDATE);
+	(void)buf_putu64(p->tmpbuf, offset, PLAYER_BUFSIZE, friend);
+	offset += 8;
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, 0);
+
+	return player_write_packet(p, p->tmpbuf, offset);
 }

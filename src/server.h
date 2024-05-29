@@ -15,5 +15,10 @@ struct server {
 };
 
 void server_tick(void);
+struct player *server_find_player_name37(int64_t);
+void server_register_login(int64_t);
+void server_register_logout(int64_t);
+void server_register_hide_status(struct player *);
+void server_register_unhide_status(struct player *);
 
 #endif

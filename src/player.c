@@ -2,6 +2,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 #include "config/anim.h"
 #include "protocol/opcodes.h"
@@ -94,8 +95,6 @@ player_accept(struct server *s, int sock)
 	p->mob.y = 648;
 	s->players[slot] = p;
 
-	player_send_design_ui(p);
-	player_send_message(p, "@que@Welcome to RSCSundae!");
 	loop_add_player(p);
 	return p;
 }
@@ -188,7 +187,8 @@ player_close_ui(struct player *p)
 }
 
 void
-player_destroy(struct player *p) {
+player_destroy(struct player *p)
+{
 	for (int i = 0; i < p->known_player_count; ++i) {
 		p->known_players[i]->mob.refcount--;
 	}
@@ -197,4 +197,125 @@ player_destroy(struct player *p) {
 		p->sock = -1;
 	}
 	free(p);
+}
+
+bool
+player_has_friend(struct player *p, int64_t name)
+{
+	for (int i = 0; i < p->friend_count; ++i) {
+		if (p->friend_list[i] == name) {
+			return true;
+		}
+	}
+	return false;
+}
+
+bool
+player_has_ignore(struct player *p, int64_t name)
+{
+	for (int i = 0; i < p->ignore_count; ++i) {
+		if (p->ignore_list[i] == name) {
+			return true;
+		}
+	}
+	return false;
+}
+
+int
+player_add_friend(struct player *p, int64_t entry)
+{
+	struct player *p2;
+
+	if (p->friend_count >= MAX_FRIENDS) {
+		return -1;
+	}
+	p->friend_list[p->friend_count++] = entry;
+	p2 = server_find_player_name37(entry);
+	if (p2 != NULL) {
+		player_notify_friend_online(p, entry);
+		player_notify_friend_online(p2, p->name);
+	} else {
+		player_notify_friend_offline(p, entry);
+	}
+	return 0;
+}
+
+int
+player_remove_friend(struct player *p, int64_t entry)
+{
+	for (int i = 0; i < p->friend_count; ++i) {
+		if (p->friend_list[i] != entry) {
+			continue;
+		}
+		if (p->block_private) {
+			struct player *p2;
+
+			p2 = server_find_player_name37(entry);
+			if (p2 != NULL) {
+				player_notify_friend_offline(p2, p->name);
+			}
+		}
+		if (i != (p->friend_count - 1)) {
+			memmove(p->friend_list + i,
+				p->friend_list + i + 1,
+				sizeof(int64_t) * (p->friend_count - i - 1));
+		}
+		p->friend_count--;
+		break;
+	}
+	return 0;
+}
+
+int
+player_add_ignore(struct player *p, int64_t entry)
+{
+	if (p->ignore_count >= MAX_IGNORE) {
+		return -1;
+	}
+	if (!p->block_private || player_has_friend(p, entry)) {
+		struct player *p2;
+
+		p2 = server_find_player_name37(entry);
+		if (p2 != NULL) {
+			player_notify_friend_offline(p2, p->name);
+		 }
+	}
+	p->ignore_list[p->ignore_count++] = entry;
+	return 0;
+}
+
+int
+player_remove_ignore(struct player *p, int64_t entry)
+{
+	for (int i = 0; i < p->ignore_count; ++i) {
+		struct player *p2;
+
+		if (p->ignore_list[i] != entry) {
+			continue;
+		}
+		if (i != (p->ignore_count - 1)) {
+			memmove(p->ignore_list + i,
+				p->ignore_list + i + 1,
+				sizeof(int64_t) * (p->ignore_count - i - 1));
+		}
+		p->ignore_count--;
+		p2 = server_find_player_name37(entry);
+		if (p2 != NULL) {
+			player_notify_friend_online(p2, p->name);
+		}
+		break;
+	}
+	return 0;
+}
+
+bool
+player_is_blocked(struct player *p, int64_t speaker, bool flag)
+{
+	if (player_has_ignore(p, speaker)) {
+		return true;
+	}
+	if (player_has_friend(p, speaker)) {
+		return false;
+	}
+	return flag;
 }

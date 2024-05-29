@@ -25,6 +25,75 @@ main(int argc, char **argv)
 	return EXIT_SUCCESS;
 }
 
+struct player *
+server_find_player_name37(int64_t name)
+{
+	for (int i = 0; i < s.max_player_id; ++i) {
+		if (s.players[i]->name == name) {
+			return s.players[i];
+		}
+	}
+	return NULL;
+}
+
+void
+server_register_login(int64_t name)
+{
+	for (int i = 0; i < s.max_player_id; ++i) {
+		for (int j = 0; j < s.players[i]->friend_count; ++j) {
+			if (s.players[i]->friend_list[j] != name) {
+				continue;
+			}
+			player_notify_friend_online(s.players[i], name);
+		}
+	}
+}
+
+void
+server_register_logout(int64_t name)
+{
+	for (int i = 0; i < s.max_player_id; ++i) {
+		for (int j = 0; j < s.players[i]->friend_count; ++j) {
+			if (s.players[i]->friend_list[j] != name) {
+				continue;
+			}
+			player_notify_friend_offline(s.players[i], name);
+		}
+	}
+}
+
+void
+server_register_hide_status(struct player *p)
+{
+	for (int i = 0; i < s.max_player_id; ++i) {
+		for (int j = 0; j < s.players[i]->friend_count; ++j) {
+			if (s.players[i]->friend_list[j] != p->name) {
+				continue;
+			}
+			if (player_has_friend(p, s.players[i]->name)) {
+				continue;
+			}
+			player_notify_friend_offline(s.players[i], p->name);
+		}
+	}
+}
+
+void
+server_register_unhide_status(struct player *p)
+{
+	for (int i = 0; i < s.max_player_id; ++i) {
+		for (int j = 0; j < s.players[i]->friend_count; ++j) {
+			if (s.players[i]->friend_list[j] != p->name) {
+				continue;
+			}
+			if (player_has_friend(p, s.players[i]->name)) {
+				continue;
+			}
+			player_notify_friend_online(s.players[i], p->name);
+		}
+	}
+}
+
 void
 server_tick(void)
 {
@@ -39,6 +108,7 @@ server_tick(void)
 		    s.players[i]->mob.refcount == 0) {
 			char name[32];
 
+			server_register_logout(s.players[i]->name);
 			mod37_namedec(s.players[i]->name, name);
 			printf("removed player %s\n", name);
 			player_destroy(s.players[i]);
