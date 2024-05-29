@@ -169,8 +169,8 @@ server_tick(void)
 		}
 		net_player_recv(s.players[i]);
 		player_parse_incoming(s.players[i]);
-		player_process_walk_queue(s.players[i]);
 		player_process_combat(s.players[i]);
+		player_process_walk_queue(s.players[i]);
 	}
 
 	for (int i = 0; i < s.max_player_id; ++i) {

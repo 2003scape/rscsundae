@@ -405,7 +405,7 @@ player_process_combat(struct player *p)
 			}
 
 			if (mob_within_range(&p->mob,
-			    target->mob.x, target->mob.y, 2)) {
+			    target->mob.x, target->mob.y, 3)) {
 				target->walk_queue_len = 0;
 				target->walk_queue_pos= 0;
 			}
