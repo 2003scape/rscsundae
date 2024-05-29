@@ -7,7 +7,7 @@
 #include "../entity.h"
 #include "../server.h"
 
-#define UPDATE_RADIUS	(32)
+#define UPDATE_RADIUS	(15)
 
 enum player_update_type {
 	PLAYER_UPDATE_BUBBLE		= 0,
@@ -150,7 +150,9 @@ player_send_movement(struct player *p)
 				return -1;
 			}
 			bitpos += 3;
-		} else if (p->known_players[i]->logout_confirmed) {
+		} else if (p->known_players[i]->logout_confirmed ||
+			    !mob_within_range(&p->known_players[i]->mob,
+				p->mob.x, p->mob.y, UPDATE_RADIUS)) {
 			if (buf_putbits(p->tmpbuf, bitpos,
 					PLAYER_BUFSIZE, 4, 12) == -1) {
 				return -1;
