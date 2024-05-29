@@ -6,6 +6,8 @@
 
 #define PLAYER_BUFSIZE		(5000)
 
+#define PLANE_WIDTH		(2304)
+#define PLANE_HEIGHT		(1776)
 #define PLANE_LEVEL_INC		(944)
 
 #define MAX_KNOWN_PLAYERS	(255)
@@ -75,6 +77,7 @@ struct mob {
 	uint64_t combat_next_hit;
 	uint8_t cur_stats[MAX_SKILL_ID];
 	uint8_t base_stats[MAX_SKILL_ID];
+	uint8_t combat_level;
 	int16_t target_player;
 	int16_t target_npc;
 };
@@ -122,7 +125,6 @@ struct player {
 	uint8_t leg_colour;
 	uint8_t skin_colour;
 	uint8_t rpg_class;
-	uint8_t combat_level;
 	uint8_t skulled;
 	char public_chat_enc[MAX_PUBLIC_CHAT_LEN];
 	size_t public_chat_len;
@@ -166,6 +168,7 @@ struct loc {
 /* mob.c */
 bool mob_within_range(struct mob *, int, int, int);
 int mob_combat_roll(struct ranctx *, int, int, int, int, int, int);
+int mob_wilderness_level(struct mob *);
 size_t get_nearby_players(struct mob *, struct player **, size_t, int);
 void mob_combat_reset(struct mob *);
 

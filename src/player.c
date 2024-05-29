@@ -68,7 +68,6 @@ player_accept(struct server *s, int sock)
 	p->hair_colour = COLOUR_HAIR_DEFAULT;
 	p->top_colour = COLOUR_TOP_DEFAULT;
 	p->leg_colour = COLOUR_LEG_DEFAULT;
-	p->combat_level = 3;
 	p->weapon_aim = 1;
 	p->weapon_power = 1;
 	p->armour = 1;
@@ -85,6 +84,7 @@ player_accept(struct server *s, int sock)
 	p->mob.x = 333;
 	p->mob.y = 333;
 	p->mob.damage = UINT8_MAX;
+	p->mob.combat_level = 3;
 	mob_combat_reset(&p->mob);
 	s->players[slot] = p;
 
@@ -391,6 +391,27 @@ player_process_combat(struct player *p)
 
 			target = p->mob.server->players[p->mob.target_player];
 			if (target == NULL) {
+				mob_combat_reset(&p->mob);
+				return;
+			}
+
+			int depth = mob_wilderness_level(&target->mob);
+			printf("wilderness depth is %d\n", depth);
+			if (depth <= 0) {
+				return;
+			}
+
+			int difference = abs(target->mob.combat_level -
+			    (int)p->mob.combat_level);
+
+			if (difference > depth) {
+				char msgdepth[64];
+
+				(void)snprintf(msgdepth, sizeof(msgdepth),
+				    "You can only attack players within %d levels of your own here",
+				    depth);
+				player_send_message(p, msgdepth);
+				player_send_message(p, "Move further into the wilderness for less restrictions");
 				mob_combat_reset(&p->mob);
 				return;
 			}

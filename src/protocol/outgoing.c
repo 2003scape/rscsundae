@@ -72,10 +72,10 @@ player_send_plane_init(struct player *p)
 	buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE, p->mob.id);
 	offset += 2;
 
-	buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE, 2304);
+	buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE, PLANE_WIDTH);
 	offset += 2;
 
-	buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE, 1776);
+	buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE, PLANE_HEIGHT);
 	offset += 2;
 
 	buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
@@ -308,7 +308,7 @@ player_send_appearance(struct player *p, void *tmpbuf, size_t offset)
 		return -1;
 	}
 	if (buf_putu8(tmpbuf, offset++, PLAYER_BUFSIZE,
-		      p->combat_level) == -1) {
+		      p->mob.combat_level) == -1) {
 		return -1;
 	}
 	if (buf_putu8(tmpbuf, offset++, PLAYER_BUFSIZE,

@@ -36,10 +36,26 @@ mob_combat_roll(struct ranctx *ran, int att_stat, int att_bonus,
 	return 0;
 }
 
+int
+mob_wilderness_level(struct mob *mob)
+{
+	int depth = 2203 - (mob->y + PLANE_HEIGHT);
+	if ((mob->x + PLANE_WIDTH) >= 2640) {
+		depth = -50;
+	}
+	if (depth > 0) {
+		return 1 + (depth / 6);
+	}
+	return depth;
+}
+
 void
 mob_combat_reset(struct mob *mob)
 {
-	mob->dir = MOB_DIR_NORTH;
+	if (mob->dir == MOB_DIR_COMBAT_LEFT ||
+	    mob->dir == MOB_DIR_COMBAT_RIGHT) {
+		mob->dir = MOB_DIR_NORTH;
+	}
 	mob->in_combat = false;
 	mob->combat_timer = 0;
 	mob->combat_rounds = 0;
