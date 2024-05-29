@@ -94,7 +94,7 @@ player_send_movement(struct player *p)
 	size_t offset = 0;
 	size_t bitpos;
 	struct player *nearby[MAX_KNOWN_PLAYERS];
-	struct player *new_known[MAX_KNOWN_PLAYERS];
+	int16_t new_known[MAX_KNOWN_PLAYERS];
 	size_t nearby_count = 0;
 	size_t new_known_count = 0;
 
@@ -124,10 +124,23 @@ player_send_movement(struct player *p)
 
 	/* players the client already knows */
 	for (size_t i = 0; i < p->known_player_count; ++i) {
-		if (p->known_players[i] == NULL) {
+		struct player *known_player;
+
+		if (p->known_players[i] == -1) {
 			continue;
 		}
-		if (p->known_players[i]->moved) {
+		known_player = p->mob.server->players[p->known_players[i]];
+		if (known_player == NULL ||
+		    known_player->logout_confirmed ||
+		    !mob_within_range(&known_player->mob,
+			p->mob.x, p->mob.y, UPDATE_RADIUS)) {
+			if (buf_putbits(p->tmpbuf, bitpos,
+					PLAYER_BUFSIZE, 4, 12) == -1) {
+				return -1;
+			}
+			p->known_players[i] = -1;
+			bitpos += 4;
+		} else if (known_player->moved) {
 			if (buf_putbits(p->tmpbuf, bitpos++,
 					PLAYER_BUFSIZE, 1, 1) == -1) {
 				return -1;
@@ -138,35 +151,25 @@ player_send_movement(struct player *p)
 			}
 			if (buf_putbits(p->tmpbuf, bitpos,
 					PLAYER_BUFSIZE, 3,
-					p->known_players[i]->mob.dir) == -1) {
+					known_player->mob.dir) == -1) {
 				return -1;
 			}
 			bitpos += 3;
-		} else if (p->known_players[i]->mob.dir !=
-			    p->known_players[i]->mob.prev_dir) {
+		} else if (known_player->mob.dir !=
+			    known_player->mob.prev_dir) {
 			if (buf_putbits(p->tmpbuf, bitpos,
 					PLAYER_BUFSIZE, 3,
-					p->known_players[i]->mob.dir) == -1) {
+					known_player->mob.dir) == -1) {
 				return -1;
 			}
 			bitpos += 3;
-		} else if (p->known_players[i]->logout_confirmed ||
-			    !mob_within_range(&p->known_players[i]->mob,
-				p->mob.x, p->mob.y, UPDATE_RADIUS)) {
-			if (buf_putbits(p->tmpbuf, bitpos,
-					PLAYER_BUFSIZE, 4, 12) == -1) {
-				return -1;
-			}
-			p->known_players[i]->mob.refcount--;
-			p->known_players[i] = NULL;
-			bitpos += 4;
 		} else {
 			if (buf_putbits(p->tmpbuf, bitpos++,
 					PLAYER_BUFSIZE, 1, 0) == -1) {
 				return -1;
 			}
 		}
-		if (p->known_players[i] != NULL) {
+		if (p->known_players[i] != -1) {
 			new_known[new_known_count++] = p->known_players[i];
 		}
 	}
@@ -183,7 +186,7 @@ player_send_movement(struct player *p)
 		}
 		bool known = false;
 		for (size_t j = 0; j < new_known_count; ++j) {
-			if (new_known[j] == nearby[i]) {
+			if (new_known[j] == nearby[i]->mob.id) {
 				known = true;
 				break;
 			}
@@ -221,13 +224,12 @@ player_send_movement(struct player *p)
 		}
 		bitpos++;
 
-		p->mob.refcount++;
 		p->known_players_seen[new_known_count] = false;
-		new_known[new_known_count++] = nearby[i];
+		new_known[new_known_count++] = nearby[i]->mob.id;
 	}
 
 	memcpy(p->known_players, new_known,
-	    new_known_count * sizeof(struct player *));
+	    new_known_count * sizeof(int16_t));
 	p->known_player_count = new_known_count;
 
 	offset = (bitpos + 7) / 8;
@@ -443,7 +445,12 @@ player_send_appearance_update(struct player *p)
 	}
 
 	for (int i = 0; i < p->known_player_count; ++i) {
-		struct player *p2 = p->known_players[i];
+		struct player *p2;
+
+		if (p->known_players[i] == -1) {
+			continue;
+		}
+		p2 = p->mob.server->players[p->known_players[i]];
 		if (p2 == NULL || p2->logout_confirmed) {
 			continue;
 		}

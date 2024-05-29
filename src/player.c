@@ -182,9 +182,6 @@ player_close_ui(struct player *p)
 void
 player_destroy(struct player *p)
 {
-	for (int i = 0; i < p->known_player_count; ++i) {
-		p->known_players[i]->mob.refcount--;
-	}
 	if (p->sock != -1) {
 		close(p->sock);
 		p->sock = -1;

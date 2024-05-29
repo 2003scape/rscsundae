@@ -51,7 +51,6 @@ struct mob {
 	struct server *server;
 	uint16_t x, y;
 	uint16_t id;
-	uint32_t refcount;
 	uint8_t dir;
 	uint8_t prev_dir;
 	uint8_t moved;
@@ -75,7 +74,7 @@ enum animslot {
 struct player {
 	struct mob mob;
 	int sock;
-	struct player *known_players[MAX_KNOWN_PLAYERS];
+	int16_t known_players[MAX_KNOWN_PLAYERS];
 	uint8_t known_players_seen[MAX_KNOWN_PLAYERS];
 	uint16_t known_player_count;
 	uint8_t tmpbuf[PLAYER_BUFSIZE]; /* used for packet construction */

@@ -157,8 +157,7 @@ server_tick(void)
 		if (s.tick_counter > (s.players[i]->last_packet + MAX_IDLE_TICKS)) {
 			player_send_logout(s.players[i]);
 		}
-		if (s.players[i]->logout_confirmed &&
-		    s.players[i]->mob.refcount == 0) {
+		if (s.players[i]->logout_confirmed) {
 			char name[32];
 
 			server_register_logout(s.players[i]->name);
