@@ -39,6 +39,7 @@ mob_combat_roll(struct ranctx *ran, int att_stat, int att_bonus,
 void
 mob_combat_reset(struct mob *mob)
 {
+	mob->dir = MOB_DIR_NORTH;
 	mob->in_combat = false;
 	mob->combat_timer = 0;
 	mob->combat_rounds = 0;
