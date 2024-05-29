@@ -379,8 +379,6 @@ player_process_combat(struct player *p)
 		if (p->mob.target_player != -1) {
 			struct player *target;
 
-			/* TODO: check whether in wilderness */
-
 			if (p->mob.server->tick_counter <
 			    (p->mob.combat_timer + 3)) {
 				p->walk_queue_pos = 0;
@@ -396,7 +394,6 @@ player_process_combat(struct player *p)
 			}
 
 			int depth = mob_wilderness_level(&target->mob);
-			printf("wilderness depth is %d\n", depth);
 			if (depth <= 0) {
 				return;
 			}
