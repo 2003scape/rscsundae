@@ -1,6 +1,7 @@
 #include <ev.h>
 #include <sys/socket.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,11 +25,16 @@ server_sock_cb(EV_P_ ev_io *w, int revents)
 	struct sockaddr_storage client_addr;
 	socklen_t client_len = sizeof(client_addr);
 
-	printf("server socket ready\n");
-
 	int client_sock = accept(w->fd,
 	    (struct sockaddr *)&client_addr, &client_len);
 	if (client_sock != -1) {
+		int flags = fcntl(client_sock, F_GETFL, 0);
+		if (flags == -1) {
+			close(client_sock);
+			return;
+		}
+
+		(void)fcntl(client_sock, F_SETFL, flags | O_NONBLOCK);
 		if (player_accept(serv, client_sock) == NULL) {
 			close(client_sock);
 		}

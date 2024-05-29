@@ -1,5 +1,4 @@
 #include <sys/socket.h>
-#include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -18,15 +17,6 @@ struct player *
 player_accept(struct server *s, int sock)
 {
 	int slot = -1;
-	int flags;
-
-	flags = fcntl(sock, F_GETFL, 0);
-	if (flags == -1) {
-		printf("get flags failed\n");
-		return NULL;
-	}
-
-	(void)fcntl(sock, F_SETFL, flags | O_NONBLOCK);
 
 	int32_t session_id = ranval(&s->ran);
 
