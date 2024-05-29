@@ -365,7 +365,6 @@ player_die(struct player *p)
 	for (int i = 0; i < MAX_SKILL_ID; ++i) {
 		p->mob.cur_stats[i] = p->mob.base_stats[i];
 	}
-	p->mob.dir = MOB_DIR_NORTH;
 	p->following_player = -1;
 	p->walk_queue_len = 0;
 	p->walk_queue_pos = 0;
@@ -396,12 +395,25 @@ player_process_combat(struct player *p)
 				return;
 			}
 
-			if (!mob_within_range(&p->mob,
-			    target->mob.x, target->mob.y, 1)) {
+			if (target->mob.in_combat) {
+				/* XXX needs verifying */
+				player_send_message(p, "I can't get close enough");
+				p->walk_queue_pos = 0;
+				p->walk_queue_len = 0;
+				mob_combat_reset(&p->mob);
 				return;
 			}
 
-			/* TODO target already busy fighting? */
+			if (mob_within_range(&p->mob,
+			    target->mob.x, target->mob.y, 2)) {
+				target->walk_queue_len = 0;
+				target->walk_queue_pos= 0;
+			}
+
+			if (p->mob.x != target->mob.x ||
+			    p->mob.y != target->mob.y) {
+				return;
+			}
 
 			p->following_player = -1;
 			p->walk_queue_len = 0;
@@ -448,7 +460,6 @@ player_process_combat(struct player *p)
 			char name[32], msg[64];
 
 			mob_combat_reset(&p->mob);
-			p->mob.dir = MOB_DIR_NORTH;
 			player_die(target);
 			mod37_namedec(target->name, name);
 			/* TODO give experience */
@@ -484,7 +495,6 @@ player_retreat(struct player *p)
 			    "Your opponent is retreating!");
 			p2->walk_queue_len = 0;
 			p2->walk_queue_pos = 0;
-			p2->mob.dir = MOB_DIR_NORTH;
 			mob_combat_reset(&p2->mob);
 		}
 	}
