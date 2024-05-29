@@ -19,6 +19,7 @@ enum player_update_type {
 };
 
 static ssize_t player_send_appearance(struct player *, void *, size_t);
+static ssize_t player_send_damage(struct player *, void *, size_t);
 static int player_write_packet(struct player *, void *, size_t);
 
 static int
@@ -157,12 +158,20 @@ player_send_movement(struct player *p)
 			bitpos += 3;
 		} else if (known_player->mob.dir !=
 			    known_player->mob.prev_dir) {
+			if (buf_putbits(p->tmpbuf, bitpos++,
+					PLAYER_BUFSIZE, 1, 1) == -1) {
+				return -1;
+			}
+			if (buf_putbits(p->tmpbuf, bitpos++,
+					PLAYER_BUFSIZE, 1, 1) == -1) {
+				return -1;
+			}
 			if (buf_putbits(p->tmpbuf, bitpos,
-					PLAYER_BUFSIZE, 3,
+					PLAYER_BUFSIZE, 4,
 					known_player->mob.dir) == -1) {
 				return -1;
 			}
-			bitpos += 3;
+			bitpos += 4;
 		} else {
 			if (buf_putbits(p->tmpbuf, bitpos++,
 					PLAYER_BUFSIZE, 1, 0) == -1) {
@@ -309,6 +318,33 @@ player_send_appearance(struct player *p, void *tmpbuf, size_t offset)
 	return offset;
 }
 
+static ssize_t
+player_send_damage(struct player *p, void *tmpbuf, size_t offset)
+{
+	if (buf_putu16(tmpbuf, offset, PLAYER_BUFSIZE,
+		       p->mob.id) == -1) {
+		return -1;
+	}
+	offset += 2;
+	if (buf_putu8(tmpbuf, offset++, PLAYER_BUFSIZE,
+		      PLAYER_UPDATE_DAMAGE) == -1) {
+		return -1;
+	}
+	if (buf_putu8(tmpbuf, offset++, PLAYER_BUFSIZE,
+		      p->mob.damage) == -1) {
+		return -1;
+	}
+	if (buf_putu8(tmpbuf, offset++, PLAYER_BUFSIZE,
+		      p->mob.cur_stats[SKILL_HITS]) == -1) {
+		return -1;
+	}
+	if (buf_putu8(tmpbuf, offset++, PLAYER_BUFSIZE,
+		      p->mob.base_stats[SKILL_HITS]) == -1) {
+		return -1;
+	}
+	return offset;
+}
+
 int
 player_send_design_ui(struct player *p)
 {
@@ -394,14 +430,14 @@ player_send_stats_update(struct player *p)
 
 	for (int i = 0; i < MAX_SKILL_ID; ++i) {
 		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
-				p->cur_stats[i]) == -1) {
+				p->mob.cur_stats[i]) == -1) {
 			return -1;
 		}
 	}
 
 	for (int i = 0; i < MAX_SKILL_ID; ++i) {
 		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
-				p->base_stats[i]) == -1) {
+				p->mob.base_stats[i]) == -1) {
 			return -1;
 		}
 	}
@@ -443,6 +479,14 @@ player_send_appearance_update(struct player *p)
 		offset = tmpofs;
 		update_count++;
 	}
+	if (p->mob.damage != UINT8_MAX) {
+		tmpofs = player_send_damage(p, p->tmpbuf, offset);
+		if (tmpofs == -1) {
+			return -1;
+		}
+		offset = tmpofs;
+		update_count++;
+	}
 
 	for (int i = 0; i < p->known_player_count; ++i) {
 		struct player *p2;
@@ -474,6 +518,14 @@ player_send_appearance_update(struct player *p)
 				return -1;
 			}
 			offset += p2->public_chat_len;
+			update_count++;
+		}
+		if (p2->mob.damage != UINT8_MAX) {
+			tmpofs = player_send_damage(p2, p->tmpbuf, offset);
+			if (tmpofs == -1) {
+				return -1;
+			}
+			offset = tmpofs;
 			update_count++;
 		}
 		if (p2->appearance_changed || !p->known_players_seen[i]) {

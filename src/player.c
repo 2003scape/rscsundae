@@ -6,10 +6,13 @@
 #include <unistd.h>
 #include "config/anim.h"
 #include "protocol/opcodes.h"
+#include "protocol/utility.h"
 #include "server.h"
 #include "entity.h"
 #include "loop.h"
 #include "netio.h"
+
+static int player_pvp_roll(struct player *, struct player *);
 
 struct player *
 player_accept(struct server *s, int sock)
@@ -63,11 +66,11 @@ player_accept(struct server *s, int sock)
 	p->sock = sock;
 
 	for (int i = 0; i < MAX_SKILL_ID; ++i) {
-		p->cur_stats[i] = 1;
-		p->base_stats[i] = 1;
+		p->mob.cur_stats[i] = 1;
+		p->mob.base_stats[i] = 1;
 	}
-	p->cur_stats[SKILL_HITS] = 10;
-	p->base_stats[SKILL_HITS] = 10;
+	p->mob.cur_stats[SKILL_HITS] = 10;
+	p->mob.base_stats[SKILL_HITS] = 10;
 	p->experience[SKILL_HITS] = 4000;
 	p->sprites[ANIM_SLOT_HEAD] = ANIM_HEAD1 + 1;
 	p->sprites[ANIM_SLOT_BODY] = ANIM_BODY1 + 1;
@@ -76,6 +79,9 @@ player_accept(struct server *s, int sock)
 	p->top_colour = COLOUR_TOP_DEFAULT;
 	p->leg_colour = COLOUR_LEG_DEFAULT;
 	p->combat_level = 3;
+	p->weapon_aim = 1;
+	p->weapon_power = 1;
+	p->armour = 1;
 	p->stats_changed = true;
 	p->appearance_changed = true;
 	p->plane_changed = true;
@@ -84,8 +90,12 @@ player_accept(struct server *s, int sock)
 	p->last_packet = s->tick_counter;
 
 	p->mob.server = s;
-	p->mob.x = 120;
-	p->mob.y = 648;
+	/*p->mob.x = 120;
+	p->mob.y = 648;*/
+	p->mob.x = 333;
+	p->mob.y = 333;
+	p->mob.damage = UINT8_MAX;
+	mob_combat_reset(&p->mob);
 	s->players[slot] = p;
 
 	loop_add_player(p);
@@ -310,4 +320,182 @@ player_is_blocked(struct player *p, int64_t speaker, bool flag)
 		return false;
 	}
 	return flag;
+}
+
+static int
+player_pvp_roll(struct player *attacker, struct player *defender)
+{
+	int att = attacker->mob.cur_stats[SKILL_ATTACK];
+	int def = defender->mob.cur_stats[SKILL_DEFENSE];
+	int str = attacker->mob.cur_stats[SKILL_STRENGTH];
+
+	switch (attacker->combat_style) {
+	case COMBAT_STYLE_CONTROLLED:
+		att++;
+		str++;
+		break;
+	case COMBAT_STYLE_AGGRESSIVE:
+		str += 3;
+		break;
+	case COMBAT_STYLE_ACCURATE:
+		att += 3;
+		break;
+	}
+
+	switch (defender->combat_style) {
+	case COMBAT_STYLE_CONTROLLED:
+		def++;
+		break;
+	case COMBAT_STYLE_DEFENSIVE:
+		def += 3;
+		break;
+	}
+
+	return mob_combat_roll(&attacker->mob.server->ran,
+	    att, attacker->weapon_aim,
+	    def, defender->armour,
+	    str, attacker->weapon_power);
+}
+
+void
+player_pvp_attack(struct player *attacker, struct player *target)
+{
+	if (attacker->mob.in_combat) {
+		player_send_message(attacker,
+		    "You are already busy fighting!");
+		return;
+	}
+	attacker->mob.target_player = target->mob.id;
+}
+
+void
+player_die(struct player *p)
+{
+	/* TODO */
+	for (int i = 0; i < MAX_SKILL_ID; ++i) {
+		p->mob.cur_stats[i] = p->mob.base_stats[i];
+	}
+	p->following_player = -1;
+	p->walk_queue_len = 0;
+	p->walk_queue_pos = 0;
+	mob_combat_reset(&p->mob);
+}
+
+void
+player_process_combat(struct player *p)
+{
+	if (!p->mob.in_combat) {
+		if (p->mob.target_player != -1) {
+			struct player *target;
+
+			/* TODO: check whether in wilderness */
+
+			if (p->mob.server->tick_counter <
+			    (p->mob.combat_timer + 3)) {
+				p->walk_queue_pos = 0;
+				p->walk_queue_len = 0;
+				mob_combat_reset(&p->mob);
+				return;
+			}
+
+			target = p->mob.server->players[p->mob.target_player];
+			if (target == NULL) {
+				mob_combat_reset(&p->mob);
+				return;
+			}
+
+			if (!mob_within_range(&p->mob,
+			    target->mob.x, target->mob.y, 1)) {
+				return;
+			}
+
+			/* TODO target already busy fighting? */
+
+			p->following_player = -1;
+			p->walk_queue_len = 0;
+			p->walk_queue_pos = 0;
+			p->mob.target_player = target->mob.id;
+			p->mob.target_npc = -1;
+			p->mob.in_combat = true;
+			p->mob.combat_next_hit = 0;
+			p->mob.combat_rounds = 0;
+			p->mob.dir = MOB_DIR_COMBAT_RIGHT;
+
+			target->following_player = -1;
+			target->walk_queue_len = 0;
+			target->walk_queue_pos = 0;
+			target->mob.target_player = p->mob.id;
+			target->mob.target_npc = -1;
+			target->mob.in_combat = true;
+			target->mob.combat_next_hit =
+			    target->mob.server->tick_counter + 3;
+			target->mob.combat_rounds = 0;
+			target->mob.dir = MOB_DIR_COMBAT_LEFT;
+
+			player_close_ui(target);
+			player_send_message(target, "You are under attack!");
+		}
+		return;
+	}
+
+	if (p->mob.server->tick_counter < p->mob.combat_next_hit) {
+		return;
+	}
+
+	if (p->mob.target_player != -1) {
+		struct player *target;
+		int roll;
+
+		target = p->mob.server->players[p->mob.target_player];
+		if (target == NULL) {
+			mob_combat_reset(&p->mob);
+			return;
+		}
+		roll = player_pvp_roll(p, target);
+		if (roll >= target->mob.cur_stats[SKILL_HITS]) {
+			char name[32], msg[64];
+
+			mob_combat_reset(&p->mob);
+			p->mob.dir = MOB_DIR_SOUTH;
+			player_die(target);
+			mod37_namedec(target->name, name);
+			(void)snprintf(msg, sizeof(msg),
+			    "You have defeated %s!", name);
+			player_send_message(p, msg);
+			return;
+		}
+		target->mob.cur_stats[SKILL_HITS] -= roll;
+		target->mob.damage = roll;
+		target->mob.combat_rounds++;
+	}
+
+	p->mob.combat_next_hit = p->mob.server->tick_counter + 4;
+	p->mob.combat_timer = p->mob.server->tick_counter;
+}
+
+int
+player_retreat(struct player *p)
+{
+	struct player *p2;
+
+	if (p->mob.combat_rounds < 3) {
+		player_send_message(p,
+		    "You can't retreat during the first 3 rounds of combat");
+		return -1;
+	}
+
+	if (p->mob.target_player != -1) {
+		p2 = p->mob.server->players[p->mob.target_player];
+		if (p2 != NULL) {
+			player_send_message(p2,
+			    "Your opponent is retreating!");
+			p2->walk_queue_len = 0;
+			p2->walk_queue_pos = 0;
+			p2->mob.dir = MOB_DIR_SOUTH;
+			mob_combat_reset(&p2->mob);
+		}
+	}
+
+	mob_combat_reset(&p->mob);
+	return 0;
 }

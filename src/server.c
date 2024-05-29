@@ -170,6 +170,7 @@ server_tick(void)
 		net_player_recv(s.players[i]);
 		player_parse_incoming(s.players[i]);
 		player_process_walk_queue(s.players[i]);
+		player_process_combat(s.players[i]);
 	}
 
 	for (int i = 0; i < s.max_player_id; ++i) {
@@ -196,6 +197,7 @@ server_tick(void)
 		s.players[i]->plane_changed = false;
 		s.players[i]->stats_changed = false;
 		s.players[i]->moved = false;
+		s.players[i]->mob.damage = UINT8_MAX;
 		s.players[i]->mob.prev_dir = s.players[i]->mob.dir;
 	}
 

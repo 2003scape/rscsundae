@@ -2,6 +2,50 @@
 #include "entity.h"
 #include "server.h"
 
+static int mob_combat_max_roll(int, int);
+static int mob_combat_roll_damage(struct ranctx *, int, int);
+
+static int
+mob_combat_max_roll(int stat, int bonus)
+{
+	/* only players have bonuses */
+	int base_num = bonus != 0 ? 8 : 0;
+	return (base_num + stat) * (64 + bonus);
+}
+
+static int
+mob_combat_roll_damage(struct ranctx *ran, int stat, int bonus)
+{
+	int max = mob_combat_max_roll(stat, bonus);
+	float f = ranval(ran) / (float)UINT32_MAX;
+	float roll = max * f;
+	return (int)((roll + 320.0f) / 640.0f);
+}
+
+int
+mob_combat_roll(struct ranctx *ran, int att_stat, int att_bonus,
+    int def_stat, int def_bonus, int str_stat, int str_bonus)
+{
+	int att_roll, def_roll;
+
+	att_roll = ranval(ran) % mob_combat_max_roll(att_stat, att_bonus);
+	def_roll = ranval(ran) % mob_combat_max_roll(def_stat, def_bonus);
+	if (att_roll > def_roll) {
+		return mob_combat_roll_damage(ran, str_stat, str_bonus);
+	}
+	return 0;
+}
+
+void
+mob_combat_reset(struct mob *mob)
+{
+	mob->in_combat = false;
+	mob->combat_timer = 0;
+	mob->combat_rounds = 0;
+	mob->target_player = -1;
+	mob->target_npc = -1;
+}
+
 bool
 mob_within_range(struct mob *mob, int x, int y, int range)
 {

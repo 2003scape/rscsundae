@@ -284,7 +284,37 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			p->following_player = (int16_t)target;
 		}
 		break;
+	case OP_CLI_ATTACK_PLAYER:
+		{
+			struct player *t;
+			uint16_t id;
+
+			if (buf_getu16(data, offset, len, &id) == -1) {
+				return;
+			}
+			offset += 2;
+			if (id < MAXPLAYERS) {
+				t = p->mob.server->players[id];
+				if (t != NULL) {
+					player_pvp_attack(p, t);
+				}
+			}
+		}
+		break;
+	case OP_CLI_COMBAT_STYLE:
+		{
+			uint8_t style;
+
+			if (buf_getu8(data, offset, len, &style) == -1) {
+				return;
+			}
+			if (style <= COMBAT_STYLE_DEFENSIVE) {
+				p->combat_style = style;
+			}
+		}
+		break;
 	case OP_CLI_WALK_TILE:
+	case OP_CLI_WALK_ENTITY:
 		{
 			size_t steps;
 			int start_x, start_y;
@@ -320,6 +350,13 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				new_y = start_y + (int8_t)off_y;
 				p->walk_queue_x[i + 1] = (uint16_t)new_x;
 				p->walk_queue_y[i + 1] = (uint16_t)new_y;
+			}
+			if (p->mob.in_combat && player_retreat(p) == -1) {
+				return;
+			}
+			if (opcode != OP_CLI_WALK_ENTITY) {
+				p->mob.target_npc = -1;
+				p->mob.target_player = -1;
 			}
 			p->walk_queue_len = steps + 1;
 			p->walk_queue_pos = 0;

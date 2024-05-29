@@ -20,6 +20,7 @@
 #define WALK_QUEUE_LEN		(16)
 
 struct server;
+struct ranctx;
 
 enum skills {
 	SKILL_ATTACK		= 0,
@@ -28,6 +29,13 @@ enum skills {
 	SKILL_HITS		= 3,
 	SKILL_RANGED		= 4,
 	SKILL_PRAYER		= 5,
+};
+
+enum combat_style {
+	COMBAT_STYLE_CONTROLLED	= 0,
+	COMBAT_STYLE_AGGRESSIVE	= 1,
+	COMBAT_STYLE_ACCURATE	= 2,
+	COMBAT_STYLE_DEFENSIVE	= 3,
 };
 
 /* TODO: expand with a they/them option */
@@ -60,6 +68,15 @@ struct mob {
 	uint8_t dir;
 	uint8_t prev_dir;
 	uint8_t moved;
+	uint8_t in_combat;
+	uint8_t damage;
+	uint32_t combat_rounds;
+	uint64_t combat_timer;
+	uint64_t combat_next_hit;
+	uint8_t cur_stats[MAX_SKILL_ID];
+	uint8_t base_stats[MAX_SKILL_ID];
+	int16_t target_player;
+	int16_t target_npc;
 };
 
 enum animslot {
@@ -122,14 +139,16 @@ struct player {
 	uint8_t block_duel;
 	uint8_t logout_confirmed;
 	uint64_t last_packet;
-	uint8_t cur_stats[MAX_SKILL_ID];
-	uint8_t base_stats[MAX_SKILL_ID];
 	uint32_t experience[MAX_SKILL_ID];
 	uint8_t quest_points;
 	int64_t friend_list[MAX_FRIENDS];
 	int64_t ignore_list[MAX_IGNORE];
 	uint16_t friend_count;
 	uint16_t ignore_count;
+	uint8_t combat_style;
+	uint8_t weapon_aim;
+	uint8_t weapon_power;
+	uint8_t armour;
 };
 
 struct bound {
@@ -146,21 +165,27 @@ struct loc {
 
 /* mob.c */
 bool mob_within_range(struct mob *, int, int, int);
+int mob_combat_roll(struct ranctx *, int, int, int, int, int, int);
 size_t get_nearby_players(struct mob *, struct player **, size_t, int);
+void mob_combat_reset(struct mob *);
 
 /* player.c */
 struct player *player_accept(struct server *, int);
 void player_process_walk_queue(struct player *);
+void player_process_combat(struct player *);
+void player_die(struct player *);
 void player_close_ui(struct player *);
 void player_destroy(struct player *);
 bool player_has_ignore(struct player *, int64_t);
 bool player_has_friend(struct player *, int64_t);
 bool player_public_chat_visible(struct player *, int64_t);
 bool player_is_blocked(struct player *, int64_t, bool);
+int player_retreat(struct player *);
 int player_add_ignore(struct player *, int64_t);
 int player_add_friend(struct player *, int64_t);
 int player_remove_ignore(struct player *, int64_t);
 int player_remove_friend(struct player *, int64_t);
+void player_pvp_attack(struct player *, struct player *);
 
 /* incoming.c */
 int player_parse_incoming(struct player *);
