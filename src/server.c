@@ -40,6 +40,9 @@ void
 server_register_login(int64_t name)
 {
 	for (int i = 0; i < s.max_player_id; ++i) {
+		if (s.players[i] == NULL) {
+			continue;
+		}
 		for (int j = 0; j < s.players[i]->friend_count; ++j) {
 			if (s.players[i]->friend_list[j] != name) {
 				continue;
@@ -53,6 +56,9 @@ void
 server_register_logout(int64_t name)
 {
 	for (int i = 0; i < s.max_player_id; ++i) {
+		if (s.players[i] == NULL) {
+			continue;
+		}
 		for (int j = 0; j < s.players[i]->friend_count; ++j) {
 			if (s.players[i]->friend_list[j] != name) {
 				continue;
@@ -66,6 +72,9 @@ void
 server_register_hide_status(struct player *p)
 {
 	for (int i = 0; i < s.max_player_id; ++i) {
+		if (s.players[i] == NULL) {
+			continue;
+		}
 		for (int j = 0; j < s.players[i]->friend_count; ++j) {
 			if (s.players[i]->friend_list[j] != p->name) {
 				continue;
@@ -82,6 +91,9 @@ void
 server_register_unhide_status(struct player *p)
 {
 	for (int i = 0; i < s.max_player_id; ++i) {
+		if (s.players[i] == NULL) {
+			continue;
+		}
 		for (int j = 0; j < s.players[i]->friend_count; ++j) {
 			if (s.players[i]->friend_list[j] != p->name) {
 				continue;
