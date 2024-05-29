@@ -195,6 +195,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			uint8_t block_private;
 			uint8_t block_trade;
 			uint8_t block_duel;
+			bool unhide = false;
 
 			if (buf_getu8(data, offset++, len, &hide_online) == -1) {
 				return;
@@ -214,12 +215,15 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			if (!p->block_private && block_private) {
 				server_register_hide_status(p);
 			} else if (p->block_private && !block_private) {
-				server_register_unhide_status(p);
+				unhide = true;
 			}
 			p->block_public = block_public;
 			p->block_private = block_private || hide_online;
 			p->block_trade = block_trade;
 			p->block_duel = block_duel;
+			if (unhide) {
+				server_register_unhide_status(p);
+			}
 		}
 		break;
 	case OP_CLI_SAVE_SETTING:
