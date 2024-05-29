@@ -44,7 +44,13 @@ enum mobdir {
 	MOB_DIR_SOUTH		= 4,
 	MOB_DIR_SOUTHEAST	= 5,
 	MOB_DIR_EAST		= 6,
-	MOB_DIR_NORTHEAST	= 7
+	MOB_DIR_NORTHEAST	= 7,
+	/*
+	 * attacker is shown on right, defender on left
+	 * except NPCs are always on the left
+	 */
+	MOB_DIR_COMBAT_LEFT	= 8,
+	MOB_DIR_COMBAT_RIGHT	= 9
 };
 
 struct mob {
