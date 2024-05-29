@@ -544,6 +544,10 @@ player_notify_friend_online(struct player *p, int64_t friend)
 	size_t offset = 0;
 	struct player *p2;
 
+	if (!player_has_friend(p, friend)) {
+		return 0;
+	}
+
 	p2 = server_find_player_name37(friend);
 	if (p2 != NULL && player_is_blocked(p2, p->name, p2->block_private)) {
 		return 0;
@@ -563,6 +567,10 @@ player_notify_friend_offline(struct player *p, int64_t friend)
 {
 	size_t offset = 0;
 	struct player *p2;
+
+	if (!player_has_friend(p, friend)) {
+		return 0;
+	}
 
 	p2 = server_find_player_name37(friend);
 	if (p2 != NULL && player_is_blocked(p2, p->name, p2->block_private)) {
