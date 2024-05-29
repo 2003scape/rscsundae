@@ -64,6 +64,20 @@ server_register_login(int64_t name)
 	}
 }
 
+bool
+server_has_player(int64_t name)
+{
+	for (int i = 0; i < s.max_player_id; ++i) {
+		if (s.players[i] == NULL) {
+			continue;
+		}
+		if (s.players[i]->name == name) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void
 server_register_logout(int64_t name)
 {

@@ -9,13 +9,13 @@
 #include "server.h"
 #include "entity.h"
 #include "loop.h"
+#include "netio.h"
 
 struct player *
 player_accept(struct server *s, int sock)
 {
 	int slot = -1;
 	int flags;
-	uint8_t resp[2];
 
 	flags = fcntl(sock, F_GETFL, 0);
 	if (flags == -1) {
@@ -46,26 +46,16 @@ player_accept(struct server *s, int sock)
 	}
 
 	if (slot == -1) {
-		/* no space */
-		printf("server is full\n");
-		resp[0] = 0;
-		resp[1] = RESP_FULL;
-		(void)send(sock, &resp, sizeof(resp), 0);
+		/* server is full */
+		net_login_response(sock, RESP_FULL);
 		return NULL;
 	}
 
 	struct player *p = calloc(1, sizeof(struct player));
 	if (p == NULL) {
-		printf("player alloc failed\n");
-		resp[0] = 0;
-		resp[1] = RESP_FULL;
-		(void)send(sock, &resp, sizeof(resp), 0);
+		net_login_response(sock, RESP_FULL);
 		return NULL;
 	}
-
-	resp[0] = 0;
-	resp[1] = 0;
-	(void)send(sock, &resp, sizeof(resp), 0);
 
 	p->name = -1;
 	p->mob.id = (uint16_t)slot;

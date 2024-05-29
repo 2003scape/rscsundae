@@ -6,6 +6,7 @@
 #include "../config/anim.h"
 #include "../buffer.h"
 #include "../entity.h"
+#include "../netio.h"
 #include "../server.h"
 
 #define MAX_PACKETS_PER_TICK		(10)
@@ -112,6 +113,12 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			offset += 8;
 			printf("got username: %lld %s\n", name, mod37_namedec(name, namestr));
 
+			if (server_has_player(name)) {
+				p->logout_confirmed = true;
+				net_login_response(p->sock, RESP_ACCOUNT_USED);
+				return;
+			}
+
 			p->name = name;
 
 			player_send_design_ui(p);
@@ -122,6 +129,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			player_send_init_ignore(p);
 
 			server_register_login(p->name);
+			net_login_response(p->sock, RESP_LOGIN_OK);
 		}
 		break;
 	case OP_CLI_LOGOUT:

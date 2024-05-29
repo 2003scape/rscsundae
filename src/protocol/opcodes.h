@@ -31,5 +31,6 @@
 #define OP_SRV_PLAYER_MOVEMENT		(255)
 
 #define RESP_LOGIN_OK		(0)
+#define RESP_ACCOUNT_USED	(4)
 #define RESP_FULL		(14)
 #endif

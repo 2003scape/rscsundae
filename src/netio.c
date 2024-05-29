@@ -92,3 +92,14 @@ net_player_send(struct player *p)
 	}
 	return 0;
 }
+
+void
+net_login_response(int sock, int response)
+{
+	uint8_t b[2];
+
+	b[0] = 0;
+	b[1] = response;
+
+	(void)send(sock, &b, sizeof(b), 0);
+}
