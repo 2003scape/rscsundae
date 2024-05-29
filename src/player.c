@@ -425,11 +425,14 @@ player_process_combat(struct player *p)
 			if (mob_within_range(&p->mob,
 			    target->mob.x, target->mob.y, 3)) {
 				target->walk_queue_len = 0;
-				target->walk_queue_pos= 0;
+				target->walk_queue_pos = 0;
 			}
 
 			if (p->mob.x != target->mob.x ||
 			    p->mob.y != target->mob.y) {
+				if (p->walk_queue_len == 0) {
+					mob_combat_reset(&p->mob);
+				}
 				return;
 			}
 
