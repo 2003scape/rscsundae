@@ -79,9 +79,12 @@ player_accept(struct server *s, int sock)
 	p->cur_stats[SKILL_HITS] = 10;
 	p->base_stats[SKILL_HITS] = 10;
 	p->experience[SKILL_HITS] = 4000;
-	p->sprites[ANIM_SLOT_HEAD] = ANIM_FHEAD1 + 1;
-	p->sprites[ANIM_SLOT_BODY] = ANIM_FBODY1 + 1;
+	p->sprites[ANIM_SLOT_HEAD] = ANIM_HEAD1 + 1;
+	p->sprites[ANIM_SLOT_BODY] = ANIM_BODY1 + 1;
 	p->sprites[ANIM_SLOT_LEGS] = ANIM_LEGS1 + 1;
+	p->hair_colour = COLOUR_HAIR_DEFAULT;
+	p->top_colour = COLOUR_TOP_DEFAULT;
+	p->leg_colour = COLOUR_LEG_DEFAULT;
 	p->combat_level = 3;
 	p->stats_changed = true;
 	p->appearance_changed = true;

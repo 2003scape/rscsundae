@@ -10,4 +10,9 @@
 #define ANIM_HEAD3	(6)
 #define ANIM_HEAD4	(7)
 
+/* for the "andrew gower style" defaults */
+#define COLOUR_HAIR_DEFAULT	(2)
+#define COLOUR_TOP_DEFAULT	(8)
+#define COLOUR_LEG_DEFAULT	(14)
+
 #endif
