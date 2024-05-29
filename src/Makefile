@@ -9,6 +9,7 @@ OBJS+=	outgoing.o
 OBJS+=	utility.o
 OBJS+=	mob.o
 
+CFLAGS+=	-std=c99
 CFLAGS+=	-I/usr/pkg/include/ev
 LDFLAGS+=	-L/usr/pkg/lib/ev
 LDFLAGS+=	-Wl,-R/usr/pkg/lib/ev
