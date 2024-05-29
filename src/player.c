@@ -103,10 +103,12 @@ player_process_walk_queue(struct player *p)
 			if (mob_within_range(&p->mob, p2->mob.x, p2->mob.y, 2)) {
 				return;
 			}
-			p->walk_queue_x[0] = p2->mob.x;
-			p->walk_queue_y[0] = p2->mob.y;
-			p->walk_queue_pos = 0;
-			p->walk_queue_len = 1;
+			if (!mob_within_range(&p->mob, p2->mob.x, p2->mob.y, 3)) {
+				p->walk_queue_x[0] = p2->mob.x;
+				p->walk_queue_y[0] = p2->mob.y;
+				p->walk_queue_pos = 0;
+				p->walk_queue_len = 1;
+			}
 		} else {
 			p->following_player = -1;
 		}
