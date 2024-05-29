@@ -585,3 +585,20 @@ player_notify_friend_offline(struct player *p, int64_t friend)
 
 	return player_write_packet(p, p->tmpbuf, offset);
 }
+
+int
+player_send_pm(struct player *p, int64_t from, uint8_t *encoded, size_t len)
+{
+	size_t offset = 0;
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_PRIVATE_MESSAGE);
+	(void)buf_putu64(p->tmpbuf, offset, PLAYER_BUFSIZE, from);
+	offset += 8;
+	if (buf_putdata(p->tmpbuf, offset, PLAYER_BUFSIZE,
+			encoded, len) == -1) {
+		return -1;
+	}
+	offset += len;
+	return player_write_packet(p, p->tmpbuf, offset);
+}

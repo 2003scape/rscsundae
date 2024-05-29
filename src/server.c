@@ -107,6 +107,21 @@ server_register_unhide_status(struct player *p)
 }
 
 void
+server_send_pm(struct player *from, int64_t target, uint8_t *msg, size_t len)
+{
+	struct player *targetp;
+
+	targetp = server_find_player_name37(target);
+	if (targetp == NULL) {
+		return;
+	}
+	if (player_is_blocked(targetp, from->name, targetp->block_private)) {
+		return;
+	}
+	player_send_pm(targetp, from->name, msg, len);
+}
+
+void
 server_tick(void)
 {
 	for (int i = 0; i < s.max_player_id; ++i) {

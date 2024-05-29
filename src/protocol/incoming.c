@@ -166,6 +166,17 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			player_remove_friend(p, target);
 		}
 		break;
+	case OP_CLI_PRIVATE_MESSAGE:
+		{
+			int64_t target;
+
+			if (buf_gets64(data, offset, len, &target) == -1) {
+				return;
+			}
+			offset += 8;
+			server_send_pm(p, target, data + offset, len - 9);
+		}
+		break;
 	case OP_CLI_ADD_IGNORE:
 		{
 			int64_t target;
