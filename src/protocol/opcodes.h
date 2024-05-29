@@ -5,6 +5,7 @@
 #define OP_CLI_PUBLIC_CHAT	(3)
 #define OP_CLI_PING		(5)
 #define OP_CLI_LOGOUT		(6)
+#define OP_CLI_RECONNECT	(19)
 #define OP_CLI_ADD_FRIEND	(26)
 #define OP_CLI_REMOVE_FRIEND	(27)
 #define OP_CLI_PRIVATE_MESSAGE	(28)

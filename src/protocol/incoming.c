@@ -93,6 +93,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 
 	switch (opcode) {
 	case OP_CLI_LOGIN:
+	case OP_CLI_RECONNECT:
 		{
 			char namestr[64];
 			uint16_t ver;
