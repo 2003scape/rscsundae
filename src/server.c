@@ -3,6 +3,8 @@
 #include "loop.h"
 #include "netio.h"
 #include "entity.h"
+#include <sys/types.h>
+#include <sys/signal.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -12,17 +14,27 @@
 
 struct server s = {0};
 
+static void on_signal_do_nothing(int);
+
 int
 main(int argc, char **argv)
 {
+	(void)signal(SIGPIPE, on_signal_do_nothing);
+
 	/* init random number generator */
-	raninit(&s.ran, time(NULL)); 
+	raninit(&s.ran, time(NULL));
 
 	/* TODO: port should be configurable */
 	if (loop_start(&s, 43594) == -1) {
 		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;
+}
+
+static void
+on_signal_do_nothing(int dummy)
+{
+	(void)dummy;
 }
 
 struct player *
