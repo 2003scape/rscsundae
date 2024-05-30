@@ -35,8 +35,10 @@ Content included in mudclient110
 - There was no Tutorial Island. You were immediately spawned
   adventure-ready in the game world, next to a Guide character (who
   you could choose to ignore).  Most players will probably welcome this. :)
-- Varrock contained some cute extra empty houses in the south-east
+- Varrock contained some extra cute empty houses in the south-east
   that players could use for roleplaying and meetings.
+  Earlier in 2001, these fully blocked the eastern exit and took up a lot
+  of space, but they don't here.
 
 ### Items
 
