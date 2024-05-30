@@ -6,7 +6,6 @@ AM_CPPFLAGS = -Iext/libjag/include
 
 rscsundae_SOURCES = \
 	buffer.c \
-	loop-ev.c \
 	mob.c \
 	netio.c \
 	player.c \
@@ -23,5 +22,15 @@ rscsundae_SOURCES = \
 	protocol/incoming.c \
 	protocol/outgoing.c \
 	protocol/utility.c
+
+if KQUEUE
+rscsundae_SOURCES += loop-kqueue.c
+else
+if LINUXPOLL
+rscsundae_SOURCES += loop-linuxpoll.c
+else
+rscsundae_SOURCES += loop-ev.c
+endif
+endif
 
 rscsundae_LDADD = $(libev_LIBS)
