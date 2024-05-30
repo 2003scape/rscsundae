@@ -24,8 +24,8 @@ jag_find_entry(struct jag_archive *archive, const char *name,
 		    archive->unpacked_len, &entry) == -1) {
 			return -1;
 		}
-		offset += entry.packed_len;
 		if (entry.name_hash != target_hash) {
+			offset += entry.unpacked_len;
 			continue;
 		}
 		entry.data = archive->data + offset;
