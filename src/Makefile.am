@@ -11,6 +11,7 @@ rscsundae_SOURCES = \
 	netio.c \
 	player.c \
 	server.c \
+	config/text.c \
 	ext/flea.c \
 	ext/libjag/lib/jag_bzip2_decompress.c \
 	ext/libjag/lib/jag_find_entry.c \

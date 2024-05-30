@@ -101,7 +101,7 @@ next_token_hex(char *buffer, size_t offset, size_t len, unsigned long *out)
 }
 
 struct item_config *
-parse_items(char *buffer, size_t len, size_t *num_items)
+config_parse_items(char *buffer, size_t len, size_t *num_items)
 {
 	struct item_config *items = NULL;
 	size_t max_items;

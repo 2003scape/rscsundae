@@ -1,5 +1,6 @@
 #ifndef SERVER_H
 #define SERVER_H
+#include "config/config.h"
 #include "ext/flea.h"
 #include "entity.h"
 
@@ -12,6 +13,8 @@ struct server {
 	uint64_t tick_counter;
 	struct player *players[MAXPLAYERS];
 	struct ranctx ran;
+	struct item_config *item_config;
+	size_t item_config_count;
 };
 
 void server_tick(void);

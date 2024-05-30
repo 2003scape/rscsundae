@@ -1,5 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
+#include <stdint.h>
+#include <stddef.h>
 
 #define MAX_ITEM_NAMES	(4)
 
@@ -26,5 +28,8 @@ struct item_config {
 	uint16_t respawn_rate;
 	uint8_t quest_item; /* untradable */
 };
+
+struct item_config *
+config_parse_items(char *, size_t, size_t *);
 
 #endif

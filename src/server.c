@@ -3,6 +3,7 @@
 #include "loop.h"
 #include "netio.h"
 #include "entity.h"
+#include <jag.h>
 #include <sys/types.h>
 #include <sys/signal.h>
 #include <stdlib.h>
@@ -15,6 +16,7 @@
 struct server s = {0};
 
 static void on_signal_do_nothing(int);
+static int load_config_jag(void);
 
 int
 main(int argc, char **argv)
@@ -23,6 +25,12 @@ main(int argc, char **argv)
 
 	/* init random number generator */
 	raninit(&s.ran, time(NULL));
+
+	if (load_config_jag() == -1) {
+		fprintf(stderr, "error reading config.jag\n");
+		fprintf(stderr, "did you run the fetch-jag-files script from the data directory?\n");
+		return EXIT_FAILURE;
+	}
 
 	/* TODO: port should be configurable */
 	if (loop_start(&s, 43594) == -1) {
@@ -202,4 +210,59 @@ server_tick(void)
 	}
 
 	s.tick_counter++;
+}
+
+static int
+load_config_jag(void)
+{
+	struct jag_archive archive = {0};
+	struct jag_entry entry = {0};
+	FILE *f = NULL;
+
+	/* TODO: support configurable & system-wide paths */
+	f = fopen("./data/config46.jag", "rb");
+	if (f == NULL) {
+		goto err;
+	}
+	if (jag_unpack_file(f, &archive) == -1) {
+		goto err;
+	}
+	fclose(f);
+	f = NULL;
+	if (jag_find_entry(&archive, "objects.txt", &entry) == -1) {
+		goto err;
+	}
+	/*
+	 * DO NOT free the unpacked entry data unless erroring,
+	 * we are reusing it
+	 */
+	if (jag_unpack_entry(&entry) == -1) {
+		goto err;
+	}
+	s.item_config = config_parse_items((char *)entry.data,
+	    entry.unpacked_len, &s.item_config_count);
+	if (s.item_config == NULL) {
+		goto err;
+	}
+	printf("read configuration for %zu items (\"objects\")\n",
+	    s.item_config_count);
+	if (archive.must_free) {
+		free(archive.data);
+		archive.data = NULL;
+	}
+	return 0;
+err:
+	if (entry.must_free) {
+		free(entry.data);
+		entry.data = NULL;
+	}
+	if (archive.must_free) {
+		free(archive.data);
+		archive.data = NULL;
+	}
+	if (f != NULL) {
+		fclose(f);
+		f = NULL;
+	}
+	return -1;
 }
