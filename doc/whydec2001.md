@@ -24,48 +24,52 @@ fully complete, with some caveats.
 
 There is a Mining Guild, Cooking Guild, Prayer Guild, and Champions' Guild.
 There is no Crafting Guild, since this was originally pay-to-play
-content (gold rocks are therefore more spread around the map,
-making things a bit more balanced).
+content. Gold rocks are therefore more spread around the map,
+making things a bit more balanced.
 
-The Wilderness contains the graveyard, eastern Chaos Temple, Bone Yard,
+The Wilderness contained the graveyard, eastern Chaos Temple, Bone Yard,
 Chaos Dwarf mine, Chaos Ridge, Hobgoblin mine, ruined village,
 lava maze, Greater Demon ruins, sapphire house, and Ice Plateau.
 The Dark Warrior Castle, Bandit Camp, and overgrown village are sadly
-missing since they were originally pay-to-play - they look cool, but
-aren't extremely useful.
+missing since they were originally pay-to-play. They look cool, but
+aren't extremely useful. The western chaos altar was added at some point
+in 2002.
 
-There is no bank in Al Kharid.  This means the furnace closest
+There was no bank in Al Kharid.  This means the furnace closest
 to an item bank is in Falador - just like when Bluerose13x was getting
 99 Smithing.
 
-There is no Tutorial Island. You're immediately spawned
+There was no Tutorial Island. You were immediately spawned
 adventure-ready in the game world, next to a Guide character (who
-you can choose to ignore).  Most players will probably welcome this. :)
+you could choose to ignore).  Most players will probably welcome this. :)
+
+Varrock contained some cute extra empty houses in the south-east
+that players could use for roleplaying and meetings.
 
 ### Items
 
-Items can be exchanged for certificates at Draynor Village market.
+Items could be exchanged for certificates at Draynor Village market.
 
 The best-in-slot food was Swordfish (heals 14 Hits in one bite) and
 Anchovy pizza (heals 16 Hits in two bites).
 Swordfish are technically tied with Pumpkins.
 
-Runite equipment is fully available.  The most powerful weapons
+Runite equipment was fully available.  The most powerful weapons
 (battle axe, 2-handed sword) require high level Smithing to create.
 Runite rocks could only be found in the deep Wilderness.
 
-Rune helmets can be obtained as drop from demons.  Shields must be
-acquired through Smithing.  Other runite equipment can be purchased
+Rune helmets could be obtained as drop from demons.  Shields had to be
+acquired through Smithing.  Other runite equipment could be purchased
 from the Champions' Guild.
 
-There are three ranged weapons, the shortbow, the longbow, and
-the crossbow.  The longbow can be used at a greater distance
-and was more accurate, but the crossbow hits harder.
+There were three ranged weapons, the shortbow, the longbow, and
+the crossbow.  The longbow could be used at a greater distance
+and was more accurate, but the crossbow hit harder.
 The phoenix crossbow was the same as the regular crossbow.
 
-Strength Potions are the only drinkable potion - they can be acquired
+Strength Potions were the only drinkable potion - they could be acquired
 by bringing ingredients to the Apothecary in Varrock.  A small Defense
-boost can be acquired by eating the magical cabbages growing at Draynor
+boost could be acquired by eating the magical cabbages growing at Draynor
 Manor.
 
 Disks of Returning could be purchased from Thordur's tourist
@@ -78,7 +82,7 @@ There were no sleeping bags since there was no Fatigue.
 
 There were no priest robes since these were introduced with the
 Biohazard quest in 2002 and originally pay-to-play only.
-You can get monk robes from the prayer guild.
+You could get monk robes from the prayer guild.
 
 There was only one pickaxe type, since tiered pickaxes were introduced
 with Fatigue.
@@ -93,7 +97,7 @@ Prayer, Magic, Cooking, Woodcutting, Firemaking, Crafting,
 Smithing, Mining
 
 Mining and Smithing were basically fully complete at this date.
-You can't make ranged ammunition since there's no Fletching skill
+You couldn't make ranged ammunition since there was no Fletching skill
 (broken by prototype darts in 2003 anyway, and bow strings broke
 the Crafting skill).
 
@@ -124,6 +128,9 @@ since the fully accurate damage at higher levels is more limited.
 Prayer is fully complete.
 
 ### Other
+
+Compared to earlier in 2001, PvP was restricted to the Wilderness,
+and item banks are fully available.
 
 There was no makeover mage.  This is unfortunate, and will
 be worked around with a server-side command to let players
