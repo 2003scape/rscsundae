@@ -103,6 +103,13 @@ am__dirstamp = $(am__leading_dot)dirstamp
 am_rscsundae_OBJECTS = buffer.$(OBJEXT) loop-ev.$(OBJEXT) \
 	mob.$(OBJEXT) netio.$(OBJEXT) player.$(OBJEXT) \
 	server.$(OBJEXT) ext/flea.$(OBJEXT) \
+	ext/libjag/lib/jag_bzip2_decompress.$(OBJEXT) \
+	ext/libjag/lib/jag_find_entry.$(OBJEXT) \
+	ext/libjag/lib/jag_hash_entry_name.$(OBJEXT) \
+	ext/libjag/lib/jag_read_entry.$(OBJEXT) \
+	ext/libjag/lib/jag_read_header.$(OBJEXT) \
+	ext/libjag/lib/jag_unpack_entry.$(OBJEXT) \
+	ext/libjag/lib/jag_unpack_file.$(OBJEXT) \
 	protocol/incoming.$(OBJEXT) protocol/outgoing.$(OBJEXT) \
 	protocol/utility.$(OBJEXT)
 rscsundae_OBJECTS = $(am_rscsundae_OBJECTS)
@@ -126,6 +133,13 @@ am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/buffer.Po ./$(DEPDIR)/loop-ev.Po \
 	./$(DEPDIR)/mob.Po ./$(DEPDIR)/netio.Po ./$(DEPDIR)/player.Po \
 	./$(DEPDIR)/server.Po ext/$(DEPDIR)/flea.Po \
+	ext/libjag/lib/$(DEPDIR)/jag_bzip2_decompress.Po \
+	ext/libjag/lib/$(DEPDIR)/jag_find_entry.Po \
+	ext/libjag/lib/$(DEPDIR)/jag_hash_entry_name.Po \
+	ext/libjag/lib/$(DEPDIR)/jag_read_entry.Po \
+	ext/libjag/lib/$(DEPDIR)/jag_read_header.Po \
+	ext/libjag/lib/$(DEPDIR)/jag_unpack_entry.Po \
+	ext/libjag/lib/$(DEPDIR)/jag_unpack_file.Po \
 	protocol/$(DEPDIR)/incoming.Po protocol/$(DEPDIR)/outgoing.Po \
 	protocol/$(DEPDIR)/utility.Po
 am__mv = mv -f
@@ -261,6 +275,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = subdir-objects
+AM_CPPFLAGS = -Iext/libjag/include
 rscsundae_SOURCES = \
 	buffer.c \
 	loop-ev.c \
@@ -269,6 +284,13 @@ rscsundae_SOURCES = \
 	player.c \
 	server.c \
 	ext/flea.c \
+	ext/libjag/lib/jag_bzip2_decompress.c \
+	ext/libjag/lib/jag_find_entry.c \
+	ext/libjag/lib/jag_hash_entry_name.c  \
+	ext/libjag/lib/jag_read_entry.c \
+	ext/libjag/lib/jag_read_header.c \
+	ext/libjag/lib/jag_unpack_entry.c \
+	ext/libjag/lib/jag_unpack_file.c \
 	protocol/incoming.c \
 	protocol/outgoing.c \
 	protocol/utility.c
@@ -356,6 +378,33 @@ ext/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) ext/$(DEPDIR)
 	@: > ext/$(DEPDIR)/$(am__dirstamp)
 ext/flea.$(OBJEXT): ext/$(am__dirstamp) ext/$(DEPDIR)/$(am__dirstamp)
+ext/libjag/lib/$(am__dirstamp):
+	@$(MKDIR_P) ext/libjag/lib
+	@: > ext/libjag/lib/$(am__dirstamp)
+ext/libjag/lib/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) ext/libjag/lib/$(DEPDIR)
+	@: > ext/libjag/lib/$(DEPDIR)/$(am__dirstamp)
+ext/libjag/lib/jag_bzip2_decompress.$(OBJEXT):  \
+	ext/libjag/lib/$(am__dirstamp) \
+	ext/libjag/lib/$(DEPDIR)/$(am__dirstamp)
+ext/libjag/lib/jag_find_entry.$(OBJEXT):  \
+	ext/libjag/lib/$(am__dirstamp) \
+	ext/libjag/lib/$(DEPDIR)/$(am__dirstamp)
+ext/libjag/lib/jag_hash_entry_name.$(OBJEXT):  \
+	ext/libjag/lib/$(am__dirstamp) \
+	ext/libjag/lib/$(DEPDIR)/$(am__dirstamp)
+ext/libjag/lib/jag_read_entry.$(OBJEXT):  \
+	ext/libjag/lib/$(am__dirstamp) \
+	ext/libjag/lib/$(DEPDIR)/$(am__dirstamp)
+ext/libjag/lib/jag_read_header.$(OBJEXT):  \
+	ext/libjag/lib/$(am__dirstamp) \
+	ext/libjag/lib/$(DEPDIR)/$(am__dirstamp)
+ext/libjag/lib/jag_unpack_entry.$(OBJEXT):  \
+	ext/libjag/lib/$(am__dirstamp) \
+	ext/libjag/lib/$(DEPDIR)/$(am__dirstamp)
+ext/libjag/lib/jag_unpack_file.$(OBJEXT):  \
+	ext/libjag/lib/$(am__dirstamp) \
+	ext/libjag/lib/$(DEPDIR)/$(am__dirstamp)
 protocol/$(am__dirstamp):
 	@$(MKDIR_P) protocol
 	@: > protocol/$(am__dirstamp)
@@ -376,6 +425,7 @@ rscsundae$(EXEEXT): $(rscsundae_OBJECTS) $(rscsundae_DEPENDENCIES) $(EXTRA_rscsu
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 	-rm -f ext/*.$(OBJEXT)
+	-rm -f ext/libjag/lib/*.$(OBJEXT)
 	-rm -f protocol/*.$(OBJEXT)
 
 distclean-compile:
@@ -388,6 +438,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/player.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@ext/$(DEPDIR)/flea.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@ext/libjag/lib/$(DEPDIR)/jag_bzip2_decompress.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@ext/libjag/lib/$(DEPDIR)/jag_find_entry.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@ext/libjag/lib/$(DEPDIR)/jag_hash_entry_name.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@ext/libjag/lib/$(DEPDIR)/jag_read_entry.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@ext/libjag/lib/$(DEPDIR)/jag_read_header.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@ext/libjag/lib/$(DEPDIR)/jag_unpack_entry.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@ext/libjag/lib/$(DEPDIR)/jag_unpack_file.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@protocol/$(DEPDIR)/incoming.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@protocol/$(DEPDIR)/outgoing.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@protocol/$(DEPDIR)/utility.Po@am__quote@ # am--include-marker
@@ -533,6 +590,8 @@ distclean-generic:
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
 	-rm -f ext/$(DEPDIR)/$(am__dirstamp)
 	-rm -f ext/$(am__dirstamp)
+	-rm -f ext/libjag/lib/$(DEPDIR)/$(am__dirstamp)
+	-rm -f ext/libjag/lib/$(am__dirstamp)
 	-rm -f protocol/$(DEPDIR)/$(am__dirstamp)
 	-rm -f protocol/$(am__dirstamp)
 
@@ -551,6 +610,13 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/player.Po
 	-rm -f ./$(DEPDIR)/server.Po
 	-rm -f ext/$(DEPDIR)/flea.Po
+	-rm -f ext/libjag/lib/$(DEPDIR)/jag_bzip2_decompress.Po
+	-rm -f ext/libjag/lib/$(DEPDIR)/jag_find_entry.Po
+	-rm -f ext/libjag/lib/$(DEPDIR)/jag_hash_entry_name.Po
+	-rm -f ext/libjag/lib/$(DEPDIR)/jag_read_entry.Po
+	-rm -f ext/libjag/lib/$(DEPDIR)/jag_read_header.Po
+	-rm -f ext/libjag/lib/$(DEPDIR)/jag_unpack_entry.Po
+	-rm -f ext/libjag/lib/$(DEPDIR)/jag_unpack_file.Po
 	-rm -f protocol/$(DEPDIR)/incoming.Po
 	-rm -f protocol/$(DEPDIR)/outgoing.Po
 	-rm -f protocol/$(DEPDIR)/utility.Po
@@ -606,6 +672,13 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/player.Po
 	-rm -f ./$(DEPDIR)/server.Po
 	-rm -f ext/$(DEPDIR)/flea.Po
+	-rm -f ext/libjag/lib/$(DEPDIR)/jag_bzip2_decompress.Po
+	-rm -f ext/libjag/lib/$(DEPDIR)/jag_find_entry.Po
+	-rm -f ext/libjag/lib/$(DEPDIR)/jag_hash_entry_name.Po
+	-rm -f ext/libjag/lib/$(DEPDIR)/jag_read_entry.Po
+	-rm -f ext/libjag/lib/$(DEPDIR)/jag_read_header.Po
+	-rm -f ext/libjag/lib/$(DEPDIR)/jag_unpack_entry.Po
+	-rm -f ext/libjag/lib/$(DEPDIR)/jag_unpack_file.Po
 	-rm -f protocol/$(DEPDIR)/incoming.Po
 	-rm -f protocol/$(DEPDIR)/outgoing.Po
 	-rm -f protocol/$(DEPDIR)/utility.Po

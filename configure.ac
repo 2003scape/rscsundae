@@ -8,5 +8,8 @@ AC_CONFIG_FILES([
  src/Makefile
 ])
 AC_CHECK_FUNCS([arc4random_buf])
+AC_CHECK_HEADER([bzlib.h])
+AC_SEARCH_LIBS([BZ2_bzDecompressInit], [bz2])
+AM_SILENT_RULES([yes])
 AX_LIB_EV
 AC_OUTPUT
