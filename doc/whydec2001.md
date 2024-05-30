@@ -5,13 +5,12 @@ Why 10th December 2001?
 
 RSCSundae has this as its target for several reasons:
 
-- This is the last versions of the RS Classic game before the
-  introduction of pay-to-play.
-  It contains the well-balanced free-to-play content that people love
+- This is the last version of the RS Classic game before the introduction
+  of pay-to-play.
+  It contains the well-balanced free-to-play content that players love
   and remember best.
-- It is the last client version that included the full
-  server-side spawn and NPC behaviour data, allowing
-  extremely accurate replication.
+- It is the last client version that included the full server-side spawn
+  and NPC behaviour data, allowing extremely accurate replication.
 
 Content included in mudclient110
 --------------------------------
