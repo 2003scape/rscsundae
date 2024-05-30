@@ -21,7 +21,7 @@ jag_find_entry(struct jag_archive *archive, const char *name,
 	for (i = 0; i < num_entries; ++i) {
 		if (jag_read_entry(archive->data,
 		    JAG_PER_FILE_METADATA_START + (JAG_ENTRY_HEADER_SIZE * i),
-		    archive->unpacked_len, &entry) != 0) {
+		    archive->unpacked_len, &entry) == -1) {
 			return -1;
 		}
 		offset += entry.packed_len;
