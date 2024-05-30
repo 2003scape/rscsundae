@@ -651,8 +651,8 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
-LINUXPOLL_FALSE
-LINUXPOLL_TRUE
+LIBEV_FALSE
+LIBEV_TRUE
 KQUEUE_FALSE
 KQUEUE_TRUE
 am__fastdepCC_FALSE
@@ -747,7 +747,6 @@ enable_option_checking
 enable_silent_rules
 enable_dependency_tracking
 with_kqueue
-with_linuxpoll
 with_libev
 '
       ac_precious_vars='build_alias
@@ -1392,8 +1391,6 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-kqueue           use kqueue for the event loop (best on BSD systems)
-                          [default=check]
-  --with-linuxpoll        use poll+timerfd for the event loop (best on Linux)
                           [default=check]
   --with-libev            use libev for the event loop [default=no]
 
@@ -4326,6 +4323,13 @@ then :
 
 fi
 
+ac_fn_c_check_func "$LINENO" "clock_gettime" "ac_cv_func_clock_gettime"
+if test "x$ac_cv_func_clock_gettime" = xyes
+then :
+  printf "%s\n" "#define HAVE_CLOCK_GETTIME 1" >>confdefs.h
+
+fi
+
 ac_header= ac_cache=
 for ac_item in $ac_header_c_list
 do
@@ -4355,6 +4359,12 @@ then :
 printf "%s\n" "#define STDC_HEADERS 1" >>confdefs.h
 
 fi
+ac_fn_c_check_header_compile "$LINENO" "sys/time.h" "ac_cv_header_sys_time_h" "$ac_includes_default"
+if test "x$ac_cv_header_sys_time_h" = xyes
+then :
+
+fi
+
 ac_fn_c_check_header_compile "$LINENO" "bzlib.h" "ac_cv_header_bzlib_h" "$ac_includes_default"
 if test "x$ac_cv_header_bzlib_h" = xyes
 then :
@@ -4473,16 +4483,6 @@ fi
 
 
 
-# Check whether --with-linuxpoll was given.
-if test ${with_linuxpoll+y}
-then :
-  withval=$with_linuxpoll;
-else $as_nop
-  with_linuxpoll=check
-fi
-
-
-
 # Check whether --with-libev was given.
 if test ${with_libev+y}
 then :
@@ -4522,57 +4522,17 @@ fi
 printf "%s\n" "#define HAVE_KQUEUE 1" >>confdefs.h
 
 
-else $as_nop
-  { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-printf "%s\n" "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "--with-kqueue was given, but test for kqueue failed
-See \`config.log' for more details" "$LINENO" 5; }
 fi
 
 done
 fi
 
  if false; then
-  LINUXPOLL_TRUE=
-  LINUXPOLL_FALSE='#'
+  LIBEV_TRUE=
+  LIBEV_FALSE='#'
 else
-  LINUXPOLL_TRUE='#'
-  LINUXPOLL_FALSE=
-fi
-
-if test "x$with_linuxpoll" != xno
-then :
-
-  for ac_func in poll timerfd_create
-do :
-  as_ac_var=`printf "%s\n" "ac_cv_func_$ac_func" | $as_tr_sh`
-ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
-if eval test \"x\$"$as_ac_var"\" = x"yes"
-then :
-  cat >>confdefs.h <<_ACEOF
-#define `printf "%s\n" "HAVE_$ac_func" | $as_tr_cpp` 1
-_ACEOF
-
-			 if true; then
-  LINUXPOLL_TRUE=
-  LINUXPOLL_FALSE='#'
-else
-  LINUXPOLL_TRUE='#'
-  LINUXPOLL_FALSE=
-fi
-
-
-printf "%s\n" "#define HAVE_LINUXPOLL 1" >>confdefs.h
-
-
-else $as_nop
-  { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-printf "%s\n" "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "--with-linuxpoll was given, but test for Linux poll failed
-See \`config.log' for more details" "$LINENO" 5; }
-fi
-
-done
+  LIBEV_TRUE='#'
+  LIBEV_FALSE=
 fi
 
 if test "x$with_libev" = xyes
@@ -4637,7 +4597,17 @@ if test "$ac_res" != no
 then :
   test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
 
+				 if true; then
+  LIBEV_TRUE=
+  LIBEV_FALSE='#'
+else
+  LIBEV_TRUE='#'
+  LIBEV_FALSE=
+fi
+
+
 printf "%s\n" "#define HAVE_LIBEV 1" >>confdefs.h
+
 
 else $as_nop
   { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
@@ -4796,12 +4766,12 @@ if test -z "${KQUEUE_TRUE}" && test -z "${KQUEUE_FALSE}"; then
   as_fn_error $? "conditional \"KQUEUE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${LINUXPOLL_TRUE}" && test -z "${LINUXPOLL_FALSE}"; then
-  as_fn_error $? "conditional \"LINUXPOLL\" was never defined.
+if test -z "${LIBEV_TRUE}" && test -z "${LIBEV_FALSE}"; then
+  as_fn_error $? "conditional \"LIBEV\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${LINUXPOLL_TRUE}" && test -z "${LINUXPOLL_FALSE}"; then
-  as_fn_error $? "conditional \"LINUXPOLL\" was never defined.
+if test -z "${LIBEV_TRUE}" && test -z "${LIBEV_FALSE}"; then
+  as_fn_error $? "conditional \"LIBEV\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

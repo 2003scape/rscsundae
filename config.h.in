@@ -3,6 +3,9 @@
 /* Define to 1 if you have the `arc4random_buf' function. */
 #undef HAVE_ARC4RANDOM_BUF
 
+/* Define to 1 if you have the `clock_gettime' function. */
+#undef HAVE_CLOCK_GETTIME
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
@@ -11,12 +14,6 @@
 
 /* Define if you have libev */
 #undef HAVE_LIBEV
-
-/* Define if you have Linux poll */
-#undef HAVE_LINUXPOLL
-
-/* Define to 1 if you have the `poll' function. */
-#undef HAVE_POLL
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
@@ -38,9 +35,6 @@
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
-
-/* Define to 1 if you have the `timerfd_create' function. */
-#undef HAVE_TIMERFD_CREATE
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H

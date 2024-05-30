@@ -88,8 +88,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 bin_PROGRAMS = rscsundae$(EXEEXT)
 @KQUEUE_TRUE@am__append_1 = loop-kqueue.c
-@KQUEUE_FALSE@@LINUXPOLL_TRUE@am__append_2 = loop-linuxpoll.c
-@KQUEUE_FALSE@@LINUXPOLL_FALSE@am__append_3 = loop-ev.c
+@KQUEUE_FALSE@@LIBEV_TRUE@am__append_2 = loop-ev.c
+@KQUEUE_FALSE@@LIBEV_FALSE@am__append_3 = loop-poll.c
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -110,13 +110,12 @@ am__rscsundae_SOURCES_DIST = buffer.c mob.c netio.c player.c server.c \
 	ext/libjag/lib/jag_read_header.c \
 	ext/libjag/lib/jag_unpack_entry.c \
 	ext/libjag/lib/jag_unpack_file.c protocol/incoming.c \
-	protocol/outgoing.c protocol/utility.c loop-kqueue.c \
-	loop-linuxpoll.c loop-ev.c
+	protocol/outgoing.c protocol/utility.c loop-kqueue.c loop-ev.c \
+	loop-poll.c
 am__dirstamp = $(am__leading_dot)dirstamp
 @KQUEUE_TRUE@am__objects_1 = loop-kqueue.$(OBJEXT)
-@KQUEUE_FALSE@@LINUXPOLL_TRUE@am__objects_2 =  \
-@KQUEUE_FALSE@@LINUXPOLL_TRUE@	loop-linuxpoll.$(OBJEXT)
-@KQUEUE_FALSE@@LINUXPOLL_FALSE@am__objects_3 = loop-ev.$(OBJEXT)
+@KQUEUE_FALSE@@LIBEV_TRUE@am__objects_2 = loop-ev.$(OBJEXT)
+@KQUEUE_FALSE@@LIBEV_FALSE@am__objects_3 = loop-poll.$(OBJEXT)
 am_rscsundae_OBJECTS = buffer.$(OBJEXT) mob.$(OBJEXT) netio.$(OBJEXT) \
 	player.$(OBJEXT) server.$(OBJEXT) config/text.$(OBJEXT) \
 	ext/flea.$(OBJEXT) \
@@ -148,7 +147,7 @@ DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/buffer.Po ./$(DEPDIR)/loop-ev.Po \
-	./$(DEPDIR)/loop-kqueue.Po ./$(DEPDIR)/loop-linuxpoll.Po \
+	./$(DEPDIR)/loop-kqueue.Po ./$(DEPDIR)/loop-poll.Po \
 	./$(DEPDIR)/mob.Po ./$(DEPDIR)/netio.Po ./$(DEPDIR)/player.Po \
 	./$(DEPDIR)/server.Po config/$(DEPDIR)/text.Po \
 	ext/$(DEPDIR)/flea.Po \
@@ -448,7 +447,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/buffer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loop-ev.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loop-kqueue.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loop-linuxpoll.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loop-poll.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mob.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/netio.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/player.Po@am__quote@ # am--include-marker
@@ -625,7 +624,7 @@ distclean: distclean-am
 		-rm -f ./$(DEPDIR)/buffer.Po
 	-rm -f ./$(DEPDIR)/loop-ev.Po
 	-rm -f ./$(DEPDIR)/loop-kqueue.Po
-	-rm -f ./$(DEPDIR)/loop-linuxpoll.Po
+	-rm -f ./$(DEPDIR)/loop-poll.Po
 	-rm -f ./$(DEPDIR)/mob.Po
 	-rm -f ./$(DEPDIR)/netio.Po
 	-rm -f ./$(DEPDIR)/player.Po
@@ -690,7 +689,7 @@ maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/buffer.Po
 	-rm -f ./$(DEPDIR)/loop-ev.Po
 	-rm -f ./$(DEPDIR)/loop-kqueue.Po
-	-rm -f ./$(DEPDIR)/loop-linuxpoll.Po
+	-rm -f ./$(DEPDIR)/loop-poll.Po
 	-rm -f ./$(DEPDIR)/mob.Po
 	-rm -f ./$(DEPDIR)/netio.Po
 	-rm -f ./$(DEPDIR)/player.Po
