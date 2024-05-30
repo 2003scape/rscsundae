@@ -19,8 +19,8 @@ Content included in mudclient110
 - Regions: Asgarnia, Misthalin, Al Kharid, the Wilderness, Crandor,
   and the area around Karamja Volcano are available and almost fully
   complete, with some caveats (mentioned below).
-- Guilds: There is a Mining Guild, Cooking Guild, Prayer Guild, and
-  Champions' Guild.  There is no Crafting Guild, since this was originally
+- Guilds: There was a Mining Guild, Cooking Guild, Prayer Guild, and
+  Champions' Guild.  There was no Crafting Guild, since this was originally
   pay-to-play content. Gold rocks are therefore more spread around the map,
   making things a bit more balanced.
 - Wilderness: It contained the graveyard, eastern Chaos Temple, Bone Yard,
@@ -85,7 +85,7 @@ Smithing, Mining
   strings broke the Crafting skill.
 - Cooking and Fishing contain fish up to Swordfish (no sharks),
   pizzas up to Anchovy (no pineapple), wine, cakes, bread,
-  stews, and meat.  Cooking is fairly grounded and the popular
+  stews, and meat.  Cooking was fairly grounded and the popular
   content was there.
 - Crafting was almost fully complete besides dragonstones,
   unholy symbols, and and glass making.  Besides dragonstones,
@@ -102,8 +102,8 @@ Smithing, Mining
   Wilderness and as a very rare drop from certain monsters.
   Chaos-Runes are much more common but still quite rare.
   Most RS Classic players believe this system was more balanced,
-  since the fully accurate damage at higher levels is more limited.
-- Prayer is fully complete.
+  since the fully accurate damage at higher levels was more limited.
+- Prayer was fully complete.
 
 ### Other
 
