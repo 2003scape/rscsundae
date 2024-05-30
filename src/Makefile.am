@@ -26,10 +26,10 @@ rscsundae_SOURCES = \
 if KQUEUE
 rscsundae_SOURCES += loop-kqueue.c
 else
-if LINUXPOLL
-rscsundae_SOURCES += loop-linuxpoll.c
-else
+if LIBEV
 rscsundae_SOURCES += loop-ev.c
+else
+rscsundae_SOURCES += loop-poll.c
 endif
 endif
 

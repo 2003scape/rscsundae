@@ -1,4 +1,7 @@
-#include <sys/timerfd.h>
+#include "../config.h"
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
 #include <sys/socket.h>
 #include <poll.h>
 #include <errno.h>
@@ -6,17 +9,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 #include "entity.h"
 #include "loop.h"
 #include "server.h"
 #include "netio.h"
 
-/* i'd rather have kqueue, but... */
-
 struct server *serv;
 
 static void server_sock_cb(int fd);
+static uint64_t get_time_ms(void);
 
 static void
 server_sock_cb(int fd)
@@ -40,6 +43,26 @@ server_sock_cb(int fd)
 	}
 }
 
+static uint64_t
+get_time_ms(void)
+{
+	uint64_t milliseconds = 0;
+#ifdef HAVE_CLOCK_GETTIME
+	struct timespec ts = {0};
+
+	(void)clock_gettime(CLOCK_MONOTONIC, &ts);
+	milliseconds = ts.tv_sec * 1000LL;
+	milliseconds += ts.tv_nsec / 1000000LL;
+#else
+	struct timeval tv = {0};
+
+	(void)gettimeofday(&tv, NULL);
+	milliseconds = tv.tv_sec * 1000LL;
+	milliseconds += tv.tv_usec / 1000LL;
+#endif
+	return milliseconds;
+}
+
 int
 loop_add_player(struct player *p)
 {
@@ -50,30 +73,11 @@ int
 loop_start(struct server *s, int port)
 {
 	int sockets[8];
-	int tfd = -1;
-	struct pollfd pfds[12];
-	struct itimerspec its = {0};
+	struct pollfd pfds[8];
 	int numsockets = 0;
+	uint64_t next_tick = 0;
 
 	serv = s;
-
-	tfd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
-
-	if (tfd == 0) {
-		fprintf(stderr, "failed to open timerfd: %s\n", strerror(errno));
-		goto err;
-	}
-
-	its.it_value.tv_nsec = 640000000L;
-	its.it_interval.tv_nsec = 640000000L;
-
-	if (timerfd_settime(tfd, 0, &its, NULL) == -1) {
-		fprintf(stderr, "failed to set timerfd: %s\n", strerror(errno));
-		goto err;
-	}
-
-	pfds[0].fd = tfd;
-	pfds[0].events = POLLRDNORM | POLLRDBAND;
 
 	numsockets = net_establish_listener(sockets, port);
 	if (numsockets == 0) {
@@ -83,35 +87,28 @@ loop_start(struct server *s, int port)
 
 	printf("got %d sockets\n", numsockets);
 	for (unsigned i = 0; i < numsockets; ++i) {
-		pfds[i + 1].fd = sockets[i];
-		pfds[i + 1].events = POLLRDNORM | POLLRDBAND;
+		pfds[i].fd = sockets[i];
+		pfds[i].events = POLLRDNORM | POLLRDBAND;
 	}
 
-
-	while (poll(pfds, numsockets + 1, -1) != -1) {
-		if ((pfds[0].revents & POLLRDNORM) ||
-		    (pfds[0].revents & POLLRDBAND)) {
-			(void)timerfd_settime(tfd, 0, &its, NULL);
-			server_tick();
-			continue;
-		}
+	while (poll(pfds, numsockets, 640) != -1) {
 		for (unsigned i = 0; i < numsockets; ++i) {
-			if ((pfds[i + 1].revents & POLLRDNORM) ||
-			    (pfds[i + 1].revents & POLLRDBAND)) {
-				server_sock_cb(pfds[i + 1].fd);
+			if ((pfds[i].revents & POLLRDNORM) ||
+			    (pfds[i].revents & POLLRDBAND)) {
+				server_sock_cb(pfds[i].fd);
 			}
 		}
+		if (get_time_ms() >= next_tick) {
+			server_tick();
+			next_tick = get_time_ms() + 640;
+		}
 	}
-	close(tfd);
 	for (unsigned i = 0; i < numsockets; ++i) {
 		close(sockets[i]);
 	}
 	printf("done\n");
 	return 0;
 err:
-	if (tfd != -1) {
-		close(tfd);
-	}
 	for (unsigned i = 0; i < numsockets; ++i) {
 		close(sockets[i]);
 	}
