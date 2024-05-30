@@ -9,7 +9,7 @@ Since RSC-C runs on old and low-power mobile devices, RSCSundae
 should target similar devices.
 
 An initial target for RSCSundae should be to accurately replicate
-RS Classic on the 19th December 2001, since lots of preserved data
+RS Classic on the 10th December 2001, since lots of preserved data
 exists for this date. This should be accomplished using the
 original game's data files and an implementation of the RuneScript
 API in a modern scripting language.
