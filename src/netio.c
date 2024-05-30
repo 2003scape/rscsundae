@@ -1,4 +1,5 @@
 #include <sys/socket.h>
+#include <fcntl.h>
 #include <netdb.h>
 #include <stdio.h>
 #include <errno.h>
@@ -18,7 +19,7 @@ net_establish_listener(int *sockets, int port)
 
 	hints.ai_family = PF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = AI_PASSIVE | AI_NUMERICSERV;
+	hints.ai_flags = AI_PASSIVE;
 
 	if (getaddrinfo("127.0.0.1", portstr, &hints, &ai0) == -1) {
 		fprintf(stderr, "failed to getaddrinfo: %s\n", strerror(errno));
@@ -26,12 +27,20 @@ net_establish_listener(int *sockets, int port)
 	}
 
 	for (ai = ai0; ai != NULL; ai = ai->ai_next) {
-		int s = socket(ai->ai_family, SOCK_STREAM | SOCK_NONBLOCK, 0);
+		int s = socket(ai->ai_family, SOCK_STREAM, 0);
 		if (s == -1) {
 			fprintf(stderr,
 			    "failed to open socket: %s\n", strerror(errno));
 			continue;
 		}
+
+		int flags = fcntl(s, F_GETFL, 0);
+		if (flags == -1) {
+			close(s);
+			continue;
+		}
+
+		(void)fcntl(s, F_SETFL, flags | O_NONBLOCK);
 
 		if (bind(s, ai->ai_addr, ai->ai_addrlen) == -1) {
 			fprintf(stderr,
