@@ -25,6 +25,7 @@ enum equip_type {
 	EQUIP_TYPE_BACK		= 0x0800
 };
 
+/* "object.txt" - definitions for items */
 struct item_config {
 	uint16_t id;
 	uint16_t name_count;
@@ -48,7 +49,19 @@ struct item_config {
 	uint8_t quest_item; /* untradable */
 };
 
+/* "entity.txt" - definitions for sprites/animations for mobs */
+struct entity_config {
+	uint16_t id;
+	char *name;
+	char *file_name;
+	uint32_t colour;
+	uint8_t mask;
+	uint8_t has_a;
+	uint8_t has_f;
+};
+
 struct item_config *config_parse_items(char *, size_t, size_t *);
+struct entity_config *config_parse_entity(char *, size_t, size_t *);
 bool item_equip_clear(struct item_config *, int);
 
 #endif

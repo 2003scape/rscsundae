@@ -254,6 +254,19 @@ load_config_jag(void)
 	}
 	printf("read configuration for %zu items (\"objects\")\n",
 	    s.item_config_count);
+
+	if (jag_find_entry(&archive, "entity.txt", &entry) == -1 ||
+	    jag_unpack_entry(&entry) == -1) {
+		goto err;
+	}
+	s.entity_config = config_parse_entity((char *)entry.data,
+	    entry.unpacked_len, &s.entity_config_count);
+	if (s.entity_config == NULL) {
+		goto err;
+	}
+	printf("read configuration for %zu mob sprites (\"entities\")\n",
+	    s.entity_config_count);
+
 	if (archive.must_free) {
 		free(archive.data);
 		archive.data = NULL;

@@ -306,3 +306,70 @@ err:
 	items = NULL;
 	return NULL;
 }
+
+struct entity_config *
+config_parse_entity(char *buffer, size_t len, size_t *num_entities)
+{
+	struct entity_config *entities = NULL;
+	size_t max_entities;
+	size_t offset;
+	ssize_t tmp;
+	long tmpl;
+
+	offset = 0;
+	tmp = next_token_int(buffer, offset, len, &tmpl);
+	if (tmp == -1) {
+		return NULL;
+	}
+	offset = tmp;
+	max_entities = tmpl;
+
+	entities = calloc(max_entities, sizeof(struct entity_config));
+	if (entities == NULL) {
+		return NULL;
+	}
+
+	for (size_t i = 0; i < max_entities; ++i) {
+		entities[i].id = i;
+
+		/* first line: name and filename */
+
+		tmp = next_line(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+
+		tmp = next_token(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		entities[i].name = buffer + tmp;
+		offset = tmp + strlen((char *)buffer + tmp) + 1;
+
+		tmp = next_token(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		entities[i].file_name = buffer + tmp;
+		offset = tmp + strlen((char *)buffer + tmp) + 1;
+
+		/* second line: colour mask and metadata */
+
+		tmp = next_line(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+
+		/* ignored for now */
+	}
+
+	*num_entities = max_entities;
+	return entities;
+err:
+	assert(0);
+	free(entities);
+	entities = NULL;
+	return NULL;
+}

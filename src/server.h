@@ -15,6 +15,8 @@ struct server {
 	struct ranctx ran;
 	struct item_config *item_config;
 	size_t item_config_count;
+	struct entity_config *entity_config;
+	size_t entity_config_count;
 };
 
 void server_tick(void);
