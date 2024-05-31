@@ -64,9 +64,10 @@ player_accept(struct server *s, int sock)
 	p->mob.base_stats[SKILL_HITS] = 10;
 	p->experience[SKILL_HITS] = 4000;
 
-	p->sprites[ANIM_SLOT_HEAD] = ANIM_HEAD1 + 1;
-	p->sprites[ANIM_SLOT_BODY] = ANIM_BODY1 + 1;
-	p->sprites[ANIM_SLOT_LEGS] = ANIM_LEGS1 + 1;
+	p->sprites_base[ANIM_SLOT_HEAD] = ANIM_HEAD1 + 1;
+	p->sprites_base[ANIM_SLOT_BODY] = ANIM_BODY1 + 1;
+	p->sprites_base[ANIM_SLOT_LEGS] = ANIM_LEGS1 + 1;
+
 	p->hair_colour = COLOUR_HAIR_DEFAULT;
 	p->top_colour = COLOUR_TOP_DEFAULT;
 	p->leg_colour = COLOUR_LEG_DEFAULT;
@@ -78,34 +79,50 @@ player_accept(struct server *s, int sock)
 	p->bonus_magic = 1;
 
 	/* add some test items */
-	p->inventory[0].id = 10;
-	p->inventory[0].stack = 1000;
-	p->inventory[1].id = 81;
-	p->inventory[1].stack = 1;
-	p->inventory[2].id = 222;
-	p->inventory[2].stack = 1;
-	p->inventory[3].id = 5;
-	p->inventory[3].stack = 1;
-	p->inventory[4].id = 6;
-	p->inventory[4].stack = 1;
-	p->inventory[5].id = 7;
-	p->inventory[5].stack = 1;
-	p->inventory[6].id = 9;
-	p->inventory[6].stack = 1;
-	p->inventory[7].id = 312;
-	p->inventory[7].stack = 1;
-	p->inventory[8].id = 2;
-	p->inventory[8].stack = 1;
-	p->inv_count = 9;
+	p->inventory[p->inv_count].id = 10;
+	p->inventory[p->inv_count++].stack = 1000;
+	p->inventory[p->inv_count].id = 81;
+	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 222;
+	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 5;
+	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 6;
+	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 7;
+	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 9;
+	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 312;
+	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 2;
+	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 24;
+	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 187;
+	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 191;
+	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 188;
+	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 183;
+	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 16;
+	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 17;
+	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 59;
+	p->inventory[p->inv_count++].stack = 1;
 
 	p->stats_changed = true;
 	p->bonus_changed = true;
-	p->appearance_changed = true;
 	p->plane_changed = true;
 	p->inv_changed = true;
 	p->ui_design_open = true;
 	p->following_player = -1;
 	p->last_packet = s->tick_counter;
+
+	player_recalculate_sprites(p);
 
 	p->mob.server = s;
 	/*p->mob.x = 120;
@@ -638,6 +655,7 @@ player_wear(struct player *p, int slot)
 	}
 	p->inventory[slot].worn = true;
 	player_recalculate_bonus(p);
+	player_recalculate_sprites(p);
 	player_send_inv_slot(p, slot, p->inventory[slot].id + 0x8000, 1);
 	return 0;
 }
@@ -657,6 +675,65 @@ player_unwear(struct player *p, int slot)
 	}
 	p->inventory[slot].worn = false;
 	player_recalculate_bonus(p);
+	player_recalculate_sprites(p);
 	player_send_inv_slot(p, slot, p->inventory[slot].id, 1);
 	return 0;
+}
+
+int
+player_recalculate_sprites(struct player *p)
+{
+	uint8_t sprites_orig[MAX_ENTITY_SPRITES];
+
+	memcpy(sprites_orig, p->sprites, sizeof(sprites_orig));
+	memcpy(p->sprites, p->sprites_base, sizeof(p->sprites));
+
+	for (int i = 0; i < p->inv_count; ++i) {
+		if (!p->inventory[i].worn) {
+			continue;
+		}
+		struct item_config *item;
+
+		item = server_item_config_by_id(p->inventory[i].id);
+		if (item == NULL) {
+			continue;
+		}
+		if (item->equip_type == EQUIP_TYPE_WEAPON_OFF) {
+			/* funny special case, bows go in the shield slot */
+			p->sprites[ANIM_SLOT_OFFHAND] = item->entity_sprite + 1;
+		} else if ((item->equip_type & EQUIP_TYPE_WEAPON) != 0) {
+			p->sprites[ANIM_SLOT_HAND] = item->entity_sprite + 1;
+		} else if ((item->equip_type & EQUIP_TYPE_SHIELD) != 0) {
+			p->sprites[ANIM_SLOT_OFFHAND] = item->entity_sprite + 1;
+		} else if ((item->equip_type & EQUIP_TYPE_HEAD) != 0) {
+			p->sprites[ANIM_SLOT_HELMET] = item->entity_sprite + 1;
+		} else if ((item->equip_type & EQUIP_TYPE_TORSO) != 0) {
+			p->sprites[ANIM_SLOT_SHIRT] = item->entity_sprite + 1;
+		} else if ((item->equip_type & EQUIP_TYPE_HANDS) != 0) {
+			p->sprites[ANIM_SLOT_GLOVES] = item->entity_sprite + 1;
+		} else if ((item->equip_type & EQUIP_TYPE_LEGS) != 0) {
+			p->sprites[ANIM_SLOT_TROUSERS] = item->entity_sprite + 1;
+		} else if ((item->equip_type & EQUIP_TYPE_SHOES) != 0) {
+			p->sprites[ANIM_SLOT_SHOES] = item->entity_sprite + 1;
+		} else if ((item->equip_type & EQUIP_TYPE_NECK) != 0) {
+			p->sprites[ANIM_SLOT_NECK] = item->entity_sprite + 1;
+		} else if ((item->equip_type & EQUIP_TYPE_BACK) != 0) {
+			p->sprites[ANIM_SLOT_CAPE] = item->entity_sprite + 1;
+		}
+
+		if (item->equip_type == EQUIP_TYPE_HEAD_FULL) {
+			p->sprites[ANIM_SLOT_HEAD] = 0;
+		}
+		if (item->equip_type == EQUIP_TYPE_TORSO_FULL) {
+			p->sprites[ANIM_SLOT_BODY] = 0;
+		}
+		if (item->equip_type == EQUIP_TYPE_LEGS_FULL ||
+		    item->equip_type == EQUIP_TYPE_LEGS_FULL2) {
+			p->sprites[ANIM_SLOT_LEGS] = 0;
+		}
+	}
+
+	if (memcmp(sprites_orig, p->sprites, sizeof(sprites_orig)) != 0) {
+		p->appearance_changed = true;
+	}
 }

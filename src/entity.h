@@ -20,6 +20,8 @@
 #define MAX_FRIENDS		(200)
 #define MAX_IGNORE		(100)
 
+#define MAX_ENTITY_SPRITES	(12)
+
 #define WALK_QUEUE_LEN		(16)
 
 struct server;
@@ -126,7 +128,8 @@ struct player {
 	uint8_t plane_changed;
 	uint8_t inv_changed;
 	uint8_t moved;
-	uint8_t sprites[12];
+	uint8_t sprites_base[MAX_ENTITY_SPRITES];
+	uint8_t sprites[MAX_ENTITY_SPRITES];
 	uint8_t client_settings[MAX_CLIENT_SETTINGS];
 	uint8_t gender;
 	uint8_t hair_colour;
@@ -204,6 +207,7 @@ int player_remove_friend(struct player *, int64_t);
 void player_pvp_attack(struct player *, struct player *);
 int player_wear(struct player *, int);
 int player_unwear(struct player *, int);
+int player_recalculate_sprites(struct player *);
 
 /* incoming.c */
 int player_parse_incoming(struct player *);

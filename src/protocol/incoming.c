@@ -392,29 +392,32 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			(void)buf_getu8(data, offset++, len, &p->gender);
-			(void)buf_getu8(data, offset++, len, &p->sprites[ANIM_SLOT_HEAD]);
-			if (p->sprites[ANIM_SLOT_HEAD] != ANIM_HEAD1 &&
-			    p->sprites[ANIM_SLOT_HEAD] != ANIM_HEAD2 &&
-			    p->sprites[ANIM_SLOT_HEAD] != ANIM_HEAD3 &&
-			    p->sprites[ANIM_SLOT_HEAD] != ANIM_HEAD4 &&
-			    p->sprites[ANIM_SLOT_HEAD] != ANIM_FHEAD1) {
-				p->sprites[ANIM_SLOT_HEAD] = ANIM_HEAD1;
+			(void)buf_getu8(data, offset++, len,
+			    &p->sprites_base[ANIM_SLOT_HEAD]);
+			if (p->sprites_base[ANIM_SLOT_HEAD] != ANIM_HEAD1 &&
+			    p->sprites_base[ANIM_SLOT_HEAD] != ANIM_HEAD2 &&
+			    p->sprites_base[ANIM_SLOT_HEAD] != ANIM_HEAD3 &&
+			    p->sprites_base[ANIM_SLOT_HEAD] != ANIM_HEAD4 &&
+			    p->sprites_base[ANIM_SLOT_HEAD] != ANIM_FHEAD1) {
+				p->sprites_base[ANIM_SLOT_HEAD] = ANIM_HEAD1;
 			}
-			p->sprites[ANIM_SLOT_HEAD]++;
+			p->sprites_base[ANIM_SLOT_HEAD]++;
 
-			(void)buf_getu8(data, offset++, len, &p->sprites[ANIM_SLOT_BODY]);
-			if (p->sprites[ANIM_SLOT_BODY] != ANIM_BODY1 &&
-			    p->sprites[ANIM_SLOT_BODY] != ANIM_FBODY1) {
-				p->sprites[ANIM_SLOT_BODY] = ANIM_BODY1;
+			(void)buf_getu8(data, offset++, len,
+			    &p->sprites_base[ANIM_SLOT_BODY]);
+			if (p->sprites_base[ANIM_SLOT_BODY] != ANIM_BODY1 &&
+			    p->sprites_base[ANIM_SLOT_BODY] != ANIM_FBODY1) {
+				p->sprites_base[ANIM_SLOT_BODY] = ANIM_BODY1;
 			}
-			p->sprites[ANIM_SLOT_BODY]++;
+			p->sprites_base[ANIM_SLOT_BODY]++;
 
-			(void)buf_getu8(data, offset++, len, &p->sprites[ANIM_SLOT_LEGS]);
+			(void)buf_getu8(data, offset++, len,
+				&p->sprites_base[ANIM_SLOT_LEGS]);
 			/* authentically only one choice of leg */
-			if (p->sprites[ANIM_SLOT_LEGS] != ANIM_LEGS1) {
-				p->sprites[ANIM_SLOT_LEGS] = ANIM_LEGS1;
+			if (p->sprites_base[ANIM_SLOT_LEGS] != ANIM_LEGS1) {
+				p->sprites_base[ANIM_SLOT_LEGS] = ANIM_LEGS1;
 			}
-			p->sprites[ANIM_SLOT_LEGS]++;
+			p->sprites_base[ANIM_SLOT_LEGS]++;
 
 			(void)buf_getu8(data, offset++, len, &p->hair_colour);
 			if (p->hair_colour > MAX_PLAYER_HAIR_COLOUR) {
@@ -438,6 +441,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 
 			(void)buf_getu8(data, offset++, len, &p->rpg_class);
 
+			player_recalculate_sprites(p);
 			p->appearance_changed = true;
 			p->ui_design_open = false;
 		}
