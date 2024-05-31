@@ -88,7 +88,7 @@ Smithing, Mining
   stews, and meat.  Cooking was fairly grounded and the popular
   content was there.
 - Crafting was almost fully complete besides dragonstones,
-  unholy symbols, and and glass making.  Besides dragonstones,
+  unholy symbols, and glass making.  Besides dragonstones,
   this is fairly unpopular content.  Pottery, leatherworking,
   wool spinning, gem cutting, and silver/gold moulding are all there.
 - Woodcutting consists of pointy, round, and unhealthy trees.
