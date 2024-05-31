@@ -54,7 +54,6 @@ player_inv_give(struct player *p, struct item_config *item, uint32_t count)
 void
 player_inv_remove(struct player *p, struct item_config *item, uint32_t count)
 {
-	struct item_config *c;
 	uint32_t removed = 0;
 
 	if (item->weight == 0) {
@@ -123,4 +122,5 @@ player_inv_clear(struct player *p)
 {
 	p->inv_count = 0;
 	p->inv_changed = true;
+	return 0;
 }
