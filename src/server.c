@@ -194,6 +194,9 @@ server_tick(void)
 		if (s.players[i]->inv_changed) {
 			player_send_inv(s.players[i]);
 		}
+		if (s.players[i]->bonus_changed) {
+			player_send_equip_bonuses(s.players[i]);
+		}
 		player_send_movement(s.players[i]);
 		player_send_appearance_update(s.players[i]);
 		net_player_send(s.players[i]);
@@ -208,6 +211,7 @@ server_tick(void)
 		s.players[i]->plane_changed = false;
 		s.players[i]->stats_changed = false;
 		s.players[i]->inv_changed = false;
+		s.players[i]->bonus_changed = false;
 		s.players[i]->moved = false;
 		s.players[i]->mob.damage = UINT8_MAX;
 		s.players[i]->mob.prev_dir = s.players[i]->mob.dir;

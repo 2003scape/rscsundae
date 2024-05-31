@@ -121,6 +121,7 @@ struct player {
 	int64_t name;
 	int16_t following_player;
 	uint8_t stats_changed;
+	uint8_t bonus_changed;
 	uint8_t appearance_changed;
 	uint8_t plane_changed;
 	uint8_t inv_changed;
@@ -156,9 +157,11 @@ struct player {
 	uint16_t friend_count;
 	uint16_t ignore_count;
 	uint8_t combat_style;
-	uint8_t weapon_aim;
-	uint8_t weapon_power;
-	uint8_t armour;
+	uint8_t bonus_armour;
+	uint8_t bonus_weaponaim;
+	uint8_t bonus_weaponpower;
+	uint8_t bonus_magic;
+	uint8_t bonus_prayer;
 	uint8_t inv_count;
 	struct invitem inventory[MAX_INV_SIZE];
 };
@@ -222,6 +225,7 @@ int player_send_death(struct player *);
 int player_send_inv(struct player *);
 int player_send_inv_slot(struct player *, int, int, uint32_t);
 int player_send_inv_remove(struct player *, int);
+int player_send_equip_bonuses(struct player *);
 int player_notify_friend_online(struct player *, int64_t);
 int player_notify_friend_offline(struct player *, int64_t);
 

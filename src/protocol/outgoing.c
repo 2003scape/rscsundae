@@ -735,3 +735,23 @@ player_send_inv_remove(struct player *p, int slot)
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, slot);
 	return player_write_packet(p, p->tmpbuf, offset);
 }
+
+int
+player_send_equip_bonuses(struct player *p)
+{
+	size_t offset = 0;
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_EQUIP_BONUSES);
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        p->bonus_armour);
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        p->bonus_weaponaim);
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        p->bonus_weaponpower);
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        p->bonus_magic);
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        p->bonus_prayer);
+	return player_write_packet(p, p->tmpbuf, offset);
+}

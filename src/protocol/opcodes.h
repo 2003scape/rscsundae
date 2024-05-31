@@ -35,6 +35,7 @@
 #define OP_SRV_SHOW_DESIGN		(239)
 #define OP_SRV_STATS			(243)
 #define OP_SRV_DEATH			(241)
+#define OP_SRV_EQUIP_BONUSES		(242)
 #define OP_SRV_INIT_PLANE		(244)
 #define OP_SRV_PLAYER_APPEARANCE	(250)
 #define OP_SRV_INVENTORY		(252)

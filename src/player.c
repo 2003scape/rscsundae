@@ -12,6 +12,7 @@
 #include "netio.h"
 
 static int player_pvp_roll(struct player *, struct player *);
+static void player_recalculate_bonus(struct player *);
 
 struct player *
 player_accept(struct server *s, int sock)
@@ -70,18 +71,23 @@ player_accept(struct server *s, int sock)
 	p->top_colour = COLOUR_TOP_DEFAULT;
 	p->leg_colour = COLOUR_LEG_DEFAULT;
 
-	p->weapon_aim = 1;
-	p->weapon_power = 1;
-	p->armour = 1;
+	p->bonus_weaponaim = 1;
+	p->bonus_weaponpower = 1;
+	p->bonus_armour = 1;
+	p->bonus_prayer = 1;
+	p->bonus_magic = 1;
 
 	/* add some test items */
 	p->inventory[0].id = 10;
 	p->inventory[0].stack = 1000;
 	p->inventory[1].id = 81;
 	p->inventory[1].stack = 1;
-	p->inv_count = 2;
+	p->inventory[2].id = 222;
+	p->inventory[2].stack = 1;
+	p->inv_count = 3;
 
 	p->stats_changed = true;
+	p->bonus_changed = true;
 	p->appearance_changed = true;
 	p->plane_changed = true;
 	p->inv_changed = true;
@@ -353,9 +359,9 @@ player_pvp_roll(struct player *attacker, struct player *defender)
 	}
 
 	return mob_combat_roll(&attacker->mob.server->ran,
-	    att, attacker->weapon_aim,
-	    def, defender->armour,
-	    str, attacker->weapon_power);
+	    att, attacker->bonus_weaponaim,
+	    def, defender->bonus_armour,
+	    str, attacker->bonus_weaponpower);
 }
 
 void
@@ -555,6 +561,43 @@ player_retreat(struct player *p)
 	return 0;
 }
 
+static void
+player_recalculate_bonus(struct player *p)
+{
+	struct item_config *item;
+	int orig_armour = p->bonus_armour;
+	int orig_aim = p->bonus_weaponaim;
+	int orig_power = p->bonus_weaponpower;
+	int orig_magic = p->bonus_magic;
+	int orig_prayer = p->bonus_prayer;
+
+	p->bonus_armour = 1;
+	p->bonus_weaponaim = 1;
+	p->bonus_weaponpower = 1;
+	p->bonus_magic = 1;
+	p->bonus_prayer = 1;
+
+	for (int i = 0; i < p->inv_count; ++i) {
+		if (!p->inventory[i].worn) {
+			continue;
+		}
+		item = server_item_config_by_id(p->inventory[i].id);
+		p->bonus_armour += item->bonus_armour;
+		p->bonus_weaponaim += item->bonus_aim;
+		p->bonus_weaponpower += item->bonus_power;
+		p->bonus_magic += item->bonus_magic;
+		p->bonus_prayer += item->bonus_prayer;
+	}
+
+	if (p->bonus_weaponaim != orig_aim ||
+	    p->bonus_weaponpower != orig_power ||
+	    p->bonus_armour != orig_armour ||
+	    p->bonus_magic != orig_magic ||
+	    p->bonus_prayer != orig_prayer) {
+		p->bonus_changed = true;
+	}
+}
+
 int
 player_wear(struct player *p, int slot)
 {
@@ -579,6 +622,7 @@ player_wear(struct player *p, int slot)
 		}
 	}*/
 	p->inventory[slot].worn = true;
+	player_recalculate_bonus(p);
 	player_send_inv_slot(p, slot, p->inventory[slot].id + 0x8000, 1);
 	return 0;
 }
@@ -597,6 +641,7 @@ player_unwear(struct player *p, int slot)
 		return -1;
 	}
 	p->inventory[slot].worn = false;
+	player_recalculate_bonus(p);
 	player_send_inv_slot(p, slot, p->inventory[slot].id, 1);
 	return 0;
 }
