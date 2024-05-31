@@ -8,6 +8,7 @@
 /* entities defined in config.jag */
 
 struct item_config {
+	uint16_t id;
 	uint16_t name_count;
 	char *names[MAX_ITEM_NAMES];
 	char *description;
@@ -22,7 +23,7 @@ struct item_config {
 	uint8_t bonus_prayer;
 	uint8_t bonus_hiding; /* not used */
 	char *projectile;
-	uint32_t equip_mask;
+	uint32_t equip_type;
 	char *animation;
 	uint32_t colour;
 	uint16_t respawn_rate;

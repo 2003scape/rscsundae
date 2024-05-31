@@ -15,4 +15,5 @@ int buf_putu16(void *, size_t, size_t, uint16_t);
 int buf_putu32(void *, size_t, size_t, uint32_t);
 int buf_putu64(void *, size_t, size_t, uint64_t);
 int buf_putbits(void *, size_t, size_t, int, int);
+int buf_putsmartu32(void *, size_t, size_t, uint32_t);
 #endif

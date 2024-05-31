@@ -673,3 +673,65 @@ player_send_death(struct player *p)
 		        OP_SRV_DEATH);
 	return player_write_packet(p, p->tmpbuf, offset);
 }
+
+int
+player_send_inv(struct player *p)
+{
+	size_t offset = 0;
+	size_t tmpofs;
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_INVENTORY);
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        p->inv_count);
+	for (int i = 0; i < p->inv_count; ++i) {
+		struct item_config *item;
+		int id = p->inventory[i].id;
+
+		if (p->inventory[i].worn) {
+			id += 0x8000;
+		}
+		if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE, id) == -1) {
+			return -1;
+		}
+		offset += 2;
+		item = server_item_config_by_id(p->inventory[i].id);
+		if (item == NULL) {
+			return -1;
+		}
+		if (item->weight == 0) {
+			tmpofs = buf_putsmartu32(p->tmpbuf, offset,
+			    PLAYER_BUFSIZE, p->inventory[i].stack);
+			if (tmpofs == -1) {
+				return -1;
+			}
+			offset = tmpofs;
+		}
+	}
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
+player_send_inv_slot(struct player *p, int slot, int id, uint32_t stack)
+{
+	size_t offset = 0;
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_INVENTORY_ITEM);
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, slot);
+	(void)buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE, id);
+	offset += 2;
+	offset = buf_putsmartu32(p->tmpbuf, offset, PLAYER_BUFSIZE, id);
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
+player_send_inv_remove(struct player *p, int slot)
+{
+	size_t offset = 0;
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_INVENTORY_REMOVE);
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, slot);
+	return player_write_packet(p, p->tmpbuf, offset);
+}

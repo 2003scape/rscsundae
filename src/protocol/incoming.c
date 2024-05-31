@@ -314,6 +314,28 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			}
 		}
 		break;
+	case OP_CLI_INV_WEAR:
+		{
+			uint16_t slot;
+
+			if (buf_getu16(data, offset, len, &slot) == -1) {
+				return;
+			}
+			offset += 2;
+			player_wear(p, slot);
+		}
+		break;
+	case OP_CLI_INV_UNWEAR:
+		{
+			uint16_t slot;
+
+			if (buf_getu16(data, offset, len, &slot) == -1) {
+				return;
+			}
+			offset += 2;
+			player_unwear(p, slot);
+		}
+		break;
 	case OP_CLI_WALK_TILE:
 	case OP_CLI_WALK_ENTITY:
 		{

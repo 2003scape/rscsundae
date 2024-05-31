@@ -191,6 +191,9 @@ server_tick(void)
 		if (s.players[i]->stats_changed) {
 			player_send_stats_update(s.players[i]);
 		}
+		if (s.players[i]->inv_changed) {
+			player_send_inv(s.players[i]);
+		}
 		player_send_movement(s.players[i]);
 		player_send_appearance_update(s.players[i]);
 		net_player_send(s.players[i]);
@@ -204,6 +207,7 @@ server_tick(void)
 		s.players[i]->appearance_changed = false;
 		s.players[i]->plane_changed = false;
 		s.players[i]->stats_changed = false;
+		s.players[i]->inv_changed = false;
 		s.players[i]->moved = false;
 		s.players[i]->mob.damage = UINT8_MAX;
 		s.players[i]->mob.prev_dir = s.players[i]->mob.dir;
@@ -265,4 +269,13 @@ err:
 		f = NULL;
 	}
 	return -1;
+}
+
+struct item_config *
+server_item_config_by_id(int id)
+{
+	if (id < 0 || id >= (int)s.item_config_count) {
+		return NULL;
+	}
+	return &s.item_config[id];
 }

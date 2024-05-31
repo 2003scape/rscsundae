@@ -102,8 +102,9 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am__rscsundae_SOURCES_DIST = buffer.c mob.c netio.c player.c server.c \
-	config/text.c ext/flea.c ext/libjag/lib/jag_bzip2_decompress.c \
+am__rscsundae_SOURCES_DIST = buffer.c mob.c netio.c player.c \
+	inventory.c server.c config/text.c ext/flea.c \
+	ext/libjag/lib/jag_bzip2_decompress.c \
 	ext/libjag/lib/jag_find_entry.c \
 	ext/libjag/lib/jag_hash_entry_name.c \
 	ext/libjag/lib/jag_read_entry.c \
@@ -117,8 +118,8 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @KQUEUE_FALSE@@LIBEV_TRUE@am__objects_2 = loop-ev.$(OBJEXT)
 @KQUEUE_FALSE@@LIBEV_FALSE@am__objects_3 = loop-poll.$(OBJEXT)
 am_rscsundae_OBJECTS = buffer.$(OBJEXT) mob.$(OBJEXT) netio.$(OBJEXT) \
-	player.$(OBJEXT) server.$(OBJEXT) config/text.$(OBJEXT) \
-	ext/flea.$(OBJEXT) \
+	player.$(OBJEXT) inventory.$(OBJEXT) server.$(OBJEXT) \
+	config/text.$(OBJEXT) ext/flea.$(OBJEXT) \
 	ext/libjag/lib/jag_bzip2_decompress.$(OBJEXT) \
 	ext/libjag/lib/jag_find_entry.$(OBJEXT) \
 	ext/libjag/lib/jag_hash_entry_name.$(OBJEXT) \
@@ -146,9 +147,10 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/buffer.Po ./$(DEPDIR)/loop-ev.Po \
-	./$(DEPDIR)/loop-kqueue.Po ./$(DEPDIR)/loop-poll.Po \
-	./$(DEPDIR)/mob.Po ./$(DEPDIR)/netio.Po ./$(DEPDIR)/player.Po \
+am__depfiles_remade = ./$(DEPDIR)/buffer.Po ./$(DEPDIR)/inventory.Po \
+	./$(DEPDIR)/loop-ev.Po ./$(DEPDIR)/loop-kqueue.Po \
+	./$(DEPDIR)/loop-poll.Po ./$(DEPDIR)/mob.Po \
+	./$(DEPDIR)/netio.Po ./$(DEPDIR)/player.Po \
 	./$(DEPDIR)/server.Po config/$(DEPDIR)/text.Po \
 	ext/$(DEPDIR)/flea.Po \
 	ext/libjag/lib/$(DEPDIR)/jag_bzip2_decompress.Po \
@@ -289,8 +291,9 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = subdir-objects
 AM_CPPFLAGS = -Iext/libjag/include
-rscsundae_SOURCES = buffer.c mob.c netio.c player.c server.c \
-	config/text.c ext/flea.c ext/libjag/lib/jag_bzip2_decompress.c \
+rscsundae_SOURCES = buffer.c mob.c netio.c player.c inventory.c \
+	server.c config/text.c ext/flea.c \
+	ext/libjag/lib/jag_bzip2_decompress.c \
 	ext/libjag/lib/jag_find_entry.c \
 	ext/libjag/lib/jag_hash_entry_name.c \
 	ext/libjag/lib/jag_read_entry.c \
@@ -445,6 +448,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/buffer.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inventory.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loop-ev.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loop-kqueue.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/loop-poll.Po@am__quote@ # am--include-marker
@@ -622,6 +626,7 @@ clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
 
 distclean: distclean-am
 		-rm -f ./$(DEPDIR)/buffer.Po
+	-rm -f ./$(DEPDIR)/inventory.Po
 	-rm -f ./$(DEPDIR)/loop-ev.Po
 	-rm -f ./$(DEPDIR)/loop-kqueue.Po
 	-rm -f ./$(DEPDIR)/loop-poll.Po
@@ -687,6 +692,7 @@ installcheck-am:
 
 maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/buffer.Po
+	-rm -f ./$(DEPDIR)/inventory.Po
 	-rm -f ./$(DEPDIR)/loop-ev.Po
 	-rm -f ./$(DEPDIR)/loop-kqueue.Po
 	-rm -f ./$(DEPDIR)/loop-poll.Po

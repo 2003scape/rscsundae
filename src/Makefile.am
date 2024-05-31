@@ -9,6 +9,7 @@ rscsundae_SOURCES = \
 	mob.c \
 	netio.c \
 	player.c \
+	inventory.c \
 	server.c \
 	config/text.c \
 	ext/flea.c \

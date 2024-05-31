@@ -62,18 +62,29 @@ player_accept(struct server *s, int sock)
 	p->mob.cur_stats[SKILL_HITS] = 10;
 	p->mob.base_stats[SKILL_HITS] = 10;
 	p->experience[SKILL_HITS] = 4000;
+
 	p->sprites[ANIM_SLOT_HEAD] = ANIM_HEAD1 + 1;
 	p->sprites[ANIM_SLOT_BODY] = ANIM_BODY1 + 1;
 	p->sprites[ANIM_SLOT_LEGS] = ANIM_LEGS1 + 1;
 	p->hair_colour = COLOUR_HAIR_DEFAULT;
 	p->top_colour = COLOUR_TOP_DEFAULT;
 	p->leg_colour = COLOUR_LEG_DEFAULT;
+
 	p->weapon_aim = 1;
 	p->weapon_power = 1;
 	p->armour = 1;
+
+	/* add some test items */
+	p->inventory[0].id = 10;
+	p->inventory[0].stack = 1000;
+	p->inventory[1].id = 81;
+	p->inventory[1].stack = 1;
+	p->inv_count = 2;
+
 	p->stats_changed = true;
 	p->appearance_changed = true;
 	p->plane_changed = true;
+	p->inv_changed = true;
 	p->ui_design_open = true;
 	p->following_player = -1;
 	p->last_packet = s->tick_counter;
@@ -541,5 +552,51 @@ player_retreat(struct player *p)
 	}
 
 	mob_combat_reset(&p->mob);
+	return 0;
+}
+
+int
+player_wear(struct player *p, int slot)
+{
+	struct item_config *type, *type2;
+
+	if (slot < 0 || slot >= p->inv_count) {
+		return -1;
+	}
+	type = server_item_config_by_id(p->inventory[slot].id);
+	if (type == NULL || type->equip_type == 0) {
+		return -1;
+	}
+	/* XXX should be delayed by tick */
+	/* TODO scan previously equipped items to remove them */
+	/*for (int i = 0; i < p->inv_count; ++i) {
+		if (i == slot || !p->inventory[slot].worn) {
+			continue;
+		}
+		type2 = server_item_config_by_id(p->inventory[i].id);
+		if (type2 == NULL || type2->equip_type == 0) {
+			continue;
+		}
+	}*/
+	p->inventory[slot].worn = true;
+	player_send_inv_slot(p, slot, p->inventory[slot].id + 0x8000, 1);
+	return 0;
+}
+
+int
+player_unwear(struct player *p, int slot)
+{
+	struct item_config *type;
+
+	if (slot < 0 || slot >= p->inv_count) {
+		return -1;
+	}
+	/* XXX should be delayed by tick */
+	type = server_item_config_by_id(p->inventory[slot].id);
+	if (type == NULL || type->equip_type == 0) {
+		return -1;
+	}
+	p->inventory[slot].worn = false;
+	player_send_inv_slot(p, slot, p->inventory[slot].id, 1);
 	return 0;
 }

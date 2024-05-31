@@ -14,6 +14,7 @@
 #define MAX_PUBLIC_CHAT_LEN	(80)
 #define MAX_SKILL_ID		(16)
 #define MAX_CLIENT_SETTINGS	(3)
+#define MAX_INV_SIZE		(30)
 
 /* final client supports 100 ignore and 200 friend entries */
 #define MAX_FRIENDS		(200)
@@ -97,6 +98,12 @@ enum animslot {
 	ANIM_SLOT_CAPE		= 11,
 };
 
+struct invitem {
+	uint16_t id;
+	uint32_t stack;
+	uint8_t worn;
+};
+
 struct player {
 	struct mob mob;
 	int sock;
@@ -116,6 +123,7 @@ struct player {
 	uint8_t stats_changed;
 	uint8_t appearance_changed;
 	uint8_t plane_changed;
+	uint8_t inv_changed;
 	uint8_t moved;
 	uint8_t sprites[12];
 	uint8_t client_settings[MAX_CLIENT_SETTINGS];
@@ -151,6 +159,8 @@ struct player {
 	uint8_t weapon_aim;
 	uint8_t weapon_power;
 	uint8_t armour;
+	uint8_t inv_count;
+	struct invitem inventory[MAX_INV_SIZE];
 };
 
 struct bound {
@@ -189,6 +199,8 @@ int player_add_friend(struct player *, int64_t);
 int player_remove_ignore(struct player *, int64_t);
 int player_remove_friend(struct player *, int64_t);
 void player_pvp_attack(struct player *, struct player *);
+int player_wear(struct player *, int);
+int player_unwear(struct player *, int);
 
 /* incoming.c */
 int player_parse_incoming(struct player *);
@@ -207,6 +219,9 @@ int player_send_init_friends(struct player *);
 int player_send_init_ignore(struct player *);
 int player_send_pm(struct player *, int64_t, uint8_t *, size_t);
 int player_send_death(struct player *);
+int player_send_inv(struct player *);
+int player_send_inv_slot(struct player *, int, int, uint32_t);
+int player_send_inv_remove(struct player *, int);
 int player_notify_friend_online(struct player *, int64_t);
 int player_notify_friend_offline(struct player *, int64_t);
 

@@ -126,6 +126,8 @@ config_parse_items(char *buffer, size_t len, size_t *num_items)
 	}
 
 	for (size_t i = 0; i < max_items; ++i) {
+		items[i].id = i;
+
 		/* first line: names and description */
 
 		tmp = next_line(buffer, offset, len);
@@ -264,7 +266,7 @@ config_parse_items(char *buffer, size_t len, size_t *num_items)
 			goto err;
 		}
 		offset = tmp;
-		items[i].equip_mask = tmpl;
+		items[i].equip_type = tmpl;
 
 		tmp = next_token(buffer, offset, len);
 		if (tmp == -1) {

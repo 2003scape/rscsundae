@@ -150,6 +150,34 @@ buf_putu32(void *b, size_t offset, size_t buflen, uint32_t in)
 	return 0;
 }
 
+/*
+ * This is used for item stacks which have the special property
+ * of usually being either 1 or a much higher number.
+ */
+int
+buf_putsmartu32(void *b, size_t offset, size_t buflen, uint32_t in)
+{
+	uint8_t *buffer;
+
+	if (in < 128) {
+		if (buf_putu8(b, offset, buflen, (uint8_t)in) == -1) {
+			return -1;
+		}
+		return offset + 1;
+	}
+
+	if (offset > (SSIZE_MAX - 4) ||
+	    ((ssize_t)buflen - (ssize_t)offset) < 4) {
+		return -1;
+	}
+	buffer = b + offset;
+	*(buffer++) = (uint8_t)(in >> 24) + 128;
+	*(buffer++) = (uint8_t)(in >> 16);
+	*(buffer++) = (uint8_t)(in >> 8);
+	*(buffer++) = (uint8_t)in;
+	return offset + 4;
+}
+
 int
 buf_putu64(void *b, size_t offset, size_t buflen, uint64_t in)
 {
