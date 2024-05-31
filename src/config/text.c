@@ -2,6 +2,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 #include <stdlib.h>
 #include "../buffer.h"
 #include "config.h"
@@ -12,6 +13,7 @@ static ssize_t next_line(char *, size_t, size_t);
 static ssize_t next_token(char *, size_t, size_t);
 static ssize_t next_token_int(char *, size_t, size_t, long *);
 static ssize_t next_token_hex(char *, size_t, size_t, unsigned long *);
+static int find_entity(const char *, struct entity_config *, size_t);
 
 static ssize_t
 next_line(char *buffer, size_t offset, size_t len)
@@ -100,8 +102,25 @@ next_token_hex(char *buffer, size_t offset, size_t len, unsigned long *out)
 	return n + strlen(buffer + n) + 1;
 }
 
+static int
+find_entity(const char *name,
+    struct entity_config *entities, size_t num_entities)
+{
+	if (strcasecmp(name, "na") == 0) {
+		return -1;
+	}
+	for (size_t i = 0; i < num_entities; ++i) {
+		if (strcasecmp(name, entities[i].name) == 0) {
+			return (int)i;
+		}
+	}
+	printf("warning: entity sprite not found: %s\n", name);
+	return -1;
+}
+
 struct item_config *
-config_parse_items(char *buffer, size_t len, size_t *num_items)
+config_parse_items(char *buffer, size_t len, size_t *num_items,
+	struct entity_config *entities, size_t num_entities)
 {
 	struct item_config *items = NULL;
 	size_t max_items;
@@ -272,7 +291,8 @@ config_parse_items(char *buffer, size_t len, size_t *num_items)
 		if (tmp == -1) {
 			goto err;
 		}
-		items[i].animation = buffer + tmp;
+		items[i].entity_sprite = find_entity(buffer + tmp,
+		    entities, num_entities);
 		offset = tmp + strlen((char *)buffer + tmp) + 1;
 
 		tmp = next_token_hex(buffer, offset, len, &tmpul);

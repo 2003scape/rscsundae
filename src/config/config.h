@@ -43,7 +43,7 @@ struct item_config {
 	uint8_t bonus_hiding; /* not used */
 	char *projectile;
 	uint16_t equip_type;
-	char *animation;
+	uint16_t entity_sprite;
 	uint32_t colour;
 	uint16_t respawn_rate;
 	uint8_t quest_item; /* untradable */
@@ -60,7 +60,8 @@ struct entity_config {
 	uint8_t has_f;
 };
 
-struct item_config *config_parse_items(char *, size_t, size_t *);
+struct item_config *config_parse_items(char *, size_t, size_t *,
+    struct entity_config *, size_t);
 struct entity_config *config_parse_entity(char *, size_t, size_t *);
 bool item_equip_clear(struct item_config *, int);
 
