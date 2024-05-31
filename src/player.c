@@ -680,7 +680,7 @@ player_unwear(struct player *p, int slot)
 	return 0;
 }
 
-int
+void
 player_recalculate_sprites(struct player *p)
 {
 	uint8_t sprites_orig[MAX_ENTITY_SPRITES];

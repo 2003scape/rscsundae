@@ -195,6 +195,7 @@ void player_process_combat(struct player *);
 void player_die(struct player *);
 void player_close_ui(struct player *);
 void player_destroy(struct player *);
+void player_recalculate_sprites(struct player *);
 bool player_has_ignore(struct player *, int64_t);
 bool player_has_friend(struct player *, int64_t);
 bool player_public_chat_visible(struct player *, int64_t);
@@ -207,7 +208,6 @@ int player_remove_friend(struct player *, int64_t);
 void player_pvp_attack(struct player *, struct player *);
 int player_wear(struct player *, int);
 int player_unwear(struct player *, int);
-int player_recalculate_sprites(struct player *);
 
 /* incoming.c */
 int player_parse_incoming(struct player *);
