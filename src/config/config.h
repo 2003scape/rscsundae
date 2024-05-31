@@ -2,6 +2,7 @@
 #define CONFIG_H
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 #define MAX_ITEM_NAMES	(4)
 
@@ -15,10 +16,10 @@ enum equip_type {
 	EQUIP_TYPE_HEAD_FULL	= 0x0021,
 	EQUIP_TYPE_TORSO	= 0x0040,
 	EQUIP_TYPE_TORSO_FULL	= 0x0142,
-	EQUIP_TYPE_GLOVES	= 0x0100,
-	EQUIP_TYPE_LEG		= 0x0080,
-	EQUIP_TYPE_LEG_FULL	= 0x0280,
-	EQUIP_TYPE_LEG_FULL2	= 0x0284,
+	EQUIP_TYPE_HANDS	= 0x0100,
+	EQUIP_TYPE_LEGS		= 0x0080,
+	EQUIP_TYPE_LEGS_FULL	= 0x0280,
+	EQUIP_TYPE_LEGS_FULL2	= 0x0284,
 	EQUIP_TYPE_SHOES	= 0x0200,
 	EQUIP_TYPE_NECK		= 0x0400,
 	EQUIP_TYPE_BACK		= 0x0800
@@ -47,7 +48,7 @@ struct item_config {
 	uint8_t quest_item; /* untradable */
 };
 
-struct item_config *
-config_parse_items(char *, size_t, size_t *);
+struct item_config *config_parse_items(char *, size_t, size_t *);
+bool item_equip_clear(struct item_config *, int);
 
 #endif

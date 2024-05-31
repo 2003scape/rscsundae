@@ -84,7 +84,19 @@ player_accept(struct server *s, int sock)
 	p->inventory[1].stack = 1;
 	p->inventory[2].id = 222;
 	p->inventory[2].stack = 1;
-	p->inv_count = 3;
+	p->inventory[3].id = 5;
+	p->inventory[3].stack = 1;
+	p->inventory[4].id = 6;
+	p->inventory[4].stack = 1;
+	p->inventory[5].id = 7;
+	p->inventory[5].stack = 1;
+	p->inventory[6].id = 9;
+	p->inventory[6].stack = 1;
+	p->inventory[7].id = 312;
+	p->inventory[7].stack = 1;
+	p->inventory[8].id = 2;
+	p->inventory[8].stack = 1;
+	p->inv_count = 9;
 
 	p->stats_changed = true;
 	p->bonus_changed = true;
@@ -610,17 +622,20 @@ player_wear(struct player *p, int slot)
 	if (type == NULL || type->equip_type == 0) {
 		return -1;
 	}
-	/* XXX should be delayed by tick */
-	/* TODO scan previously equipped items to remove them */
-	/*for (int i = 0; i < p->inv_count; ++i) {
-		if (i == slot || !p->inventory[slot].worn) {
+	/* XXX should be delayed by tick? */
+	for (int i = 0; i < p->inv_count; ++i) {
+		if (i == slot || !p->inventory[i].worn) {
 			continue;
 		}
 		type2 = server_item_config_by_id(p->inventory[i].id);
 		if (type2 == NULL || type2->equip_type == 0) {
 			continue;
 		}
-	}*/
+		if (item_equip_clear(type, type2->equip_type)) {
+			p->inventory[i].worn = false;
+			player_send_inv_slot(p, i, p->inventory[i].id, 1);
+		}
+	}
 	p->inventory[slot].worn = true;
 	player_recalculate_bonus(p);
 	player_send_inv_slot(p, slot, p->inventory[slot].id + 0x8000, 1);

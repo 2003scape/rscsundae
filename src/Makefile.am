@@ -11,6 +11,7 @@ rscsundae_SOURCES = \
 	player.c \
 	inventory.c \
 	server.c \
+	config/config.c \
 	config/text.c \
 	ext/flea.c \
 	ext/libjag/lib/jag_bzip2_decompress.c \
