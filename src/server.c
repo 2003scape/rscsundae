@@ -194,6 +194,12 @@ server_tick(void)
 		if (restore_tick) {
 			player_slow_restore(s.players[i]);
 		}
+
+		if (s.players[i]->skulled &&
+		    s.tick_counter > s.players[i]->skull_timer) {
+			s.players[i]->skulled = false;
+			s.players[i]->appearance_changed = true;
+		}
 	}
 
 	for (int i = 0; i < s.max_player_id; ++i) {

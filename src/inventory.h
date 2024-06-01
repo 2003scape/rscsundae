@@ -1,5 +1,6 @@
 #ifndef INVENTORY_H
 #define INVENTORY_H
+#include "config/config.h"
 #include "entity.h"
 
 void

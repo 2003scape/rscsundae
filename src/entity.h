@@ -139,6 +139,7 @@ struct player {
 	uint8_t skin_colour;
 	uint8_t rpg_class;
 	uint8_t skulled;
+	uint64_t skull_timer;
 	char public_chat_enc[MAX_PUBLIC_CHAT_LEN];
 	size_t public_chat_len;
 	uint16_t walk_queue_x[WALK_QUEUE_LEN];

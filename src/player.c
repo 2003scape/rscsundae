@@ -1,5 +1,6 @@
 #include <sys/socket.h>
 #include <assert.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -7,6 +8,7 @@
 #include "config/anim.h"
 #include "protocol/opcodes.h"
 #include "protocol/utility.h"
+#include "inventory.h"
 #include "server.h"
 #include "entity.h"
 #include "loop.h"
@@ -428,6 +430,9 @@ player_pvp_attack(struct player *attacker, struct player *target)
 void
 player_die(struct player *p)
 {
+	struct item_config *item;
+	int kept_max = 3;
+
 	/* TODO teleportation */
 	for (int i = 0; i < MAX_SKILL_ID; ++i) {
 		p->mob.cur_stats[i] = p->mob.base_stats[i];
@@ -436,6 +441,45 @@ player_die(struct player *p)
 	p->walk_queue_len = 0;
 	p->walk_queue_pos = 0;
 	mob_combat_reset(&p->mob);
+
+	if (p->skulled) {
+		/* TODO protect item prayer */
+		kept_max = 0;
+	}
+
+	while (p->inv_count > kept_max) {
+		int slot = INT_MAX;
+		uint32_t lowest_value = UINT32_MAX;
+
+		for (int i = 0; i < p->inv_count; ++i) {
+			item = server_item_config_by_id(p->inventory[i].id);
+			if (item->value < lowest_value) {
+				slot = i;
+				lowest_value = item->value;
+			}
+		}
+		if (slot >= p->inv_count) {
+			break;
+		}
+		item = server_item_config_by_id(p->inventory[slot].id);
+		/* TODO: should drop items on ground */
+		if (item->weight == 0) {
+			player_inv_remove(p, item,
+			    p->inventory[slot].stack);
+		} else {
+			player_inv_remove(p, item, 1);
+			printf("removed %s value %d\n", item->names[0], item->value);
+		}
+	}
+
+	for (int i = 0; i < p->inv_count; ++i) {
+		struct item_config *item =
+		    server_item_config_by_id(p->inventory[i].id);
+		if (item->weight == 0 && p->inventory[i].stack > 1) {
+			player_inv_remove(p, item,
+			    p->inventory[i].stack - 1);
+		}
+	}
 
 	player_send_death(p);
 }
@@ -517,6 +561,15 @@ player_process_combat(struct player *p)
 			/* successful catch, combat lock the target */
 			target->walk_queue_len = 0;
 			target->walk_queue_pos = 0;
+
+			if (!p->skulled) {
+				/* skull remains for 20 minutes */
+				/* TODO: should track players who attacked us */
+				p->skulled = true;
+				p->skull_timer =
+				    p->mob.server->tick_counter + 2000;
+				p->appearance_changed = true;
+			}
 
 			p->following_player = -1;
 			p->mob.target_player = target->mob.id;
