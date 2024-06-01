@@ -34,6 +34,7 @@ enum skills {
 	SKILL_HITS		= 3,
 	SKILL_RANGED		= 4,
 	SKILL_PRAYER		= 5,
+	SKILL_MAGIC		= 6,
 };
 
 enum combat_style {
@@ -187,6 +188,7 @@ int mob_combat_roll(struct ranctx *, int, int, int, int, int, int);
 int mob_wilderness_level(struct mob *);
 size_t get_nearby_players(struct mob *, struct player **, size_t, int);
 void mob_combat_reset(struct mob *);
+uint32_t mob_combat_xp(struct mob *);
 
 /* player.c */
 struct player *player_accept(struct server *, int);
@@ -196,6 +198,7 @@ void player_die(struct player *);
 void player_close_ui(struct player *);
 void player_destroy(struct player *);
 void player_recalculate_sprites(struct player *);
+void player_recalculate_combat_level(struct player *);
 bool player_has_ignore(struct player *, int64_t);
 bool player_has_friend(struct player *, int64_t);
 bool player_public_chat_visible(struct player *, int64_t);
@@ -208,6 +211,7 @@ int player_remove_friend(struct player *, int64_t);
 void player_pvp_attack(struct player *, struct player *);
 int player_wear(struct player *, int);
 int player_unwear(struct player *, int);
+void player_award_combat_xp(struct player *, struct mob *);
 
 /* incoming.c */
 int player_parse_incoming(struct player *);
@@ -219,7 +223,9 @@ int player_send_appearance_update(struct player *);
 int player_send_design_ui(struct player *);
 int player_send_logout(struct player *);
 int player_send_message(struct player *, const char *);
-int player_send_stats_update(struct player *);
+int player_send_stat(struct player *, int);
+int player_send_stat_xp(struct player *, int);
+int player_send_init_stats(struct player *);
 int player_send_client_settings(struct player *);
 int player_send_privacy_settings(struct player *);
 int player_send_init_friends(struct player *);

@@ -429,11 +429,47 @@ player_send_privacy_settings(struct player *p)
 }
 
 int
-player_send_stats_update(struct player *p)
+player_send_stat(struct player *p, int stat)
 {
 	size_t offset = 0;
 
-	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, OP_SRV_STATS);
+	assert(stat < MAX_SKILL_ID);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, OP_SRV_STAT);
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, (uint8_t)stat);
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+	    p->mob.cur_stats[stat]);
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+	    p->mob.base_stats[stat]);
+	(void)buf_putu32(p->tmpbuf, offset, PLAYER_BUFSIZE,
+	    p->experience[stat]);
+	offset += 4;
+
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
+player_send_stat_xp(struct player *p, int stat)
+{
+	size_t offset = 0;
+
+	assert(stat < MAX_SKILL_ID);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, OP_SRV_STAT_XP);
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, (uint8_t)stat);
+	(void)buf_putu32(p->tmpbuf, offset, PLAYER_BUFSIZE,
+	    p->experience[stat]);
+	offset += 4;
+
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
+player_send_init_stats(struct player *p)
+{
+	size_t offset = 0;
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, OP_SRV_INIT_STATS);
 
 	for (int i = 0; i < MAX_SKILL_ID; ++i) {
 		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,

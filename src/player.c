@@ -1,4 +1,5 @@
 #include <sys/socket.h>
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -10,6 +11,7 @@
 #include "entity.h"
 #include "loop.h"
 #include "netio.h"
+#include "stat.h"
 
 static int player_pvp_roll(struct player *, struct player *);
 static void player_recalculate_bonus(struct player *);
@@ -132,6 +134,7 @@ player_accept(struct server *s, int sock)
 	p->following_player = -1;
 	p->last_packet = s->tick_counter;
 
+	player_recalculate_combat_level(p);
 	player_recalculate_sprites(p);
 
 	p->mob.server = s;
@@ -140,7 +143,7 @@ player_accept(struct server *s, int sock)
 	p->mob.x = 333;
 	p->mob.y = 333;
 	p->mob.damage = UINT8_MAX;
-	p->mob.combat_level = 3;
+
 	mob_combat_reset(&p->mob);
 	s->players[slot] = p;
 
@@ -569,6 +572,7 @@ player_process_combat(struct player *p)
 			char name[32], msg[64];
 
 			mob_combat_reset(&p->mob);
+			player_award_combat_xp(p, &target->mob);
 			player_die(target);
 			mod37_namedec(target->name, name);
 			/* TODO give experience */
@@ -700,6 +704,64 @@ player_unwear(struct player *p, int slot)
 	player_recalculate_sprites(p);
 	player_send_inv_slot(p, slot, p->inventory[slot].id, 1);
 	return 0;
+}
+
+void
+player_recalculate_combat_level(struct player *p)
+{
+	int attack = p->mob.base_stats[SKILL_ATTACK];
+	int defense = p->mob.base_stats[SKILL_DEFENSE];
+	int strength = p->mob.base_stats[SKILL_STRENGTH];
+	int hits = p->mob.base_stats[SKILL_HITS];
+	int ranged = p->mob.base_stats[SKILL_RANGED];
+	int magic = p->mob.base_stats[SKILL_MAGIC];
+	int prayer = p->mob.base_stats[SKILL_PRAYER];
+	uint8_t level;
+
+	if ((int)(ranged * 1.5) < (attack + strength)) {
+		level = (uint8_t)
+		    ((attack * 0.25) + (defense * 0.25) + (strength * 0.25) +
+		    (hits * 0.25) + (magic * 0.125) + (prayer * 0.125));
+	} else {
+		level = (uint8_t)((ranged * 0.375) +
+		    (magic * 0.125) + (prayer * 0.125) +
+		    (defense * 0.25) + (hits * 0.25));
+	}
+
+	if (level != p->mob.combat_level) {
+		p->mob.combat_level = level;
+		p->appearance_changed = true;
+	}
+}
+
+void
+player_award_combat_xp(struct player *p, struct mob *target)
+{
+	uint32_t xp;
+
+	assert(target != NULL);
+
+	xp = mob_combat_xp(target);
+	switch (p->combat_style) {
+	case COMBAT_STYLE_CONTROLLED:
+		/* this order has been verified */
+		stat_advance(p, SKILL_ATTACK, xp, 0);
+		stat_advance(p, SKILL_DEFENSE, xp, 0);
+		stat_advance(p, SKILL_STRENGTH, xp, 0);
+		break;
+	case COMBAT_STYLE_AGGRESSIVE:
+		stat_advance(p, SKILL_STRENGTH, xp * 3, 0);
+		break;
+	case COMBAT_STYLE_ACCURATE:
+		stat_advance(p, SKILL_ATTACK, xp * 3, 0);
+		break;
+	case COMBAT_STYLE_DEFENSIVE:
+		stat_advance(p, SKILL_DEFENSE, xp * 3, 0);
+		break;
+	}
+
+	/* it's been verified that hits is given last */
+	stat_advance(p, SKILL_HITS, xp, 0);
 }
 
 void

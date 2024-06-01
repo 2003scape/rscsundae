@@ -1,14 +1,15 @@
-#include "protocol/utility.h"
-#include "server.h"
-#include "loop.h"
-#include "netio.h"
-#include "entity.h"
 #include <jag.h>
 #include <sys/types.h>
 #include <sys/signal.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include "protocol/utility.h"
+#include "server.h"
+#include "loop.h"
+#include "netio.h"
+#include "entity.h"
+#include "stat.h"
 
 /* XXX no idea what's authentic here */
 #define MAX_IDLE_TICKS		(20)
@@ -21,10 +22,15 @@ static int load_config_jag(void);
 int
 main(int argc, char **argv)
 {
+	/* TODO: should be configurable somehow */
+	s.xp_multiplier = 1;
+
 	(void)signal(SIGPIPE, on_signal_do_nothing);
 
 	/* init random number generator */
 	raninit(&s.ran, time(NULL));
+
+	stat_calculate_table();
 
 	if (load_config_jag() == -1) {
 		fprintf(stderr, "error reading config.jag\n");
@@ -189,7 +195,7 @@ server_tick(void)
 			player_send_plane_init(s.players[i]);
 		}
 		if (s.players[i]->stats_changed) {
-			player_send_stats_update(s.players[i]);
+			player_send_init_stats(s.players[i]);
 		}
 		if (s.players[i]->inv_changed) {
 			player_send_inv(s.players[i]);

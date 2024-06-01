@@ -22,6 +22,20 @@ mob_combat_roll_damage(struct ranctx *ran, int stat, int bonus)
 	return (int)((roll + 320.0f) / 640.0f);
 }
 
+uint32_t
+mob_combat_xp(struct mob *mob)
+{
+	/* combat experience reward for killing a mob */
+	int xp;
+	int attack = 2 * mob->base_stats[SKILL_ATTACK];
+	int defense = 2 * mob->base_stats[SKILL_DEFENSE];
+	int strength = 2 * mob->base_stats[SKILL_STRENGTH];
+	int hits = mob->base_stats[SKILL_HITS];
+
+	xp = (uint32_t)((hits + attack + defense + strength) / 7.0) * 2 + 20;
+	return (uint32_t)xp;
+}
+
 int
 mob_combat_roll(struct ranctx *ran, int att_stat, int att_bonus,
     int def_stat, int def_bonus, int str_stat, int str_bonus)

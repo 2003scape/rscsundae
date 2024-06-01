@@ -11,6 +11,7 @@ rscsundae_SOURCES = \
 	player.c \
 	inventory.c \
 	server.c \
+	stat.c \
 	config/config.c \
 	config/text.c \
 	ext/flea.c \
@@ -35,4 +36,4 @@ rscsundae_SOURCES += loop-poll.c
 endif
 endif
 
-rscsundae_LDADD = $(libev_LIBS)
+rscsundae_LDADD = $(libev_LIBS) -lm
