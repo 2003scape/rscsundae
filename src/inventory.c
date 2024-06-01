@@ -77,9 +77,9 @@ player_inv_remove(struct player *p, struct item_config *item, uint32_t count)
 		}
 		p->inv_count--;
 		for (int j = i; j < p->inv_count; ++j) {
-			p->inventory[i].id = p->inventory[i + 1].id;
-			p->inventory[i].stack = p->inventory[i + 1].stack;
-			p->inventory[i].worn = p->inventory[i + 1].worn;
+			p->inventory[j].id = p->inventory[j + 1].id;
+			p->inventory[j].stack = p->inventory[j + 1].stack;
+			p->inventory[j].worn = p->inventory[j + 1].worn;
 		}
 		removed++;
 		player_send_inv_remove(p, i);
