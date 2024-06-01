@@ -436,6 +436,7 @@ player_die(struct player *p)
 	p->walk_queue_len = 0;
 	p->walk_queue_pos = 0;
 	mob_combat_reset(&p->mob);
+
 	player_send_death(p);
 }
 
@@ -454,7 +455,7 @@ player_process_combat(struct player *p)
 			}
 
 			if (p->mob.server->tick_counter <
-			    (target->mob.combat_timer + 3)) {
+			    (target->mob.combat_timer + 4)) {
 				p->walk_queue_pos = 0;
 				p->walk_queue_len = 0;
 				mob_combat_reset(&p->mob);
