@@ -24,6 +24,7 @@
 
 #define OP_SRV_MESSAGE			(8)
 #define OP_SRV_LOGOUT			(9)
+#define OP_SRV_LOGOUT_REJECT		(10)
 #define OP_SRV_INIT_FRIENDS		(23)
 #define OP_SRV_FRIEND_UPDATE		(24)
 #define OP_SRV_INIT_IGNORE		(26)

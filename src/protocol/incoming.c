@@ -135,7 +135,12 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 		break;
 	case OP_CLI_LOGOUT:
 		{
-			/* TODO handle combat timer */
+			if (p->mob.in_combat || p->mob.server->tick_counter <
+			    (p->mob.combat_timer + 17)) {
+				player_send_logout_reject(p);
+				return;
+			}
+
 			player_send_logout(p);
 		}
 		break;

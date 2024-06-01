@@ -223,6 +223,7 @@ int player_send_movement(struct player *);
 int player_send_appearance_update(struct player *);
 int player_send_design_ui(struct player *);
 int player_send_logout(struct player *);
+int player_send_logout_reject(struct player *);
 int player_send_message(struct player *, const char *);
 int player_send_stat(struct player *, int);
 int player_send_stat_xp(struct player *, int);
