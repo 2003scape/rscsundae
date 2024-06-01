@@ -135,6 +135,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 		break;
 	case OP_CLI_LOGOUT:
 		{
+			/* TODO handle combat timer */
 			player_send_logout(p);
 		}
 		break;

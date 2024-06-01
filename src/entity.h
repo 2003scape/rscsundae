@@ -212,6 +212,7 @@ void player_pvp_attack(struct player *, struct player *);
 int player_wear(struct player *, int);
 int player_unwear(struct player *, int);
 void player_award_combat_xp(struct player *, struct mob *);
+void player_slow_restore(struct player *);
 
 /* incoming.c */
 int player_parse_incoming(struct player *);

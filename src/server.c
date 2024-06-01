@@ -164,6 +164,12 @@ server_send_pm(struct player *from, int64_t target, uint8_t *msg, size_t len)
 void
 server_tick(void)
 {
+	bool restore_tick = (s.tick_counter % 100) == 0;
+	/*
+	 * TODO: handle rapid restore prayer
+	 * bool restore_tick_rapid = (s.tick_counter % 50) == 0;
+	 */
+
 	for (int i = 0; i < s.max_player_id; ++i) {
 		if (s.players[i] == NULL) {
 			continue;
@@ -185,6 +191,9 @@ server_tick(void)
 		player_parse_incoming(s.players[i]);
 		player_process_combat(s.players[i]);
 		player_process_walk_queue(s.players[i]);
+		if (restore_tick) {
+			player_slow_restore(s.players[i]);
+		}
 	}
 
 	for (int i = 0; i < s.max_player_id; ++i) {

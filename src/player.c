@@ -820,3 +820,17 @@ player_recalculate_sprites(struct player *p)
 		p->appearance_changed = true;
 	}
 }
+
+void
+player_slow_restore(struct player *p)
+{
+	for (int i = 0; i < MAX_SKILL_ID; ++i) {
+		if (p->mob.cur_stats[i] < p->mob.base_stats[i]) {
+			p->mob.cur_stats[i]++;
+			player_send_stat(p, i);
+		} else if (p->mob.cur_stats[i] > p->mob.base_stats[i]) {
+			p->mob.cur_stats[i]--;
+			player_send_stat(p, i);
+		}
+	}
+}
