@@ -718,7 +718,7 @@ player_recalculate_sprites(struct player *p)
 		} else if ((item->equip_type & EQUIP_TYPE_NECK) != 0) {
 			p->sprites[ANIM_SLOT_NECK] = item->entity_sprite + 1;
 		} else if ((item->equip_type & EQUIP_TYPE_BACK) != 0) {
-			p->sprites[ANIM_SLOT_CAPE] = item->entity_sprite + 1;
+			p->sprites[ANIM_SLOT_BACK] = item->entity_sprite + 1;
 		}
 
 		if (item->equip_type == EQUIP_TYPE_HEAD_FULL) {

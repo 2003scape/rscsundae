@@ -97,7 +97,7 @@ enum animslot {
 	ANIM_SLOT_NECK		= 8,
 	ANIM_SLOT_SHOES		= 9,
 	ANIM_SLOT_GLOVES	= 10,
-	ANIM_SLOT_CAPE		= 11,
+	ANIM_SLOT_BACK		= 11,
 };
 
 struct invitem {

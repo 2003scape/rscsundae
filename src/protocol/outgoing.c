@@ -273,7 +273,7 @@ player_send_appearance(struct player *p, void *tmpbuf, size_t offset)
 	offset += 8;
 
 	int anim_count = 0;
-	for (int i = ANIM_SLOT_CAPE; i >= 0; --i) {
+	for (int i = ANIM_SLOT_BACK; i >= 0; --i) {
 		if (p->sprites[i] != 0) {
 			anim_count = i + 1;
 			break;
