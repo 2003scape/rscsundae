@@ -706,7 +706,7 @@ player_recalculate_sprites(struct player *p)
 		} else if ((item->equip_type & EQUIP_TYPE_SHIELD) != 0) {
 			p->sprites[ANIM_SLOT_OFFHAND] = item->entity_sprite + 1;
 		} else if ((item->equip_type & EQUIP_TYPE_HEAD) != 0) {
-			p->sprites[ANIM_SLOT_HELMET] = item->entity_sprite + 1;
+			p->sprites[ANIM_SLOT_HAT] = item->entity_sprite + 1;
 		} else if ((item->equip_type & EQUIP_TYPE_TORSO) != 0) {
 			p->sprites[ANIM_SLOT_SHIRT] = item->entity_sprite + 1;
 		} else if ((item->equip_type & EQUIP_TYPE_HANDS) != 0) {
@@ -727,8 +727,7 @@ player_recalculate_sprites(struct player *p)
 		if (item->equip_type == EQUIP_TYPE_TORSO_FULL) {
 			p->sprites[ANIM_SLOT_BODY] = 0;
 		}
-		if (item->equip_type == EQUIP_TYPE_LEGS_FULL ||
-		    item->equip_type == EQUIP_TYPE_LEGS_FULL2) {
+		if (item->equip_type == EQUIP_TYPE_LEGS_FULL) {
 			p->sprites[ANIM_SLOT_LEGS] = 0;
 		}
 	}
