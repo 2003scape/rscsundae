@@ -105,7 +105,7 @@ player_accept(struct server *s, int sock)
 	p->inventory[p->inv_count++].stack = 1;
 	p->inventory[p->inv_count].id = 188;
 	p->inventory[p->inv_count++].stack = 1;
-	p->inventory[p->inv_count].id = 183;
+	p->inventory[p->inv_count].id = 229;
 	p->inventory[p->inv_count++].stack = 1;
 	p->inventory[p->inv_count].id = 16;
 	p->inventory[p->inv_count++].stack = 1;
@@ -118,6 +118,10 @@ player_accept(struct server *s, int sock)
 	p->inventory[p->inv_count].id = 0;
 	p->inventory[p->inv_count++].stack = 1;
 	p->inventory[p->inv_count].id = 317;
+	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 185;
+	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 184;
 	p->inventory[p->inv_count++].stack = 1;
 
 	p->stats_changed = true;
@@ -147,6 +151,14 @@ player_accept(struct server *s, int sock)
 void
 player_process_walk_queue(struct player *p)
 {
+	if (p->mob.in_combat) {
+		if (p->mob.dir == MOB_DIR_COMBAT_LEFT ||
+		    p->mob.dir == MOB_DIR_COMBAT_RIGHT) {
+			p->walk_queue_len = 0;
+			p->walk_queue_pos = 0;
+			return;
+		}
+	}
 	if (p->following_player != -1) {
 		struct player *p2;
 
@@ -427,20 +439,21 @@ player_die(struct player *p)
 void
 player_process_combat(struct player *p)
 {
+
 	if (!p->mob.in_combat) {
 		if (p->mob.target_player != -1) {
 			struct player *target;
 
-			if (p->mob.server->tick_counter <
-			    (p->mob.combat_timer + 3)) {
-				p->walk_queue_pos = 0;
-				p->walk_queue_len = 0;
+			target = p->mob.server->players[p->mob.target_player];
+			if (target == NULL) {
 				mob_combat_reset(&p->mob);
 				return;
 			}
 
-			target = p->mob.server->players[p->mob.target_player];
-			if (target == NULL) {
+			if (p->mob.server->tick_counter <
+			    (target->mob.combat_timer + 6)) {
+				p->walk_queue_pos = 0;
+				p->walk_queue_len = 0;
 				mob_combat_reset(&p->mob);
 				return;
 			}
@@ -475,31 +488,27 @@ player_process_combat(struct player *p)
 				return;
 			}
 
-			if (mob_within_range(&p->mob,
+			if (!mob_within_range(&p->mob,
 			    target->mob.x, target->mob.y, 3)) {
-				/* successful catch, combat lock the target */
-				target->walk_queue_len = 0;
-				target->walk_queue_pos = 0;
+				return;
 			}
 
-			if (p->mob.x != target->mob.x ||
-			    p->mob.y != target->mob.y) {
-				if (p->walk_queue_len != 1 ||
-				    p->walk_queue_x[0] != target->mob.x ||
-				    p->walk_queue_y[0] != target->mob.y) {
-					mob_combat_reset(&p->mob);
-					return;
-				}
-				/*
-				 * walk queue is ready, locked into combat
-				 * XXX when checking whether tile is unwalkable,
-				 * need to reset combat state
-				 */
-			} else {
+			if (p->mob.x == target->mob.x &&
+			    p->mob.y == target->mob.y) {
 				p->mob.dir = MOB_DIR_COMBAT_RIGHT;
 				p->walk_queue_len = 0;
 				p->walk_queue_pos = 0;
+			} else {
+				/* TODO reachability */
+				p->walk_queue_x[0] = target->mob.x;
+				p->walk_queue_y[0] = target->mob.y;
+				p->walk_queue_len = 1;
+				p->walk_queue_pos = 0;
 			}
+
+			/* successful catch, combat lock the target */
+			target->walk_queue_len = 0;
+			target->walk_queue_pos = 0;
 
 			p->following_player = -1;
 			p->mob.target_player = target->mob.id;
@@ -525,16 +534,6 @@ player_process_combat(struct player *p)
 		return;
 	}
 
-	/*
-	 * assume the target was "combat locked" as we were running towards
-	 * this allows the smooth "glide" into combat after a successful
-	 * catch.
-	 */
-	if (p->mob.dir != MOB_DIR_COMBAT_RIGHT &&
-	    p->mob.dir != MOB_DIR_COMBAT_LEFT) {
-		p->mob.dir = MOB_DIR_COMBAT_RIGHT;
-	}
-
 	if (p->mob.server->tick_counter < p->mob.combat_next_hit) {
 		return;
 	}
@@ -548,6 +547,23 @@ player_process_combat(struct player *p)
 			mob_combat_reset(&p->mob);
 			return;
 		}
+
+		if (p->mob.x != target->mob.x ||
+		    p->mob.y != target->mob.y) {
+			return;
+		}
+
+		/*
+		 * assume the target was "combat locked" as we were running
+		 * towards.  this allows the smooth "glide" into combat after
+		 * a successful catch.
+		 */
+		if (p->mob.dir != MOB_DIR_COMBAT_RIGHT &&
+		    p->mob.dir != MOB_DIR_COMBAT_LEFT) {
+			p->mob.dir = MOB_DIR_COMBAT_RIGHT;
+			target->mob.dir = MOB_DIR_COMBAT_LEFT;
+		}
+
 		roll = player_pvp_roll(p, target);
 		if (roll >= target->mob.cur_stats[SKILL_HITS]) {
 			char name[32], msg[64];
@@ -564,10 +580,10 @@ player_process_combat(struct player *p)
 		target->mob.cur_stats[SKILL_HITS] -= roll;
 		target->mob.damage = roll;
 		target->mob.combat_rounds++;
+		target->mob.combat_timer = p->mob.server->tick_counter;
 	}
 
 	p->mob.combat_next_hit = p->mob.server->tick_counter + 4;
-	p->mob.combat_timer = p->mob.server->tick_counter;
 }
 
 int

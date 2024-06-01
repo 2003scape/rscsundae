@@ -1,4 +1,5 @@
 #include <sys/types.h>
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
@@ -142,6 +143,12 @@ player_send_movement(struct player *p)
 			p->known_players[i] = -1;
 			bitpos += 4;
 		} else if (known_player->moved) {
+			/*
+			 * TODO: this assertion can be fired!!! it's fatal
+			 * because there isn't room in the next bits
+			 */
+			assert(known_player->mob.dir != MOB_DIR_COMBAT_LEFT &&
+			    known_player->mob.dir != MOB_DIR_COMBAT_RIGHT);
 			if (buf_putbits(p->tmpbuf, bitpos++,
 					PLAYER_BUFSIZE, 1, 1) == -1) {
 				return -1;
