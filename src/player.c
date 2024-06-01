@@ -455,7 +455,11 @@ player_process_combat(struct player *p)
 			}
 
 			if (p->mob.server->tick_counter <
-			    (target->mob.combat_timer + 4)) {
+			    (target->mob.combat_timer + 6)) {
+				/*
+				 * hp bar in client takes roughly 4 seconds
+				 * to be gone
+				 */
 				p->walk_queue_pos = 0;
 				p->walk_queue_len = 0;
 				mob_combat_reset(&p->mob);
