@@ -113,6 +113,12 @@ player_accept(struct server *s, int sock)
 	p->inventory[p->inv_count++].stack = 1;
 	p->inventory[p->inv_count].id = 59;
 	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 215;
+	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 0;
+	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 317;
+	p->inventory[p->inv_count++].stack = 1;
 
 	p->stats_changed = true;
 	p->bonus_changed = true;
