@@ -342,7 +342,8 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			size_t steps;
 			int start_x, start_y;
 
-			if (len < 5) {
+			if (len < 5 ||
+			    (p->mob.in_combat && player_retreat(p) == -1)) {
 				return;
 			}
 			steps = (len - 5) / 2;
@@ -373,9 +374,6 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				new_y = start_y + (int8_t)off_y;
 				p->walk_queue_x[i + 1] = (uint16_t)new_x;
 				p->walk_queue_y[i + 1] = (uint16_t)new_y;
-			}
-			if (p->mob.in_combat && player_retreat(p) == -1) {
-				return;
 			}
 			if (opcode != OP_CLI_WALK_ENTITY) {
 				p->mob.target_npc = -1;
