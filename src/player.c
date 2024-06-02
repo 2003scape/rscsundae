@@ -1102,6 +1102,9 @@ player_prayer_drain(struct player *p)
 	}
 
 	if (amount >= p->mob.cur_stats[SKILL_PRAYER]) {
+		player_send_message(p,
+		    "You have run out of prayer points. "
+		    "Return to a church to recharge");
 		p->mob.cur_stats[SKILL_PRAYER] = 0;
 		player_reset_prayers(p);
 	} else {
