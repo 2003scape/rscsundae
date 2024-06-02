@@ -45,7 +45,7 @@ if ! [ -e config46.jag ]; then
 	printf "fetching config46.jag\n"
 	get_url https://web.archive.org/web/20011212112437/http://66.28.11.53:80/client/config46.jag
 fi
-printf "verifying maps27.jag\n"
+printf "verifying config46.jag\n"
 hash=$(${CKSUM} < config46.jag)
 target='304ff7147a21119c4e47f913f5d27d65de8222d69d2f3317dff569d8a4061e94'
 if [ "${hash}" != "${target}" ]; then
