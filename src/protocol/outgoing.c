@@ -407,8 +407,12 @@ player_send_prayers(struct player *p)
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 		        OP_SRV_PRAYERS);
 
-	/* TODO: can send less than MAX_PRAYERS if we want */
 	for (int i = 0; i < MAX_PRAYERS; ++i) {
+		struct prayer_config *config = server_prayer_config_by_id(i);
+		assert(config != NULL);
+		if (config->level > p->mob.base_stats[SKILL_PRAYER]) {
+			break;
+		}
 		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 				p->prayers[i]) == -1) {
 			return -1;

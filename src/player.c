@@ -964,7 +964,14 @@ player_slow_restore(struct player *p)
 void
 player_prayer_enable(struct player *p, int prayer)
 {
+	struct prayer_config *config = NULL;
+
 	if (p->mob.cur_stats[SKILL_PRAYER] == 0 || prayer >= MAX_PRAYERS) {
+		return;
+	}
+	config = server_prayer_config_by_id(prayer);
+	assert(config != NULL);
+	if (p->mob.base_stats[SKILL_PRAYER] < config->level) {
 		return;
 	}
 	/* do not allow overlapping stat boost prayers */
@@ -1002,6 +1009,8 @@ player_prayer_disable(struct player *p, int prayer)
 	if (prayer >= MAX_PRAYERS) {
 		return;
 	}
-	p->prayers[prayer] = false;
-	player_send_prayers(p);
+	if (p->prayers[prayer]) {
+		p->prayers[prayer] = false;
+		player_send_prayers(p);
+	}
 }

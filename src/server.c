@@ -330,3 +330,12 @@ server_item_config_by_id(int id)
 	}
 	return &s.item_config[id];
 }
+
+struct prayer_config *
+server_prayer_config_by_id(int id)
+{
+	if (id < 0 || id >= (int)s.prayer_config_count) {
+		return NULL;
+	}
+	return &s.prayer_config[id];
+}
