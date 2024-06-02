@@ -289,6 +289,18 @@ load_config_jag(void)
 	printf("read configuration for %zu items (\"objects\")\n",
 	    s.item_config_count);
 
+	if (jag_find_entry(&archive, "prayers.txt", &entry) == -1 ||
+	    jag_unpack_entry(&entry) == -1) {
+		goto err;
+	}
+	s.prayer_config = config_parse_prayers((char *)entry.data,
+	    entry.unpacked_len, &s.prayer_config_count);
+	if (s.prayer_config == NULL) {
+		goto err;
+	}
+	printf("read configuration for %zu prayers\n",
+	    s.prayer_config_count);
+
 	if (archive.must_free) {
 		free(archive.data);
 		archive.data = NULL;

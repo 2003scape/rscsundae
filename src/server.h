@@ -17,6 +17,8 @@ struct server {
 	size_t item_config_count;
 	struct entity_config *entity_config;
 	size_t entity_config_count;
+	struct prayer_config *prayer_config;
+	size_t prayer_config_count;
 	int xp_multiplier;
 };
 

@@ -61,9 +61,19 @@ struct entity_config {
 	uint8_t has_f;
 };
 
+/* prayer.txt */
+struct prayer_config {
+	uint16_t id;
+	char *name;
+	uint8_t level;
+	char *description;
+	uint8_t drain;
+};
+
 struct item_config *config_parse_items(char *, size_t, size_t *,
     struct entity_config *, size_t);
 struct entity_config *config_parse_entity(char *, size_t, size_t *);
+struct prayer_config *config_parse_prayers(char *, size_t, size_t *);
 bool item_equip_clear(struct item_config *, int);
 
 #endif

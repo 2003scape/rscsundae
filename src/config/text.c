@@ -393,3 +393,72 @@ err:
 	entities = NULL;
 	return NULL;
 }
+
+struct prayer_config *
+config_parse_prayers(char *buffer, size_t len, size_t *num_prayers)
+{
+	struct prayer_config *prayers = NULL;
+	size_t max_prayers;
+	size_t offset;
+	ssize_t tmp;
+	long tmpl;
+
+	offset = 0;
+	tmp = next_token_int(buffer, offset, len, &tmpl);
+	if (tmp == -1) {
+		return NULL;
+	}
+	offset = tmp;
+	max_prayers = tmpl;
+
+	prayers = calloc(max_prayers, sizeof(struct prayer_config));
+	if (prayers == NULL) {
+		return NULL;
+	}
+
+	for (size_t i = 0; i < max_prayers; ++i) {
+		prayers[i].id = i;
+
+		tmp = next_line(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+
+		tmp = next_token(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		prayers[i].name = buffer + tmp;
+		offset = tmp + strlen((char *)buffer + tmp) + 1;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+		prayers[i].level = tmpl;
+
+		tmp = next_token(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		prayers[i].description = buffer + tmp;
+		offset = tmp + strlen((char *)buffer + tmp) + 1;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+		prayers[i].drain = tmpl;
+	}
+
+	*num_prayers = max_prayers;
+	return prayers;
+err:
+	assert(0);
+	free(prayers);
+	prayers = NULL;
+	return NULL;
+}
