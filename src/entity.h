@@ -27,7 +27,7 @@
 struct server;
 struct ranctx;
 
-enum skills {
+enum skill {
 	SKILL_ATTACK		= 0,
 	SKILL_DEFENSE		= 1,
 	SKILL_STRENGTH		= 2,
@@ -36,6 +36,25 @@ enum skills {
 	SKILL_PRAYER		= 5,
 	SKILL_MAGIC		= 6,
 };
+
+enum prayer {
+	PRAY_THICK_SKIN			= 0,
+	PRAY_BURST_OF_STRENGTH		= 1,
+	PRAY_CLARITY_OF_THOUGHT		= 2,
+	PRAY_ROCK_SKIN			= 3,
+	PRAY_SUPERHUMAN_STRENGTH	= 4,
+	PRAY_IMPROVED_REFLEXES		= 5,
+	PRAY_RAPID_RESTORE		= 6,
+	PRAY_RAPID_HEAL			= 7,
+	PRAY_PROTECT_ITEM		= 8,
+	PRAY_STEEL_SKIN			= 9,
+	PRAY_ULTIMATE_STRENGTH		= 10,
+	PRAY_INCREDIBLE_REFLEXES	= 11,
+	PRAY_PARALYZE_MONSTER		= 12,
+	PRAY_PROTECT_FROM_MISSILES	= 13,
+};
+
+#define MAX_PRAYERS	(PRAY_PROTECT_FROM_MISSILES + 1)
 
 enum combat_style {
 	COMBAT_STYLE_CONTROLLED	= 0,
@@ -169,6 +188,7 @@ struct player {
 	uint8_t bonus_prayer;
 	uint8_t inv_count;
 	struct invitem inventory[MAX_INV_SIZE];
+	uint8_t prayers[MAX_PRAYERS];
 };
 
 struct bound {
@@ -214,6 +234,8 @@ int player_wear(struct player *, int);
 int player_unwear(struct player *, int);
 void player_award_combat_xp(struct player *, struct mob *);
 void player_slow_restore(struct player *);
+void player_prayer_enable(struct player *, int);
+void player_prayer_disable(struct player *, int);
 
 /* incoming.c */
 int player_parse_incoming(struct player *);
@@ -239,6 +261,7 @@ int player_send_inv(struct player *);
 int player_send_inv_slot(struct player *, int, int, uint32_t);
 int player_send_inv_remove(struct player *, int);
 int player_send_equip_bonuses(struct player *);
+int player_send_prayers(struct player *);
 int player_notify_friend_online(struct player *, int64_t);
 int player_notify_friend_offline(struct player *, int64_t);
 

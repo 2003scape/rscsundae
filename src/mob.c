@@ -8,9 +8,7 @@ static int mob_combat_roll_damage(struct ranctx *, int, int);
 static int
 mob_combat_max_roll(int stat, int bonus)
 {
-	/* only players have bonuses */
-	int base_num = bonus != 0 ? 8 : 0;
-	return (base_num + stat) * (64 + bonus);
+	return stat * (64 + bonus);
 }
 
 static int

@@ -15,6 +15,9 @@
 #include "netio.h"
 #include "stat.h"
 
+static int player_get_attack_boosted(struct player *);
+static int player_get_defense_boosted(struct player *);
+static int player_get_strength_boosted(struct player *);
 static int player_pvp_roll(struct player *, struct player *);
 static void player_recalculate_bonus(struct player *);
 
@@ -67,6 +70,10 @@ player_accept(struct server *s, int sock)
 	p->mob.cur_stats[SKILL_HITS] = 10;
 	p->mob.base_stats[SKILL_HITS] = 10;
 	p->experience[SKILL_HITS] = 4000;
+
+	/* XXX: testing, remove later... */
+	p->mob.cur_stats[SKILL_PRAYER] = 70;
+	p->mob.base_stats[SKILL_PRAYER] = 70;
 
 	p->sprites_base[ANIM_SLOT_HEAD] = ANIM_HEAD1 + 1;
 	p->sprites_base[ANIM_SLOT_BODY] = ANIM_BODY1 + 1;
@@ -382,33 +389,89 @@ player_is_blocked(struct player *p, int64_t speaker, bool flag)
 }
 
 static int
+player_get_attack_boosted(struct player *p)
+{
+	int stat = 8;
+
+	switch (p->combat_style) {
+	case COMBAT_STYLE_ACCURATE:
+		stat += 3;
+		break;
+	case COMBAT_STYLE_CONTROLLED:
+		stat += 1;
+		break;
+	}
+
+	if (p->prayers[PRAY_INCREDIBLE_REFLEXES]) {
+		stat += (p->mob.cur_stats[SKILL_ATTACK] * 1.15);
+	} else if (p->prayers[PRAY_IMPROVED_REFLEXES]) {
+		stat += (p->mob.cur_stats[SKILL_ATTACK] * 1.10);
+	} else if (p->prayers[PRAY_CLARITY_OF_THOUGHT]) {
+		stat += (p->mob.cur_stats[SKILL_ATTACK] * 1.05);
+	} else {
+		stat += p->mob.cur_stats[SKILL_ATTACK];
+	}
+	return stat;
+}
+
+static int
+player_get_defense_boosted(struct player *p)
+{
+	int stat = 8;
+
+	switch (p->combat_style) {
+	case COMBAT_STYLE_DEFENSIVE:
+		stat += 3;
+		break;
+	case COMBAT_STYLE_CONTROLLED:
+		stat += 1;
+		break;
+	}
+
+	if (p->prayers[PRAY_STEEL_SKIN]) {
+		stat += (p->mob.cur_stats[SKILL_DEFENSE] * 1.15);
+	} else if (p->prayers[PRAY_ROCK_SKIN]) {
+		stat += (p->mob.cur_stats[SKILL_DEFENSE] * 1.10);
+	} else if (p->prayers[PRAY_THICK_SKIN]) {
+		stat += (p->mob.cur_stats[SKILL_DEFENSE] * 1.05);
+	} else {
+		stat += p->mob.cur_stats[SKILL_DEFENSE];
+	}
+	return stat;
+}
+
+static int
+player_get_strength_boosted(struct player *p)
+{
+	int stat = 8;
+
+	switch (p->combat_style) {
+	case COMBAT_STYLE_AGGRESSIVE:
+		stat += 3;
+		break;
+	case COMBAT_STYLE_CONTROLLED:
+		stat += 1;
+		break;
+	}
+
+	if (p->prayers[PRAY_ULTIMATE_STRENGTH]) {
+		stat += (p->mob.cur_stats[SKILL_STRENGTH] * 1.15);
+	} else if (p->prayers[PRAY_SUPERHUMAN_STRENGTH]) {
+		stat += (p->mob.cur_stats[SKILL_STRENGTH] * 1.10);
+	} else if (p->prayers[PRAY_BURST_OF_STRENGTH]) {
+		stat += (p->mob.cur_stats[SKILL_STRENGTH] * 1.05);
+	} else {
+		stat += p->mob.cur_stats[SKILL_STRENGTH];
+	}
+	return stat;
+}
+
+static int
 player_pvp_roll(struct player *attacker, struct player *defender)
 {
-	int att = attacker->mob.cur_stats[SKILL_ATTACK];
-	int def = defender->mob.cur_stats[SKILL_DEFENSE];
-	int str = attacker->mob.cur_stats[SKILL_STRENGTH];
-
-	switch (attacker->combat_style) {
-	case COMBAT_STYLE_CONTROLLED:
-		att++;
-		str++;
-		break;
-	case COMBAT_STYLE_AGGRESSIVE:
-		str += 3;
-		break;
-	case COMBAT_STYLE_ACCURATE:
-		att += 3;
-		break;
-	}
-
-	switch (defender->combat_style) {
-	case COMBAT_STYLE_CONTROLLED:
-		def++;
-		break;
-	case COMBAT_STYLE_DEFENSIVE:
-		def += 3;
-		break;
-	}
+	int att = player_get_attack_boosted(attacker);
+	int def = player_get_defense_boosted(defender);
+	int str = player_get_strength_boosted(attacker);
 
 	return mob_combat_roll(&attacker->mob.server->ran,
 	    att, attacker->bonus_weaponaim,
@@ -443,8 +506,12 @@ player_die(struct player *p)
 	mob_combat_reset(&p->mob);
 
 	if (p->skulled) {
-		/* TODO protect item prayer */
 		kept_max = 0;
+		p->skulled = false;
+	}
+
+	if (p->prayers[PRAY_PROTECT_ITEM]) {
+		kept_max++;
 	}
 
 	while (p->inv_count > kept_max) {
@@ -482,6 +549,7 @@ player_die(struct player *p)
 	}
 
 	player_send_death(p);
+	p->appearance_changed = true;
 }
 
 void
@@ -891,4 +959,49 @@ player_slow_restore(struct player *p)
 			player_send_stat(p, i);
 		}
 	}
+}
+
+void
+player_prayer_enable(struct player *p, int prayer)
+{
+	if (p->mob.cur_stats[SKILL_PRAYER] == 0 || prayer >= MAX_PRAYERS) {
+		return;
+	}
+	/* do not allow overlapping stat boost prayers */
+	/* TODO: manage drain */
+	switch (prayer) {
+	case PRAY_THICK_SKIN:
+	case PRAY_ROCK_SKIN:
+	case PRAY_STEEL_SKIN:
+		p->prayers[PRAY_THICK_SKIN] = false;
+		p->prayers[PRAY_ROCK_SKIN] = false;
+		p->prayers[PRAY_STEEL_SKIN] = false;
+		break;
+	case PRAY_BURST_OF_STRENGTH:
+	case PRAY_SUPERHUMAN_STRENGTH:
+	case PRAY_ULTIMATE_STRENGTH:
+		p->prayers[PRAY_BURST_OF_STRENGTH] = false;
+		p->prayers[PRAY_SUPERHUMAN_STRENGTH] = false;
+		p->prayers[PRAY_ULTIMATE_STRENGTH] = false;
+		break;
+	case PRAY_CLARITY_OF_THOUGHT:
+	case PRAY_IMPROVED_REFLEXES:
+	case PRAY_INCREDIBLE_REFLEXES:
+		p->prayers[PRAY_CLARITY_OF_THOUGHT] = false;
+		p->prayers[PRAY_IMPROVED_REFLEXES] = false;
+		p->prayers[PRAY_INCREDIBLE_REFLEXES] = false;
+		break;
+	}
+	p->prayers[prayer] = true;
+	player_send_prayers(p);
+}
+
+void
+player_prayer_disable(struct player *p, int prayer)
+{
+	if (prayer >= MAX_PRAYERS) {
+		return;
+	}
+	p->prayers[prayer] = false;
+	player_send_prayers(p);
 }

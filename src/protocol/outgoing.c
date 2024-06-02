@@ -401,6 +401,23 @@ player_send_logout_reject(struct player *p)
 }
 
 int
+player_send_prayers(struct player *p)
+{
+	size_t offset = 0;
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_PRAYERS);
+
+	/* TODO: can send less than MAX_PRAYERS if we want */
+	for (int i = 0; i < MAX_PRAYERS; ++i) {
+		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+				p->prayers[i]) == -1) {
+			return -1;
+		}
+	}
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
 player_send_client_settings(struct player *p)
 {
 	size_t offset = 0;

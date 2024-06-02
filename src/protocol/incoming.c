@@ -252,6 +252,26 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			}
 		}
 		break;
+	case OP_CLI_PRAYER_OFF:
+		{
+			uint8_t id;
+
+			if (buf_getu8(data, offset++, len, &id) == -1) {
+				return;
+			}
+			player_prayer_disable(p, id);
+		}
+		break;
+	case OP_CLI_PRAYER_ON:
+		{
+			uint8_t id;
+
+			if (buf_getu8(data, offset++, len, &id) == -1) {
+				return;
+			}
+			player_prayer_enable(p, id);
+		}
+		break;
 	case OP_CLI_SAVE_SETTING:
 		{
 			uint8_t id, value;
