@@ -146,6 +146,7 @@ struct player {
 	uint8_t bonus_changed;
 	uint8_t appearance_changed;
 	uint8_t plane_changed;
+	uint8_t prayers_changed;
 	uint8_t inv_changed;
 	uint8_t moved;
 	uint8_t sprites_base[MAX_ENTITY_SPRITES];
@@ -159,6 +160,8 @@ struct player {
 	uint8_t rpg_class;
 	uint8_t skulled;
 	uint64_t skull_timer;
+	uint64_t drain_counter;
+	uint64_t next_drain;
 	char public_chat_enc[MAX_PUBLIC_CHAT_LEN];
 	size_t public_chat_len;
 	uint16_t walk_queue_x[WALK_QUEUE_LEN];
@@ -189,7 +192,7 @@ struct player {
 	uint8_t inv_count;
 	struct invitem inventory[MAX_INV_SIZE];
 	uint8_t prayers[MAX_PRAYERS];
-	uint8_t prayer_drain;
+	uint16_t prayer_drain;
 };
 
 struct bound {
@@ -235,8 +238,10 @@ int player_wear(struct player *, int);
 int player_unwear(struct player *, int);
 void player_award_combat_xp(struct player *, struct mob *);
 void player_slow_restore(struct player *);
+void player_reset_prayers(struct player *);
 void player_prayer_enable(struct player *, int);
 void player_prayer_disable(struct player *, int);
+void player_prayer_drain(struct player *);
 
 /* incoming.c */
 int player_parse_incoming(struct player *);

@@ -164,11 +164,16 @@ server_send_pm(struct player *from, int64_t target, uint8_t *msg, size_t len)
 void
 server_tick(void)
 {
+	bool drain_tick = s.tick_counter >= s.next_prayer_drain;
 	bool restore_tick = (s.tick_counter % 100) == 0;
 	/*
 	 * TODO: handle rapid restore prayer
 	 * bool restore_tick_rapid = (s.tick_counter % 50) == 0;
 	 */
+
+	if (drain_tick) {
+		s.next_prayer_drain = s.tick_counter + 4;
+	}
 
 	for (int i = 0; i < s.max_player_id; ++i) {
 		if (s.players[i] == NULL) {
@@ -194,6 +199,9 @@ server_tick(void)
 		if (restore_tick) {
 			player_slow_restore(s.players[i]);
 		}
+		if (drain_tick) {
+			player_prayer_drain(s.players[i]);
+		}
 
 		if (s.players[i]->skulled &&
 		    s.tick_counter > s.players[i]->skull_timer) {
@@ -218,6 +226,9 @@ server_tick(void)
 		if (s.players[i]->bonus_changed) {
 			player_send_equip_bonuses(s.players[i]);
 		}
+		if (s.players[i]->prayers_changed) {
+			player_send_prayers(s.players[i]);
+		}
 		player_send_movement(s.players[i]);
 		player_send_appearance_update(s.players[i]);
 		net_player_send(s.players[i]);
@@ -233,6 +244,7 @@ server_tick(void)
 		s.players[i]->stats_changed = false;
 		s.players[i]->inv_changed = false;
 		s.players[i]->bonus_changed = false;
+		s.players[i]->prayers_changed = false;
 		s.players[i]->moved = false;
 		s.players[i]->mob.damage = UINT8_MAX;
 		s.players[i]->mob.prev_dir = s.players[i]->mob.dir;

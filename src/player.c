@@ -548,14 +548,7 @@ player_die(struct player *p)
 		}
 	}
 
-	for (int i = 0; i < MAX_PRAYERS; ++i) {
-		if (p->prayers[i]) {
-			p->prayer_drain = 0;
-			memset(p->prayers, 0, sizeof(p->prayers));
-			player_send_prayers(p);
-			break;
-		}
-	}
+	player_reset_prayers(p);
 
 	player_send_death(p);
 	p->appearance_changed = true;
@@ -960,6 +953,9 @@ void
 player_slow_restore(struct player *p)
 {
 	for (int i = 0; i < MAX_SKILL_ID; ++i) {
+		if (i == SKILL_PRAYER) {
+			continue;
+		}
 		if (p->mob.cur_stats[i] < p->mob.base_stats[i]) {
 			p->mob.cur_stats[i]++;
 			player_send_stat(p, i);
@@ -1010,6 +1006,8 @@ player_prayer_enable(struct player *p, int prayer)
 	}
 	p->prayers[prayer] = true;
 	p->prayer_drain = 0;
+	p->next_drain = 0;
+	p->drain_counter = 0;
 	for (int i = 0; i < MAX_PRAYERS; ++i) {
 		if (p->prayers[i]) {
 			config = server_prayer_config_by_id(i);
@@ -1017,7 +1015,22 @@ player_prayer_enable(struct player *p, int prayer)
 			p->prayer_drain += config->drain;
 		}
 	}
-	player_send_prayers(p);
+	p->prayers_changed = true;
+}
+
+void
+player_reset_prayers(struct player *p)
+{
+	for (int i = 0; i < MAX_PRAYERS; ++i) {
+		if (p->prayers[i]) {
+			memset(p->prayers, 0, sizeof(p->prayers));
+			p->next_drain = 0;
+			p->drain_counter = 0;
+			p->prayer_drain = 0;
+			p->prayers_changed = true;
+			break;
+		}
+	}
 }
 
 void
@@ -1031,8 +1044,37 @@ player_prayer_disable(struct player *p, int prayer)
 	if (p->prayers[prayer]) {
 		config = server_prayer_config_by_id(prayer);
 		assert(config != NULL);
-		p->prayers[prayer] = false;
+		p->next_drain = 0;
+		p->drain_counter = 0;
 		p->prayer_drain -= config->drain;
-		player_send_prayers(p);
+		p->prayers[prayer] = false;
+		p->prayers_changed = true;
 	}
+}
+
+void
+player_prayer_drain(struct player *p)
+{
+	int amount = 1;
+	int drain = p->prayer_drain;
+
+	drain -= drain * (p->bonus_prayer * 0.0315);
+
+	if (drain <= 0 || (p->drain_counter++) < p->next_drain) {
+		return;
+	}
+
+	if (drain >= 60) {
+		amount = drain / 60;
+	}
+
+	if (amount >= p->mob.cur_stats[SKILL_PRAYER]) {
+		p->mob.cur_stats[SKILL_PRAYER] = 0;
+		player_reset_prayers(p);
+	} else {
+		p->mob.cur_stats[SKILL_PRAYER] -= amount;
+	}
+	player_send_stat(p, SKILL_PRAYER);
+	p->drain_counter = 0;
+	p->next_drain = drain < 60 ? 60 / drain : 0;
 }
