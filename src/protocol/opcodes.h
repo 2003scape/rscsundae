@@ -45,6 +45,7 @@
 #define OP_SRV_INIT_PLANE		(244)
 #define OP_SRV_PLAYER_APPEARANCE	(250)
 #define OP_SRV_INVENTORY		(252)
+#define OP_SRV_LOCS			(253)
 #define OP_SRV_PLAYER_MOVEMENT		(255)
 
 #define RESP_LOGIN_OK		(0)

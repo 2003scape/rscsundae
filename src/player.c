@@ -14,6 +14,7 @@
 #include "loop.h"
 #include "netio.h"
 #include "stat.h"
+#include "zone.h"
 
 static void player_restore_stat(struct player *, int);
 static void player_restore_stats(struct player *);
@@ -1113,4 +1114,32 @@ player_prayer_drain(struct player *p)
 	player_send_stat(p, SKILL_PRAYER);
 	p->drain_counter = 0;
 	p->next_drain = drain < 60 ? 60 / drain : 0;
+}
+
+bool
+player_has_known_loc(struct player *p, int x, int y)
+{
+	for (int i = 0; i < p->known_loc_count; ++i) {
+		if (p->known_locs[i].x == x && p->known_locs[i].y == y) {
+			return true;
+		}
+	}
+	return false;
+}
+
+void
+player_add_known_loc(struct player *p, struct loc *loc)
+{
+	if (p->known_loc_count >= p->known_loc_max) {
+		size_t n = p->known_loc_max * 2;
+		if (n == 0) {
+			n = 128;
+		}
+		if (reallocarr(&p->known_locs,
+		    n, sizeof(struct loc)) == -1) {
+			return;
+		}
+		p->known_loc_max = n;
+	}
+	memcpy(&p->known_locs[p->known_loc_count++], loc, sizeof(struct loc));
 }

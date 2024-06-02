@@ -10,6 +10,7 @@
 #include "netio.h"
 #include "entity.h"
 #include "stat.h"
+#include "zone.h"
 
 /* XXX no idea what's authentic here */
 #define MAX_IDLE_TICKS		(20)
@@ -22,11 +23,28 @@ static int load_config_jag(void);
 int
 main(int argc, char **argv)
 {
+	struct loc l;
+
 	s.next_restore = 0;
 	s.next_rapid_restore = 0;
 	s.next_prayer_drain = 0;
 	/* TODO: should be configurable somehow */
 	s.xp_multiplier = 1;
+
+	l.x = 330;
+	l.y = 333;
+	l.id = 20;
+	server_add_loc(&l);
+
+	l.x = 326;
+	l.y = 333;
+	l.id = 40;
+	server_add_loc(&l);
+
+	l.x = 328;
+	l.y = 333;
+	l.id = 60;
+	server_add_loc(&l);
 
 	(void)signal(SIGPIPE, on_signal_do_nothing);
 
@@ -230,6 +248,7 @@ server_tick(void)
 		}
 		player_send_movement(s.players[i]);
 		player_send_appearance_update(s.players[i]);
+		player_send_locs(s.players[i]);
 		net_player_send(s.players[i]);
 	}
 

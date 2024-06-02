@@ -10,6 +10,7 @@ AC_CONFIG_FILES([
 
 AC_CHECK_FUNCS([arc4random_buf])
 AC_CHECK_FUNCS([clock_gettime])
+AC_CHECK_FUNCS([reallocarr])
 AC_CHECK_HEADER([sys/time.h])
 AC_CHECK_HEADER([bzlib.h])
 AC_SEARCH_LIBS([BZ2_bzDecompressInit], [bz2])

@@ -7,8 +7,12 @@
 #include "../buffer.h"
 #include "../entity.h"
 #include "../server.h"
+#include "../zone.h"
 
-#define UPDATE_RADIUS	(15)
+#define UPDATE_RADIUS		(15)
+#define LOC_UPDATE_RADIUS	(64)
+
+#define MAX_NEARBY_LOCS		(256)
 
 enum player_update_type {
 	PLAYER_UPDATE_BUBBLE		= 0,
@@ -827,5 +831,79 @@ player_send_equip_bonuses(struct player *p)
 		        p->bonus_magic);
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 		        p->bonus_prayer);
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
+player_send_locs(struct player *p)
+{
+	size_t offset = 0;
+	struct loc nearby[MAX_NEARBY_LOCS];
+	size_t nearby_count = 0;
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_LOCS);
+
+	for (int i = 0; i < p->known_loc_count; ++i) {
+		struct loc *loc;
+
+		loc = server_find_loc(p->known_locs[i].x, p->known_locs[i].y);
+		if (loc == NULL || !mob_within_range(&p->mob, loc->x, loc->y,
+		    LOC_UPDATE_RADIUS)) {
+			/* remove out of range objects */
+			if (buf_putu16(p->tmpbuf, offset,
+			    PLAYER_BUFSIZE, 60000) == -1) {
+				return -1;
+			}
+			offset += 2;
+			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+			    (uint8_t)(loc->x - (int)p->mob.x)) == -1) {
+				return -1;
+			}
+			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+			    (uint8_t)(loc->y - (int)p->mob.y)) == -1) {
+				return -1;
+			}
+		} else if (loc->id != p->known_locs[i].id) {
+			if (buf_putu16(p->tmpbuf, offset,
+			    PLAYER_BUFSIZE, loc->id) == -1) {
+				return -1;
+			}
+			offset += 2;
+			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+			    (uint8_t)(loc->x - (int)p->mob.x)) == -1) {
+				return -1;
+			}
+			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+			    (uint8_t)(loc->y - (int)p->mob.y)) == -1) {
+				return -1;
+			}
+			p->known_locs[i].id = loc->id;
+		}
+	}
+
+	nearby_count = mob_get_nearby_locs(&p->mob,
+	    nearby, MAX_NEARBY_LOCS);
+
+	for (size_t i = 0; i < nearby_count; ++i) {
+		if (player_has_known_loc(p, nearby[i].x, nearby[i].y)) {
+			continue;
+		}
+		if (buf_putu16(p->tmpbuf, offset,
+		    PLAYER_BUFSIZE, nearby[i].id) == -1) {
+			return -1;
+		}
+		offset += 2;
+		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		    (uint8_t)(nearby[i].x - (int)p->mob.x)) == -1) {
+			return -1;
+		}
+		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		    (uint8_t)(nearby[i].y - (int)p->mob.y)) == -1) {
+			return -1;
+		}
+		player_add_known_loc(p, &nearby[i]);
+	}
+
 	return player_write_packet(p, p->tmpbuf, offset);
 }

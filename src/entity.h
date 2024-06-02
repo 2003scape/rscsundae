@@ -193,18 +193,9 @@ struct player {
 	struct invitem inventory[MAX_INV_SIZE];
 	uint8_t prayers[MAX_PRAYERS];
 	uint16_t prayer_drain;
-};
-
-struct bound {
-	uint16_t id;
-	uint16_t x, y;
-	uint8_t dir;
-};
-
-struct loc {
-	uint16_t id;
-	uint16_t x, y;
-	uint8_t dir;
+	size_t known_loc_count;
+	size_t known_loc_max;
+	struct loc *known_locs;
 };
 
 /* mob.c */
@@ -214,6 +205,7 @@ int mob_wilderness_level(struct mob *);
 size_t get_nearby_players(struct mob *, struct player **, size_t, int);
 void mob_combat_reset(struct mob *);
 uint32_t mob_combat_xp(struct mob *);
+size_t mob_get_nearby_locs(struct mob *, struct loc *, size_t);
 
 /* player.c */
 struct player *player_accept(struct server *, int);
@@ -243,6 +235,8 @@ void player_reset_prayers(struct player *);
 void player_prayer_enable(struct player *, int);
 void player_prayer_disable(struct player *, int);
 void player_prayer_drain(struct player *);
+bool player_has_known_loc(struct player *, int, int);
+void player_add_known_loc(struct player *, struct loc *);
 
 /* incoming.c */
 int player_parse_incoming(struct player *);
@@ -269,6 +263,7 @@ int player_send_inv_slot(struct player *, int, int, uint32_t);
 int player_send_inv_remove(struct player *, int);
 int player_send_equip_bonuses(struct player *);
 int player_send_prayers(struct player *);
+int player_send_locs(struct player *);
 int player_notify_friend_online(struct player *, int64_t);
 int player_notify_friend_offline(struct player *, int64_t);
 

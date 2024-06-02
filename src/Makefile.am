@@ -12,6 +12,7 @@ rscsundae_SOURCES = \
 	inventory.c \
 	server.c \
 	stat.c \
+	zone.c \
 	config/config.c \
 	config/text.c \
 	ext/flea.c \
@@ -22,6 +23,7 @@ rscsundae_SOURCES = \
 	ext/libjag/lib/jag_read_header.c \
 	ext/libjag/lib/jag_unpack_entry.c \
 	ext/libjag/lib/jag_unpack_file.c \
+	ext/reallocarr.c \
 	protocol/incoming.c \
 	protocol/outgoing.c \
 	protocol/utility.c

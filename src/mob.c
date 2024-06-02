@@ -1,6 +1,7 @@
 #include <math.h>
 #include "entity.h"
 #include "server.h"
+#include "zone.h"
 
 static int mob_combat_max_roll(int, int);
 static int mob_combat_roll_damage(struct ranctx *, int, int);
@@ -106,5 +107,40 @@ get_nearby_players(struct mob *mob,
 			list[count++] = p2;
 		}
 	}
+	return count;
+}
+
+size_t
+mob_get_nearby_locs(struct mob *mob,
+		    struct loc *list, size_t max)
+{
+	size_t count = 0;
+	struct zone *orig;
+	struct zone *zone;
+
+	orig = server_find_zone(mob->x, mob->y);
+	if (orig != NULL) {
+		for (int i = 0; i < orig->loc_count && count < max; ++i) {
+			list[count++] = orig->locs[i];
+		}
+	}
+
+	for (int x = -1; x < 2; ++x) {
+		for (int y = -1; y < 2; ++y) {
+			if (x == 0 && y == 0) {
+				continue;
+			}
+			zone = server_get_zone(orig->x + x, orig->y + y,
+			    orig->plane);
+			if (zone == NULL) {
+				continue;
+			}
+			for (int i = 0; i < zone->loc_count &&
+			    count < max; ++i) {
+				list[count++] = zone->locs[i];
+			}
+		}
+	}
+
 	return count;
 }
