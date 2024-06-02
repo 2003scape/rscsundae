@@ -76,6 +76,7 @@ stat_random(struct mob *mob, int stat,
 	assert(stat < MAX_SKILL_ID);
 
 	/* TODO implement */
+	return false;
 }
 
 /* corresponds to runescript advancestat */
