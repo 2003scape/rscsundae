@@ -22,6 +22,9 @@ static int load_config_jag(void);
 int
 main(int argc, char **argv)
 {
+	s.next_restore = 0;
+	s.next_rapid_restore = 0;
+	s.next_prayer_drain = 0;
 	/* TODO: should be configurable somehow */
 	s.xp_multiplier = 1;
 
@@ -165,15 +168,8 @@ void
 server_tick(void)
 {
 	bool drain_tick = s.tick_counter >= s.next_prayer_drain;
-	bool restore_tick = (s.tick_counter % 100) == 0;
-	/*
-	 * TODO: handle rapid restore prayer
-	 * bool restore_tick_rapid = (s.tick_counter % 50) == 0;
-	 */
-
-	if (drain_tick) {
-		s.next_prayer_drain = s.tick_counter + 4;
-	}
+	bool restore_tick = s.tick_counter >= s.next_restore;
+	bool rapid_restore_tick = s.tick_counter >= s.next_rapid_restore;
 
 	for (int i = 0; i < s.max_player_id; ++i) {
 		if (s.players[i] == NULL) {
@@ -196,11 +192,14 @@ server_tick(void)
 		player_parse_incoming(s.players[i]);
 		player_process_combat(s.players[i]);
 		player_process_walk_queue(s.players[i]);
+		if (drain_tick) {
+			player_prayer_drain(s.players[i]);
+		}
 		if (restore_tick) {
 			player_slow_restore(s.players[i]);
 		}
-		if (drain_tick) {
-			player_prayer_drain(s.players[i]);
+		if (rapid_restore_tick) {
+			player_rapid_restore(s.players[i]);
 		}
 
 		if (s.players[i]->skulled &&
@@ -251,6 +250,18 @@ server_tick(void)
 	}
 
 	s.tick_counter++;
+
+	if (drain_tick) {
+		s.next_prayer_drain = s.tick_counter + 3;
+	}
+
+	if (restore_tick) {
+		s.next_restore = s.tick_counter + 100;
+	}
+
+	if (rapid_restore_tick) {
+		s.next_rapid_restore = s.tick_counter + 50;
+	}
 }
 
 static int

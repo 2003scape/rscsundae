@@ -238,6 +238,7 @@ int player_wear(struct player *, int);
 int player_unwear(struct player *, int);
 void player_award_combat_xp(struct player *, struct mob *);
 void player_slow_restore(struct player *);
+void player_rapid_restore(struct player *);
 void player_reset_prayers(struct player *);
 void player_prayer_enable(struct player *, int);
 void player_prayer_disable(struct player *, int);

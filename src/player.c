@@ -15,6 +15,8 @@
 #include "netio.h"
 #include "stat.h"
 
+static void player_restore_stat(struct player *, int);
+static void player_restore_stats(struct player *);
 static int player_get_attack_boosted(struct player *);
 static int player_get_defense_boosted(struct player *);
 static int player_get_strength_boosted(struct player *);
@@ -949,20 +951,51 @@ player_recalculate_sprites(struct player *p)
 	}
 }
 
+static void
+player_restore_stat(struct player *p, int stat)
+{
+	if (p->mob.cur_stats[stat] < p->mob.base_stats[stat]) {
+		p->mob.cur_stats[stat]++;
+		player_send_stat(p, stat);
+	}
+}
+
+static void
+player_restore_stats(struct player *p)
+{
+	for (int i = 0; i < MAX_SKILL_ID; ++i) {
+		if (i == SKILL_PRAYER || i == SKILL_HITS) {
+			continue;
+		}
+		player_restore_stat(p, i);
+	}
+}
+
 void
 player_slow_restore(struct player *p)
 {
 	for (int i = 0; i < MAX_SKILL_ID; ++i) {
-		if (i == SKILL_PRAYER) {
-			continue;
-		}
-		if (p->mob.cur_stats[i] < p->mob.base_stats[i]) {
-			p->mob.cur_stats[i]++;
-			player_send_stat(p, i);
-		} else if (p->mob.cur_stats[i] > p->mob.base_stats[i]) {
+		if (p->mob.cur_stats[i] > p->mob.base_stats[i]) {
 			p->mob.cur_stats[i]--;
 			player_send_stat(p, i);
 		}
+	}
+	if (!p->prayers[PRAY_RAPID_HEAL]) {
+		player_restore_stat(p, SKILL_HITS);
+	}
+	if (!p->prayers[PRAY_RAPID_RESTORE]) {
+		player_restore_stats(p);
+	}
+}
+
+void
+player_rapid_restore(struct player *p)
+{
+	if (p->prayers[PRAY_RAPID_HEAL]) {
+		player_restore_stat(p, SKILL_HITS);
+	}
+	if (p->prayers[PRAY_RAPID_RESTORE]) {
+		player_restore_stats(p);
 	}
 }
 

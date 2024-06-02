@@ -12,6 +12,8 @@ struct server {
 	uint16_t max_player_id;
 	uint64_t tick_counter;
 	uint64_t next_prayer_drain;
+	uint64_t next_restore;
+	uint64_t next_rapid_restore;
 	struct player *players[MAXPLAYERS];
 	struct ranctx ran;
 	struct item_config *item_config;
