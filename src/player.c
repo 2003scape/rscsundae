@@ -548,6 +548,15 @@ player_die(struct player *p)
 		}
 	}
 
+	for (int i = 0; i < MAX_PRAYERS; ++i) {
+		if (p->prayers[i]) {
+			p->prayer_drain = 0;
+			memset(p->prayers, 0, sizeof(p->prayers));
+			player_send_prayers(p);
+			break;
+		}
+	}
+
 	player_send_death(p);
 	p->appearance_changed = true;
 }
@@ -1000,17 +1009,30 @@ player_prayer_enable(struct player *p, int prayer)
 		break;
 	}
 	p->prayers[prayer] = true;
+	p->prayer_drain = 0;
+	for (int i = 0; i < MAX_PRAYERS; ++i) {
+		if (p->prayers[i]) {
+			config = server_prayer_config_by_id(i);
+			assert(config != NULL);
+			p->prayer_drain += config->drain;
+		}
+	}
 	player_send_prayers(p);
 }
 
 void
 player_prayer_disable(struct player *p, int prayer)
 {
+	struct prayer_config *config;
+
 	if (prayer >= MAX_PRAYERS) {
 		return;
 	}
 	if (p->prayers[prayer]) {
+		config = server_prayer_config_by_id(prayer);
+		assert(config != NULL);
 		p->prayers[prayer] = false;
+		p->prayer_drain -= config->drain;
 		player_send_prayers(p);
 	}
 }

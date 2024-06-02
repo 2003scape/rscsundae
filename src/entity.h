@@ -189,6 +189,7 @@ struct player {
 	uint8_t inv_count;
 	struct invitem inventory[MAX_INV_SIZE];
 	uint8_t prayers[MAX_PRAYERS];
+	uint8_t prayer_drain;
 };
 
 struct bound {
