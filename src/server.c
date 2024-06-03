@@ -532,7 +532,7 @@ server_prayer_config_by_id(int id)
 struct loc_config *
 server_loc_config_by_id(int id)
 {
-	if (id < 0 || id >= (int)s.prayer_config_count) {
+	if (id < 0 || id >= (int)s.loc_config_count) {
 		return NULL;
 	}
 	return &s.loc_config[id];
