@@ -839,6 +839,7 @@ player_send_locs(struct player *p)
 	size_t offset = 0;
 	struct loc nearby[MAX_NEARBY_LOCS];
 	size_t nearby_count = 0;
+	size_t update_count = 0;
 
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 		        OP_SRV_LOCS);
@@ -861,6 +862,7 @@ player_send_locs(struct player *p)
 			    (uint8_t)(loc->y - (int)p->mob.y)) == -1) {
 				return -1;
 			}
+			update_count++;
 			/* TODO remove from player array */
 		} else if (loc->id != p->known_locs[i].id) {
 			if (buf_putu16(p->tmpbuf, offset,
@@ -877,6 +879,7 @@ player_send_locs(struct player *p)
 				return -1;
 			}
 			p->known_locs[i].id = loc->id;
+			update_count++;
 		}
 	}
 
@@ -901,7 +904,12 @@ player_send_locs(struct player *p)
 			return -1;
 		}
 		player_add_known_loc(p, &nearby[i]);
+		update_count++;
 	}
 
+	if (update_count == 0) {
+		/* nothing to inform client */
+		return 0;
+	}
 	return player_write_packet(p, p->tmpbuf, offset);
 }
