@@ -24,13 +24,13 @@ jag_find_entry(struct jag_archive *archive, const char *name,
 		    archive->unpacked_len, &entry) == -1) {
 			return -1;
 		}
-		if (entry.name_hash != target_hash) {
-			offset += entry.unpacked_len;
-			continue;
+		if (entry.name_hash == target_hash) {
+			entry.data = archive->data + offset;
+			entry.must_free = 0;
+			*out = entry;
+			return 0;
 		}
-		entry.data = archive->data + offset;
-		*out = entry;
-		return 0;
+		offset += entry.packed_len;
 	}
 	return -1;
 }
