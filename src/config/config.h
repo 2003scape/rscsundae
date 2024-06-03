@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 #define MAX_ITEM_NAMES	(4)
+#define MAX_LOC_NAMES	(4)
 
 /* entities defined in config.jag */
 
@@ -70,10 +71,27 @@ struct prayer_config {
 	uint8_t drain;
 };
 
+/* "location.txt" - definitions for 3d objects */
+struct loc_config {
+	uint16_t id;
+	uint16_t name_count;
+	char *names[MAX_LOC_NAMES];
+	char *description;
+	char *model;
+	uint8_t width;
+	uint8_t height;
+	uint8_t type;
+	uint8_t unknown; /* XXX */
+	char *option;
+	char *option_alt;
+	uint16_t surface_height;
+};
+
 struct item_config *config_parse_items(char *, size_t, size_t *,
     struct entity_config *, size_t);
 struct entity_config *config_parse_entity(char *, size_t, size_t *);
 struct prayer_config *config_parse_prayers(char *, size_t, size_t *);
+struct loc_config *config_parse_locs(char *, size_t, size_t *);
 bool item_equip_clear(struct item_config *, int);
 
 #endif

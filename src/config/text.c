@@ -76,6 +76,7 @@ next_token_int(char *buffer, size_t offset, size_t len, long *out)
 	errno = 0;
 	result = strtol(buffer + n, NULL, 10);
 	if (errno != 0) {
+		assert(0);
 		return -1;
 	}
 	*out = result;
@@ -460,5 +461,141 @@ err:
 	assert(0);
 	free(prayers);
 	prayers = NULL;
+	return NULL;
+}
+
+struct loc_config *
+config_parse_locs(char *buffer, size_t len, size_t *num_locs)
+{
+	struct loc_config *locs = NULL;
+	size_t max_locs;
+	size_t offset;
+	ssize_t tmp;
+	long tmpl;
+
+	offset = 0;
+	tmp = next_token_int(buffer, offset, len, &tmpl);
+	if (tmp == -1) {
+		return NULL;
+	}
+	offset = tmp;
+	max_locs = tmpl;
+
+	locs = calloc(max_locs, sizeof(struct loc_config));
+	if (locs == NULL) {
+		return NULL;
+	}
+
+	for (size_t i = 0; i < max_locs; ++i) {
+		locs[i].id = i;
+
+		/* first line: names, description */
+
+		tmp = next_line(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > MAX_LOC_NAMES) {
+			goto err;
+		}
+		offset = tmp;
+		locs[i].name_count = tmpl;
+
+		for (size_t j = 0; j < locs[i].name_count; ++j) {
+			tmp = next_token(buffer, offset, len);
+			if (tmp == -1) {
+				goto err;
+			}
+			locs[i].names[j] = buffer + tmp;
+			offset = tmp + strlen(buffer + tmp) + 1;
+		}
+
+		tmp = next_token(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		locs[i].description = buffer + tmp;
+		offset = tmp + strlen(buffer + tmp) + 1;
+
+		/* second line: metadata */
+
+		tmp = next_line(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+
+		tmp = next_token(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		locs[i].model = buffer + tmp;
+		offset = tmp + strlen(buffer + tmp) + 1;
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+		locs[i].width = tmpl;
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+		locs[i].height = tmpl;
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+		locs[i].type = tmpl;
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+		locs[i].unknown = tmpl;
+
+		tmp = next_token(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		locs[i].option = buffer + tmp;
+		offset = tmp + strlen((char *)buffer + tmp) + 1;
+
+		tmp = next_token(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		locs[i].option_alt = buffer + tmp;
+		offset = tmp + strlen((char *)buffer + tmp) + 1;
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+		locs[i].surface_height = tmpl;
+	}
+
+	*num_locs = max_locs;
+	return locs;
+err:
+	assert(0);
+	free(locs);
+	locs = NULL;
 	return NULL;
 }

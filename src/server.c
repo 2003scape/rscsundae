@@ -335,6 +335,18 @@ load_config_jag(void)
 	printf("read configuration for %zu prayers\n",
 	    s.prayer_config_count);
 
+	if (jag_find_entry(&archive, "location.txt", &entry) == -1 ||
+	    jag_unpack_entry(&entry) == -1) {
+		goto err;
+	}
+	s.loc_config = config_parse_locs((char *)entry.data,
+	    entry.unpacked_len, &s.loc_config_count);
+	if (s.loc_config == NULL) {
+		goto err;
+	}
+	printf("read configuration for %zu locs\n",
+	    s.loc_config_count);
+
 	if (archive.must_free) {
 		free(archive.data);
 		archive.data = NULL;

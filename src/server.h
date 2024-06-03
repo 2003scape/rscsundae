@@ -22,6 +22,8 @@ struct server {
 	size_t entity_config_count;
 	struct prayer_config *prayer_config;
 	size_t prayer_config_count;
+	struct loc_config *loc_config;
+	size_t loc_config_count;
 	int xp_multiplier;
 };
 
