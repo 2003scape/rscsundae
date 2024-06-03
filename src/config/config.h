@@ -6,6 +6,7 @@
 
 #define MAX_ITEM_NAMES	(4)
 #define MAX_LOC_NAMES	(4)
+#define MAX_BOUND_NAMES	(4)
 
 /* entities defined in config.jag */
 
@@ -87,11 +88,28 @@ struct loc_config {
 	uint16_t surface_height;
 };
 
+/* "boundary.txt" - definitions for 2d wall objects */
+struct bound_config {
+	uint16_t id;
+	uint16_t name_count;
+	char *names[MAX_BOUND_NAMES];
+	char *description;
+	uint16_t height;
+	int32_t fill_front;
+	int32_t fill_back;
+	uint8_t block;
+	uint8_t block_projectile;
+	uint8_t interactive;
+	char *option;
+	char *option_alt;
+};
+
 struct item_config *config_parse_items(char *, size_t, size_t *,
     struct entity_config *, size_t);
 struct entity_config *config_parse_entity(char *, size_t, size_t *);
 struct prayer_config *config_parse_prayers(char *, size_t, size_t *);
 struct loc_config *config_parse_locs(char *, size_t, size_t *);
+struct bound_config *config_parse_bounds(char *, size_t, size_t *);
 bool item_equip_clear(struct item_config *, int);
 
 #endif

@@ -24,6 +24,8 @@ struct server {
 	size_t prayer_config_count;
 	struct loc_config *loc_config;
 	size_t loc_config_count;
+	struct bound_config *bound_config;
+	size_t bound_config_count;
 	int xp_multiplier;
 };
 
@@ -38,5 +40,6 @@ void server_send_pm(struct player *, int64_t, uint8_t *, size_t);
 struct item_config *server_item_config_by_id(int);
 struct prayer_config *server_prayer_config_by_id(int);
 struct loc_config *server_loc_config_by_id(int);
+struct bound_config *server_bound_config_by_id(int);
 
 #endif

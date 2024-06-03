@@ -348,6 +348,18 @@ load_config_jag(void)
 	printf("read configuration for %zu locs\n",
 	    s.loc_config_count);
 
+	if (jag_find_entry(&archive, "boundary.txt", &entry) == -1 ||
+	    jag_unpack_entry(&entry) == -1) {
+		goto err;
+	}
+	s.bound_config = config_parse_bounds((char *)entry.data,
+	    entry.unpacked_len, &s.bound_config_count);
+	if (s.bound_config == NULL) {
+		goto err;
+	}
+	printf("read configuration for %zu bounds\n",
+	    s.bound_config_count);
+
 	if (archive.must_free) {
 		free(archive.data);
 		archive.data = NULL;
@@ -536,4 +548,13 @@ server_loc_config_by_id(int id)
 		return NULL;
 	}
 	return &s.loc_config[id];
+}
+
+struct bound_config *
+server_bound_config_by_id(int id)
+{
+	if (id < 0 || id >= (int)s.bound_config_count) {
+		return NULL;
+	}
+	return &s.bound_config[id];
 }

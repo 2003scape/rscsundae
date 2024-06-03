@@ -599,3 +599,134 @@ err:
 	locs = NULL;
 	return NULL;
 }
+
+struct bound_config *
+config_parse_bounds(char *buffer, size_t len, size_t *num_bounds)
+{
+	struct bound_config *bounds = NULL;
+	size_t max_bounds;
+	size_t offset;
+	ssize_t tmp;
+	long tmpl;
+
+	offset = 0;
+	tmp = next_token_int(buffer, offset, len, &tmpl);
+	if (tmp == -1) {
+		return NULL;
+	}
+	offset = tmp;
+	max_bounds = tmpl;
+
+	bounds = calloc(max_bounds, sizeof(struct bound_config));
+	if (bounds == NULL) {
+		return NULL;
+	}
+
+	for (size_t i = 0; i < max_bounds; ++i) {
+		bounds[i].id = i;
+
+		/* first line: names, description */
+
+		tmp = next_line(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > MAX_LOC_NAMES) {
+			goto err;
+		}
+		offset = tmp;
+		bounds[i].name_count = tmpl;
+
+		for (size_t j = 0; j < bounds[i].name_count; ++j) {
+			tmp = next_token(buffer, offset, len);
+			if (tmp == -1) {
+				goto err;
+			}
+			bounds[i].names[j] = buffer + tmp;
+			offset = tmp + strlen(buffer + tmp) + 1;
+		}
+
+		tmp = next_token(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		bounds[i].description = buffer + tmp;
+		offset = tmp + strlen(buffer + tmp) + 1;
+
+		/* second line: metadata */
+
+		tmp = next_line(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+		bounds[i].height = tmpl;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+		bounds[i].fill_front = tmpl;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+		bounds[i].fill_back = tmpl;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+		bounds[i].block = tmpl;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+		bounds[i].block_projectile = tmpl;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+		bounds[i].interactive = tmpl;
+
+		tmp = next_token(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		bounds[i].option = buffer + tmp;
+		offset = tmp + strlen(buffer + tmp) + 1;
+
+		tmp = next_token(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		bounds[i].option_alt = buffer + tmp;
+		offset = tmp + strlen(buffer + tmp) + 1;
+	}
+
+	*num_bounds = max_bounds;
+	return bounds;
+err:
+	assert(0);
+	free(bounds);
+	bounds = NULL;
+	return NULL;
+}
