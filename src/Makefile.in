@@ -103,7 +103,7 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__rscsundae_SOURCES_DIST = buffer.c mob.c netio.c player.c \
-	inventory.c server.c stat.c zone.c config/config.c \
+	inventory.c server.c stat.c utility.c zone.c config/config.c \
 	config/text.c ext/flea.c ext/libjag/lib/jag_bzip2_decompress.c \
 	ext/libjag/lib/jag_find_entry.c \
 	ext/libjag/lib/jag_hash_entry_name.c \
@@ -112,16 +112,17 @@ am__rscsundae_SOURCES_DIST = buffer.c mob.c netio.c player.c \
 	ext/libjag/lib/jag_read_header.c \
 	ext/libjag/lib/jag_unpack_entry.c \
 	ext/libjag/lib/jag_unpack_file.c ext/reallocarr.c \
-	protocol/incoming.c protocol/outgoing.c protocol/utility.c \
-	loop-kqueue.c loop-ev.c loop-poll.c
+	protocol/incoming.c protocol/outgoing.c loop-kqueue.c \
+	loop-ev.c loop-poll.c
 am__dirstamp = $(am__leading_dot)dirstamp
 @KQUEUE_TRUE@am__objects_1 = loop-kqueue.$(OBJEXT)
 @KQUEUE_FALSE@@LIBEV_TRUE@am__objects_2 = loop-ev.$(OBJEXT)
 @KQUEUE_FALSE@@LIBEV_FALSE@am__objects_3 = loop-poll.$(OBJEXT)
 am_rscsundae_OBJECTS = buffer.$(OBJEXT) mob.$(OBJEXT) netio.$(OBJEXT) \
 	player.$(OBJEXT) inventory.$(OBJEXT) server.$(OBJEXT) \
-	stat.$(OBJEXT) zone.$(OBJEXT) config/config.$(OBJEXT) \
-	config/text.$(OBJEXT) ext/flea.$(OBJEXT) \
+	stat.$(OBJEXT) utility.$(OBJEXT) zone.$(OBJEXT) \
+	config/config.$(OBJEXT) config/text.$(OBJEXT) \
+	ext/flea.$(OBJEXT) \
 	ext/libjag/lib/jag_bzip2_decompress.$(OBJEXT) \
 	ext/libjag/lib/jag_find_entry.$(OBJEXT) \
 	ext/libjag/lib/jag_hash_entry_name.$(OBJEXT) \
@@ -131,8 +132,8 @@ am_rscsundae_OBJECTS = buffer.$(OBJEXT) mob.$(OBJEXT) netio.$(OBJEXT) \
 	ext/libjag/lib/jag_unpack_entry.$(OBJEXT) \
 	ext/libjag/lib/jag_unpack_file.$(OBJEXT) \
 	ext/reallocarr.$(OBJEXT) protocol/incoming.$(OBJEXT) \
-	protocol/outgoing.$(OBJEXT) protocol/utility.$(OBJEXT) \
-	$(am__objects_1) $(am__objects_2) $(am__objects_3)
+	protocol/outgoing.$(OBJEXT) $(am__objects_1) $(am__objects_2) \
+	$(am__objects_3)
 rscsundae_OBJECTS = $(am_rscsundae_OBJECTS)
 rscsundae_DEPENDENCIES =
 AM_V_P = $(am__v_P_@AM_V@)
@@ -154,7 +155,8 @@ am__depfiles_remade = ./$(DEPDIR)/buffer.Po ./$(DEPDIR)/inventory.Po \
 	./$(DEPDIR)/loop-ev.Po ./$(DEPDIR)/loop-kqueue.Po \
 	./$(DEPDIR)/loop-poll.Po ./$(DEPDIR)/mob.Po \
 	./$(DEPDIR)/netio.Po ./$(DEPDIR)/player.Po \
-	./$(DEPDIR)/server.Po ./$(DEPDIR)/stat.Po ./$(DEPDIR)/zone.Po \
+	./$(DEPDIR)/server.Po ./$(DEPDIR)/stat.Po \
+	./$(DEPDIR)/utility.Po ./$(DEPDIR)/zone.Po \
 	config/$(DEPDIR)/config.Po config/$(DEPDIR)/text.Po \
 	ext/$(DEPDIR)/flea.Po ext/$(DEPDIR)/reallocarr.Po \
 	ext/libjag/lib/$(DEPDIR)/jag_bzip2_decompress.Po \
@@ -165,8 +167,7 @@ am__depfiles_remade = ./$(DEPDIR)/buffer.Po ./$(DEPDIR)/inventory.Po \
 	ext/libjag/lib/$(DEPDIR)/jag_read_header.Po \
 	ext/libjag/lib/$(DEPDIR)/jag_unpack_entry.Po \
 	ext/libjag/lib/$(DEPDIR)/jag_unpack_file.Po \
-	protocol/$(DEPDIR)/incoming.Po protocol/$(DEPDIR)/outgoing.Po \
-	protocol/$(DEPDIR)/utility.Po
+	protocol/$(DEPDIR)/incoming.Po protocol/$(DEPDIR)/outgoing.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -297,7 +298,7 @@ top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = subdir-objects
 AM_CPPFLAGS = -Iext/libjag/include
 rscsundae_SOURCES = buffer.c mob.c netio.c player.c inventory.c \
-	server.c stat.c zone.c config/config.c config/text.c \
+	server.c stat.c utility.c zone.c config/config.c config/text.c \
 	ext/flea.c ext/libjag/lib/jag_bzip2_decompress.c \
 	ext/libjag/lib/jag_find_entry.c \
 	ext/libjag/lib/jag_hash_entry_name.c \
@@ -306,8 +307,8 @@ rscsundae_SOURCES = buffer.c mob.c netio.c player.c inventory.c \
 	ext/libjag/lib/jag_read_header.c \
 	ext/libjag/lib/jag_unpack_entry.c \
 	ext/libjag/lib/jag_unpack_file.c ext/reallocarr.c \
-	protocol/incoming.c protocol/outgoing.c protocol/utility.c \
-	$(am__append_1) $(am__append_2) $(am__append_3)
+	protocol/incoming.c protocol/outgoing.c $(am__append_1) \
+	$(am__append_2) $(am__append_3)
 rscsundae_LDADD = $(libev_LIBS) -lm
 all: all-am
 
@@ -443,8 +444,6 @@ protocol/incoming.$(OBJEXT): protocol/$(am__dirstamp) \
 	protocol/$(DEPDIR)/$(am__dirstamp)
 protocol/outgoing.$(OBJEXT): protocol/$(am__dirstamp) \
 	protocol/$(DEPDIR)/$(am__dirstamp)
-protocol/utility.$(OBJEXT): protocol/$(am__dirstamp) \
-	protocol/$(DEPDIR)/$(am__dirstamp)
 
 rscsundae$(EXEEXT): $(rscsundae_OBJECTS) $(rscsundae_DEPENDENCIES) $(EXTRA_rscsundae_DEPENDENCIES) 
 	@rm -f rscsundae$(EXEEXT)
@@ -470,6 +469,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/player.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stat.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utility.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/zone.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@config/$(DEPDIR)/config.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@config/$(DEPDIR)/text.Po@am__quote@ # am--include-marker
@@ -485,7 +485,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@ext/libjag/lib/$(DEPDIR)/jag_unpack_file.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@protocol/$(DEPDIR)/incoming.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@protocol/$(DEPDIR)/outgoing.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@protocol/$(DEPDIR)/utility.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -653,6 +652,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/player.Po
 	-rm -f ./$(DEPDIR)/server.Po
 	-rm -f ./$(DEPDIR)/stat.Po
+	-rm -f ./$(DEPDIR)/utility.Po
 	-rm -f ./$(DEPDIR)/zone.Po
 	-rm -f config/$(DEPDIR)/config.Po
 	-rm -f config/$(DEPDIR)/text.Po
@@ -668,7 +668,6 @@ distclean: distclean-am
 	-rm -f ext/libjag/lib/$(DEPDIR)/jag_unpack_file.Po
 	-rm -f protocol/$(DEPDIR)/incoming.Po
 	-rm -f protocol/$(DEPDIR)/outgoing.Po
-	-rm -f protocol/$(DEPDIR)/utility.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -724,6 +723,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/player.Po
 	-rm -f ./$(DEPDIR)/server.Po
 	-rm -f ./$(DEPDIR)/stat.Po
+	-rm -f ./$(DEPDIR)/utility.Po
 	-rm -f ./$(DEPDIR)/zone.Po
 	-rm -f config/$(DEPDIR)/config.Po
 	-rm -f config/$(DEPDIR)/text.Po
@@ -739,7 +739,6 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ext/libjag/lib/$(DEPDIR)/jag_unpack_file.Po
 	-rm -f protocol/$(DEPDIR)/incoming.Po
 	-rm -f protocol/$(DEPDIR)/outgoing.Po
-	-rm -f protocol/$(DEPDIR)/utility.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
