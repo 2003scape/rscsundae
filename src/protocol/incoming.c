@@ -2,12 +2,12 @@
 #include <stdio.h>
 #include <string.h>
 #include "opcodes.h"
-#include "utility.h"
 #include "../config/anim.h"
 #include "../buffer.h"
 #include "../entity.h"
 #include "../netio.h"
 #include "../server.h"
+#include "../utility.h"
 
 #define MAX_PACKETS_PER_TICK		(10)
 #define MAX_PLAYER_HAIR_COLOUR		(9)

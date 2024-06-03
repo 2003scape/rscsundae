@@ -7,13 +7,13 @@
 #include <unistd.h>
 #include "config/anim.h"
 #include "protocol/opcodes.h"
-#include "protocol/utility.h"
 #include "inventory.h"
 #include "server.h"
 #include "entity.h"
 #include "loop.h"
 #include "netio.h"
 #include "stat.h"
+#include "utility.h"
 #include "zone.h"
 
 static void player_restore_stat(struct player *, int);

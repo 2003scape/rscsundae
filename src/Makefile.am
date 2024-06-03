@@ -12,6 +12,7 @@ rscsundae_SOURCES = \
 	inventory.c \
 	server.c \
 	stat.c \
+	utility.c \
 	zone.c \
 	config/config.c \
 	config/text.c \
@@ -26,8 +27,7 @@ rscsundae_SOURCES = \
 	ext/libjag/lib/jag_unpack_file.c \
 	ext/reallocarr.c \
 	protocol/incoming.c \
-	protocol/outgoing.c \
-	protocol/utility.c
+	protocol/outgoing.c
 
 if KQUEUE
 rscsundae_SOURCES += loop-kqueue.c

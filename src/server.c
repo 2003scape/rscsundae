@@ -5,12 +5,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include "protocol/utility.h"
 #include "server.h"
 #include "loop.h"
 #include "netio.h"
 #include "entity.h"
 #include "stat.h"
+#include "utility.h"
 #include "zone.h"
 
 /* XXX no idea what's authentic here */
