@@ -19,6 +19,7 @@ rscsundae_SOURCES = \
 	ext/libjag/lib/jag_bzip2_decompress.c \
 	ext/libjag/lib/jag_find_entry.c \
 	ext/libjag/lib/jag_hash_entry_name.c  \
+	ext/libjag/lib/jag_map_read_jm.c \
 	ext/libjag/lib/jag_read_entry.c \
 	ext/libjag/lib/jag_read_header.c \
 	ext/libjag/lib/jag_unpack_entry.c \

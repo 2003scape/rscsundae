@@ -1,6 +1,7 @@
 #include "../../../buffer.h"
 
-#ifndef jag_getu16
+#ifndef jag_getu8
+#define jag_getu8 buf_getu8
 #define jag_getu16 buf_getu16
 #define jag_getu24 buf_getu24
 #define jag_getu32 buf_getu32

@@ -1,4 +1,5 @@
 #include <jag.h>
+#include <map.h>
 #include <sys/types.h>
 #include <sys/signal.h>
 #include <stdlib.h>
@@ -19,32 +20,17 @@ struct server s = {0};
 
 static void on_signal_do_nothing(int);
 static int load_config_jag(void);
+static void load_map_chunk(struct jag_map *, int, int, int);
+static int load_maps_jag(void);
 
 int
 main(int argc, char **argv)
 {
-	struct loc l;
-
 	s.next_restore = 0;
 	s.next_rapid_restore = 0;
 	s.next_prayer_drain = 0;
 	/* TODO: should be configurable somehow */
 	s.xp_multiplier = 1;
-
-	l.x = 330;
-	l.y = 333;
-	l.id = 20;
-	server_add_loc(&l);
-
-	l.x = 326;
-	l.y = 333;
-	l.id = 40;
-	server_add_loc(&l);
-
-	l.x = 328;
-	l.y = 333;
-	l.id = 60;
-	server_add_loc(&l);
 
 	(void)signal(SIGPIPE, on_signal_do_nothing);
 
@@ -55,6 +41,12 @@ main(int argc, char **argv)
 
 	if (load_config_jag() == -1) {
 		fprintf(stderr, "error reading config.jag\n");
+		fprintf(stderr, "did you run the fetch-jag-files script from the data directory?\n");
+		return EXIT_FAILURE;
+	}
+
+	if (load_maps_jag() == -1) {
+		fprintf(stderr, "error reading maps.jag\n");
 		fprintf(stderr, "did you run the fetch-jag-files script from the data directory?\n");
 		return EXIT_FAILURE;
 	}
@@ -360,6 +352,95 @@ err:
 	if (f != NULL) {
 		fclose(f);
 		f = NULL;
+	}
+	return -1;
+}
+
+static void
+load_map_chunk(struct jag_map *chunk, int chunk_x, int chunk_y, int plane)
+{
+	int object_type;
+	int global_x, global_y;
+	struct loc loc;
+	int ind;
+
+	for (int x = 0; x < JAG_MAP_CHUNK_SIZE; ++x) {
+		for (int y = 0; y < JAG_MAP_CHUNK_SIZE; ++y) {
+			global_x = ((chunk_x - JAG_MAP_CHUNK_SIZE) *
+			    JAG_MAP_CHUNK_SIZE) + x;
+			global_y = (plane * PLANE_LEVEL_INC) +
+			    ((chunk_y - 37) * JAG_MAP_CHUNK_SIZE) + y;
+			ind = x * JAG_MAP_CHUNK_SIZE + y;
+			object_type = chunk->tiles[ind].bound_diag;
+			if (object_type > JAG_MAP_DIAG_LOC) {
+				/*
+				 * TODO need to read direction and clear
+				 * adjacent tiles like the client does
+				 */
+				loc.id = object_type - JAG_MAP_DIAG_LOC - 1;
+				loc.x = global_x;
+				loc.y = global_y;
+				if (loc.id < 300) {
+					server_add_loc(&loc);
+				}
+			}
+		}
+	}
+}
+
+static int
+load_maps_jag(void)
+{
+	struct jag_archive archive = {0};
+	struct jag_entry entry = {0};
+	FILE *f = NULL;
+
+	/* TODO: support configurable & system-wide paths */
+	f = fopen("./data/maps27.jag", "rb");
+	if (f == NULL) {
+		goto err;
+	}
+	if (jag_unpack_file(f, &archive) == -1) {
+		goto err;
+	}
+	fclose(f);
+	f = NULL;
+	for (int plane = 0; plane < 4; ++plane) {
+		for (int x = 49; x < 64; ++x) {
+			for (int y = 40; y < 64; ++y) {
+				struct jag_map chunk;
+				char file[32];
+
+				(void)snprintf(file, sizeof(file),
+				    "m%d%d%d%d%d.jm", plane,
+				    x / 10, x % 10, y / 10, y % 10);
+				if (jag_find_entry(&archive,
+					file, &entry) == -1 ||
+				    jag_unpack_entry(&entry) == -1) {
+					continue;
+				}
+
+				if (jag_map_read_jm(&chunk,
+				    entry.data, entry.unpacked_len) != -1) {
+					load_map_chunk(&chunk, x, y, plane);
+				}
+
+				if (entry.must_free) {
+					free(entry.data);
+					entry.data = NULL;
+				}
+			}
+		}
+	}
+	if (archive.must_free) {
+		free(archive.data);
+		archive.data = NULL;
+	}
+	return 0;
+err:
+	if (archive.must_free) {
+		free(archive.data);
+		archive.data = NULL;
 	}
 	return -1;
 }
