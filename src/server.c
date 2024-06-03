@@ -423,7 +423,7 @@ load_map_tile(struct jag_map *chunk,
 				int ind2;
 				uint32_t n;
 
-				if (x == loc.x && y == loc.y) {
+				if (x == tile_x && y == tile_y) {
 					continue;
 				}
 
