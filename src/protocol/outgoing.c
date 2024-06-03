@@ -864,6 +864,7 @@ player_send_locs(struct player *p)
 			    (uint8_t)(loc->y - (int)p->mob.y)) == -1) {
 				return -1;
 			}
+			/* TODO remove from player array */
 		} else if (loc->id != p->known_locs[i].id) {
 			if (buf_putu16(p->tmpbuf, offset,
 			    PLAYER_BUFSIZE, loc->id) == -1) {
