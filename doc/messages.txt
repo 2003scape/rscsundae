@@ -1,3 +1,7 @@
+I'm not near enough
+Sending trade request
+Other player has declined trade
+Trade completed successfully
 You are under attack!
 You are already busy fighting!
 You have defeated %!
@@ -26,3 +30,36 @@ Sending trade request
 Player has a protection from missiles prayer active!
 Your opponent already has weakend attack
 Your opponent already has weakend strength
+@que@You swing your mithril axe at the tree...
+@que@You slip and fail to hit the tree
+@que@You get some wood
+@que@You attempt to light the logs
+@que@The fire catches and the logs begin to burn
+@que@You dig a hole in the ground
+@que@You bury the bones
+@que@You attempt to catch a lobster
+@que@You catch a lobster
+@que@You fail to catch anything
+@que@You cook the lobster on the stove
+@que@The lobster is now nicely cooked
+@que@You swing your pick at the rock...
+@que@You manage to obtain some mithril ore
+@que@You only succeed in scratching the rock
+@que@You place the mithril and 4 heaps of coal into the furnace
+@que@You retrieve a bar of mithril
+@que@What would you like to make?
+@que@Choose a type of weapon to make
+@que@Choose a type of armour to make
+@que@What sort of axe do you want to make?
+@que@What sort of helmet do you want to make?
+@que@You hammer the metal and make an axe
+@que@You hammer the metal and make a large helmet
+@que@What would you like to make?
+@que@You make some leather armour
+@que@You make some boots
+@que@You use up one of your reels of thread
+@que@You pay 30 gold
+@que@You board the ship
+@que@The ship arrives at Karamja
+@que@You climb down the ladder
+@que@You just went through a secret door
