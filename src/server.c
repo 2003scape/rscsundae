@@ -21,6 +21,7 @@ struct server s = {0};
 static void on_signal_do_nothing(int);
 static int load_config_jag(void);
 static void load_map_chunk(struct jag_map *, int, int, int);
+static void load_map_tile(struct jag_map *, int, int, int, int);
 static int load_maps_jag(void);
 
 int
@@ -369,11 +370,77 @@ err:
 }
 
 static void
+load_map_tile(struct jag_map *chunk,
+    int tile_x, int tile_y, int global_x, int global_y)
+{
+	struct loc loc;
+	struct loc_config *loc_config;
+	uint32_t object_type;
+	uint16_t object_dir;
+	int ind;
+
+	ind = tile_x * JAG_MAP_CHUNK_SIZE + tile_y;
+	object_type = chunk->tiles[ind].bound_diag;
+	object_dir = chunk->tiles[ind].loc_direction;
+	if (object_type > JAG_MAP_DIAG_LOC) {
+		int width, height;
+		int max_x, max_y;
+
+		loc.id = object_type - JAG_MAP_DIAG_LOC - 1;
+		loc.x = global_x;
+		loc.y = global_y;
+		loc_config = server_loc_config_by_id(loc.id);
+		if (loc_config == NULL) {
+			return;
+		}
+		server_add_loc(&loc);
+		if (object_dir == 0 || object_dir == 4) {
+			width = loc_config->width;
+			height = loc_config->height;
+		} else {
+			width = loc_config->height;
+			height = loc_config->width;
+		}
+		if (width <= 1 && height <= 1) {
+			return;
+		}
+		/*
+		 * have to clear up adjacent tiles as apparently the
+		 * original map editor puts objects on every tile
+		 * their width and height occupy, and we don't want
+		 * duplicates
+		 */
+		max_x = tile_x + width;
+		if (max_x >= JAG_MAP_CHUNK_SIZE) {
+			max_x = JAG_MAP_CHUNK_SIZE;
+		}
+		max_y = tile_y + height;
+		if (max_y >= JAG_MAP_CHUNK_SIZE) {
+			max_y = JAG_MAP_CHUNK_SIZE;
+		}
+		for (int x = tile_x; x < max_x; ++x) {
+			for (int y = tile_y; y < max_y; ++y) {
+				int ind2;
+				uint32_t n;
+
+				if (x == loc.x && y == loc.y) {
+					continue;
+				}
+
+				ind2 = x * JAG_MAP_CHUNK_SIZE + y;
+				n = chunk->tiles[ind2].bound_diag;
+				if (n == object_type) {
+					chunk->tiles[ind2].bound_diag = 0;
+				}
+			}
+		}
+	}
+}
+
+static void
 load_map_chunk(struct jag_map *chunk, int chunk_x, int chunk_y, int plane)
 {
-	int object_type;
 	int global_x, global_y;
-	struct loc loc;
 	int ind;
 
 	for (int x = 0; x < JAG_MAP_CHUNK_SIZE; ++x) {
@@ -382,20 +449,7 @@ load_map_chunk(struct jag_map *chunk, int chunk_x, int chunk_y, int plane)
 			    JAG_MAP_CHUNK_SIZE) + x;
 			global_y = (plane * PLANE_LEVEL_INC) +
 			    ((chunk_y - 37) * JAG_MAP_CHUNK_SIZE) + y;
-			ind = x * JAG_MAP_CHUNK_SIZE + y;
-			object_type = chunk->tiles[ind].bound_diag;
-			if (object_type > JAG_MAP_DIAG_LOC) {
-				/*
-				 * TODO need to read direction and clear
-				 * adjacent tiles like the client does
-				 */
-				loc.id = object_type - JAG_MAP_DIAG_LOC - 1;
-				loc.x = global_x;
-				loc.y = global_y;
-				if (loc.id < 300) {
-					server_add_loc(&loc);
-				}
-			}
+			load_map_tile(chunk, x, y, global_x, global_y);
 		}
 	}
 }
@@ -473,4 +527,13 @@ server_prayer_config_by_id(int id)
 		return NULL;
 	}
 	return &s.prayer_config[id];
+}
+
+struct loc_config *
+server_loc_config_by_id(int id)
+{
+	if (id < 0 || id >= (int)s.prayer_config_count) {
+		return NULL;
+	}
+	return &s.loc_config[id];
 }
