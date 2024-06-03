@@ -10,7 +10,6 @@
 #include "../zone.h"
 
 #define UPDATE_RADIUS		(15)
-#define LOC_UPDATE_RADIUS	(64)
 
 #define MAX_NEARBY_LOCS		(256)
 
@@ -848,9 +847,7 @@ player_send_locs(struct player *p)
 		struct loc *loc;
 
 		loc = server_find_loc(p->known_locs[i].x, p->known_locs[i].y);
-		if (loc == NULL || !mob_within_range(&p->mob, loc->x, loc->y,
-		    LOC_UPDATE_RADIUS)) {
-			/* remove out of range objects */
+		if (loc == NULL) {
 			if (buf_putu16(p->tmpbuf, offset,
 			    PLAYER_BUFSIZE, 60000) == -1) {
 				return -1;
