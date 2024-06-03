@@ -66,10 +66,10 @@ buf_getu32(void *b, size_t offset, size_t buflen, uint32_t *out)
 	    ((ptrdiff_t)buflen - (ptrdiff_t)offset) < 4) {
 		return -1;
 	}
-	*out = ((buffer[offset] & 0xff) << 24) |
-	       ((buffer[offset + 1] & 0xff) << 16) |
-	       ((buffer[offset + 2] & 0xff) << 8) |
-	        (buffer[offset + 3] & 0xff);
+	*out = ((uint32_t)(buffer[offset] & 0xff) << 24) |
+	       ((uint32_t)(buffer[offset + 1] & 0xff) << 16) |
+	       ((uint32_t)(buffer[offset + 2] & 0xff) << 8) |
+	        (uint32_t)(buffer[offset + 3] & 0xff);
 	return 0;
 }
 
