@@ -4,7 +4,7 @@
 #include "ext/flea.h"
 #include "entity.h"
 
-#define MAXPLAYERS	(2000)
+#define MAXPLAYERS	(1000)
 
 struct server {
 	void *loop_ctx;
