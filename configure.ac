@@ -1,6 +1,5 @@
 AC_INIT([rscsundae], [0.0.1], [stormy@mailfence.com])
 AM_INIT_AUTOMAKE([-Wall foreign])
-: ${CFLAGS="-std=c99 -Wall"}
 AC_PROG_CC
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([
@@ -8,6 +7,10 @@ AC_CONFIG_FILES([
  src/Makefile
 ])
 
+
+AX_CHECK_COMPILE_FLAG([-Wall], [CFLAGS="$CFLAGS -Wall"])
+AX_CHECK_COMPILE_FLAG([-Wextra], [CFLAGS="$CFLAGS -Wextra"])
+AX_CHECK_COMPILE_FLAG([-std=c99], [CFLAGS="$CFLAGS -std=c99"])
 AC_CHECK_FUNCS([arc4random_buf])
 AC_CHECK_FUNCS([clock_gettime])
 AC_CHECK_FUNCS([reallocarr])
