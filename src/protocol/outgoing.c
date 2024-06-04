@@ -12,6 +12,7 @@
 #define UPDATE_RADIUS		(15)
 
 #define MAX_NEARBY_LOCS		(256)
+#define MAX_NEARBY_BOUNDS	(256)
 
 enum player_update_type {
 	PLAYER_UPDATE_BUBBLE		= 0,
@@ -844,7 +845,7 @@ player_send_locs(struct player *p)
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 		        OP_SRV_LOCS);
 
-	for (int i = 0; i < p->known_loc_count; ++i) {
+	for (size_t i = 0; i < p->known_loc_count; ++i) {
 		struct loc *loc;
 
 		loc = server_find_loc(p->known_locs[i].x, p->known_locs[i].y);
@@ -904,6 +905,86 @@ player_send_locs(struct player *p)
 			return -1;
 		}
 		player_add_known_loc(p, &nearby[i]);
+		update_count++;
+	}
+
+	if (update_count == 0) {
+		/* nothing to inform client */
+		return 0;
+	}
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
+player_send_bounds(struct player *p)
+{
+	size_t offset = 0;
+	struct bound nearby[MAX_NEARBY_BOUNDS];
+	size_t nearby_count = 0;
+	size_t update_count = 0;
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_BOUNDARIES);
+
+	for (size_t i = 0; i < p->known_bound_count; ++i) {
+		struct bound *bound;
+
+		bound = server_find_bound(p->known_bounds[i].x,
+		    p->known_bounds[i].y, p->known_bounds[i].dir);
+		if (bound == NULL) {
+			/*
+			 * no way for client to remove individual bounds
+			 * due to a bug
+			 */
+			continue;
+		} else if (bound->id != p->known_bounds[i].id) {
+			if (buf_putu16(p->tmpbuf, offset,
+			    PLAYER_BUFSIZE, bound->id) == -1) {
+				return -1;
+			}
+			offset += 2;
+			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+			    (uint8_t)(bound->x - (int)p->mob.x)) == -1) {
+				return -1;
+			}
+			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+			    (uint8_t)(bound->y - (int)p->mob.y)) == -1) {
+				return -1;
+			}
+			if (buf_putu8(p->tmpbuf, offset++,
+			    PLAYER_BUFSIZE, bound->dir) == -1) {
+				return -1;
+			}
+			update_count++;
+		}
+	}
+
+	nearby_count = mob_get_nearby_bounds(&p->mob,
+	    nearby, MAX_NEARBY_BOUNDS);
+
+	for (size_t i = 0; i < nearby_count; ++i) {
+		if (player_has_known_bound(p,
+		    nearby[i].x, nearby[i].y, nearby[i].dir)) {
+			continue;
+		}
+		if (buf_putu16(p->tmpbuf, offset,
+		    PLAYER_BUFSIZE, nearby[i].id) == -1) {
+			return -1;
+		}
+		offset += 2;
+		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		    (uint8_t)(nearby[i].x - (int)p->mob.x)) == -1) {
+			return -1;
+		}
+		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		    (uint8_t)(nearby[i].y - (int)p->mob.y)) == -1) {
+			return -1;
+		}
+		if (buf_putu8(p->tmpbuf, offset++,
+		    PLAYER_BUFSIZE, nearby[i].dir) == -1) {
+			return -1;
+		}
+		player_add_known_bound(p, &nearby[i]);
 		update_count++;
 	}
 

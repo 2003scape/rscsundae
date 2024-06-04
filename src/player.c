@@ -150,10 +150,10 @@ player_accept(struct server *s, int sock)
 	player_recalculate_sprites(p);
 
 	p->mob.server = s;
-	/*p->mob.x = 120;
-	p->mob.y = 648;*/
-	p->mob.x = 333;
-	p->mob.y = 333;
+	p->mob.x = 120;
+	p->mob.y = 648;
+	/*p->mob.x = 333;
+	p->mob.y = 333;*/
 	p->mob.damage = UINT8_MAX;
 
 	mob_combat_reset(&p->mob);
@@ -1142,4 +1142,34 @@ player_add_known_loc(struct player *p, struct loc *loc)
 		p->known_loc_max = n;
 	}
 	memcpy(&p->known_locs[p->known_loc_count++], loc, sizeof(struct loc));
+}
+
+bool
+player_has_known_bound(struct player *p, int x, int y, int dir)
+{
+	for (int i = 0; i < p->known_bound_count; ++i) {
+		if (p->known_bounds[i].x == x && p->known_bounds[i].y == y &&
+		    p->known_bounds[i].dir == dir) {
+			return true;
+		}
+	}
+	return false;
+}
+
+void
+player_add_known_bound(struct player *p, struct bound *bound)
+{
+	if (p->known_bound_count >= p->known_bound_max) {
+		size_t n = p->known_bound_max * 2;
+		if (n == 0) {
+			n = 128;
+		}
+		if (reallocarr(&p->known_bounds,
+		    n, sizeof(struct bound)) == -1) {
+			return;
+		}
+		p->known_bound_max = n;
+	}
+	memcpy(&p->known_bounds[p->known_bound_count++],
+		bound, sizeof(struct bound));
 }

@@ -242,6 +242,7 @@ server_tick(void)
 		player_send_movement(s.players[i]);
 		player_send_appearance_update(s.players[i]);
 		player_send_locs(s.players[i]);
+		player_send_bounds(s.players[i]);
 		net_player_send(s.players[i]);
 	}
 
@@ -387,6 +388,8 @@ load_map_tile(struct jag_map *chunk,
 {
 	struct loc loc;
 	struct loc_config *loc_config;
+	struct bound bound;
+	struct bound_config *bound_config;
 	uint32_t object_type;
 	uint16_t object_dir;
 	int ind;
@@ -394,6 +397,30 @@ load_map_tile(struct jag_map *chunk,
 	ind = tile_x * JAG_MAP_CHUNK_SIZE + tile_y;
 	object_type = chunk->tiles[ind].bound_diag;
 	object_dir = chunk->tiles[ind].loc_direction;
+	if (chunk->tiles[ind].bound_vert) {
+		bound.x = global_x;
+		bound.y = global_y;
+		bound.id =  chunk->tiles[ind].bound_vert - 1;
+		bound.dir = BOUND_DIR_VERT;
+		bound_config = server_bound_config_by_id(bound.id);
+		if (bound_config != NULL) {
+			if (bound_config->interactive) {
+				server_add_bound(&bound);
+			}
+		}
+	}
+	if (chunk->tiles[ind].bound_horiz) {
+		bound.x = global_x;
+		bound.y = global_y;
+		bound.id =  chunk->tiles[ind].bound_horiz - 1;
+		bound.dir = BOUND_DIR_HORIZ;
+		bound_config = server_bound_config_by_id(bound.id);
+		if (bound_config != NULL) {
+			if (bound_config->interactive) {
+				server_add_bound(&bound);
+			}
+		}
+	}
 	if (object_type > JAG_MAP_DIAG_LOC) {
 		int width, height;
 		int max_x, max_y;
@@ -444,6 +471,29 @@ load_map_tile(struct jag_map *chunk,
 				if (n == object_type) {
 					chunk->tiles[ind2].bound_diag = 0;
 				}
+			}
+		}
+	} else if (object_type > JAG_MAP_DIAG_INVERSE) {
+		bound.x = global_x;
+		bound.y = global_y;
+		bound.id =  chunk->tiles[ind].bound_diag -
+		    1 - JAG_MAP_DIAG_INVERSE;
+		bound.dir = BOUND_DIR_DIAG_NW_SE;
+		bound_config = server_bound_config_by_id(bound.id);
+		if (bound_config != NULL) {
+			if (bound_config->interactive) {
+				server_add_bound(&bound);
+			}
+		}
+	} else {
+		bound.x = global_x;
+		bound.y = global_y;
+		bound.id =  chunk->tiles[ind].bound_diag - 1;
+		bound.dir = BOUND_DIR_DIAG_NE_SW;
+		bound_config = server_bound_config_by_id(bound.id);
+		if (bound_config != NULL) {
+			if (bound_config->interactive) {
+				server_add_bound(&bound);
 			}
 		}
 	}

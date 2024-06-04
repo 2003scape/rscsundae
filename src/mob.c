@@ -144,3 +144,38 @@ mob_get_nearby_locs(struct mob *mob,
 
 	return count;
 }
+
+size_t
+mob_get_nearby_bounds(struct mob *mob,
+		      struct bound *list, size_t max)
+{
+	size_t count = 0;
+	struct zone *orig;
+	struct zone *zone;
+
+	orig = server_find_zone(mob->x, mob->y);
+	if (orig != NULL) {
+		for (int i = 0; i < orig->bound_count && count < max; ++i) {
+			list[count++] = orig->bounds[i];
+		}
+	}
+
+	for (int x = -3; x < 4; ++x) {
+		for (int y = -3; y < 4; ++y) {
+			if (x == 0 && y == 0) {
+				continue;
+			}
+			zone = server_get_zone(orig->x + x, orig->y + y,
+			    orig->plane);
+			if (zone == NULL) {
+				continue;
+			}
+			for (int i = 0; i < zone->bound_count &&
+			    count < max; ++i) {
+				list[count++] = zone->bounds[i];
+			}
+		}
+	}
+
+	return count;
+}

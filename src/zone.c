@@ -90,20 +90,58 @@ void
 server_add_loc(struct loc *loc)
 {
 	struct zone *zone;
+	struct loc *loc2;
 
+	loc2 = server_find_loc(loc->x, loc->y);
+	if (loc2 != NULL) {
+		loc2->id = loc->id;
+		return;
+	}
 	zone = server_find_zone(loc->x, loc->y);
 	if (zone == NULL) {
 		return;
 	}
-	/* TODO can optimize since one loc per tile */
-	for (int i = 0; i < zone->loc_count; ++i) {
-		if (zone->locs[i].x == loc->x && zone->locs[i].y == loc->y) {
-			zone->locs[i].id = loc->id;
-			return;
-		}
-	}
 	if (zone->loc_count < ZONE_AREA) {
 		memcpy(&zone->locs[zone->loc_count++],
 		    loc, sizeof(struct loc));
+	}
+}
+
+struct bound *
+server_find_bound(int x, int y, int dir)
+{
+	struct zone *zone;
+
+	zone = server_find_zone(x, y);
+	if (zone == NULL) {
+		return NULL;
+	}
+	for (int i = 0; i < zone->bound_count; ++i) {
+		if (zone->bounds[i].x == x && zone->bounds[i].y == y &&
+		    zone->bounds[i].dir == dir) {
+			return &zone->bounds[i];
+		}
+	}
+	return NULL;
+}
+
+void
+server_add_bound(struct bound *bound)
+{
+	struct zone *zone;
+	struct bound *bound2;
+
+	bound2 = server_find_bound(bound->x, bound->y, bound->dir);
+	if (bound2 != NULL) {
+		bound2->id = bound->id;
+		return;
+	}
+	zone = server_find_zone(bound->x, bound->y);
+	if (zone == NULL) {
+		return;
+	}
+	if (zone->bound_count < ZONE_MAX_BOUNDS) {
+		memcpy(&zone->bounds[zone->bound_count++],
+		    bound, sizeof(struct bound));
 	}
 }

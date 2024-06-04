@@ -11,6 +11,10 @@
 #define ZONE_AREA	(16)
 #endif
 
+#ifndef ZONE_MAX_BOUNDS
+#define ZONE_MAX_BOUNDS	(16)
+#endif
+
 #ifndef ZONE_MAX_X
 #define ZONE_MAX_X	(450)
 #endif
@@ -36,6 +40,20 @@ struct loc {
 	uint16_t id;
 	uint16_t x;
 	uint16_t y;
+};
+
+enum bound_dir {
+	BOUND_DIR_HORIZ		= 0,
+	BOUND_DIR_VERT		= 1,
+	BOUND_DIR_DIAG_NW_SE	= 2,
+	BOUND_DIR_DIAG_NE_SW	= 3,
+};
+
+/* 2d object (wall) in 3-dimensional space */
+struct bound {
+	uint16_t id;
+	uint16_t x;
+	uint16_t y;
 	uint8_t dir;
 };
 
@@ -44,12 +62,16 @@ struct zone {
 	uint16_t x, y;
 	uint8_t plane;
 	struct loc locs[ZONE_AREA];
-	size_t loc_count;
+	uint16_t loc_count;
+	struct bound bounds[ZONE_MAX_BOUNDS];
+	uint16_t bound_count;
 };
 
 struct zone *server_find_zone(int, int);
 struct zone *server_get_zone(int, int, int);
 struct loc *server_find_loc(int, int);
 void server_add_loc(struct loc *);
+struct bound *server_find_bound(int, int, int);
+void server_add_bound(struct bound *);
 
 #endif
