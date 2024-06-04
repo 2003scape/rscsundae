@@ -1255,4 +1255,5 @@ player_process_take_item(struct player *p)
 		/* TODO implement */
 	}
 	item->creation_time = p->mob.server->tick_counter;
+	p->take_item = NULL;
 }
