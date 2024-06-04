@@ -16,6 +16,13 @@
 /* XXX no idea what's authentic here */
 #define MAX_IDLE_TICKS		(20)
 
+#ifndef DEFAULT_START_X
+#define DEFAULT_START_X		(120)
+#endif
+#ifndef DEFAULT_START_Y
+#define DEFAULT_START_Y		(648)
+#endif
+
 struct server s = {0};
 
 static void on_signal_do_nothing(int);
@@ -30,6 +37,8 @@ main(int argc, char **argv)
 	(void)argc;
 	(void)argv;
 
+	s.start_tile_x = DEFAULT_START_X;
+	s.start_tile_y = DEFAULT_START_Y;
 	s.next_restore = 0;
 	s.next_rapid_restore = 0;
 	s.next_prayer_drain = 0;

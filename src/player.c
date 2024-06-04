@@ -150,10 +150,8 @@ player_accept(struct server *s, int sock)
 	player_recalculate_sprites(p);
 
 	p->mob.server = s;
-	p->mob.x = 120;
-	p->mob.y = 648;
-	/*p->mob.x = 333;
-	p->mob.y = 333;*/
+	p->mob.x = s->start_tile_x;
+	p->mob.y = s->start_tile_y;
 	p->mob.damage = UINT8_MAX;
 
 	mob_combat_reset(&p->mob);
