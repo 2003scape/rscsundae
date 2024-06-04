@@ -9,6 +9,12 @@
 /* increment for inverse diagonal boundaries */
 #define JAG_MAP_DIAG_INVERSE	(12000)
 
+/* increment for NPCs boundaries */
+#define JAG_MAP_DIAG_NPC	(24000)
+
+/* increment for ground items */
+#define JAG_MAP_DIAG_ITEM	(36000)
+
 /* increment for locs stored inside bound_diag */
 #define JAG_MAP_DIAG_LOC	(48000)
 

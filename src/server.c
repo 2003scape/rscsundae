@@ -476,6 +476,10 @@ load_map_tile(struct jag_map *chunk,
 				}
 			}
 		}
+	} else if (object_type > JAG_MAP_DIAG_ITEM) {
+		/* TODO */
+	} else if (object_type > JAG_MAP_DIAG_NPC) {
+		/* TODO */
 	} else if (object_type > JAG_MAP_DIAG_INVERSE) {
 		bound.x = global_x;
 		bound.y = global_y;
