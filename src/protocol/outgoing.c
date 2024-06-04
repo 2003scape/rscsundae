@@ -1,6 +1,7 @@
 #include <sys/types.h>
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <limits.h>
 #include "opcodes.h"
@@ -13,6 +14,7 @@
 
 #define MAX_NEARBY_LOCS		(256)
 #define MAX_NEARBY_BOUNDS	(256)
+#define MAX_NEARBY_ITEMS	(256)
 
 enum player_update_type {
 	PLAYER_UPDATE_BUBBLE		= 0,
@@ -986,6 +988,85 @@ player_send_bounds(struct player *p)
 		}
 		player_add_known_bound(p, &nearby[i]);
 		update_count++;
+	}
+
+	if (update_count == 0) {
+		/* nothing to inform client */
+		return 0;
+	}
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
+player_send_ground_items(struct player *p)
+{
+	size_t offset = 0;
+	struct ground_item nearby[MAX_NEARBY_ITEMS];
+	size_t nearby_count = 0;
+	size_t update_count = 0;
+	struct zone *origin;
+	struct zone *zone;
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_GROUND_ITEMS);
+
+	nearby_count = mob_get_nearby_items(&p->mob,
+	    nearby, MAX_NEARBY_ITEMS);
+
+	for (size_t i = 0; i < nearby_count; ++i) {
+		zone = server_find_zone(nearby[i].x, nearby[i].y);
+		if (zone == NULL) {
+			continue;
+		}
+		if (player_has_known_zone(p, zone->x, zone->y)) {
+			if (p->last_update > nearby[i].creation_time) {
+				continue;
+			}
+		}
+		if (buf_putu16(p->tmpbuf, offset,
+		    PLAYER_BUFSIZE, nearby[i].id) == -1) {
+			return -1;
+		}
+		offset += 2;
+		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		    (uint8_t)(nearby[i].x - (int)p->mob.x)) == -1) {
+			return -1;
+		}
+		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		    (uint8_t)(nearby[i].y - (int)p->mob.y)) == -1) {
+			return -1;
+		}
+		update_count++;
+	}
+
+	origin = server_find_zone(p->mob.x, p->mob.y);
+	for (int i = 0; i < MAX_KNOWN_ZONES; ++i) {
+		zone = p->known_zones[i];
+		if (zone == NULL) {
+			continue;
+		}
+		if (abs(zone->x - (int)origin->x) <= 3 &&
+		    abs(zone->y - (int)origin->y) <= 3) {
+			/* zone still in range */
+			continue;
+		}
+		/* remove out of range items */
+		for (int j = 0; j < zone->item_count; ++j) {
+			if (buf_putu16(p->tmpbuf, offset,
+			    PLAYER_BUFSIZE, zone->items[j].id | 0x8000) == -1) {
+				return -1;
+			}
+			offset += 2;
+			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+			    (uint8_t)(zone->items[j].x - (int)p->mob.x)) == -1) {
+				return -1;
+			}
+			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+			    (uint8_t)(zone->items[j].y - (int)p->mob.y)) == -1) {
+				return -1;
+			}
+			update_count++;
+		}
 	}
 
 	if (update_count == 0) {

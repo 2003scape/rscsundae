@@ -15,6 +15,7 @@
 #define MAX_SKILL_ID		(16)
 #define MAX_CLIENT_SETTINGS	(3)
 #define MAX_INV_SIZE		(30)
+#define MAX_KNOWN_ZONES		(64)
 
 /* final client supports 100 ignore and 200 friend entries */
 #define MAX_FRIENDS		(200)
@@ -26,6 +27,9 @@
 
 struct server;
 struct ranctx;
+struct bound;
+struct loc;
+struct ground_item;
 
 enum skill {
 	SKILL_ATTACK		= 0,
@@ -199,6 +203,8 @@ struct player {
 	size_t known_bound_count;
 	size_t known_bound_max;
 	struct bound *known_bounds;
+	struct zone *known_zones[MAX_KNOWN_ZONES];
+	uint64_t last_update;
 };
 
 /* mob.c */
@@ -210,6 +216,7 @@ void mob_combat_reset(struct mob *);
 uint32_t mob_combat_xp(struct mob *);
 size_t mob_get_nearby_locs(struct mob *, struct loc *, size_t);
 size_t mob_get_nearby_bounds(struct mob *, struct bound *, size_t);
+size_t mob_get_nearby_items(struct mob *, struct ground_item *, size_t);
 
 /* player.c */
 struct player *player_accept(struct server *, int);
@@ -243,6 +250,8 @@ bool player_has_known_loc(struct player *, int, int);
 void player_add_known_loc(struct player *, struct loc *);
 bool player_has_known_bound(struct player *, int, int, int);
 void player_add_known_bound(struct player *, struct bound *);
+bool player_has_known_zone(struct player *, int, int);
+void player_update_known_zones(struct player *);
 
 /* incoming.c */
 int player_parse_incoming(struct player *);
@@ -271,6 +280,7 @@ int player_send_equip_bonuses(struct player *);
 int player_send_prayers(struct player *);
 int player_send_locs(struct player *);
 int player_send_bounds(struct player *);
+int player_send_ground_items(struct player *);
 int player_notify_friend_online(struct player *, int64_t);
 int player_notify_friend_offline(struct player *, int64_t);
 

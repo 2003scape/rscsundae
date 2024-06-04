@@ -1173,3 +1173,48 @@ player_add_known_bound(struct player *p, struct bound *bound)
 	memcpy(&p->known_bounds[p->known_bound_count++],
 		bound, sizeof(struct bound));
 }
+
+bool
+player_has_known_zone(struct player *p, int x, int y)
+{
+	for (int i = 0; i < MAX_KNOWN_ZONES; ++i) {
+		if (p->known_zones[i] == NULL) {
+			continue;
+		}
+		if (p->known_zones[i]->x == x &&
+		    p->known_zones[i]->y == y) {
+			return true;
+		}
+	}
+	return false;
+}
+
+void
+player_update_known_zones(struct player *p)
+{
+	size_t count = 0;
+	struct zone *orig;
+	struct zone *zone;
+
+	memset(p->known_zones, 0, sizeof(p->known_zones));
+
+	orig = server_find_zone(p->mob.x, p->mob.y);
+	if (orig != NULL) {
+		p->known_zones[count++] = orig;
+	} else {
+		return;
+	}
+
+	for (int x = -3; x < 4; ++x) {
+		for (int y = -3; y < 4; ++y) {
+			if (x == 0 && y == 0) {
+				continue;
+			}
+			zone = server_get_zone(orig->x + x, orig->y + y,
+			    orig->plane);
+			if (zone != NULL) {
+				p->known_zones[count++] = zone;
+			}
+		}
+	}
+}

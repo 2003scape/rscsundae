@@ -57,6 +57,14 @@ struct bound {
 	uint8_t dir;
 };
 
+struct ground_item {
+	uint16_t id;
+	uint16_t x;
+	uint16_t y;
+	uint8_t respawn;
+	uint64_t creation_time;
+};
+
 /* small chunk of the game world */
 struct zone {
 	uint16_t x, y;
@@ -65,6 +73,9 @@ struct zone {
 	uint16_t loc_count;
 	struct bound bounds[ZONE_MAX_BOUNDS];
 	uint16_t bound_count;
+	struct ground_item *items;
+	uint16_t item_count;
+	uint16_t item_max;
 };
 
 struct zone *server_find_zone(int, int);
@@ -73,5 +84,8 @@ struct loc *server_find_loc(int, int);
 void server_add_loc(struct loc *);
 struct bound *server_find_bound(int, int, int);
 void server_add_bound(struct bound *);
+struct ground_item *server_find_ground_item(int, int, int);
+void server_add_ground_item(struct ground_item *);
+void server_remove_ground_item(struct ground_item *);
 
 #endif

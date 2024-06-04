@@ -244,6 +244,7 @@ server_tick(void)
 		}
 		player_send_movement(s.players[i]);
 		player_send_appearance_update(s.players[i]);
+		player_send_ground_items(s.players[i]);
 		player_send_locs(s.players[i]);
 		player_send_bounds(s.players[i]);
 		net_player_send(s.players[i]);
@@ -263,6 +264,8 @@ server_tick(void)
 		s.players[i]->moved = false;
 		s.players[i]->mob.damage = UINT8_MAX;
 		s.players[i]->mob.prev_dir = s.players[i]->mob.dir;
+		s.players[i]->last_update = s.tick_counter;
+		player_update_known_zones(s.players[i]);
 	}
 
 	s.tick_counter++;
@@ -393,6 +396,7 @@ load_map_tile(struct jag_map *chunk,
 	struct loc_config *loc_config;
 	struct bound bound;
 	struct bound_config *bound_config;
+	struct ground_item item;
 	uint32_t object_type;
 	uint16_t object_dir;
 	int ind;
@@ -477,7 +481,12 @@ load_map_tile(struct jag_map *chunk,
 			}
 		}
 	} else if (object_type > JAG_MAP_DIAG_ITEM) {
-		/* TODO */
+		item.id = object_type - JAG_MAP_DIAG_ITEM - 1;
+		item.x = global_x;
+		item.y = global_y;
+		item.respawn = true;
+		item.creation_time = 0;
+		server_add_ground_item(&item);
 	} else if (object_type > JAG_MAP_DIAG_NPC) {
 		/* TODO */
 	} else if (object_type > JAG_MAP_DIAG_INVERSE) {

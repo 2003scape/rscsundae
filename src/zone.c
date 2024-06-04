@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include "entity.h"
@@ -144,4 +145,60 @@ server_add_bound(struct bound *bound)
 		memcpy(&zone->bounds[zone->bound_count++],
 		    bound, sizeof(struct bound));
 	}
+}
+
+struct ground_item *
+server_find_ground_item(int x, int y, int id)
+{
+	struct zone *zone;
+
+	zone = server_find_zone(x, y);
+	if (zone == NULL) {
+		return NULL;
+	}
+	for (int i = 0; i < zone->item_count; ++i) {
+		if (zone->items[i].x == x && zone->items[i].y == y &&
+		    zone->items[i].id == id) {
+			return &zone->items[i];
+		}
+	}
+	return NULL;
+}
+
+void
+server_add_ground_item(struct ground_item *item)
+{
+	struct zone *zone;
+
+	assert(item != NULL);
+
+	zone = server_find_zone(item->x, item->y);
+	if (zone == NULL) {
+		return;
+	}
+	if (zone->item_count >= zone->item_max) {
+		uint16_t new_max = 0;
+
+		if (zone->item_max == 0) {
+			new_max = 8;
+		} else if (zone->item_max == 8) {
+			new_max = 64;
+		} else {
+			new_max *= 2;
+		}
+		if (reallocarr(&zone->items, new_max,
+		    sizeof(struct ground_item)) == -1) {
+			return;
+		}
+		zone->item_max = new_max;
+	}
+	memcpy(&zone->items[zone->item_count++],
+	    item, sizeof(struct ground_item));
+}
+
+void
+server_remove_ground_item(struct ground_item *item)
+{
+	/* TODO implement */
+	assert(item != NULL);
 }

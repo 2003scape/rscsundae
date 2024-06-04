@@ -179,3 +179,38 @@ mob_get_nearby_bounds(struct mob *mob,
 
 	return count;
 }
+
+size_t
+mob_get_nearby_items(struct mob *mob,
+		     struct ground_item *list, size_t max)
+{
+	size_t count = 0;
+	struct zone *orig;
+	struct zone *zone;
+
+	orig = server_find_zone(mob->x, mob->y);
+	if (orig != NULL) {
+		for (int i = 0; i < orig->item_count && count < max; ++i) {
+			list[count++] = orig->items[i];
+		}
+	}
+
+	for (int x = -3; x < 4; ++x) {
+		for (int y = -3; y < 4; ++y) {
+			if (x == 0 && y == 0) {
+				continue;
+			}
+			zone = server_get_zone(orig->x + x, orig->y + y,
+			    orig->plane);
+			if (zone == NULL) {
+				continue;
+			}
+			for (int i = 0; i < zone->item_count &&
+			    count < max; ++i) {
+				list[count++] = zone->items[i];
+			}
+		}
+	}
+
+	return count;
+}
