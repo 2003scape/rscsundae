@@ -24,29 +24,27 @@ player_inv_give(struct player *p, struct item_config *item, uint32_t count)
 			} else {
 				p->inventory[i].stack = new_stack;
 			}
-			player_send_inv_slot(p, i, item->id + 0x7fff,
-			    p->inventory[i].stack);
+			player_send_inv_slot(p, i);
 			return;
 		}
 		if (p->inv_count >= MAX_INV_SIZE) {
 			/* TODO: should drop it on the floor here */
 			return;
 		}
-		player_send_inv_slot(p, p->inv_count,
-		    item->id + 0x7fff, count);
 		p->inventory[p->inv_count].id = item->id;
 		p->inventory[p->inv_count].stack = count;
 		p->inventory[p->inv_count++].worn = false;
+		player_send_inv_slot(p, p->inv_count - 1);
 		return;
 	}
 	for (unsigned i = 0; i < count; ++i) {
 		if (p->inv_count >= MAX_INV_SIZE) {
 			break;
 		}
-		player_send_inv_slot(p, p->inv_count, item->id, 1);
 		p->inventory[p->inv_count].id = item->id;
 		p->inventory[p->inv_count].stack = 1;
 		p->inventory[p->inv_count++].worn = false;
+		player_send_inv_slot(p, p->inv_count - 1);
 	}
 }
 
@@ -63,8 +61,7 @@ player_inv_remove(struct player *p, struct item_config *item, uint32_t count)
 			}
 			if (count < p->inventory[i].stack) {
 				p->inventory[i].stack -= count;
-				player_send_inv_slot(p, i, item->id + 0x7fff,
-				    p->inventory[i].stack);
+				player_send_inv_slot(p, i);
 				return;
 			}
 			count = 1;

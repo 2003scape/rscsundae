@@ -806,13 +806,13 @@ player_wear(struct player *p, int slot)
 		}
 		if (item_equip_clear(type, type2->equip_type)) {
 			p->inventory[i].worn = false;
-			player_send_inv_slot(p, i, p->inventory[i].id, 1);
+			player_send_inv_slot(p, i);
 		}
 	}
 	p->inventory[slot].worn = true;
 	player_recalculate_bonus(p);
 	player_recalculate_sprites(p);
-	player_send_inv_slot(p, slot, p->inventory[slot].id + 0x8000, 1);
+	player_send_inv_slot(p, slot);
 	return 0;
 }
 
@@ -832,7 +832,7 @@ player_unwear(struct player *p, int slot)
 	p->inventory[slot].worn = false;
 	player_recalculate_bonus(p);
 	player_recalculate_sprites(p);
-	player_send_inv_slot(p, slot, p->inventory[slot].id, 1);
+	player_send_inv_slot(p, slot);
 	return 0;
 }
 

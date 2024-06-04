@@ -792,16 +792,30 @@ player_send_inv(struct player *p)
 }
 
 int
-player_send_inv_slot(struct player *p, int slot, int id, uint32_t stack)
+player_send_inv_slot(struct player *p, int slot)
 {
 	size_t offset = 0;
+	struct item_config *config;
+	bool stackable = false;
+	int id = p->inventory[slot].id;
+
+	config = server_item_config_by_id(p->inventory[slot].id);
+	if (config != NULL && config->weight == 0) {
+		stackable = true;
+	}
+	if (p->inventory[slot].worn) {
+		id += 0x8000;
+	}
 
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 		        OP_SRV_INVENTORY_ITEM);
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, slot);
 	(void)buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE, id);
 	offset += 2;
-	offset = buf_putsmartu32(p->tmpbuf, offset, PLAYER_BUFSIZE, stack);
+	if (stackable) {
+		offset = buf_putsmartu32(p->tmpbuf, offset,
+		    PLAYER_BUFSIZE, p->inventory[slot].stack);
+	}
 	return player_write_packet(p, p->tmpbuf, offset);
 }
 
