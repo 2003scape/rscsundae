@@ -1019,13 +1019,22 @@ player_send_ground_items(struct player *p)
 			continue;
 		}
 		if (player_has_known_zone(p, zone->x, zone->y)) {
-			if (p->last_update > nearby[i].creation_time) {
+			if (p->last_update > nearby[i].creation_time &&
+			    nearby[i].respawn_time != p->mob.server->tick_counter) {
 				continue;
 			}
 		}
-		if (buf_putu16(p->tmpbuf, offset,
-		    PLAYER_BUFSIZE, nearby[i].id) == -1) {
-			return -1;
+		if (nearby[i].respawn_time > p->mob.server->tick_counter) {
+			/* not respawned yet, remove it */
+			if (buf_putu16(p->tmpbuf, offset,
+			    PLAYER_BUFSIZE, nearby[i].id | 0x8000) == -1) {
+				return -1;
+			}
+		} else {
+			if (buf_putu16(p->tmpbuf, offset,
+			    PLAYER_BUFSIZE, nearby[i].id) == -1) {
+				return -1;
+			}
 		}
 		offset += 2;
 		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,

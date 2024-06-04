@@ -211,6 +211,9 @@ server_tick(void)
 			s.players[i] = NULL;
 			continue;
 		}
+		if (s.players[i]->take_item != NULL) {
+			player_process_take_item(s.players[i]);
+		}
 		net_player_recv(s.players[i]);
 		player_parse_incoming(s.players[i]);
 		player_process_combat(s.players[i]);
@@ -224,7 +227,6 @@ server_tick(void)
 		if (rapid_restore_tick) {
 			player_rapid_restore(s.players[i]);
 		}
-
 		if (s.players[i]->skulled &&
 		    s.tick_counter > s.players[i]->skull_timer) {
 			s.players[i]->skulled = false;
@@ -495,6 +497,7 @@ load_map_tile(struct jag_map *chunk,
 		item.y = global_y;
 		item.respawn = true;
 		item.creation_time = 0;
+		item.respawn_time = 0;
 		server_add_ground_item(&item);
 	} else if (object_type > JAG_MAP_DIAG_NPC) {
 		/* TODO */

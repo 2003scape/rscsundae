@@ -63,6 +63,7 @@ struct ground_item {
 	uint16_t y;
 	uint8_t respawn;
 	uint64_t creation_time;
+	uint64_t respawn_time;
 };
 
 /* small chunk of the game world */

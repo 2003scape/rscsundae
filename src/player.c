@@ -501,9 +501,9 @@ player_die(struct player *p)
 	for (int i = 0; i < MAX_SKILL_ID; ++i) {
 		p->mob.cur_stats[i] = p->mob.base_stats[i];
 	}
-	p->following_player = -1;
 	p->walk_queue_len = 0;
 	p->walk_queue_pos = 0;
+	player_clear_actions(p);
 	mob_combat_reset(&p->mob);
 
 	if (p->skulled) {
@@ -642,14 +642,15 @@ player_process_combat(struct player *p)
 				p->appearance_changed = true;
 			}
 
-			p->following_player = -1;
+			player_clear_actions(p);
 			p->mob.target_player = target->mob.id;
 			p->mob.target_npc = -1;
 			p->mob.in_combat = true;
 			p->mob.combat_next_hit = 0;
 			p->mob.combat_rounds = 0;
 
-			target->following_player = -1;
+
+			player_clear_actions(target);
 			target->walk_queue_len = 0;
 			target->walk_queue_pos = 0;
 			target->mob.target_player = p->mob.id;
@@ -1215,4 +1216,43 @@ player_update_known_zones(struct player *p)
 			}
 		}
 	}
+}
+
+void
+player_clear_actions(struct player *p)
+{
+	p->take_item = NULL;
+	p->following_player = -1;
+	p->ui_design_open = false;
+}
+
+void
+player_process_take_item(struct player *p)
+{
+	struct ground_item *item;
+	struct item_config *config;
+
+	item = server_find_ground_item(p->take_item->x, p->take_item->y,
+	    p->take_item->id);
+	config = server_item_config_by_id(p->take_item->id);
+	if (item == NULL || config == NULL || p->inv_count >= MAX_INV_SIZE) {
+		p->take_item = NULL;
+		return;
+	}
+	if (p->mob.x != item->x || p->mob.y != item->y) {
+		/* not reached it yet */
+		return;
+	}
+	if (item->respawn_time > p->mob.server->tick_counter) {
+		/* not respawned yet */
+		return;
+	}
+	player_inv_give(p, config, 1);
+	if (item->respawn) {
+		item->respawn_time = p->mob.server->tick_counter +
+		    (config->respawn_rate / 5);
+	} else {
+		/* TODO implement */
+	}
+	item->creation_time = p->mob.server->tick_counter;
 }

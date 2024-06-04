@@ -8,6 +8,7 @@
 #include "../netio.h"
 #include "../server.h"
 #include "../utility.h"
+#include "../zone.h"
 
 #define MAX_PACKETS_PER_TICK		(10)
 #define MAX_PLAYER_HAIR_COLOUR		(9)
@@ -362,6 +363,25 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			player_unwear(p, slot);
 		}
 		break;
+	case OP_CLI_ITEM_TAKE:
+		{
+			uint16_t x, y, id;
+
+			if (buf_getu16(data, offset, len, &x) == -1) {
+				return;
+			}
+			offset += 2;
+			if (buf_getu16(data, offset, len, &y) == -1) {
+				return;
+			}
+			offset += 2;
+			if (buf_getu16(data, offset, len, &id) == -1) {
+				return;
+			}
+			offset += 2;
+			p->take_item = server_find_ground_item(x, y, id);
+		}
+		break;
 	case OP_CLI_WALK_TILE:
 	case OP_CLI_WALK_ENTITY:
 		{
@@ -407,7 +427,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			}
 			p->walk_queue_len = steps + 1;
 			p->walk_queue_pos = 0;
-			p->following_player = -1;
+			player_clear_actions(p);
 		}
 		break;
 	case OP_CLI_ACCEPT_DESIGN:

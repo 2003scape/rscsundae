@@ -204,6 +204,7 @@ struct player {
 	size_t known_bound_max;
 	struct bound *known_bounds;
 	struct zone *known_zones[MAX_KNOWN_ZONES];
+	struct ground_item *take_item;
 	uint64_t last_update;
 };
 
@@ -222,6 +223,7 @@ size_t mob_get_nearby_items(struct mob *, struct ground_item *, size_t);
 struct player *player_accept(struct server *, int);
 void player_process_walk_queue(struct player *);
 void player_process_combat(struct player *);
+void player_process_take_item(struct player *);
 void player_die(struct player *);
 void player_close_ui(struct player *);
 void player_destroy(struct player *);
@@ -252,6 +254,7 @@ bool player_has_known_bound(struct player *, int, int, int);
 void player_add_known_bound(struct player *, struct bound *);
 bool player_has_known_zone(struct player *, int, int);
 void player_update_known_zones(struct player *);
+void player_clear_actions(struct player *);
 
 /* incoming.c */
 int player_parse_incoming(struct player *);
