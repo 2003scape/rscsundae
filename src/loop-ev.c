@@ -78,7 +78,7 @@ loop_add_player(struct player *p)
 {
 	ev_io event;
 
-	printf("add player\n");
+	(void)p;
 	//ev_io_init(&event, client_sock_cb, p->sock, EV_READ | EV_WRITE);
 	//ev_io_start(serv->loop_ctx, &event);
 
@@ -107,7 +107,7 @@ loop_start(struct server *s, int port)
 	ev_timer_init(&tick_timer, tick_cb, 0.64, 0.64);
 	ev_timer_start(loop, &tick_timer); 
 	printf("got %d sockets\n", numsockets);
-	for (unsigned i = 0; i < numsockets; ++i) {
+	for (int i = 0; i < numsockets; ++i) {
 		ev_io_init(&sock_events[i],
 		    server_sock_cb, sockets[i], EV_READ);
 		ev_io_start(loop, &sock_events[i]);

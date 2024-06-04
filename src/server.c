@@ -27,6 +27,9 @@ static int load_maps_jag(void);
 int
 main(int argc, char **argv)
 {
+	(void)argc;
+	(void)argv;
+
 	s.next_restore = 0;
 	s.next_rapid_restore = 0;
 	s.next_prayer_drain = 0;
@@ -503,7 +506,6 @@ static void
 load_map_chunk(struct jag_map *chunk, int chunk_x, int chunk_y, int plane)
 {
 	int global_x, global_y;
-	int ind;
 
 	for (int x = 0; x < JAG_MAP_CHUNK_SIZE; ++x) {
 		for (int y = 0; y < JAG_MAP_CHUNK_SIZE; ++y) {
@@ -537,7 +539,7 @@ load_maps_jag(void)
 		for (int x = 49; x < 64; ++x) {
 			for (int y = 40; y < 64; ++y) {
 				struct jag_map chunk;
-				char file[32];
+				char file[64];
 
 				(void)snprintf(file, sizeof(file),
 				    "m%d%d%d%d%d.jm", plane,

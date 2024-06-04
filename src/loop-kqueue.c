@@ -40,6 +40,7 @@ server_sock_cb(int fd)
 int
 loop_add_player(struct player *p)
 {
+	(void)p;
 	return 0;
 }
 
@@ -70,7 +71,7 @@ loop_start(struct server *s, int port)
 	    EV_ADD | EV_ENABLE, NOTE_MSECONDS, 640, 0);
 
 	printf("got %d sockets\n", numsockets);
-	for (unsigned i = 0; i < numsockets; ++i) {
+	for (int i = 0; i < numsockets; ++i) {
 		EV_SET(&events[i + 1], sockets[i], EVFILT_READ,
 		    EV_ADD | EV_ENABLE, 0, -1, 1);
 	}
@@ -94,7 +95,7 @@ loop_start(struct server *s, int port)
 		}
 	}
 	close(kq);
-	for (unsigned i = 0; i < numsockets; ++i) {
+	for (int i = 0; i < numsockets; ++i) {
 		close(sockets[i]);
 	}
 	printf("done\n");

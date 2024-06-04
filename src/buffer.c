@@ -98,7 +98,10 @@ buf_putdata(void *b, size_t offset, size_t buflen, void *in, size_t inlen)
 {
 	uint8_t *buffer = b;
 
-	if (offset > (SSIZE_MAX - (ssize_t)inlen) ||
+	if (inlen > SSIZE_MAX) {
+		return -1;
+	}
+	if (offset > (size_t)(SSIZE_MAX - (ssize_t)inlen) ||
 	    ((ssize_t)buflen - (ssize_t)offset) < (ssize_t)inlen) {
 		return -1;
 	}
@@ -204,7 +207,7 @@ buf_putbits(void *b, size_t bitpos, size_t buflen, int num, int value)
 {
 	uint8_t *buffer = b;
 	size_t offset = bitpos >> 3;
-	size_t i = 8 - (bitpos & 7);
+	int i = 8 - (bitpos & 7);
 
 	bitpos += num;
 

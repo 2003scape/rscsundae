@@ -87,7 +87,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 	size_t offset = 0;
 	uint8_t opcode = data[offset++] & 0xff;
 
-	printf("process packet opcode %d len %d\n", opcode, len);
+	printf("process packet opcode %d len %zu\n", opcode, len);
 
 	p->last_packet = p->mob.server->tick_counter;
 
@@ -112,7 +112,8 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			offset += 8;
-			printf("got username: %lld %s\n", name, mod37_namedec(name, namestr));
+			printf("got username: %s\n",
+			    mod37_namedec(name, namestr));
 
 			if (server_has_player(name)) {
 				p->logout_confirmed = true;
@@ -166,7 +167,6 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			offset += 8;
-			printf("add friend %lld\n", target);
 			player_add_friend(p, target);
 		}
 		break;

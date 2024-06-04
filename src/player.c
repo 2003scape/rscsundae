@@ -1119,7 +1119,7 @@ player_prayer_drain(struct player *p)
 bool
 player_has_known_loc(struct player *p, int x, int y)
 {
-	for (int i = 0; i < p->known_loc_count; ++i) {
+	for (size_t i = 0; i < p->known_loc_count; ++i) {
 		if (p->known_locs[i].x == x && p->known_locs[i].y == y) {
 			return true;
 		}
@@ -1147,7 +1147,7 @@ player_add_known_loc(struct player *p, struct loc *loc)
 bool
 player_has_known_bound(struct player *p, int x, int y, int dir)
 {
-	for (int i = 0; i < p->known_bound_count; ++i) {
+	for (size_t i = 0; i < p->known_bound_count; ++i) {
 		if (p->known_bounds[i].x == x && p->known_bounds[i].y == y &&
 		    p->known_bounds[i].dir == dir) {
 			return true;

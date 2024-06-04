@@ -73,6 +73,9 @@ bool
 stat_random(struct mob *mob, int stat,
     int base_probability, int top_probability)
 {
+	(void)base_probability;
+	(void)top_probability;
+	assert(mob != NULL);
 	assert(stat < MAX_SKILL_ID);
 
 	/* TODO implement */

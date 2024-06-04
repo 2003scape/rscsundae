@@ -56,8 +56,8 @@ player_write_packet(struct player *p, void *b, size_t len)
 			len--;
 		}
 	}
-	if (off > (SSIZE_MAX - len) ||
-	    ((ptrdiff_t)PLAYER_BUFSIZE - (ptrdiff_t)off) < len) {
+	if (off > (size_t)(SSIZE_MAX - len) ||
+	    ((ptrdiff_t)PLAYER_BUFSIZE - (ptrdiff_t)off) < (ptrdiff_t)len) {
 		return -1;
 	}
 	memcpy(p->outbuf + off, b, len);
@@ -756,7 +756,7 @@ int
 player_send_inv(struct player *p)
 {
 	size_t offset = 0;
-	size_t tmpofs;
+	ssize_t tmpofs;
 
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 		        OP_SRV_INVENTORY);
@@ -799,7 +799,7 @@ player_send_inv_slot(struct player *p, int slot, int id, uint32_t stack)
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, slot);
 	(void)buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE, id);
 	offset += 2;
-	offset = buf_putsmartu32(p->tmpbuf, offset, PLAYER_BUFSIZE, id);
+	offset = buf_putsmartu32(p->tmpbuf, offset, PLAYER_BUFSIZE, stack);
 	return player_write_packet(p, p->tmpbuf, offset);
 }
 

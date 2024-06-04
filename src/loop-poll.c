@@ -66,6 +66,7 @@ get_time_ms(void)
 int
 loop_add_player(struct player *p)
 {
+	(void)p;
 	return 0;
 }
 
@@ -86,13 +87,13 @@ loop_start(struct server *s, int port)
 	}
 
 	printf("got %d sockets\n", numsockets);
-	for (unsigned i = 0; i < numsockets; ++i) {
+	for (int i = 0; i < numsockets; ++i) {
 		pfds[i].fd = sockets[i];
 		pfds[i].events = POLLRDNORM | POLLRDBAND;
 	}
 
 	while (poll(pfds, numsockets, 640) != -1) {
-		for (unsigned i = 0; i < numsockets; ++i) {
+		for (int i = 0; i < numsockets; ++i) {
 			if ((pfds[i].revents & POLLRDNORM) ||
 			    (pfds[i].revents & POLLRDBAND)) {
 				server_sock_cb(pfds[i].fd);
@@ -103,13 +104,13 @@ loop_start(struct server *s, int port)
 			next_tick = get_time_ms() + 640;
 		}
 	}
-	for (unsigned i = 0; i < numsockets; ++i) {
+	for (int i = 0; i < numsockets; ++i) {
 		close(sockets[i]);
 	}
 	printf("done\n");
 	return 0;
 err:
-	for (unsigned i = 0; i < numsockets; ++i) {
+	for (int i = 0; i < numsockets; ++i) {
 		close(sockets[i]);
 	}
 	return -1;

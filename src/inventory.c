@@ -39,7 +39,7 @@ player_inv_give(struct player *p, struct item_config *item, uint32_t count)
 		p->inventory[p->inv_count++].worn = false;
 		return;
 	}
-	for (int i = 0; i < count; ++i) {
+	for (unsigned i = 0; i < count; ++i) {
 		if (p->inv_count >= MAX_INV_SIZE) {
 			break;
 		}
