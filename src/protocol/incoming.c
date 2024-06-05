@@ -430,6 +430,42 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			player_clear_actions(p);
 		}
 		break;
+	case OP_CLI_TRADE_PLAYER:
+		{
+			uint16_t id;
+			struct player *target;
+			char name[32], message[64];
+
+			if (buf_getu16(data, offset, len, &id) == -1) {
+				return;
+			}
+			if (id >= MAXPLAYERS) {
+				return;
+			}
+			target = p->mob.server->players[id];
+			if (target == NULL || player_is_blocked(target,
+			    p->name, target->block_trade)) {
+				return;
+			}
+			/* XXX range needs verifying */
+			if (abs(p->mob.x - (int)target->mob.x) >= 4 ||
+			    abs(p->mob.y - (int)target->mob.y) >= 4) {
+				player_send_message(p, "I'm not near enough");
+				return;
+			}
+			p->trading_player = (int16_t)id;
+			if (target->trading_player != p->mob.id) {
+				player_send_message(p, "Sending trade request");
+
+				mod37_namedec(p->name, name);
+				(void)snprintf(message, sizeof(message),
+				    "%s wishes to trade with you.", name);
+				player_send_message(target, message);
+			} else {
+				/* TODO: show the interface */
+			}
+		}
+		break;
 	case OP_CLI_ACCEPT_DESIGN:
 		{
 			if (!p->ui_design_open) {

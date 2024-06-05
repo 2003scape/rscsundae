@@ -146,6 +146,7 @@ struct player {
 	int64_t session_id;
 	int64_t name;
 	int16_t following_player;
+	int16_t trading_player;
 	uint8_t stats_changed;
 	uint8_t bonus_changed;
 	uint8_t appearance_changed;

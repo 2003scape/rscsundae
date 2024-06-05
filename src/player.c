@@ -144,6 +144,7 @@ player_accept(struct server *s, int sock)
 	p->inv_changed = true;
 	p->ui_design_open = true;
 	p->following_player = -1;
+	p->trading_player = -1;
 	p->last_packet = s->tick_counter;
 
 	player_recalculate_combat_level(p);
@@ -1232,6 +1233,7 @@ player_clear_actions(struct player *p)
 {
 	p->take_item = NULL;
 	p->following_player = -1;
+	p->trading_player = -1;
 	p->ui_design_open = false;
 }
 

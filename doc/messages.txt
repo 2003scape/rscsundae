@@ -1,10 +1,11 @@
 I'm not near enough
+%s wishes to trade with you.
 Sending trade request
 Other player has declined trade
 Trade completed successfully
 You are under attack!
 You are already busy fighting!
-You have defeated %!
+You have defeated %s!
 Your opponent is retreating!
 You can't retreat during the first 3 rounds of combat
 You have run out of prayer points. Return to a church to recharge
