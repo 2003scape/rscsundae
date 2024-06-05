@@ -1143,6 +1143,15 @@ player_add_known_loc(struct player *p, struct loc *loc)
 	memcpy(&p->known_locs[p->known_loc_count++], loc, sizeof(struct loc));
 }
 
+void
+player_remove_known_loc(struct player *p, size_t index)
+{
+	p->known_loc_count--;
+	for (size_t i = index; i < p->known_loc_count; ++i) {
+		p->known_locs[i] = p->known_locs[i + 1];
+	}
+}
+
 bool
 player_has_known_bound(struct player *p, int x, int y, int dir)
 {

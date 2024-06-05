@@ -250,6 +250,7 @@ void player_prayer_disable(struct player *, int);
 void player_prayer_drain(struct player *);
 bool player_has_known_loc(struct player *, int, int);
 void player_add_known_loc(struct player *, struct loc *);
+void player_remove_known_loc(struct player *, size_t);
 bool player_has_known_bound(struct player *, int, int, int);
 void player_add_known_bound(struct player *, struct bound *);
 bool player_has_known_zone(struct player *, int, int);

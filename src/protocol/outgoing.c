@@ -857,30 +857,22 @@ player_send_locs(struct player *p)
 	struct loc nearby[MAX_NEARBY_LOCS];
 	size_t nearby_count = 0;
 	size_t update_count = 0;
+	size_t removed_count = 0;
+	struct zone *player_zone;
+	struct zone *zone;
 
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 		        OP_SRV_LOCS);
 
+	player_zone = server_find_zone(p->mob.x, p->mob.y);
+
 	for (size_t i = 0; i < p->known_loc_count; ++i) {
 		struct loc *loc;
+		bool remove = false;
 
 		loc = server_find_loc(p->known_locs[i].x, p->known_locs[i].y);
 		if (loc == NULL) {
-			if (buf_putu16(p->tmpbuf, offset,
-			    PLAYER_BUFSIZE, 60000) == -1) {
-				return -1;
-			}
-			offset += 2;
-			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
-			    (uint8_t)(loc->x - (int)p->mob.x)) == -1) {
-				return -1;
-			}
-			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
-			    (uint8_t)(loc->y - (int)p->mob.y)) == -1) {
-				return -1;
-			}
-			update_count++;
-			/* TODO remove from player array */
+			remove = true;
 		} else if (loc->id != p->known_locs[i].id) {
 			if (buf_putu16(p->tmpbuf, offset,
 			    PLAYER_BUFSIZE, loc->id) == -1) {
@@ -897,8 +889,53 @@ player_send_locs(struct player *p)
 			}
 			p->known_locs[i].id = loc->id;
 			update_count++;
+		} else {
+			/*
+			 * remove locs far beyond the update range to free
+			 * up client and server memory, but don't remove
+			 * those on a nearby plane in case the player
+			 * travels up or down stairs
+			 */
+			zone = server_find_zone(p->known_locs[i].x,
+			    p->known_locs[i].y);
+			if (zone != NULL && player_zone != NULL) {
+				if (abs(zone->x - (int)player_zone->x) >= 8 ||
+				    abs(zone->y - (int)player_zone->y) >= 8) {
+					remove = true;
+				}
+			} else {
+				remove = true;
+			}
+		}
+		if (remove) {
+			if (buf_putu16(p->tmpbuf, offset,
+			    PLAYER_BUFSIZE, 60000) == -1) {
+				return -1;
+			}
+			offset += 2;
+			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+			    (uint8_t)(loc->x - (int)p->mob.x)) == -1) {
+				return -1;
+			}
+			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+			    (uint8_t)(loc->y - (int)p->mob.y)) == -1) {
+				return -1;
+			}
+			update_count++;
+			removed_count++;
+			player_remove_known_loc(p, i);
 		}
 	}
+
+#if 0 /* just for testing efficiency */
+	if (removed_count > 0) {
+		printf("Removed %zu locs from player cache\n",
+		    removed_count);
+	}
+	printf("Player loc cache size: %zu\n", p->known_loc_count);
+#else
+	(void)removed_count;
+#endif
 
 	nearby_count = mob_get_nearby_locs(&p->mob,
 	    nearby, MAX_NEARBY_LOCS);
