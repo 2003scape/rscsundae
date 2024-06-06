@@ -117,3 +117,6 @@ Smithing, Mining
   on low level characters due to this. This should be a server
   config option.
 - Worlds could hold a maximum of 1000 players at a time.
+- Items were all tradable. The "special" flag to make them
+  non-tradable was present, but also covered items like
+  capes and potions. We probably need to find a compromise here.
