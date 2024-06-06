@@ -144,6 +144,7 @@ player_accept(struct server *s, int sock)
 	p->inv_changed = true;
 	p->ui_design_open = true;
 	p->following_player = -1;
+	p->trading_player = -1;
 	p->last_packet = s->tick_counter;
 
 	player_recalculate_combat_level(p);
@@ -253,9 +254,15 @@ player_process_walk_queue(struct player *p)
 void
 player_close_ui(struct player *p)
 {
+	if (p->ui_trade_open) {
+		player_send_close_trade(p);
+	}
+	p->trade_state = TRADE_STATE_NONE;
+	p->trading_player = -1;
+	p->offer_count = 0;
 	p->ui_dialog_open = false;
 	p->ui_design_open = false;
-	p->ui_bank_open = false;
+	p->ui_trade_open = false;
 }
 
 void
@@ -642,6 +649,7 @@ player_process_combat(struct player *p)
 				p->appearance_changed = true;
 			}
 
+			player_close_ui(p);
 			player_clear_actions(p);
 			p->mob.target_player = target->mob.id;
 			p->mob.target_npc = -1;
@@ -649,7 +657,7 @@ player_process_combat(struct player *p)
 			p->mob.combat_next_hit = 0;
 			p->mob.combat_rounds = 0;
 
-
+			player_close_ui(target);
 			player_clear_actions(target);
 			target->walk_queue_len = 0;
 			target->walk_queue_pos = 0;
@@ -661,7 +669,6 @@ player_process_combat(struct player *p)
 			target->mob.combat_rounds = 0;
 			target->mob.dir = MOB_DIR_COMBAT_LEFT;
 
-			player_close_ui(target);
 			player_send_message(target, "You are under attack!");
 		}
 		return;
@@ -1232,6 +1239,7 @@ player_clear_actions(struct player *p)
 {
 	p->take_item = NULL;
 	p->following_player = -1;
+	p->trading_player = -1;
 	p->ui_design_open = false;
 }
 

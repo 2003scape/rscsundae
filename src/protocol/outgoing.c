@@ -546,6 +546,8 @@ player_send_appearance_update(struct player *p)
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 		        OP_SRV_PLAYER_APPEARANCE);
 
+	/* TODO: too many seem to be sent currently */
+
 	/* allocate placeholder for length */
 	lenofs = offset;
 	offset += 2;
@@ -1132,5 +1134,151 @@ player_send_ground_items(struct player *p)
 		/* nothing to inform client */
 		return 0;
 	}
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
+player_send_trade_open(struct player *p)
+{
+	size_t offset = 0;
+
+	assert(p->trading_player != -1);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_SHOW_TRADE);
+
+	(void)buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
+			 p->trading_player);
+	offset += 2;
+
+	p->ui_trade_open = true;
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
+player_send_partner_trade_offer(struct player *p)
+{
+	size_t offset = 0;
+	struct player *partner;
+
+	assert(p->trading_player != -1);
+	partner = p->mob.server->players[p->trading_player];
+	assert(partner != NULL);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_UPDATE_TRADE_OFFER);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        partner->offer_count);
+
+	for (int i = 0; i < partner->offer_count; ++i) {
+		if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
+				partner->trade_offer[i].id) == -1) {
+			return -1;
+		}
+		offset += 2;
+		if (buf_putu32(p->tmpbuf, offset, PLAYER_BUFSIZE,
+				partner->trade_offer[i].stack) == -1) {
+			return -1;
+		}
+		offset += 4;
+	}
+
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
+player_send_close_trade(struct player *p)
+{
+	size_t offset = 0;
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_CLOSE_TRADE);
+
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
+player_send_trade_state(struct player *p)
+{
+	size_t offset = 0;
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_TRADE_STATE_LOCAL);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        p->trade_state != TRADE_STATE_NONE);
+
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
+player_send_trade_state_remote(struct player *p)
+{
+	size_t offset = 0;
+	struct player *partner;
+
+	assert(p->trading_player != -1);
+	partner = p->mob.server->players[p->trading_player];
+	assert(partner != NULL);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_TRADE_STATE_REMOTE);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        partner->trade_state != TRADE_STATE_NONE);
+
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
+player_send_trade_confirm(struct player *p)
+{
+	size_t offset = 0;
+	struct player *partner;
+
+	assert(p->trading_player != -1);
+	partner = p->mob.server->players[p->trading_player];
+	assert(partner != NULL);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_TRADE_CONFIRM);
+
+	(void)buf_putu64(p->tmpbuf, offset, PLAYER_BUFSIZE,
+		         partner->name);
+	offset += 8;
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        p->offer_count);
+
+	for (int i = 0; i < p->offer_count; ++i) {
+		if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
+				p->trade_offer[i].id) == -1) {
+			return -1;
+		}
+		offset += 2;
+		if (buf_putu32(p->tmpbuf, offset, PLAYER_BUFSIZE,
+				p->trade_offer[i].stack) == -1) {
+			return -1;
+		}
+		offset += 4;
+	}
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        partner->offer_count);
+
+	for (int i = 0; i < partner->offer_count; ++i) {
+		if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
+				partner->trade_offer[i].id) == -1) {
+			return -1;
+		}
+		offset += 2;
+		if (buf_putu32(p->tmpbuf, offset, PLAYER_BUFSIZE,
+				partner->trade_offer[i].stack) == -1) {
+			return -1;
+		}
+		offset += 4;
+	}
+
 	return player_write_packet(p, p->tmpbuf, offset);
 }

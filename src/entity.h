@@ -15,7 +15,11 @@
 #define MAX_SKILL_ID		(16)
 #define MAX_CLIENT_SETTINGS	(3)
 #define MAX_INV_SIZE		(30)
+#define MAX_OFFER_SIZE		(12)
 #define MAX_KNOWN_ZONES		(64)
+
+/* signed to accomodate java client */
+#define MAX_STACK_SIZE		(INT32_MAX)
 
 /* final client supports 100 ignore and 200 friend entries */
 #define MAX_FRIENDS		(200)
@@ -30,6 +34,12 @@ struct ranctx;
 struct bound;
 struct loc;
 struct ground_item;
+
+enum trade_state {
+	TRADE_STATE_NONE	= 0,
+	TRADE_STATE_ACCEPTED	= 1,
+	TRADE_STATE_CONFIRMED	= 2,
+};
 
 enum skill {
 	SKILL_ATTACK		= 0,
@@ -146,6 +156,7 @@ struct player {
 	int64_t session_id;
 	int64_t name;
 	int16_t following_player;
+	int16_t trading_player;
 	uint8_t stats_changed;
 	uint8_t bonus_changed;
 	uint8_t appearance_changed;
@@ -175,6 +186,7 @@ struct player {
 	uint8_t ui_dialog_open;
 	uint8_t ui_bank_open;
 	uint8_t ui_design_open;
+	uint8_t ui_trade_open;
 	uint8_t block_public;
 	uint8_t block_private;
 	uint8_t block_trade;
@@ -195,6 +207,10 @@ struct player {
 	uint8_t bonus_prayer;
 	uint8_t inv_count;
 	struct invitem inventory[MAX_INV_SIZE];
+	uint8_t offer_count;
+	uint8_t partner_offer_changed;
+	uint8_t trade_state;
+	struct invitem trade_offer[MAX_OFFER_SIZE];
 	uint8_t prayers[MAX_PRAYERS];
 	uint16_t prayer_drain;
 	size_t known_loc_count;
@@ -256,6 +272,7 @@ void player_add_known_bound(struct player *, struct bound *);
 bool player_has_known_zone(struct player *, int, int);
 void player_update_known_zones(struct player *);
 void player_clear_actions(struct player *);
+void player_trade_request(struct player *, uint16_t);
 
 /* incoming.c */
 int player_parse_incoming(struct player *);
@@ -285,6 +302,12 @@ int player_send_prayers(struct player *);
 int player_send_locs(struct player *);
 int player_send_bounds(struct player *);
 int player_send_ground_items(struct player *);
+int player_send_trade_open(struct player *);
+int player_send_partner_trade_offer(struct player *);
+int player_send_close_trade(struct player *);
+int player_send_trade_state(struct player *);
+int player_send_trade_state_remote(struct player *);
+int player_send_trade_confirm(struct player *);
 int player_notify_friend_online(struct player *, int64_t);
 int player_notify_friend_offline(struct player *, int64_t);
 

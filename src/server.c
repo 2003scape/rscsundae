@@ -253,6 +253,9 @@ server_tick(void)
 		if (s.players[i]->prayers_changed) {
 			player_send_prayers(s.players[i]);
 		}
+		if (s.players[i]->partner_offer_changed) {
+			player_send_partner_trade_offer(s.players[i]);
+		}
 		player_send_movement(s.players[i]);
 		player_send_appearance_update(s.players[i]);
 		player_send_ground_items(s.players[i]);
@@ -272,6 +275,7 @@ server_tick(void)
 		s.players[i]->inv_changed = false;
 		s.players[i]->bonus_changed = false;
 		s.players[i]->prayers_changed = false;
+		s.players[i]->partner_offer_changed = false;
 		s.players[i]->moved = false;
 		s.players[i]->mob.damage = UINT8_MAX;
 		s.players[i]->mob.prev_dir = s.players[i]->mob.dir;
