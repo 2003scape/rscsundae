@@ -192,6 +192,7 @@ player_send_movement(struct player *p)
 			}
 		}
 		if (p->known_players[i] != -1) {
+			p->known_players_seen[new_known_count] = true;
 			new_known[new_known_count++] = p->known_players[i];
 		}
 	}
