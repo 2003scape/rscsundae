@@ -196,8 +196,6 @@ player_send_movement(struct player *p)
 		}
 	}
 
-	memset(p->known_players_seen, 0, new_known_count * sizeof(uint8_t));
-
 	/* players the client doesn't know about yet */
 	for (size_t i = 0; i < nearby_count; ++i) {
 		if (p->known_player_count >= MAX_KNOWN_PLAYERS) {
