@@ -132,6 +132,12 @@ player_trade_accept(struct player *p)
 	}
 	p->trade_state = TRADE_STATE_ACCEPTED;
 	if (partner->trade_state == TRADE_STATE_ACCEPTED) {
+		/*
+		 * work around a bug in the 110 client where it doesn't
+		 * display the actual final trade offer it gets sent
+		 */
+		player_send_partner_trade_offer(p);
+		player_send_partner_trade_offer(partner);
 		player_send_trade_confirm(p);
 		player_send_trade_confirm(partner);
 	} else {

@@ -1248,6 +1248,13 @@ player_send_trade_confirm(struct player *p)
 		         partner->name);
 	offset += 8;
 
+	/*
+	 * send over the final offer, note that the 110 client
+	 * appears to have a bug where this isn't actually
+	 * used but rather it displays the previously sent
+	 * offer.
+	 */
+
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 		        p->offer_count);
 
