@@ -35,6 +35,12 @@ struct bound;
 struct loc;
 struct ground_item;
 
+enum trade_state {
+	TRADE_STATE_NONE	= 0,
+	TRADE_STATE_ACCEPTED	= 1,
+	TRADE_STATE_CONFIRMED	= 2,
+};
+
 enum skill {
 	SKILL_ATTACK		= 0,
 	SKILL_DEFENSE		= 1,
@@ -203,6 +209,7 @@ struct player {
 	struct invitem inventory[MAX_INV_SIZE];
 	uint8_t offer_count;
 	uint8_t partner_offer_changed;
+	uint8_t trade_state;
 	struct invitem trade_offer[MAX_OFFER_SIZE];
 	uint8_t prayers[MAX_PRAYERS];
 	uint16_t prayer_drain;
@@ -297,7 +304,10 @@ int player_send_bounds(struct player *);
 int player_send_ground_items(struct player *);
 int player_send_trade_open(struct player *);
 int player_send_partner_trade_offer(struct player *);
-int player_send_close_trade(struct player *p);
+int player_send_close_trade(struct player *);
+int player_send_trade_state(struct player *);
+int player_send_trade_state_remote(struct player *);
+int player_send_trade_confirm(struct player *);
 int player_notify_friend_online(struct player *, int64_t);
 int player_notify_friend_offline(struct player *, int64_t);
 

@@ -1,4 +1,5 @@
 #include <stdlib.h>
+
 #include <stdio.h>
 #include <string.h>
 #include "opcodes.h"
@@ -254,6 +255,9 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			}
 		}
 		break;
+	case OP_CLI_TRADE_CONFIRM:
+		player_trade_confirm(p);
+		break;
 	case OP_CLI_PRAYER_OFF:
 		{
 			uint8_t id;
@@ -430,6 +434,9 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			p->walk_queue_pos = 0;
 			player_clear_actions(p);
 		}
+		break;
+	case OP_CLI_TRADE_ACCEPT:
+		player_trade_accept(p);
 		break;
 	case OP_CLI_TRADE_DECLINE:
 		player_trade_decline(p);
