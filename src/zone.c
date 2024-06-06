@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "entity.h"
+#include "utility.h"
 #include "zone.h"
 
 static struct zone *zones[ZONE_TOTAL_X][ZONE_TOTAL_Y][ZONE_MAX_PLANE] = {0};

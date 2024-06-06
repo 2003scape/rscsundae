@@ -1,7 +1,7 @@
 #include <jag.h>
 #include <map.h>
 #include <sys/types.h>
-#include <sys/signal.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>

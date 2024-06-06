@@ -44,8 +44,13 @@ Your opponent already has weakend strength
 @que@You cook the lobster on the stove
 @que@The lobster is now nicely cooked
 @que@You swing your pick at the rock...
-@que@You manage to obtain some mithril ore
 @que@You only succeed in scratching the rock
+@que@You manage to obtain some mithril ore
+@que@You manage to obtain some coal
+@que@You manage to obtain some clay
+@que@You examine the rock for ores...
+@que@This rock contains clay
+@que@This rock contains coal
 @que@You place the mithril and 4 heaps of coal into the furnace
 @que@You retrieve a bar of mithril
 @que@What would you like to make?
@@ -55,12 +60,30 @@ Your opponent already has weakend strength
 @que@What sort of helmet do you want to make?
 @que@You hammer the metal and make an axe
 @que@You hammer the metal and make a large helmet
+@que@You hammer the metal and make some nails
 @que@What would you like to make?
 @que@You make some leather armour
 @que@You make some boots
 @que@You use up one of your reels of thread
-@que@You pay 30 gold
-@que@You board the ship
-@que@The ship arrives at Karamja
+You pay 30 gold
+You board the ship
+The ship arrives at Karamja
+The ship arrives at Port Sarim
 @que@You climb down the ladder
 @que@You just went through a secret door
+@que@The dragon breathes fire at you
+You are fried
+@que@You fill the bucket from the sink
+You don't have enough money!
+@que@You mix the clay and water
+@que@You now have some soft workable clay
+You need 4 steel nails to attach the plank with
+You need a hammer to hammer the nails in with
+You still need more planks to close the hole completely
+You hammer the plank over the hole
+You board up the hole in the ship
+You feel the ship begin to move
+You are out at sea
+The ship is sailing
+The ship is sailing
+You feel a crunch

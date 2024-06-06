@@ -22,7 +22,6 @@ autom4te.cache
 /config.status
 /config.sub
 /configure.scan
-/depcomp
 /stamp-h1
 
 # https://www.gnu.org/software/libtool/
