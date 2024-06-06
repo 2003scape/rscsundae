@@ -18,6 +18,9 @@
 #define MAX_OFFER_SIZE		(12)
 #define MAX_KNOWN_ZONES		(64)
 
+/* signed to accomodate java client */
+#define MAX_STACK_SIZE		(INT32_MAX)
+
 /* final client supports 100 ignore and 200 friend entries */
 #define MAX_FRIENDS		(200)
 #define MAX_IGNORE		(100)
@@ -198,8 +201,9 @@ struct player {
 	uint8_t bonus_prayer;
 	uint8_t inv_count;
 	struct invitem inventory[MAX_INV_SIZE];
-	uint8_t offering_count;
-	struct invitem offering[MAX_OFFER_SIZE];
+	uint8_t offer_count;
+	uint8_t partner_offer_changed;
+	struct invitem trade_offer[MAX_OFFER_SIZE];
 	uint8_t prayers[MAX_PRAYERS];
 	uint16_t prayer_drain;
 	size_t known_loc_count;
@@ -292,6 +296,7 @@ int player_send_locs(struct player *);
 int player_send_bounds(struct player *);
 int player_send_ground_items(struct player *);
 int player_send_trade_open(struct player *);
+int player_send_partner_trade_offer(struct player *);
 int player_notify_friend_online(struct player *, int64_t);
 int player_notify_friend_offline(struct player *, int64_t);
 

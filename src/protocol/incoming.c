@@ -7,6 +7,7 @@
 #include "../entity.h"
 #include "../netio.h"
 #include "../server.h"
+#include "../trade.h"
 #include "../utility.h"
 #include "../zone.h"
 
@@ -428,6 +429,39 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			p->walk_queue_len = steps + 1;
 			p->walk_queue_pos = 0;
 			player_clear_actions(p);
+		}
+		break;
+	case OP_CLI_TRADE_UPDATE:
+		{
+			uint8_t count;
+			uint16_t id;
+			uint32_t amount;
+			struct player *partner = NULL;
+
+			if (p->trading_player == -1 || !p->ui_trade_open) {
+				return;
+			}
+			partner = p->mob.server->players[p->trading_player];
+			if (partner == NULL) {
+				return;
+			}
+
+			p->offer_count = 0;
+			if (buf_getu8(data, offset++, len, &count) == -1) {
+				return;
+			}
+			for (int i = 0; i < count; ++i) {
+				if (buf_getu16(data, offset, len, &id) == -1) {
+					return;
+				}
+				offset += 2;
+				if (buf_getu32(data, offset, len, &amount) == -1) {
+					return;
+				}
+				offset += 4;
+				player_trade_offer(p, id, amount);
+			}
+			partner->partner_offer_changed = true;
 		}
 		break;
 	case OP_CLI_TRADE_PLAYER:

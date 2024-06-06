@@ -1155,3 +1155,35 @@ player_send_trade_open(struct player *p)
 	p->ui_trade_open = true;
 	return player_write_packet(p, p->tmpbuf, offset);
 }
+
+int
+player_send_partner_trade_offer(struct player *p)
+{
+	size_t offset = 0;
+	struct player *partner;
+
+	assert(p->trading_player != -1);
+	partner = p->mob.server->players[p->trading_player];
+	assert(partner != NULL);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_UPDATE_TRADE_OFFER);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        partner->offer_count);
+
+	for (int i = 0; i < partner->offer_count; ++i) {
+		if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
+				partner->trade_offer[i].id) == -1) {
+			return -1;
+		}
+		offset += 2;
+		if (buf_putu32(p->tmpbuf, offset, PLAYER_BUFSIZE,
+				partner->trade_offer[i].stack) == -1) {
+			return -1;
+		}
+		offset += 4;
+	}
+
+	return player_write_packet(p, p->tmpbuf, offset);
+}

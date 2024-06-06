@@ -4,9 +4,6 @@
 #include "entity.h"
 #include "server.h"
 
-/* signed to accomodate java client */
-#define MAX_STACK_SIZE		(INT32_MAX)
-
 /* corresponds to runescript give() */
 void
 player_inv_give(struct player *p, struct item_config *item, uint32_t count)

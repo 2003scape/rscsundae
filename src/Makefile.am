@@ -12,6 +12,7 @@ rscsundae_SOURCES = \
 	inventory.c \
 	server.c \
 	stat.c \
+	trade.c \
 	utility.c \
 	zone.c \
 	config/config.c \
