@@ -254,9 +254,10 @@ player_process_walk_queue(struct player *p)
 void
 player_close_ui(struct player *p)
 {
+	p->trading_player = -1;
 	p->ui_dialog_open = false;
 	p->ui_design_open = false;
-	p->ui_bank_open = false;
+	p->ui_trade_open = false;
 }
 
 void
@@ -1267,4 +1268,39 @@ player_process_take_item(struct player *p)
 	}
 	item->creation_time = p->mob.server->tick_counter;
 	p->take_item = NULL;
+}
+
+void
+player_trade_request(struct player *p, uint16_t id)
+{
+	struct player *target;
+	char name[32], message[64];
+
+	if (id >= MAXPLAYERS) {
+		return;
+	}
+	target = p->mob.server->players[id];
+	if (target == NULL || player_is_blocked(target,
+	    p->name, target->block_trade)) {
+		return;
+	}
+	/* XXX range needs verifying */
+	if (abs(p->mob.x - (int)target->mob.x) >= 4 ||
+	    abs(p->mob.y - (int)target->mob.y) >= 4) {
+		player_send_message(p, "I'm not near enough");
+		return;
+	}
+	printf("player %d (%lld) gets trade partner %d\n", p->mob.id, p->name, id);
+	p->trading_player = (int16_t)id;
+	if (target->trading_player != p->mob.id) {
+		player_send_message(p, "Sending trade request");
+
+		mod37_namedec(p->name, name);
+		(void)snprintf(message, sizeof(message),
+		    "%s wishes to trade with you.", name);
+		player_send_message(target, message);
+	} else {
+		player_send_trade_open(p);
+		player_send_trade_open(target);
+	}
 }

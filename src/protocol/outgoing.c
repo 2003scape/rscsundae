@@ -1137,3 +1137,21 @@ player_send_ground_items(struct player *p)
 	}
 	return player_write_packet(p, p->tmpbuf, offset);
 }
+
+int
+player_send_trade_open(struct player *p)
+{
+	size_t offset = 0;
+
+	assert(p->trading_player != -1);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_SHOW_TRADE);
+
+	(void)buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
+			 p->trading_player);
+	offset += 2;
+
+	p->ui_trade_open = true;
+	return player_write_packet(p, p->tmpbuf, offset);
+}

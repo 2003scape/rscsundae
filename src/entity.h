@@ -176,6 +176,7 @@ struct player {
 	uint8_t ui_dialog_open;
 	uint8_t ui_bank_open;
 	uint8_t ui_design_open;
+	uint8_t ui_trade_open;
 	uint8_t block_public;
 	uint8_t block_private;
 	uint8_t block_trade;
@@ -257,6 +258,7 @@ void player_add_known_bound(struct player *, struct bound *);
 bool player_has_known_zone(struct player *, int, int);
 void player_update_known_zones(struct player *);
 void player_clear_actions(struct player *);
+void player_trade_request(struct player *, uint16_t);
 
 /* incoming.c */
 int player_parse_incoming(struct player *);
@@ -286,6 +288,7 @@ int player_send_prayers(struct player *);
 int player_send_locs(struct player *);
 int player_send_bounds(struct player *);
 int player_send_ground_items(struct player *);
+int player_send_trade_open(struct player *);
 int player_notify_friend_online(struct player *, int64_t);
 int player_notify_friend_offline(struct player *, int64_t);
 
