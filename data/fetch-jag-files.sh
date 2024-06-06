@@ -4,7 +4,7 @@ if curl -V 2>&1 >/dev/null; then
 	USE_FETCH=curl
 elif wget -V 2>&1 >/dev/null; then
 	USE_FETCH=wget
-elif [ "$(uname -s)" = "FreeBSD"]; then
+elif [ "$(uname -s)" = "FreeBSD" ]; then
 	# don't see a way to test fetch
 	USE_FETCH=fetch
 elif ftp -? 2>&1 >/dev/null; then
