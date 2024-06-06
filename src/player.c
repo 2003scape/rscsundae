@@ -1020,7 +1020,6 @@ player_prayer_enable(struct player *p, int prayer)
 		return;
 	}
 	/* do not allow overlapping stat boost prayers */
-	/* TODO: manage drain */
 	switch (prayer) {
 	case PRAY_THICK_SKIN:
 	case PRAY_ROCK_SKIN:
