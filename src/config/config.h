@@ -104,12 +104,25 @@ struct bound_config {
 	char *option_alt;
 };
 
+/* "projectile.txt" */
+struct projectile_config {
+	uint16_t id;
+	char *name;
+	uint8_t sprite;
+	uint8_t range;
+	uint8_t aim;
+	uint8_t power;
+	char *item;
+	uint8_t type;
+};
+
 struct item_config *config_parse_items(char *, size_t, size_t *,
     struct entity_config *, size_t);
 struct entity_config *config_parse_entity(char *, size_t, size_t *);
 struct prayer_config *config_parse_prayers(char *, size_t, size_t *);
 struct loc_config *config_parse_locs(char *, size_t, size_t *);
 struct bound_config *config_parse_bounds(char *, size_t, size_t *);
+struct projectile_config *config_parse_projectiles(char *, size_t, size_t *);
 bool item_equip_clear(struct item_config *, int);
 
 #endif

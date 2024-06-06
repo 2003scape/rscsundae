@@ -730,3 +730,94 @@ err:
 	bounds = NULL;
 	return NULL;
 }
+
+struct projectile_config *
+config_parse_projectiles(char *buffer, size_t len, size_t *num_projectiles)
+{
+	struct projectile_config *projectiles = NULL;
+	size_t max_projectiles;
+	size_t offset;
+	ssize_t tmp;
+	long tmpl;
+
+	offset = 0;
+	tmp = next_token_int(buffer, offset, len, &tmpl);
+	if (tmp == -1) {
+		return NULL;
+	}
+	offset = tmp;
+	max_projectiles = tmpl;
+
+	projectiles = calloc(max_projectiles,
+	    sizeof(struct projectile_config));
+	if (projectiles == NULL) {
+		return NULL;
+	}
+
+	for (size_t i = 0; i < max_projectiles; ++i) {
+		projectiles[i].id = i;
+
+		tmp = next_line(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+
+		tmp = next_token(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		projectiles[i].name = buffer + tmp;
+		offset = tmp + strlen(buffer + tmp) + 1;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		projectiles[i].sprite = tmpl;
+		offset = tmp;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		projectiles[i].range = tmpl;
+		offset = tmp;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		projectiles[i].aim = tmpl;
+		offset = tmp;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		projectiles[i].power = tmpl;
+		offset = tmp;
+
+		tmp = next_token(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		projectiles[i].item = buffer + tmp;
+		offset = tmp + strlen(buffer + tmp) + 1;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		projectiles[i].type = tmpl;
+		offset = tmp;
+	}
+
+	*num_projectiles = max_projectiles;
+	return projectiles;
+err:
+	assert(0);
+	free(projectiles);
+	projectiles = NULL;
+	return NULL;
+}

@@ -382,6 +382,18 @@ load_config_jag(void)
 	printf("read configuration for %zu bounds\n",
 	    s.bound_config_count);
 
+	if (jag_find_entry(&archive, "projectile.txt", &entry) == -1 ||
+	    jag_unpack_entry(&entry) == -1) {
+		goto err;
+	}
+	s.projectile_config = config_parse_projectiles((char *)entry.data,
+	    entry.unpacked_len, &s.projectile_config_count);
+	if (s.projectile_config == NULL) {
+		goto err;
+	}
+	printf("read configuration for %zu projectiles\n",
+	    s.projectile_config_count);
+
 	if (archive.must_free) {
 		free(archive.data);
 		archive.data = NULL;
