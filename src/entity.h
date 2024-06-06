@@ -15,6 +15,7 @@
 #define MAX_SKILL_ID		(16)
 #define MAX_CLIENT_SETTINGS	(3)
 #define MAX_INV_SIZE		(30)
+#define MAX_OFFER_SIZE		(12)
 #define MAX_KNOWN_ZONES		(64)
 
 /* final client supports 100 ignore and 200 friend entries */
@@ -197,6 +198,8 @@ struct player {
 	uint8_t bonus_prayer;
 	uint8_t inv_count;
 	struct invitem inventory[MAX_INV_SIZE];
+	uint8_t offering_count;
+	struct invitem offering[MAX_OFFER_SIZE];
 	uint8_t prayers[MAX_PRAYERS];
 	uint16_t prayer_drain;
 	size_t known_loc_count;
