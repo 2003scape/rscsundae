@@ -1187,3 +1187,14 @@ player_send_partner_trade_offer(struct player *p)
 
 	return player_write_packet(p, p->tmpbuf, offset);
 }
+
+int
+player_send_close_trade(struct player *p)
+{
+	size_t offset = 0;
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_CLOSE_TRADE);
+
+	return player_write_packet(p, p->tmpbuf, offset);
+}

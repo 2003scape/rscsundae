@@ -297,6 +297,7 @@ int player_send_bounds(struct player *);
 int player_send_ground_items(struct player *);
 int player_send_trade_open(struct player *);
 int player_send_partner_trade_offer(struct player *);
+int player_send_close_trade(struct player *p);
 int player_notify_friend_online(struct player *, int64_t);
 int player_notify_friend_offline(struct player *, int64_t);
 

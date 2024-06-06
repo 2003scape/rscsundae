@@ -93,3 +93,21 @@ player_trade_offer(struct player *p, uint16_t id, uint32_t amount)
 		p->trade_offer[p->offer_count++] = item;
 	}
 }
+
+void
+player_trade_decline(struct player *p)
+{
+	struct player *partner;
+
+	if (p->trading_player == -1 || !p->ui_trade_open) {
+		return;
+	}
+	partner = p->mob.server->players[p->trading_player];
+	if (partner == NULL) {
+		return;
+	}
+	player_send_close_trade(partner);
+	player_send_message(partner, "Other player has declined trade");
+	player_close_ui(partner);
+	player_close_ui(p);
+}

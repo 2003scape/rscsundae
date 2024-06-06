@@ -431,6 +431,9 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			player_clear_actions(p);
 		}
 		break;
+	case OP_CLI_TRADE_DECLINE:
+		player_trade_decline(p);
+		break;
 	case OP_CLI_TRADE_UPDATE:
 		{
 			uint8_t count;
