@@ -4340,6 +4340,13 @@ then :
 
 fi
 
+ac_fn_c_check_func "$LINENO" "timerfd_create" "ac_cv_func_timerfd_create"
+if test "x$ac_cv_func_timerfd_create" = xyes
+then :
+  printf "%s\n" "#define HAVE_TIMERFD_CREATE 1" >>confdefs.h
+
+fi
+
 ac_header= ac_cache=
 for ac_item in $ac_header_c_list
 do
