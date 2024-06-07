@@ -4,6 +4,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
 #include "server.h"
 #include "loop.h"
@@ -394,10 +395,6 @@ load_config_jag(void)
 	printf("read configuration for %zu projectiles\n",
 	    s.projectile_config_count);
 
-	if (archive.must_free) {
-		free(archive.data);
-		archive.data = NULL;
-	}
 	return 0;
 err:
 	if (entry.must_free) {
@@ -650,4 +647,18 @@ server_bound_config_by_id(int id)
 		return NULL;
 	}
 	return &s.bound_config[id];
+}
+
+struct projectile_config *
+server_find_projectile(const char *name)
+{
+	if (name[0] == '_') {
+		return NULL;
+	}
+	for (size_t i = 0; i < s.projectile_config_count; ++i) {
+		if (strcmp(s.projectile_config[i].name, name) == 0) {
+			return &s.projectile_config[i];
+		}
+	}
+	return NULL;
 }

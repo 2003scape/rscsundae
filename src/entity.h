@@ -222,6 +222,7 @@ struct player {
 	struct zone *known_zones[MAX_KNOWN_ZONES];
 	struct ground_item *take_item;
 	uint64_t last_update;
+	struct projectile_config *projectile;
 };
 
 /* mob.c */

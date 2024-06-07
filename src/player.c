@@ -757,6 +757,7 @@ static void
 player_recalculate_bonus(struct player *p)
 {
 	struct item_config *item;
+	struct projectile_config *proj;
 	int orig_armour = p->bonus_armour;
 	int orig_aim = p->bonus_weaponaim;
 	int orig_power = p->bonus_weaponpower;
@@ -768,12 +769,18 @@ player_recalculate_bonus(struct player *p)
 	p->bonus_weaponpower = 1;
 	p->bonus_magic = 1;
 	p->bonus_prayer = 1;
+	p->projectile = NULL;
 
 	for (int i = 0; i < p->inv_count; ++i) {
 		if (!p->inventory[i].worn) {
 			continue;
 		}
 		item = server_item_config_by_id(p->inventory[i].id);
+		assert(item != NULL);
+		proj = server_find_projectile(item->projectile);
+		if (proj != NULL) {
+			p->projectile = proj;
+		}
 		p->bonus_armour += item->bonus_armour;
 		p->bonus_weaponaim += item->bonus_aim;
 		p->bonus_weaponpower += item->bonus_power;

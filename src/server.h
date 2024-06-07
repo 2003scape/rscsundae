@@ -45,5 +45,6 @@ struct item_config *server_item_config_by_id(int);
 struct prayer_config *server_prayer_config_by_id(int);
 struct loc_config *server_loc_config_by_id(int);
 struct bound_config *server_bound_config_by_id(int);
+struct projectile_config *server_find_projectile(const char *);
 
 #endif
