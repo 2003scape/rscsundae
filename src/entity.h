@@ -223,6 +223,8 @@ struct player {
 	struct ground_item *take_item;
 	uint64_t last_update;
 	struct projectile_config *projectile;
+	uint16_t projectile_sprite;
+	uint16_t projectile_target_player;
 };
 
 /* mob.c */

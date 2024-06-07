@@ -22,6 +22,8 @@ static int player_get_attack_boosted(struct player *);
 static int player_get_defense_boosted(struct player *);
 static int player_get_strength_boosted(struct player *);
 static int player_pvp_roll(struct player *, struct player *);
+static int player_pvp_ranged_roll(struct player *, struct player *);
+static void player_process_ranged_pvp(struct player *, struct player *);
 static void player_recalculate_bonus(struct player *);
 
 struct player *
@@ -145,6 +147,7 @@ player_accept(struct server *s, int sock)
 	p->ui_design_open = true;
 	p->following_player = -1;
 	p->trading_player = -1;
+	p->projectile_sprite = UINT16_MAX;
 	p->last_packet = s->tick_counter;
 
 	player_recalculate_combat_level(p);
@@ -475,6 +478,21 @@ player_get_strength_boosted(struct player *p)
 }
 
 static int
+player_pvp_ranged_roll(struct player *attacker, struct player *defender)
+{
+	int def = player_get_defense_boosted(defender);
+
+	assert(attacker->projectile != NULL);
+
+	return mob_combat_roll(&attacker->mob.server->ran,
+	    8 + attacker->mob.cur_stats[SKILL_RANGED],
+	    attacker->projectile->aim,
+	    def, defender->bonus_armour,
+	    8 + attacker->mob.cur_stats[SKILL_RANGED],
+	    attacker->projectile->power);
+}
+
+static int
 player_pvp_roll(struct player *attacker, struct player *defender)
 {
 	int att = player_get_attack_boosted(attacker);
@@ -562,6 +580,73 @@ player_die(struct player *p)
 	p->appearance_changed = true;
 }
 
+static void
+player_process_ranged_pvp(struct player *p, struct player *target)
+{
+	char name[32], message[64];
+	int range;
+	int roll;
+
+	assert(p != NULL);
+	assert(target != NULL);
+	assert(p->projectile != NULL);
+
+	range = p->projectile->range;
+
+	if ((abs(p->mob.x - (int)target->mob.x) > range) ||
+	    (abs(p->mob.y - (int)target->mob.y) > range)) {
+		p->walk_queue_x[0] = target->mob.x;
+		p->walk_queue_y[0] = target->mob.y;
+		p->walk_queue_len = 1;
+		p->walk_queue_pos = 0;
+		return;
+	}
+
+	p->walk_queue_len = 0;
+	p->walk_queue_pos = 0;
+
+	if (target->prayers[PRAY_PROTECT_FROM_MISSILES]) {
+		player_send_message(p,
+		    "Player has a protection from missiles prayer active!");
+		p->mob.target_player = -1;
+		return;
+	}
+
+	if (p->mob.server->tick_counter < p->mob.combat_next_hit) {
+		return;
+	}
+
+	/* TODO give experience */
+	/* TODO deplete ammunition */
+	/* TODO target can log out */
+
+	roll = player_pvp_ranged_roll(p, target);
+	if (roll >= target->mob.cur_stats[SKILL_HITS]) {
+		char name[32], msg[64];
+
+		p->mob.target_player = -1;
+		player_die(target);
+		mod37_namedec(target->name, name);
+		(void)snprintf(msg, sizeof(msg),
+		    "You have defeated %s!", name);
+		player_send_message(p, msg);
+		return;
+	}
+
+	target->mob.cur_stats[SKILL_HITS] -= roll;
+	target->mob.damage = roll;
+
+	p->projectile_sprite = p->projectile->sprite;
+	p->projectile_target_player = target->mob.id;
+
+	mod37_namedec(target->name, name);
+	(void)snprintf(message, sizeof(message),
+	    "Warning! %s is shooting at you!", name);
+	player_send_message(target, message);
+
+	p->mob.combat_next_hit = p->mob.server->tick_counter + 4;
+}
+
 void
 player_process_combat(struct player *p)
 {
@@ -572,18 +657,6 @@ player_process_combat(struct player *p)
 
 			target = p->mob.server->players[p->mob.target_player];
 			if (target == NULL) {
-				mob_combat_reset(&p->mob);
-				return;
-			}
-
-			if (p->mob.server->tick_counter <
-			    (target->mob.combat_timer + 6)) {
-				/*
-				 * hp bar in client takes roughly 4 seconds
-				 * to be gone
-				 */
-				p->walk_queue_pos = 0;
-				p->walk_queue_len = 0;
 				mob_combat_reset(&p->mob);
 				return;
 			}
@@ -605,6 +678,23 @@ player_process_combat(struct player *p)
 				    depth);
 				player_send_message(p, msgdepth);
 				player_send_message(p, "Move further into the wilderness for less restrictions");
+				mob_combat_reset(&p->mob);
+				return;
+			}
+
+			if (p->projectile != NULL) {
+				player_process_ranged_pvp(p, target);
+				return;
+			}
+
+			if (p->mob.server->tick_counter <
+			    (target->mob.combat_timer + 6)) {
+				/*
+				 * hp bar in client takes roughly 4 seconds
+				 * to be gone
+				 */
+				p->walk_queue_pos = 0;
+				p->walk_queue_len = 0;
 				mob_combat_reset(&p->mob);
 				return;
 			}
@@ -712,7 +802,6 @@ player_process_combat(struct player *p)
 			player_award_combat_xp(p, &target->mob);
 			player_die(target);
 			mod37_namedec(target->name, name);
-			/* TODO give experience */
 			(void)snprintf(msg, sizeof(msg),
 			    "You have defeated %s!", name);
 			player_send_message(p, msg);

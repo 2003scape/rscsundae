@@ -278,6 +278,7 @@ server_tick(void)
 		s.players[i]->prayers_changed = false;
 		s.players[i]->partner_offer_changed = false;
 		s.players[i]->moved = false;
+		s.players[i]->projectile_sprite = UINT16_MAX;
 		s.players[i]->mob.damage = UINT8_MAX;
 		s.players[i]->mob.prev_dir = s.players[i]->mob.dir;
 		s.players[i]->last_update = s.tick_counter;

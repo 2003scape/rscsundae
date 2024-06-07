@@ -27,6 +27,7 @@ enum player_update_type {
 
 static ssize_t player_send_appearance(struct player *, void *, size_t);
 static ssize_t player_send_damage(struct player *, void *, size_t);
+static ssize_t player_send_projectile(struct player *, void *, size_t);
 static int player_write_packet(struct player *, void *, size_t);
 
 static int
@@ -357,6 +358,31 @@ player_send_damage(struct player *p, void *tmpbuf, size_t offset)
 	return offset;
 }
 
+static ssize_t
+player_send_projectile(struct player *p, void *tmpbuf, size_t offset)
+{
+	if (buf_putu16(tmpbuf, offset, PLAYER_BUFSIZE,
+		       p->mob.id) == -1) {
+		return -1;
+	}
+	offset += 2;
+	if (buf_putu8(tmpbuf, offset++, PLAYER_BUFSIZE,
+		      PLAYER_UPDATE_SHOOT_PLAYER) == -1) {
+		return -1;
+	}
+	if (buf_putu16(tmpbuf, offset, PLAYER_BUFSIZE,
+		      p->projectile_sprite) == -1) {
+		return -1;
+	}
+	offset += 2;
+	if (buf_putu16(tmpbuf, offset, PLAYER_BUFSIZE,
+		      p->projectile_target_player) == -1) {
+		return -1;
+	}
+	offset += 2;
+	return offset;
+}
+
 int
 player_send_design_ui(struct player *p)
 {
@@ -568,6 +594,14 @@ player_send_appearance_update(struct player *p)
 		offset = tmpofs;
 		update_count++;
 	}
+	if (p->projectile_sprite != UINT16_MAX) {
+		tmpofs = player_send_projectile(p, p->tmpbuf, offset);
+		if (tmpofs == -1) {
+			return -1;
+		}
+		offset = tmpofs;
+		update_count++;
+	}
 
 	for (int i = 0; i < p->known_player_count; ++i) {
 		struct player *p2;
@@ -603,6 +637,14 @@ player_send_appearance_update(struct player *p)
 		}
 		if (p2->mob.damage != UINT8_MAX) {
 			tmpofs = player_send_damage(p2, p->tmpbuf, offset);
+			if (tmpofs == -1) {
+				return -1;
+			}
+			offset = tmpofs;
+			update_count++;
+		}
+		if (p2->projectile_sprite != UINT16_MAX) {
+			tmpofs = player_send_projectile(p2, p->tmpbuf, offset);
 			if (tmpofs == -1) {
 				return -1;
 			}
