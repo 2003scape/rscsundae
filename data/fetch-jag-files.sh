@@ -23,7 +23,7 @@ elif echo "a" | sha256 -q 2>/dev/null >/dev/null; then
 elif echo "a" | cksum -a sha256 -q 2>/dev/null; then
 	CKSUM="cksum -a sha256 -q"
 else
-	printf "Please install a sha256sum utility and make sure" >/dev/stderr
+	printf "Please install a sha256sum utility and make sure " >/dev/stderr
 	printf "it's in your PATH.\n" >/dev/stderr
 	exit 1
 fi
