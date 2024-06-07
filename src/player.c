@@ -597,17 +597,19 @@ player_process_ranged_pvp(struct player *p, struct player *target)
 
 	range = p->projectile->range;
 
-	if ((abs(p->mob.x - (int)target->mob.x) > range) ||
-	    (abs(p->mob.y - (int)target->mob.y) > range)) {
-		p->walk_queue_x[0] = target->mob.x;
-		p->walk_queue_y[0] = target->mob.y;
-		p->walk_queue_len = 1;
-		p->walk_queue_pos = 0;
+	p->walk_queue_len = 0;
+	p->walk_queue_pos = 0;
+	p->following_player = -1;
+
+	if (p->mob.server->tick_counter < p->mob.combat_next_hit) {
 		return;
 	}
 
-	p->walk_queue_len = 0;
-	p->walk_queue_pos = 0;
+	if ((abs(p->mob.x - (int)target->mob.x) > range) ||
+	    (abs(p->mob.y - (int)target->mob.y) > range)) {
+		p->following_player = target->mob.id;
+		return;
+	}
 
 	if (target->prayers[PRAY_PROTECT_FROM_MISSILES]) {
 		player_send_message(p,
@@ -616,12 +618,11 @@ player_process_ranged_pvp(struct player *p, struct player *target)
 		return;
 	}
 
-	if (p->mob.server->tick_counter < p->mob.combat_next_hit) {
-		return;
-	}
-
 	/* TODO give experience */
 	/* TODO deplete ammunition */
+
+	/* XXX verify if it's always northwest */
+	p->mob.dir = MOB_DIR_NORTHWEST;
 
 	if (!p->skulled) {
 		/* skull remains for 20 minutes */
