@@ -12,7 +12,9 @@
 #include "../utility.h"
 #include "../zone.h"
 
-#define MAX_PACKETS_PER_TICK		(10)
+/* roughly one packet per frame at 50fps */
+#define MAX_PACKETS_PER_TICK		(32)
+
 #define MAX_PLAYER_HAIR_COLOUR		(9)
 #define MAX_PLAYER_SKIN_COLOUR		(4)
 #define MAX_PLAYER_CLOTHING_COLOUR	(14)
