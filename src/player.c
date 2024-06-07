@@ -526,9 +526,13 @@ player_die(struct player *p)
 	for (int i = 0; i < MAX_SKILL_ID; ++i) {
 		p->mob.cur_stats[i] = p->mob.base_stats[i];
 	}
+
+	p->mob.damage_timer = 0;
+	p->mob.combat_timer = 0;
 	p->walk_queue_len = 0;
 	p->walk_queue_pos = 0;
 	player_clear_actions(p);
+
 	mob_combat_reset(&p->mob);
 
 	if (p->skulled) {
@@ -618,7 +622,15 @@ player_process_ranged_pvp(struct player *p, struct player *target)
 
 	/* TODO give experience */
 	/* TODO deplete ammunition */
-	/* TODO target can log out */
+
+	if (!p->skulled) {
+		/* skull remains for 20 minutes */
+		/* TODO: should track players who attacked us */
+		p->skulled = true;
+		p->skull_timer =
+		    p->mob.server->tick_counter + 2000;
+		p->appearance_changed = true;
+	}
 
 	roll = player_pvp_ranged_roll(p, target);
 	if (roll >= target->mob.cur_stats[SKILL_HITS]) {
@@ -635,6 +647,7 @@ player_process_ranged_pvp(struct player *p, struct player *target)
 
 	target->mob.cur_stats[SKILL_HITS] -= roll;
 	target->mob.damage = roll;
+	target->mob.damage_timer = p->mob.server->tick_counter;
 
 	p->projectile_sprite = p->projectile->sprite;
 	p->projectile_target_player = target->mob.id;
@@ -811,6 +824,7 @@ player_process_combat(struct player *p)
 		target->mob.damage = roll;
 		target->mob.combat_rounds++;
 		target->mob.combat_timer = p->mob.server->tick_counter;
+		target->mob.damage_timer = p->mob.server->tick_counter;
 	}
 
 	p->mob.combat_next_hit = p->mob.server->tick_counter + 4;

@@ -111,6 +111,7 @@ struct mob {
 	uint8_t damage;
 	uint32_t combat_rounds;
 	uint64_t combat_timer;
+	uint64_t damage_timer;
 	uint64_t combat_next_hit;
 	uint8_t cur_stats[MAX_SKILL_ID];
 	uint8_t base_stats[MAX_SKILL_ID];

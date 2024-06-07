@@ -140,7 +140,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 	case OP_CLI_LOGOUT:
 		{
 			if (p->mob.in_combat || p->mob.server->tick_counter <
-			    (p->mob.combat_timer + 17)) {
+			    (p->mob.damage_timer + 17)) {
 				player_send_logout_reject(p);
 				return;
 			}
