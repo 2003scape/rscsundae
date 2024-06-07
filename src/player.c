@@ -618,7 +618,6 @@ player_process_ranged_pvp(struct player *p, struct player *target)
 		return;
 	}
 
-	/* TODO give experience */
 	/* TODO deplete ammunition */
 
 	/* XXX verify if it's always northwest */
@@ -634,6 +633,9 @@ player_process_ranged_pvp(struct player *p, struct player *target)
 	}
 
 	roll = player_pvp_ranged_roll(p, target);
+	if (roll > 0) {
+		stat_advance(p, SKILL_RANGED, roll * 16, 0);
+	}
 	if (roll >= target->mob.cur_stats[SKILL_HITS]) {
 		char name[32], msg[64];
 
