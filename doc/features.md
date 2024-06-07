@@ -122,3 +122,4 @@ These should all be implemented in Lua script:
 - [ ] Strength Potions
 - [ ] Dying capes
 - [ ] Mixing dyes
+- [ ] Monk of Zamorak wine aggression
