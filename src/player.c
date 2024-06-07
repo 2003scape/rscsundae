@@ -139,6 +139,10 @@ player_accept(struct server *s, int sock)
 	p->inventory[p->inv_count++].stack = 1;
 	p->inventory[p->inv_count].id = 184;
 	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 11;
+	p->inventory[p->inv_count++].stack = 25;
+	p->inventory[p->inv_count].id = 190;
+	p->inventory[p->inv_count++].stack = 25;
 
 	p->stats_changed = true;
 	p->bonus_changed = true;
@@ -587,6 +591,7 @@ player_die(struct player *p)
 static void
 player_process_ranged_pvp(struct player *p, struct player *target)
 {
+	struct item_config *ammo_config;
 	char name[32], message[64];
 	int range;
 	int roll;
@@ -618,7 +623,18 @@ player_process_ranged_pvp(struct player *p, struct player *target)
 		return;
 	}
 
-	/* TODO deplete ammunition */
+	ammo_config = server_find_item_config(p->projectile->item);
+	if (ammo_config != NULL) {
+		if (player_inv_held(p, ammo_config, 1)) {
+			player_inv_remove(p, ammo_config, 1);
+		} else {
+			player_send_message(p, "I've run out of ammo!");
+			p->mob.target_player = -1;
+			return;
+		}
+	}
+
+	/* TODO: verify reachability */
 
 	/* XXX verify if it's always northwest */
 	p->mob.dir = MOB_DIR_NORTHWEST;
@@ -655,7 +671,7 @@ player_process_ranged_pvp(struct player *p, struct player *target)
 	p->projectile_sprite = p->projectile->sprite;
 	p->projectile_target_player = target->mob.id;
 
-	mod37_namedec(target->name, name);
+	mod37_namedec(p->name, name);
 	(void)snprintf(message, sizeof(message),
 	    "Warning! %s is shooting at you!", name);
 	player_send_message(target, message);
