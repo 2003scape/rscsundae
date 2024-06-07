@@ -107,6 +107,7 @@ Smithing, Mining
 
 ### Other
 
+- Worlds could hold a maximum of 1000 players at a time.
 - Compared to earlier in 2001, PvP was restricted to the Wilderness,
   and item banks were fully available.
 - There was no makeover mage.  This is unfortunate, and will
@@ -116,7 +117,11 @@ Smithing, Mining
   23 October 2002.  Mining at certain sites was more difficult
   on low level characters due to this. This should be a server
   config option.
-- Worlds could hold a maximum of 1000 players at a time.
 - Items were all tradable. The "special" flag to make them
   non-tradable was present, but also covered items like
   capes and potions. We probably need to find a compromise here.
+  There will be a server option.
+- Mining, Fishing, and Woodcutting required two clicks (use
+  tool on object). There will be a server option to allow
+  the one-click system players are used to, enabled by
+  default for newer protocol revisions.
