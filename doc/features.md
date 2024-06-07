@@ -8,7 +8,7 @@ Engine
 
 - [x] Melee PvP combat
 - [ ] Melee PvM combat
-- [ ] Ranged PvP combat
+- [x] Ranged PvP combat
 - [ ] Ranged PvM combat
 - [x] Prayer
 - [x] Player design
