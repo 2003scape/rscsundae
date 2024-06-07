@@ -1,3 +1,5 @@
+Player has a protection from missiles prayer active!
+I've run out of ammo!
 I'm not near enough
 %s wishes to trade with you.
 Sending trade request
