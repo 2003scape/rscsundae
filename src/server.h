@@ -42,6 +42,7 @@ void server_register_hide_status(struct player *);
 void server_register_unhide_status(struct player *);
 void server_send_pm(struct player *, int64_t, uint8_t *, size_t);
 struct item_config *server_item_config_by_id(int);
+struct item_config *server_find_item_config(const char *);
 struct prayer_config *server_prayer_config_by_id(int);
 struct loc_config *server_loc_config_by_id(int);
 struct bound_config *server_bound_config_by_id(int);

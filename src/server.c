@@ -623,6 +623,22 @@ server_item_config_by_id(int id)
 	return &s.item_config[id];
 }
 
+struct item_config *
+server_find_item_config(const char *name)
+{
+	if (strcmp("na", name) == 0) {
+		return NULL;
+	}
+	for (size_t i = 0; i < s.item_config_count; ++i) {
+		for (size_t j = 0; j < s.item_config[i].name_count; ++j) {
+			if (strcasecmp(s.item_config[i].names[j], name) == 0) {
+				return &s.item_config[i];
+			}
+		}
+	}
+	return NULL;
+}
+
 struct prayer_config *
 server_prayer_config_by_id(int id)
 {
