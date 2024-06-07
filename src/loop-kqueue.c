@@ -13,6 +13,7 @@
 
 struct server *serv;
 
+static struct kevent events[12];
 static void server_sock_cb(int fd);
 
 static void
@@ -44,11 +45,17 @@ loop_add_player(struct player *p)
 	return 0;
 }
 
+void
+loop_set_delay(int delay)
+{
+	EV_SET(&events[0], 0, EVFILT_TIMER,
+	    EV_ADD | EV_ENABLE, NOTE_MSECONDS, delay, 0);
+}
+
 int
 loop_start(struct server *s, int port)
 {
 	int sockets[8];
-	struct kevent events[12];
 	struct kevent revents[12];
 	int numsockets = 0;
 	int kq = -1;

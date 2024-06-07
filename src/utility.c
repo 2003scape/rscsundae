@@ -1,5 +1,10 @@
+#include "../config.h"
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
 #include <stddef.h>
 #include <string.h>
+#include <time.h>
 #include "utility.h"
 
 char *
@@ -45,4 +50,24 @@ mod37_namedec(int64_t encoded, char *decoded)
 
 	decoded[length++] = '\0';
 	return decoded;
+}
+
+uint64_t
+get_time_ms(void)
+{
+	uint64_t milliseconds = 0;
+#ifdef HAVE_CLOCK_GETTIME
+	struct timespec ts = {0};
+
+	(void)clock_gettime(CLOCK_MONOTONIC, &ts);
+	milliseconds = ts.tv_sec * 1000LL;
+	milliseconds += ts.tv_nsec / 1000000LL;
+#else
+	struct timeval tv = {0};
+
+	(void)gettimeofday(&tv, NULL);
+	milliseconds = tv.tv_sec * 1000LL;
+	milliseconds += tv.tv_usec / 1000LL;
+#endif
+	return milliseconds;
 }

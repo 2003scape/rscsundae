@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <math.h>
 #include "entity.h"
 #include "loop.h"
 #include "server.h"
@@ -13,9 +14,14 @@
 
 struct server *serv;
 
+static struct ev_loop *loop;
+static ev_timer tick_timer;
+
 void
 tick_cb(EV_P_ ev_timer *w, int revents)
 {
+	(void)w;
+	(void)revents;
 	server_tick();
 }
 
@@ -24,6 +30,8 @@ server_sock_cb(EV_P_ ev_io *w, int revents)
 {
 	struct sockaddr_storage client_addr;
 	socklen_t client_len = sizeof(client_addr);
+
+	(void)revents;
 
 	int client_sock = accept(w->fd,
 	    (struct sockaddr *)&client_addr, &client_len);
@@ -39,6 +47,13 @@ server_sock_cb(EV_P_ ev_io *w, int revents)
 			close(client_sock);
 		}
 	}
+}
+
+void
+loop_set_delay(int delay)
+{
+	tick_timer.repeat = delay / 1000.0;
+	ev_timer_again(loop, &tick_timer);
 }
 
 void
@@ -79,8 +94,10 @@ loop_add_player(struct player *p)
 	ev_io event;
 
 	(void)p;
-	//ev_io_init(&event, client_sock_cb, p->sock, EV_READ | EV_WRITE);
-	//ev_io_start(serv->loop_ctx, &event);
+#if 0
+	ev_io_init(&event, client_sock_cb, p->sock, EV_READ | EV_WRITE);
+	ev_io_start(serv->loop_ctx, &event);
+#endif
 
 	return 0;
 }
@@ -88,12 +105,11 @@ loop_add_player(struct player *p)
 int
 loop_start(struct server *s, int port)
 {
-	struct ev_loop *loop = EV_DEFAULT;
 	int sockets[8];
 	ev_io sock_events[8];
 	int numsockets = 0;
-	ev_timer tick_timer;
 
+	loop = EV_DEFAULT;
 	s->loop_ctx = loop;
 
 	serv = s;
@@ -104,8 +120,10 @@ loop_start(struct server *s, int port)
 		return -1;
 	}
 
-	ev_timer_init(&tick_timer, tick_cb, 0.64, 0.64);
-	ev_timer_start(loop, &tick_timer); 
+	ev_init(&tick_timer, tick_cb);
+	tick_timer.repeat = 0.64;
+	ev_timer_again(loop, &tick_timer);
+
 	printf("got %d sockets\n", numsockets);
 	for (int i = 0; i < numsockets; ++i) {
 		ev_io_init(&sock_events[i],

@@ -16,6 +16,7 @@ struct server {
 	uint64_t next_prayer_drain;
 	uint64_t next_restore;
 	uint64_t next_rapid_restore;
+	uint64_t last_tick;
 	struct player *players[MAXPLAYERS];
 	struct npc *npcs[MAXNPCS];
 	struct ranctx ran;

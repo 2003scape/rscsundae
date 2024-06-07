@@ -195,6 +195,17 @@ server_tick(void)
 	bool drain_tick = s.tick_counter >= s.next_prayer_drain;
 	bool restore_tick = s.tick_counter >= s.next_restore;
 	bool rapid_restore_tick = s.tick_counter >= s.next_rapid_restore;
+	uint64_t start_time;
+	uint64_t time_delay = 0;
+
+	start_time = get_time_ms();
+
+	if (s.last_tick != 0) {
+		int64_t difference = start_time - s.last_tick;
+		if (difference > 640) {
+			time_delay = difference - 640;
+		}
+	}
 
 	for (int i = 0; i < s.max_player_id; ++i) {
 		if (s.players[i] == NULL) {
@@ -299,6 +310,15 @@ server_tick(void)
 
 	if (rapid_restore_tick) {
 		s.next_rapid_restore = s.tick_counter + 50;
+	}
+
+	s.last_tick = get_time_ms();
+	time_delay += s.last_tick - start_time;
+
+	if (time_delay > 640) {
+		loop_set_delay(0);
+	} else {
+		loop_set_delay(640 - time_delay);
 	}
 }
 

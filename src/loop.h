@@ -4,4 +4,5 @@
 
 int loop_start(struct server *, int);
 int loop_add_player(struct player *);
+void loop_set_delay(int);
 #endif
