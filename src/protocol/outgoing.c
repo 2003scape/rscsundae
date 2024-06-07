@@ -98,6 +98,144 @@ player_send_plane_init(struct player *p)
 }
 
 int
+player_send_npc_movement(struct player *p)
+{
+	size_t offset = 0;
+	size_t bitpos;
+	struct npc *nearby[MAX_KNOWN_NPCS];
+	int16_t new_known[MAX_KNOWN_NPCS];
+	size_t nearby_count = 0;
+	size_t new_known_count = 0;
+
+	nearby_count = get_nearby_npcs(&p->mob, nearby,
+	    MAX_KNOWN_NPCS, UPDATE_RADIUS);
+
+	buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		  OP_SRV_NPC_MOVEMENT);
+
+	buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		  p->known_npc_count);
+
+	bitpos = offset * 8;
+
+	/* NPCs the client already knows */
+	for (size_t i = 0; i < p->known_npc_count; ++i) {
+		struct npc *known_npc;
+
+		if (p->known_npcs[i] == -1) {
+			continue;
+		}
+		known_npc = p->mob.server->npcs[p->known_npcs[i]];
+		if (known_npc == NULL ||
+		    !mob_within_range(&known_npc->mob,
+			p->mob.x, p->mob.y, UPDATE_RADIUS)) {
+			if (buf_putbits(p->tmpbuf, bitpos,
+					PLAYER_BUFSIZE, 4, 15) == -1) {
+				return -1;
+			}
+			p->known_npcs[i] = -1;
+			bitpos += 4;
+		} else if (known_npc->mob.moved) {
+			if (buf_putbits(p->tmpbuf, bitpos++,
+					PLAYER_BUFSIZE, 1, 1) == -1) {
+				return -1;
+			}
+			if (buf_putbits(p->tmpbuf, bitpos++,
+					PLAYER_BUFSIZE, 1, 0) == -1) {
+				return -1;
+			}
+			if (buf_putbits(p->tmpbuf, bitpos,
+					PLAYER_BUFSIZE, 3,
+					known_npc->mob.dir) == -1) {
+				return -1;
+			}
+			bitpos += 3;
+		} else if (known_npc->mob.dir !=
+			    known_npc->mob.prev_dir) {
+			if (buf_putbits(p->tmpbuf, bitpos++,
+					PLAYER_BUFSIZE, 1, 1) == -1) {
+				return -1;
+			}
+			if (buf_putbits(p->tmpbuf, bitpos++,
+					PLAYER_BUFSIZE, 1, 1) == -1) {
+				return -1;
+			}
+			if (buf_putbits(p->tmpbuf, bitpos,
+					PLAYER_BUFSIZE, 4,
+					known_npc->mob.dir) == -1) {
+				return -1;
+			}
+			bitpos += 4;
+		} else {
+			if (buf_putbits(p->tmpbuf, bitpos++,
+					PLAYER_BUFSIZE, 1, 0) == -1) {
+				return -1;
+			}
+		}
+		if (p->known_npcs[i] != -1) {
+			new_known[new_known_count++] = p->known_npcs[i];
+		}
+	}
+
+	/* NPCs the client doesn't know about yet */
+	for (size_t i = 0; i < nearby_count; ++i) {
+		if (p->known_npc_count >= MAX_KNOWN_NPCS) {
+			break;
+		}
+		bool known = false;
+		for (size_t j = 0; j < new_known_count; ++j) {
+			if (new_known[j] == nearby[i]->mob.id) {
+				known = true;
+				break;
+			}
+		}
+		if (known) {
+			continue;
+		}
+
+		if (buf_putbits(p->tmpbuf, bitpos,
+				PLAYER_BUFSIZE, 11, nearby[i]->mob.id) == -1) {
+			return -1;
+		}
+		bitpos += 11;
+
+		if (buf_putbits(p->tmpbuf, bitpos, PLAYER_BUFSIZE, 5,
+				(int)nearby[i]->mob.x - (int)p->mob.x) == -1) {
+			return -1;
+		}
+		bitpos += 5;
+
+		if (buf_putbits(p->tmpbuf, bitpos, PLAYER_BUFSIZE, 5,
+				(int)nearby[i]->mob.y - (int)p->mob.y) == -1) {
+			return -1;
+		}
+		bitpos += 5;
+
+		if (buf_putbits(p->tmpbuf, bitpos, PLAYER_BUFSIZE, 4,
+				nearby[i]->mob.dir) == -1) {
+			return -1;
+		}
+		bitpos += 4;
+
+		if (buf_putbits(p->tmpbuf, bitpos, PLAYER_BUFSIZE, 8,
+				nearby[i]->config->id) == -1) {
+			return -1;
+		}
+		bitpos += 8;
+
+		new_known[new_known_count++] = nearby[i]->mob.id;
+	}
+
+	memcpy(p->known_npcs, new_known,
+	    new_known_count * sizeof(int16_t));
+	p->known_npc_count = new_known_count;
+
+	offset = (bitpos + 7) / 8;
+
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
 player_send_movement(struct player *p)
 {
 	size_t offset = 0;

@@ -19,7 +19,7 @@ Engine
 - [x] Player messaging
 - [x] Player client settings
 - [x] Player privacy settings
-- [ ] NPC spawn loading
+- [x] NPC spawn loading
 - [ ] NPC movement
 - [ ] NPC aggression
 - [x] Friends list

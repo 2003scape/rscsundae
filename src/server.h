@@ -5,16 +5,19 @@
 #include "entity.h"
 
 #define MAXPLAYERS	(1000)
+#define MAXNPCS		(1000)
 
 struct server {
 	void *loop_ctx;
 	uint16_t player_count;
 	uint16_t max_player_id;
+	uint16_t max_npc_id;
 	uint64_t tick_counter;
 	uint64_t next_prayer_drain;
 	uint64_t next_restore;
 	uint64_t next_rapid_restore;
 	struct player *players[MAXPLAYERS];
+	struct npc *npcs[MAXNPCS];
 	struct ranctx ran;
 	struct item_config *item_config;
 	size_t item_config_count;
@@ -47,5 +50,6 @@ struct prayer_config *server_prayer_config_by_id(int);
 struct loc_config *server_loc_config_by_id(int);
 struct bound_config *server_bound_config_by_id(int);
 struct projectile_config *server_find_projectile(const char *);
+int server_add_npc(int, int, int);
 
 #endif

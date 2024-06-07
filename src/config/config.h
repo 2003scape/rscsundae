@@ -116,6 +116,12 @@ struct projectile_config {
 	uint8_t type;
 };
 
+/* npc.txt */
+struct npc_config {
+	uint16_t id;
+	/* TODO rest */
+};
+
 struct item_config *config_parse_items(char *, size_t, size_t *,
     struct entity_config *, size_t);
 struct entity_config *config_parse_entity(char *, size_t, size_t *);

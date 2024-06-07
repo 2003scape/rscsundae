@@ -11,6 +11,7 @@
 #define PLANE_LEVEL_INC		(944)
 
 #define MAX_KNOWN_PLAYERS	(255)
+#define MAX_KNOWN_NPCS		(255)
 #define MAX_PUBLIC_CHAT_LEN	(80)
 #define MAX_SKILL_ID		(16)
 #define MAX_CLIENT_SETTINGS	(3)
@@ -141,12 +142,19 @@ struct invitem {
 	uint8_t worn;
 };
 
+struct npc {
+	struct mob mob;
+	struct npc_config *config;
+};
+
 struct player {
 	struct mob mob;
 	int sock;
 	int16_t known_players[MAX_KNOWN_PLAYERS];
 	uint8_t known_players_seen[MAX_KNOWN_PLAYERS];
 	uint16_t known_player_count;
+	int16_t known_npcs[MAX_KNOWN_NPCS];
+	uint16_t known_npc_count;
 	uint8_t tmpbuf[PLAYER_BUFSIZE]; /* used for packet construction */
 	uint8_t inbuf[PLAYER_BUFSIZE];
 	uint16_t inbuf_len;
@@ -232,6 +240,7 @@ struct player {
 bool mob_within_range(struct mob *, int, int, int);
 int mob_combat_roll(struct ranctx *, int, int, int, int, int, int);
 int mob_wilderness_level(struct mob *);
+size_t get_nearby_npcs(struct mob *, struct npc **, size_t, int);
 size_t get_nearby_players(struct mob *, struct player **, size_t, int);
 void mob_combat_reset(struct mob *);
 uint32_t mob_combat_xp(struct mob *);
@@ -284,6 +293,7 @@ int player_parse_incoming(struct player *);
 /* outgoing.c */
 int player_send_plane_init(struct player *);
 int player_send_movement(struct player *);
+int player_send_npc_movement(struct player *);
 int player_send_appearance_update(struct player *);
 int player_send_design_ui(struct player *);
 int player_send_logout(struct player *);

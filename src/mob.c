@@ -86,6 +86,28 @@ mob_within_range(struct mob *mob, int x, int y, int range)
 }
 
 size_t
+get_nearby_npcs(struct mob *mob,
+		struct npc **list, size_t max, int radius)
+{
+	int max_id = mob->server->max_npc_id;
+	size_t count = 0;
+
+	for (int i = 0; i < max_id; ++i) {
+		struct npc *npc = mob->server->npcs[i];
+		if (npc == NULL) {
+			continue;
+		}
+		if (count >= max) {
+			break;
+		}
+		if (mob_within_range(mob, npc->mob.x, npc->mob.y, radius)) {
+			list[count++] = npc;
+		}
+	}
+	return count;
+}
+
+size_t
 get_nearby_players(struct mob *mob,
 		   struct player **list, size_t max, int radius)
 {

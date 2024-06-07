@@ -1,6 +1,7 @@
 #include <jag.h>
 #include <map.h>
 #include <sys/types.h>
+#include <assert.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -258,6 +259,7 @@ server_tick(void)
 			player_send_partner_trade_offer(s.players[i]);
 		}
 		player_send_movement(s.players[i]);
+		player_send_npc_movement(s.players[i]);
 		player_send_appearance_update(s.players[i]);
 		player_send_ground_items(s.players[i]);
 		player_send_locs(s.players[i]);
@@ -514,7 +516,8 @@ load_map_tile(struct jag_map *chunk,
 		item.respawn_time = 0;
 		server_add_ground_item(&item);
 	} else if (object_type > JAG_MAP_DIAG_NPC) {
-		/* TODO */
+		server_add_npc(object_type - JAG_MAP_DIAG_NPC - 1,
+		    global_x, global_y);
 	} else if (object_type > JAG_MAP_DIAG_INVERSE) {
 		bound.x = global_x;
 		bound.y = global_y;
@@ -678,4 +681,39 @@ server_find_projectile(const char *name)
 		}
 	}
 	return NULL;
+}
+
+int
+server_add_npc(int id, int x, int y)
+{
+	struct npc *npc;
+	struct npc_config *config;
+
+	/* TODO: temporary placeholder until we get the proper config */
+	config = calloc(1, sizeof(struct npc_config));
+	assert(config != NULL);
+	config->id = id;
+
+	for (size_t i = 0; i < MAXNPCS; ++i) {
+		if (s.npcs[i] != NULL) {
+			continue;
+		}
+		npc = calloc(1, sizeof(struct npc));
+		if (npc == NULL) {
+			return -1;
+		}
+		npc->config = config;
+		npc->mob.id = (uint16_t)i;
+		npc->mob.x = x;
+		npc->mob.y = y;
+		npc->mob.server = &s;
+		npc->mob.damage = UINT8_MAX;
+		s.npcs[i] = npc;
+		if (i > s.max_npc_id) {
+			s.max_npc_id = i;
+		}
+		return 0;
+	}
+	printf("WARNING: failed to add NPC, too many\n");
+	return -1;
 }
