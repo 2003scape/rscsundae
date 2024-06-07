@@ -572,8 +572,6 @@ player_send_appearance_update(struct player *p)
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 		        OP_SRV_PLAYER_APPEARANCE);
 
-	/* TODO: too many seem to be sent currently */
-
 	/* allocate placeholder for length */
 	lenofs = offset;
 	offset += 2;
