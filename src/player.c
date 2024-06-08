@@ -1379,3 +1379,65 @@ player_has_known_item(struct player *p, uint64_t unique_id)
 	}
 	return false;
 }
+
+size_t
+player_get_nearby_items(struct player *p,
+			struct ground_item *list, size_t max)
+{
+	size_t count = 0;
+	struct zone *orig;
+	struct zone *zone;
+
+	orig = server_find_zone(p->mob.x, p->mob.y);
+	if (orig == NULL) {
+		return 0;
+	}
+
+	for (int i = 0; i < orig->item_count && count < max; ++i) {
+		if (player_can_see_item(p, &orig->items[i])) {
+			list[count++] = orig->items[i];
+		}
+	}
+
+	for (int x = -3; x < 4; ++x) {
+		for (int y = -3; y < 4; ++y) {
+			if (x == 0 && y == 0) {
+				continue;
+			}
+			zone = server_get_zone(orig->x + x, orig->y + y,
+			    orig->plane);
+			if (zone == NULL) {
+				continue;
+			}
+			for (int i = 0; i < zone->item_count &&
+			    count < max; ++i) {
+				if (player_can_see_item(p, &zone->items[i])) {
+					list[count++] = zone->items[i];
+				}
+			}
+		}
+	}
+
+	for (size_t i = 0; i < p->mob.server->temp_item_count; ++i) {
+		struct ground_item *item;
+
+		if (count >= max) {
+			break;
+		}
+		item = &p->mob.server->temp_items[i];
+		if (!player_can_see_item(p, item)) {
+			continue;
+		}
+		zone = server_find_zone(item->x, item->y);
+		if (zone == NULL) {
+			continue;
+		}
+		if (abs(zone->x - (int)orig->x) > 3 ||
+		    abs(zone->y - (int)orig->y) > 3) {
+			continue;
+		}
+		list[count++] = p->mob.server->temp_items[i];
+	}
+
+	return count;
+}

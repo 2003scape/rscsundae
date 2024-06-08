@@ -248,7 +248,6 @@ void mob_combat_reset(struct mob *);
 uint32_t mob_combat_xp(struct mob *);
 size_t mob_get_nearby_locs(struct mob *, struct loc *, size_t);
 size_t mob_get_nearby_bounds(struct mob *, struct bound *, size_t);
-size_t mob_get_nearby_items(struct mob *, struct ground_item *, size_t);
 
 /* player.c */
 struct player *player_accept(struct server *, int);
@@ -286,6 +285,7 @@ bool player_has_known_bound(struct player *, int, int, int);
 void player_add_known_bound(struct player *, struct bound *);
 bool player_has_known_item(struct player *, uint64_t);
 bool player_can_see_item(struct player *, struct ground_item *);
+size_t player_get_nearby_items(struct player *, struct ground_item *, size_t);
 void player_clear_actions(struct player *);
 void player_trade_request(struct player *, uint16_t);
 

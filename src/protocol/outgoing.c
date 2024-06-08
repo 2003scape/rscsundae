@@ -1279,14 +1279,10 @@ player_send_ground_items(struct player *p)
 		}
 	}
 
-	nearby_count = mob_get_nearby_items(&p->mob,
-	    nearby, MAX_NEARBY_ITEMS);
+	nearby_count = player_get_nearby_items(p, nearby, MAX_NEARBY_ITEMS);
 	for (size_t i = 0; i < nearby_count; ++i) {
 		item = &nearby[i];
 		if (player_has_known_item(p, item->unique_id)) {
-			continue;
-		}
-		if (!player_can_see_item(p, item)) {
 			continue;
 		}
 		/* add the item to the player's view */
