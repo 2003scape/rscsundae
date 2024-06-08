@@ -1,5 +1,5 @@
 #include "../config.h"
-#ifdef HAVE_TIMERFD_CREATE
+#ifdef HAVE_SYS_TIMERFD_H
 #include <sys/timerfd.h>
 #endif
 #include <sys/socket.h>
