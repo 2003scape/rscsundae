@@ -19,6 +19,10 @@ struct server {
 	uint64_t last_tick;
 	struct player *players[MAXPLAYERS];
 	struct npc *npcs[MAXNPCS];
+	struct ground_item *temp_items;
+	size_t temp_item_count;
+	size_t temp_item_max;
+	uint64_t ground_item_counter;
 	struct ranctx ran;
 	struct item_config *item_config;
 	size_t item_config_count;
@@ -52,5 +56,6 @@ struct loc_config *server_loc_config_by_id(int);
 struct bound_config *server_bound_config_by_id(int);
 struct projectile_config *server_find_projectile(const char *);
 int server_add_npc(int, int, int);
+int server_add_temp_item(struct player *, int, int, int);
 
 #endif

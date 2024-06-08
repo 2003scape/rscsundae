@@ -529,6 +529,7 @@ load_map_tile(struct jag_map *chunk,
 		}
 	} else if (object_type > JAG_MAP_DIAG_ITEM) {
 		item.id = object_type - JAG_MAP_DIAG_ITEM - 1;
+		item.unique_id = s.ground_item_counter++;
 		item.x = global_x;
 		item.y = global_y;
 		item.respawn = true;
@@ -736,4 +737,32 @@ server_add_npc(int id, int x, int y)
 	}
 	printf("WARNING: failed to add NPC, too many\n");
 	return -1;
+}
+
+int
+server_add_temp_item(struct player *owner, int x, int y, int id)
+{
+	struct ground_item item = {0};
+
+	item.id = id;
+	item.x = x;
+	item.y = y;
+	item.owner = owner->mob.id;
+	item.creation_time = s.tick_counter;
+	item.unique_id = s.ground_item_counter++;
+
+	if (s.temp_item_count >= s.temp_item_max) {
+		size_t n = s.temp_item_max * 2;
+		if (n == 0) {
+			n = 128;
+		}
+		if (reallocarr(&s.temp_items,
+		    n, sizeof(struct ground_item)) == -1) {
+			return -1;
+		}
+		s.temp_item_max = n;
+	}
+
+	s.temp_items[s.temp_item_count++] = item;
+	return 0;
 }

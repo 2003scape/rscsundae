@@ -61,9 +61,11 @@ struct ground_item {
 	uint16_t id;
 	uint16_t x;
 	uint16_t y;
+	uint16_t owner;
 	uint8_t respawn;
 	uint64_t creation_time;
 	uint64_t respawn_time;
+	uint64_t unique_id;
 };
 
 /* small chunk of the game world */
