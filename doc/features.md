@@ -27,7 +27,7 @@ Engine
 - [x] Locs
 - [x] Boundaries
 - [x] Item spawns
-- [ ] Dropping items
+- [x] Dropping items
 - [x] Equipping items
 - [x] Inventory
 - [x] Experience and levelling up
