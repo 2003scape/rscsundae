@@ -1305,7 +1305,7 @@ player_add_known_bound(struct player *p, struct bound *bound)
 	if (p->known_bound_count >= p->known_bound_max) {
 		size_t n = p->known_bound_max * 2;
 		if (n == 0) {
-			n = 128;
+			n = 32;
 		}
 		if (reallocarr(&p->known_bounds,
 		    n, sizeof(struct bound)) == -1) {
@@ -1401,4 +1401,42 @@ player_process_take_item(struct player *p)
 	}
 	item->creation_time = p->mob.server->tick_counter;
 	p->take_item = NULL;
+}
+
+bool
+player_has_known_item(struct player *p, uint64_t unique_id)
+{
+	for (size_t i = 0; i < p->known_item_count; ++i) {
+		if (p->known_items[i].unique_id == unique_id) {
+			return true;
+		}
+	}
+	return false;
+}
+
+void
+player_add_known_item(struct player *p, struct ground_item *item)
+{
+	if (p->known_item_count >= p->known_item_max) {
+		size_t n = p->known_item_max * 2;
+		if (n == 0) {
+			n = 64;
+		}
+		if (reallocarr(&p->known_items,
+		    n, sizeof(struct ground_item)) == -1) {
+			return;
+		}
+		p->known_item_max = n;
+	}
+	memcpy(&p->known_items[p->known_item_count++],
+		item, sizeof(struct ground_item));
+}
+
+void
+player_remove_known_item(struct player *p, size_t index)
+{
+	p->known_item_count--;
+	for (size_t i = index; i < p->known_item_count; ++i) {
+		p->known_items[i] = p->known_items[i + 1];
+	}
 }
