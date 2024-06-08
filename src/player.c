@@ -540,6 +540,10 @@ player_die(struct player *p, struct player *victor)
 
 	mob_combat_reset(&p->mob);
 
+	item = server_find_item_config("bones");
+	assert(item != NULL);
+	server_add_temp_item(victor, p->mob.x, p->mob.y, item->id, 1);
+
 	if (p->skulled) {
 		kept_max = 0;
 		p->skulled = false;
