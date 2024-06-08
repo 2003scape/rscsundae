@@ -1462,7 +1462,7 @@ player_process_drop_item(struct player *p)
 		return;
 	}
 
-	if (p->moved || p->ui_trade_open) {
+	if (p->walk_queue_len > 0 || p->ui_trade_open) {
 		return;
 	}
 
