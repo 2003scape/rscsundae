@@ -1234,6 +1234,7 @@ player_send_ground_items(struct player *p)
 	struct ground_item nearby[MAX_NEARBY_ITEMS];
 	struct ground_item new_known[MAX_NEARBY_ITEMS];
 	struct ground_item *item;
+	struct ground_item *global_item;
 	size_t nearby_count = 0;
 	size_t new_known_count = 0;
 	size_t update_count = 0;
@@ -1249,15 +1250,19 @@ player_send_ground_items(struct player *p)
 	for (size_t i = 0; i < p->known_item_count; ++i) {
 		bool out_of_range = false;
 
-		item = server_find_ground_item(p->known_items[i].x,
+		global_item = server_find_ground_item(p, p->known_items[i].x,
 		    p->known_items[i].y, p->known_items[i].id);
+		item = &p->known_items[i];
 		zone = server_find_zone(item->x, item->y);
-		assert(zone != NULL);
-		if (abs(zone->x - (int)origin->x) > 3 ||
-		    abs(zone->y - (int)origin->y) > 3) {
+		if (zone != NULL) {
+			if (abs(zone->x - (int)origin->x) > 3 ||
+			    abs(zone->y - (int)origin->y) > 3) {
+				out_of_range = true;
+			}
+		} else {
 			out_of_range = true;
 		}
-		if (item == NULL || out_of_range ||
+		if (global_item == NULL || out_of_range ||
 		    !player_can_see_item(p, item)) {
 			/* remove the item from the player's view */
 			if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,

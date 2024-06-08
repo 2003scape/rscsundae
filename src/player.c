@@ -1332,7 +1332,7 @@ player_process_take_item(struct player *p)
 	struct ground_item *item;
 	struct item_config *config;
 
-	item = server_find_ground_item(p->take_item->x, p->take_item->y,
+	item = server_find_ground_item(p, p->take_item->x, p->take_item->y,
 	    p->take_item->id);
 	config = server_item_config_by_id(p->take_item->id);
 	if (item == NULL || config == NULL || p->inv_count >= MAX_INV_SIZE ||

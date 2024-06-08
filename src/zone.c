@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "entity.h"
+#include "server.h"
 #include "utility.h"
 #include "zone.h"
 
@@ -151,20 +152,36 @@ server_add_bound(struct bound *bound)
 }
 
 struct ground_item *
-server_find_ground_item(int x, int y, int id)
+server_find_ground_item(struct player *p, int x, int y, int id)
 {
 	struct zone *zone;
 
 	zone = server_find_zone(x, y);
-	if (zone == NULL) {
-		return NULL;
-	}
-	for (int i = 0; i < zone->item_count; ++i) {
-		if (zone->items[i].x == x && zone->items[i].y == y &&
-		    zone->items[i].id == id) {
-			return &zone->items[i];
+	if (zone != NULL) {
+		for (int i = 0; i < zone->item_count; ++i) {
+			if (!player_can_see_item(p, &zone->items[i])) {
+				continue;
+			}
+			if (zone->items[i].id == id &&
+			    zone->items[i].x == x &&
+			    zone->items[i].y == y) {
+				return &zone->items[i];
+			}
 		}
 	}
+
+	for (size_t i = 0; i < p->mob.server->temp_item_count; ++i) {
+		struct ground_item *item;
+
+		item = &p->mob.server->temp_items[i];
+		if (!player_can_see_item(p, item)) {
+			continue;
+		}
+		if (item->id == id && item->x == x && item->y == y) {
+			return &p->mob.server->temp_items[i];
+		}
+	}
+
 	return NULL;
 }
 

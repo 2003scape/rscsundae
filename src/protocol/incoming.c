@@ -386,7 +386,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			offset += 2;
-			p->take_item = server_find_ground_item(x, y, id);
+			p->take_item = server_find_ground_item(p, x, y, id);
 		}
 		break;
 	case OP_CLI_WALK_TILE:

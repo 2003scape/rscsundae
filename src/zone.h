@@ -87,7 +87,7 @@ struct loc *server_find_loc(int, int);
 void server_add_loc(struct loc *);
 struct bound *server_find_bound(int, int, int);
 void server_add_bound(struct bound *);
-struct ground_item *server_find_ground_item(int, int, int);
+struct ground_item *server_find_ground_item(struct player *, int, int, int);
 void server_add_item_respawn(struct ground_item *);
 
 #endif
