@@ -183,9 +183,9 @@ server_add_ground_item(struct ground_item *item)
 		uint16_t new_max = 0;
 
 		if (zone->item_max == 0) {
-			new_max = 8;
-		} else if (zone->item_max == 8) {
-			new_max = 64;
+			new_max = 4;
+		} else if (zone->item_max == 4) {
+			new_max = ZONE_AREA;
 		} else {
 			new_max *= 2;
 		}
@@ -197,11 +197,4 @@ server_add_ground_item(struct ground_item *item)
 	}
 	memcpy(&zone->items[zone->item_count++],
 	    item, sizeof(struct ground_item));
-}
-
-void
-server_remove_ground_item(struct ground_item *item)
-{
-	/* TODO implement */
-	assert(item != NULL);
 }
