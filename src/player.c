@@ -1367,13 +1367,11 @@ player_can_see_item(struct player *p, struct ground_item *item)
 	if (item->respawn_time > p->mob.server->tick_counter) {
 		return false;
 	}
-	if (p->mob.id == item->owner) {
-		return true;
-	}
+	/* items appear to other players after 1 minute */
 	if (p->mob.server->tick_counter > (item->creation_time + 100)) {
 		return true;
 	}
-	return item->respawn;
+	return item->owner == p->mob.id || item->owner == UINT16_MAX;
 }
 
 bool
