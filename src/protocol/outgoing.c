@@ -14,7 +14,7 @@
 
 #define MAX_NEARBY_LOCS		(256)
 #define MAX_NEARBY_BOUNDS	(256)
-#define MAX_NEARBY_ITEMS	(256)
+#define MAX_NEARBY_ITEMS	(512)
 
 enum player_update_type {
 	PLAYER_UPDATE_BUBBLE		= 0,
@@ -1232,7 +1232,10 @@ player_send_ground_items(struct player *p)
 {
 	size_t offset = 0;
 	struct ground_item nearby[MAX_NEARBY_ITEMS];
+	struct ground_item new_known[MAX_NEARBY_ITEMS];
+	struct ground_item *item;
 	size_t nearby_count = 0;
+	size_t new_known_count = 0;
 	size_t update_count = 0;
 	struct zone *origin;
 	struct zone *zone;
@@ -1240,73 +1243,90 @@ player_send_ground_items(struct player *p)
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 		        OP_SRV_GROUND_ITEMS);
 
-	nearby_count = mob_get_nearby_items(&p->mob,
-	    nearby, MAX_NEARBY_ITEMS);
-
-	for (size_t i = 0; i < nearby_count; ++i) {
-		zone = server_find_zone(nearby[i].x, nearby[i].y);
-		if (zone == NULL) {
-			continue;
-		}
-		if (player_has_known_zone(p, zone->x, zone->y)) {
-			if (p->last_update > nearby[i].creation_time &&
-			    nearby[i].respawn_time != p->mob.server->tick_counter) {
-				continue;
-			}
-		}
-		if (nearby[i].respawn_time > p->mob.server->tick_counter) {
-			/* not respawned yet, remove it */
-			if (buf_putu16(p->tmpbuf, offset,
-			    PLAYER_BUFSIZE, nearby[i].id | 0x8000) == -1) {
-				return -1;
-			}
-		} else {
-			if (buf_putu16(p->tmpbuf, offset,
-			    PLAYER_BUFSIZE, nearby[i].id) == -1) {
-				return -1;
-			}
-		}
-		offset += 2;
-		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
-		    (uint8_t)(nearby[i].x - (int)p->mob.x)) == -1) {
-			return -1;
-		}
-		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
-		    (uint8_t)(nearby[i].y - (int)p->mob.y)) == -1) {
-			return -1;
-		}
-		update_count++;
-	}
-
 	origin = server_find_zone(p->mob.x, p->mob.y);
-	for (int i = 0; i < MAX_KNOWN_ZONES; ++i) {
-		zone = p->known_zones[i];
-		if (zone == NULL) {
-			continue;
+	assert(origin != NULL);
+
+	for (size_t i = 0; i < p->known_item_count; ++i) {
+		bool out_of_range = false;
+
+		item = server_find_ground_item(p->known_items[i].x,
+		    p->known_items[i].y, p->known_items[i].id);
+		zone = server_find_zone(item->x, item->y);
+		assert(zone != NULL);
+		if (abs(zone->x - (int)origin->x) > 3 ||
+		    abs(zone->y - (int)origin->y) > 3) {
+			out_of_range = true;
 		}
-		if (abs(zone->x - (int)origin->x) <= 3 &&
-		    abs(zone->y - (int)origin->y) <= 3) {
-			/* zone still in range */
-			continue;
-		}
-		/* remove out of range items */
-		for (int j = 0; j < zone->item_count; ++j) {
-			if (buf_putu16(p->tmpbuf, offset,
-			    PLAYER_BUFSIZE, zone->items[j].id | 0x8000) == -1) {
+		if (item == NULL ||
+		    item->respawn_time > p->mob.server->tick_counter ||
+		    out_of_range) {
+			/* remove the item from the player's view */
+			if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
+					item->id | 0x8000) == -1) {
 				return -1;
 			}
 			offset += 2;
 			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
-			    (uint8_t)(zone->items[j].x - (int)p->mob.x)) == -1) {
+			    (uint8_t)(item->x - (int)p->mob.x)) == -1) {
 				return -1;
 			}
 			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
-			    (uint8_t)(zone->items[j].y - (int)p->mob.y)) == -1) {
+			    (uint8_t)(item->y - (int)p->mob.y)) == -1) {
 				return -1;
 			}
 			update_count++;
+		} else {
+			new_known[new_known_count++] = *item;
 		}
 	}
+
+	nearby_count = mob_get_nearby_items(&p->mob,
+	    nearby, MAX_NEARBY_ITEMS);
+	for (size_t i = 0; i < nearby_count; ++i) {
+		item = &nearby[i];
+		if (player_has_known_item(p, item->unique_id)) {
+			continue;
+		}
+		if (item->respawn_time > p->mob.server->tick_counter) {
+			/* not respawned yet */
+			continue;
+		}
+		/* add the item to the player's view */
+		if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
+				item->id) == -1) {
+			return -1;
+		}
+		offset += 2;
+		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		    (uint8_t)(item->x - (int)p->mob.x)) == -1) {
+			return -1;
+		}
+		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		    (uint8_t)(item->y - (int)p->mob.y)) == -1) {
+			return -1;
+		}
+		new_known[new_known_count++] = nearby[i];
+		update_count++;
+	}
+
+	if (p->known_item_max < new_known_count) {
+		size_t n = new_known_count * 2;
+		if (n < 64) {
+			n = 64;
+		}
+		if (reallocarr(&p->known_items, n,
+		    sizeof(struct ground_item)) == -1) {
+			return -1;
+		}
+		p->known_item_max = n;
+	}
+
+	printf("known items %zu new count %zu nearby %zu updates  %zu\n",
+	    p->known_item_count, new_known_count, nearby_count, update_count);
+
+	memcpy(p->known_items, new_known,
+	    new_known_count * sizeof(struct ground_item));
+	p->known_item_count = new_known_count;
 
 	if (update_count == 0) {
 		/* nothing to inform client */

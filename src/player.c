@@ -1317,51 +1317,6 @@ player_add_known_bound(struct player *p, struct bound *bound)
 		bound, sizeof(struct bound));
 }
 
-bool
-player_has_known_zone(struct player *p, int x, int y)
-{
-	for (int i = 0; i < MAX_KNOWN_ZONES; ++i) {
-		if (p->known_zones[i] == NULL) {
-			continue;
-		}
-		if (p->known_zones[i]->x == x &&
-		    p->known_zones[i]->y == y) {
-			return true;
-		}
-	}
-	return false;
-}
-
-void
-player_update_known_zones(struct player *p)
-{
-	size_t count = 0;
-	struct zone *orig;
-	struct zone *zone;
-
-	memset(p->known_zones, 0, sizeof(p->known_zones));
-
-	orig = server_find_zone(p->mob.x, p->mob.y);
-	if (orig != NULL) {
-		p->known_zones[count++] = orig;
-	} else {
-		return;
-	}
-
-	for (int x = -3; x < 4; ++x) {
-		for (int y = -3; y < 4; ++y) {
-			if (x == 0 && y == 0) {
-				continue;
-			}
-			zone = server_get_zone(orig->x + x, orig->y + y,
-			    orig->plane);
-			if (zone != NULL) {
-				p->known_zones[count++] = zone;
-			}
-		}
-	}
-}
-
 void
 player_clear_actions(struct player *p)
 {
@@ -1412,31 +1367,4 @@ player_has_known_item(struct player *p, uint64_t unique_id)
 		}
 	}
 	return false;
-}
-
-void
-player_add_known_item(struct player *p, struct ground_item *item)
-{
-	if (p->known_item_count >= p->known_item_max) {
-		size_t n = p->known_item_max * 2;
-		if (n == 0) {
-			n = 64;
-		}
-		if (reallocarr(&p->known_items,
-		    n, sizeof(struct ground_item)) == -1) {
-			return;
-		}
-		p->known_item_max = n;
-	}
-	memcpy(&p->known_items[p->known_item_count++],
-		item, sizeof(struct ground_item));
-}
-
-void
-player_remove_known_item(struct player *p, size_t index)
-{
-	p->known_item_count--;
-	for (size_t i = index; i < p->known_item_count; ++i) {
-		p->known_items[i] = p->known_items[i + 1];
-	}
 }

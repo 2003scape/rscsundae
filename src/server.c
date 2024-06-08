@@ -295,7 +295,6 @@ server_tick(void)
 		s.players[i]->mob.damage = UINT8_MAX;
 		s.players[i]->mob.prev_dir = s.players[i]->mob.dir;
 		s.players[i]->last_update = s.tick_counter;
-		player_update_known_zones(s.players[i]);
 	}
 
 	s.tick_counter++;
