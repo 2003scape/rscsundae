@@ -534,7 +534,7 @@ load_map_tile(struct jag_map *chunk,
 		item.respawn = true;
 		item.creation_time = 0;
 		item.respawn_time = 0;
-		server_add_ground_item(&item);
+		server_add_item_respawn(&item);
 	} else if (object_type > JAG_MAP_DIAG_NPC) {
 		server_add_npc(object_type - JAG_MAP_DIAG_NPC - 1,
 		    global_x, global_y);

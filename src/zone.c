@@ -169,7 +169,7 @@ server_find_ground_item(int x, int y, int id)
 }
 
 void
-server_add_ground_item(struct ground_item *item)
+server_add_item_respawn(struct ground_item *item)
 {
 	struct zone *zone;
 
