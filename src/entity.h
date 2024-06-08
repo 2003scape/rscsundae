@@ -232,6 +232,7 @@ struct player {
 	size_t known_item_count;
 	size_t known_item_max;
 	struct ground_item *take_item;
+	uint16_t drop_slot;
 	uint64_t last_update;
 	struct projectile_config *projectile;
 	uint16_t projectile_sprite;
@@ -254,7 +255,8 @@ struct player *player_accept(struct server *, int);
 void player_process_walk_queue(struct player *);
 void player_process_combat(struct player *);
 void player_process_take_item(struct player *);
-void player_die(struct player *);
+void player_process_drop_item(struct player *);
+void player_die(struct player *, struct player *p);
 void player_close_ui(struct player *);
 void player_destroy(struct player *);
 void player_recalculate_sprites(struct player *);

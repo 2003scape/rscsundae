@@ -56,6 +56,7 @@ struct loc_config *server_loc_config_by_id(int);
 struct bound_config *server_bound_config_by_id(int);
 struct projectile_config *server_find_projectile(const char *);
 int server_add_npc(int, int, int);
-int server_add_temp_item(struct player *, int, int, int);
+int server_add_temp_item(struct player *, int, int, int, uint32_t);
+void server_remove_temp_item(uint64_t);
 
 #endif

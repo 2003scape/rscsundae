@@ -370,6 +370,19 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			player_unwear(p, slot);
 		}
 		break;
+	case OP_CLI_ITEM_DROP:
+		{
+			uint16_t slot;
+
+			if (buf_getu16(data, offset, len, &slot) == -1) {
+				return;
+			}
+			offset += 2;
+			if (slot < p->inv_count) {
+				p->drop_slot = slot;
+			}
+		}
+		break;
 	case OP_CLI_ITEM_TAKE:
 		{
 			uint16_t x, y, id;

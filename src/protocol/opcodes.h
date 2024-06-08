@@ -27,6 +27,7 @@
 #define OP_CLI_ACCEPT_DESIGN	(236)
 #define OP_CLI_INV_UNWEAR	(248)
 #define OP_CLI_INV_WEAR		(249)
+#define OP_CLI_ITEM_DROP	(251)
 #define OP_CLI_ITEM_TAKE	(252)
 #define OP_CLI_WALK_TILE	(255)
 

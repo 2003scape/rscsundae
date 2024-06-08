@@ -152,6 +152,7 @@ player_accept(struct server *s, int sock)
 	p->following_player = -1;
 	p->trading_player = -1;
 	p->projectile_sprite = UINT16_MAX;
+	p->drop_slot = UINT16_MAX;
 	p->last_packet = s->tick_counter;
 
 	player_recalculate_combat_level(p);
@@ -521,7 +522,7 @@ player_pvp_attack(struct player *attacker, struct player *target)
 }
 
 void
-player_die(struct player *p)
+player_die(struct player *p, struct player *victor)
 {
 	struct item_config *item;
 	int kept_max = 3;
@@ -563,13 +564,16 @@ player_die(struct player *p)
 			break;
 		}
 		item = server_item_config_by_id(p->inventory[slot].id);
-		/* TODO: should drop items on ground */
 		if (item->weight == 0) {
 			player_inv_remove(p, item,
 			    p->inventory[slot].stack);
+			server_add_temp_item(victor,
+			    p->mob.x, p->mob.y, item->id,
+				p->inventory[slot].stack);
 		} else {
 			player_inv_remove(p, item, 1);
-			printf("removed %s value %d\n", item->names[0], item->value);
+			server_add_temp_item(victor,
+			    p->mob.x, p->mob.y, item->id, 1);
 		}
 	}
 
@@ -656,7 +660,7 @@ player_process_ranged_pvp(struct player *p, struct player *target)
 		char name[32], msg[64];
 
 		p->mob.target_player = -1;
-		player_die(target);
+		player_die(target, p);
 		mod37_namedec(target->name, name);
 		(void)snprintf(msg, sizeof(msg),
 		    "You have defeated %s!", name);
@@ -832,7 +836,7 @@ player_process_combat(struct player *p)
 
 			mob_combat_reset(&p->mob);
 			player_award_combat_xp(p, &target->mob);
-			player_die(target);
+			player_die(target, p);
 			mod37_namedec(target->name, name);
 			(void)snprintf(msg, sizeof(msg),
 			    "You have defeated %s!", name);
@@ -1332,6 +1336,9 @@ player_process_take_item(struct player *p)
 	struct ground_item *item;
 	struct item_config *config;
 
+	if (p->take_item == NULL) {
+		return;
+	}
 	item = server_find_ground_item(p, p->take_item->x, p->take_item->y,
 	    p->take_item->id);
 	config = server_item_config_by_id(p->take_item->id);
@@ -1344,12 +1351,12 @@ player_process_take_item(struct player *p)
 		/* not reached it yet */
 		return;
 	}
-	player_inv_give(p, config, 1);
+	player_inv_give(p, config, item->stack);
 	if (item->respawn) {
 		item->respawn_time = p->mob.server->tick_counter +
 		    (config->respawn_rate / 5);
 	} else {
-		/* TODO implement */
+		server_remove_temp_item(item->unique_id);
 	}
 	p->take_item = NULL;
 }
@@ -1440,4 +1447,27 @@ player_get_nearby_items(struct player *p,
 	}
 
 	return count;
+}
+
+void
+player_process_drop_item(struct player *p)
+{
+	struct invitem item;
+	struct item_config *config;
+
+	if (p->drop_slot == UINT16_MAX || p->drop_slot >= p->inv_count) {
+		p->drop_slot = UINT16_MAX;
+		return;
+	}
+
+	if (p->moved) {
+		return;
+	}
+
+	item = p->inventory[p->drop_slot];
+	config = server_item_config_by_id(item.id);
+	assert(config != NULL);
+	player_inv_remove(p, config, item.stack);
+	server_add_temp_item(p, p->mob.x, p->mob.y, item.id, item.stack);
+	p->drop_slot = UINT16_MAX;
 }

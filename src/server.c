@@ -207,6 +207,17 @@ server_tick(void)
 		}
 	}
 
+	/* remove stale temporary ground items */
+	for (size_t i = 0; i < s.temp_item_count; ++i) {
+		if (s.tick_counter < (s.temp_items[i].creation_time + 200)) {
+			continue;
+		}
+		s.temp_item_count--;
+		for (size_t j = i; j < s.temp_item_count; ++j) {
+			s.temp_items[j] = s.temp_items[j + 1];
+		}
+	}
+
 	for (int i = 0; i < s.max_player_id; ++i) {
 		if (s.players[i] == NULL) {
 			continue;
@@ -224,13 +235,12 @@ server_tick(void)
 			s.players[i] = NULL;
 			continue;
 		}
-		if (s.players[i]->take_item != NULL) {
-			player_process_take_item(s.players[i]);
-		}
+		player_process_take_item(s.players[i]);
 		net_player_recv(s.players[i]);
 		player_parse_incoming(s.players[i]);
 		player_process_combat(s.players[i]);
 		player_process_walk_queue(s.players[i]);
+		player_process_drop_item(s.players[i]);
 		if (drain_tick) {
 			player_prayer_drain(s.players[i]);
 		}
@@ -532,6 +542,7 @@ load_map_tile(struct jag_map *chunk,
 		item.x = global_x;
 		item.y = global_y;
 		item.respawn = true;
+		item.stack = 1;
 		item.creation_time = 0;
 		item.respawn_time = 0;
 		server_add_item_respawn(&item);
@@ -739,13 +750,14 @@ server_add_npc(int id, int x, int y)
 }
 
 int
-server_add_temp_item(struct player *owner, int x, int y, int id)
+server_add_temp_item(struct player *owner, int x, int y, int id, uint32_t stack)
 {
 	struct ground_item item = {0};
 
 	item.id = id;
 	item.x = x;
 	item.y = y;
+	item.stack = stack;
 	item.owner = owner->mob.id;
 	item.creation_time = s.tick_counter;
 	item.unique_id = s.ground_item_counter++;
@@ -764,4 +776,18 @@ server_add_temp_item(struct player *owner, int x, int y, int id)
 
 	s.temp_items[s.temp_item_count++] = item;
 	return 0;
+}
+
+void
+server_remove_temp_item(uint64_t unique_id)
+{
+	for (size_t i = 0; i < s.temp_item_count; ++i) {
+		if (s.temp_items[i].unique_id != unique_id) {
+			continue;
+		}
+		s.temp_item_count--;
+		for (size_t j = i; j < s.temp_item_count; ++j) {
+			s.temp_items[j] = s.temp_items[j + 1];
+		}
+	}
 }
