@@ -1257,9 +1257,8 @@ player_send_ground_items(struct player *p)
 		    abs(zone->y - (int)origin->y) > 3) {
 			out_of_range = true;
 		}
-		if (item == NULL ||
-		    item->respawn_time > p->mob.server->tick_counter ||
-		    out_of_range) {
+		if (item == NULL || out_of_range ||
+		    !player_can_see_item(p, item)) {
 			/* remove the item from the player's view */
 			if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
 					item->id | 0x8000) == -1) {
@@ -1287,8 +1286,7 @@ player_send_ground_items(struct player *p)
 		if (player_has_known_item(p, item->unique_id)) {
 			continue;
 		}
-		if (item->respawn_time > p->mob.server->tick_counter) {
-			/* not respawned yet */
+		if (!player_can_see_item(p, item)) {
 			continue;
 		}
 		/* add the item to the player's view */

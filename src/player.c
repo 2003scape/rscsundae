@@ -1335,16 +1335,13 @@ player_process_take_item(struct player *p)
 	item = server_find_ground_item(p->take_item->x, p->take_item->y,
 	    p->take_item->id);
 	config = server_item_config_by_id(p->take_item->id);
-	if (item == NULL || config == NULL || p->inv_count >= MAX_INV_SIZE) {
+	if (item == NULL || config == NULL || p->inv_count >= MAX_INV_SIZE ||
+	    !player_can_see_item(p, item)) {
 		p->take_item = NULL;
 		return;
 	}
 	if (p->mob.x != item->x || p->mob.y != item->y) {
 		/* not reached it yet */
-		return;
-	}
-	if (item->respawn_time > p->mob.server->tick_counter) {
-		/* not respawned yet */
 		return;
 	}
 	player_inv_give(p, config, 1);
@@ -1354,8 +1351,22 @@ player_process_take_item(struct player *p)
 	} else {
 		/* TODO implement */
 	}
-	item->creation_time = p->mob.server->tick_counter;
 	p->take_item = NULL;
+}
+
+bool
+player_can_see_item(struct player *p, struct ground_item *item)
+{
+	if (item->respawn_time > p->mob.server->tick_counter) {
+		return false;
+	}
+	if (p->mob.id == item->owner) {
+		return true;
+	}
+	if (p->mob.server->tick_counter > (item->creation_time + 100)) {
+		return true;
+	}
+	return item->respawn;
 }
 
 bool

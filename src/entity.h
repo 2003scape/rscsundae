@@ -285,6 +285,7 @@ void player_remove_known_loc(struct player *, size_t);
 bool player_has_known_bound(struct player *, int, int, int);
 void player_add_known_bound(struct player *, struct bound *);
 bool player_has_known_item(struct player *, uint64_t);
+bool player_can_see_item(struct player *, struct ground_item *);
 void player_clear_actions(struct player *);
 void player_trade_request(struct player *, uint16_t);
 
