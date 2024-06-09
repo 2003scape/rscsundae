@@ -103,7 +103,7 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__rscsundae_SOURCES_DIST = buffer.c mob.c netio.c player.c \
-	inventory.c server.c stat.c trade.c utility.c zone.c \
+	inventory.c script.c server.c stat.c trade.c utility.c zone.c \
 	config/config.c config/text.c ext/flea.c \
 	ext/libjag/lib/jag_bzip2_decompress.c \
 	ext/libjag/lib/jag_find_entry.c \
@@ -120,10 +120,10 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @KQUEUE_FALSE@@LIBEV_TRUE@am__objects_2 = loop-ev.$(OBJEXT)
 @KQUEUE_FALSE@@LIBEV_FALSE@am__objects_3 = loop-poll.$(OBJEXT)
 am_rscsundae_OBJECTS = buffer.$(OBJEXT) mob.$(OBJEXT) netio.$(OBJEXT) \
-	player.$(OBJEXT) inventory.$(OBJEXT) server.$(OBJEXT) \
-	stat.$(OBJEXT) trade.$(OBJEXT) utility.$(OBJEXT) \
-	zone.$(OBJEXT) config/config.$(OBJEXT) config/text.$(OBJEXT) \
-	ext/flea.$(OBJEXT) \
+	player.$(OBJEXT) inventory.$(OBJEXT) script.$(OBJEXT) \
+	server.$(OBJEXT) stat.$(OBJEXT) trade.$(OBJEXT) \
+	utility.$(OBJEXT) zone.$(OBJEXT) config/config.$(OBJEXT) \
+	config/text.$(OBJEXT) ext/flea.$(OBJEXT) \
 	ext/libjag/lib/jag_bzip2_decompress.$(OBJEXT) \
 	ext/libjag/lib/jag_find_entry.$(OBJEXT) \
 	ext/libjag/lib/jag_hash_entry_name.$(OBJEXT) \
@@ -136,7 +136,8 @@ am_rscsundae_OBJECTS = buffer.$(OBJEXT) mob.$(OBJEXT) netio.$(OBJEXT) \
 	protocol/outgoing.$(OBJEXT) $(am__objects_1) $(am__objects_2) \
 	$(am__objects_3)
 rscsundae_OBJECTS = $(am_rscsundae_OBJECTS)
-rscsundae_DEPENDENCIES =
+am__DEPENDENCIES_1 =
+rscsundae_DEPENDENCIES = $(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -156,7 +157,8 @@ am__depfiles_remade = ./$(DEPDIR)/buffer.Po ./$(DEPDIR)/inventory.Po \
 	./$(DEPDIR)/loop-ev.Po ./$(DEPDIR)/loop-kqueue.Po \
 	./$(DEPDIR)/loop-poll.Po ./$(DEPDIR)/mob.Po \
 	./$(DEPDIR)/netio.Po ./$(DEPDIR)/player.Po \
-	./$(DEPDIR)/server.Po ./$(DEPDIR)/stat.Po ./$(DEPDIR)/trade.Po \
+	./$(DEPDIR)/script.Po ./$(DEPDIR)/server.Po \
+	./$(DEPDIR)/stat.Po ./$(DEPDIR)/trade.Po \
 	./$(DEPDIR)/utility.Po ./$(DEPDIR)/zone.Po \
 	config/$(DEPDIR)/config.Po config/$(DEPDIR)/text.Po \
 	ext/$(DEPDIR)/flea.Po ext/$(DEPDIR)/reallocarr.Po \
@@ -229,6 +231,7 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 ETAGS = @ETAGS@
 EXEEXT = @EXEEXT@
+GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -238,6 +241,14 @@ LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LTLIBOBJS = @LTLIBOBJS@
+LUA = @LUA@
+LUA_EXEC_PREFIX = @LUA_EXEC_PREFIX@
+LUA_INCLUDE = @LUA_INCLUDE@
+LUA_LIB = @LUA_LIB@
+LUA_PLATFORM = @LUA_PLATFORM@
+LUA_PREFIX = @LUA_PREFIX@
+LUA_SHORT_VERSION = @LUA_SHORT_VERSION@
+LUA_VERSION = @LUA_VERSION@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
 OBJEXT = @OBJEXT@
@@ -249,6 +260,7 @@ PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -280,10 +292,14 @@ libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
+luadir = @luadir@
+luaexecdir = @luaexecdir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
+pkgluadir = @pkgluadir@
+pkgluaexecdir = @pkgluaexecdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
@@ -299,8 +315,9 @@ top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = subdir-objects
 AM_CPPFLAGS = -Iext/libjag/include
 rscsundae_SOURCES = buffer.c mob.c netio.c player.c inventory.c \
-	server.c stat.c trade.c utility.c zone.c config/config.c \
-	config/text.c ext/flea.c ext/libjag/lib/jag_bzip2_decompress.c \
+	script.c server.c stat.c trade.c utility.c zone.c \
+	config/config.c config/text.c ext/flea.c \
+	ext/libjag/lib/jag_bzip2_decompress.c \
 	ext/libjag/lib/jag_find_entry.c \
 	ext/libjag/lib/jag_hash_entry_name.c \
 	ext/libjag/lib/jag_map_read_jm.c \
@@ -310,7 +327,7 @@ rscsundae_SOURCES = buffer.c mob.c netio.c player.c inventory.c \
 	ext/libjag/lib/jag_unpack_file.c ext/reallocarr.c \
 	protocol/incoming.c protocol/outgoing.c $(am__append_1) \
 	$(am__append_2) $(am__append_3)
-rscsundae_LDADD = $(libev_LIBS) -lm
+rscsundae_LDADD = $(libev_LIBS) $(LUA_LIB) -lm
 all: all-am
 
 .SUFFIXES:
@@ -468,6 +485,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mob.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/netio.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/player.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/script.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stat.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/trade.Po@am__quote@ # am--include-marker
@@ -652,6 +670,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/mob.Po
 	-rm -f ./$(DEPDIR)/netio.Po
 	-rm -f ./$(DEPDIR)/player.Po
+	-rm -f ./$(DEPDIR)/script.Po
 	-rm -f ./$(DEPDIR)/server.Po
 	-rm -f ./$(DEPDIR)/stat.Po
 	-rm -f ./$(DEPDIR)/trade.Po
@@ -724,6 +743,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/mob.Po
 	-rm -f ./$(DEPDIR)/netio.Po
 	-rm -f ./$(DEPDIR)/player.Po
+	-rm -f ./$(DEPDIR)/script.Po
 	-rm -f ./$(DEPDIR)/server.Po
 	-rm -f ./$(DEPDIR)/stat.Po
 	-rm -f ./$(DEPDIR)/trade.Po
