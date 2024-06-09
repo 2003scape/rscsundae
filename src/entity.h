@@ -36,6 +36,11 @@ struct bound;
 struct loc;
 struct ground_item;
 
+enum action {
+	ACTION_NONE		= 0,
+	ACTION_NPC_TALK		= 1
+};
+
 enum trade_state {
 	TRADE_STATE_NONE	= 0,
 	TRADE_STATE_ACCEPTED	= 1,
@@ -237,6 +242,8 @@ struct player {
 	struct projectile_config *projectile;
 	uint16_t projectile_sprite;
 	uint16_t projectile_target_player;
+	uint8_t action;
+	uint16_t target_npc;
 };
 
 /* mob.c */
@@ -289,6 +296,7 @@ bool player_has_known_item(struct player *, uint64_t);
 bool player_can_see_item(struct player *, struct ground_item *);
 size_t player_get_nearby_items(struct player *, struct ground_item *, size_t);
 void player_clear_actions(struct player *);
+void player_process_action(struct player *);
 void player_trade_request(struct player *, uint16_t);
 
 /* incoming.c */

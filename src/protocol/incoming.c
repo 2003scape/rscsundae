@@ -348,6 +348,24 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			}
 		}
 		break;
+	case OP_CLI_NPC_TALK:
+		{
+			uint16_t id;
+			struct npc *npc;
+
+			if (buf_getu16(data, offset, len, &id) == -1) {
+				return;
+			}
+			if (id >= MAXNPCS) {
+				return;
+			}
+			npc = p->mob.server->npcs[id];
+			if (npc != NULL) {
+				p->action = ACTION_NPC_TALK;
+				p->target_npc = npc->mob.id;
+			}
+		}
+		break;
 	case OP_CLI_INV_WEAR:
 		{
 			uint16_t slot;

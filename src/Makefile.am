@@ -10,6 +10,7 @@ rscsundae_SOURCES = \
 	netio.c \
 	player.c \
 	inventory.c \
+	script.c \
 	server.c \
 	stat.c \
 	trade.c \
@@ -40,4 +41,4 @@ rscsundae_SOURCES += loop-poll.c
 endif
 endif
 
-rscsundae_LDADD = $(libev_LIBS) -lm
+rscsundae_LDADD = $(libev_LIBS) $(LUA_LIB) -lm

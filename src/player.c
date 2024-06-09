@@ -12,6 +12,7 @@
 #include "entity.h"
 #include "loop.h"
 #include "netio.h"
+#include "script.h"
 #include "stat.h"
 #include "utility.h"
 #include "zone.h"
@@ -1328,6 +1329,7 @@ player_add_known_bound(struct player *p, struct bound *bound)
 void
 player_clear_actions(struct player *p)
 {
+	p->action = ACTION_NONE;
 	p->take_item = NULL;
 	p->following_player = -1;
 	p->trading_player = -1;
@@ -1472,4 +1474,26 @@ player_process_drop_item(struct player *p)
 	player_inv_remove(p, config, item.stack);
 	server_add_temp_item(p, p->mob.x, p->mob.y, item.id, item.stack);
 	p->drop_slot = UINT16_MAX;
+}
+
+void
+player_process_action(struct player *p)
+{
+	struct npc *npc;
+
+	switch (p->action) {
+	case ACTION_NPC_TALK:
+		npc = p->mob.server->npcs[p->target_npc];
+		if (npc == NULL) {
+			p->action = ACTION_NONE;
+			return;
+		}
+		if (!mob_within_range(&p->mob, npc->mob.x, npc->mob.y, 1)) {
+			return;
+		}
+		p->walk_queue_len = 0;
+		p->walk_queue_pos = 0;
+		script_onnpctalk(p->mob.server->lua, p, npc);
+		break;
+	}
 }

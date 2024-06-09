@@ -19,6 +19,9 @@ AC_CHECK_HEADERS([sys/time.h])
 AC_CHECK_HEADERS([sys/timerfd.h])
 AC_CHECK_HEADERS([bzlib.h])
 AC_SEARCH_LIBS([BZ2_bzDecompressInit], [bz2])
+AX_PROG_LUA([5.4])
+AX_LUA_HEADERS
+AX_LUA_LIBS
 AM_SILENT_RULES([yes])
 
 AC_ARG_WITH([kqueue], 

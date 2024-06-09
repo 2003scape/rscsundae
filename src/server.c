@@ -11,6 +11,7 @@
 #include "loop.h"
 #include "netio.h"
 #include "entity.h"
+#include "script.h"
 #include "stat.h"
 #include "utility.h"
 #include "zone.h"
@@ -53,6 +54,12 @@ main(int argc, char **argv)
 	raninit(&s.ran, time(NULL));
 
 	stat_calculate_table();
+
+	s.lua = script_init(&s);
+	if (s.lua == NULL) {
+		fprintf(stderr, "failed to start script engine\n");
+		return EXIT_FAILURE;
+	}
 
 	if (load_config_jag() == -1) {
 		fprintf(stderr, "error reading config.jag\n");
@@ -237,6 +244,8 @@ server_tick(void)
 		}
 		player_process_take_item(s.players[i]);
 		player_process_drop_item(s.players[i]);
+		player_process_action(s.players[i]);
+		script_process(s.lua, s.players[i]);
 		net_player_recv(s.players[i]);
 		player_parse_incoming(s.players[i]);
 		player_process_combat(s.players[i]);

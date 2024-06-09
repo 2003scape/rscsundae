@@ -1,5 +1,6 @@
 #ifndef SERVER_H
 #define SERVER_H
+#include <lua.h>
 #include "config/config.h"
 #include "ext/flea.h"
 #include "entity.h"
@@ -39,6 +40,7 @@ struct server {
 	uint16_t start_tile_x;
 	uint16_t start_tile_y;
 	int xp_multiplier;
+	lua_State *lua;
 };
 
 void server_tick(void);
