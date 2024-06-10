@@ -22,7 +22,6 @@ static int script_statup(lua_State *);
 static int script_statdown(lua_State *);
 static int script_thinkbubble(lua_State *);
 static int script_default_talk(lua_State *);
-static int script_default_action(lua_State *);
 
 static int
 script_say(lua_State *L)
@@ -280,9 +279,9 @@ script_give(lua_State *L)
 static int
 script_remove(lua_State *L)
 {
+	const char *item_name;
 	lua_Integer amount;
 	lua_Integer player_id;
-	const char *item_name;
 	struct player *p;
 	struct item_config *item;
 
@@ -319,16 +318,6 @@ script_default_talk(lua_State *L)
 
 	/* TODO */
 	puts("The avocado does not appear interested in talking");
-	return 0;
-}
-
-static int
-script_default_action(lua_State *L)
-{
-	(void)L;
-
-	/* TODO: player_send_message */
-	puts("Nothing interesting happens");
 	return 0;
 }
 
@@ -457,9 +446,6 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_default_talk);
 	lua_setglobal(L, "_default_talk");
-
-	lua_pushcfunction(L, script_default_action);
-	lua_setglobal(L, "_default_action");
 
 	/* TODO: configurable path */
 	if (luaL_dofile(L, "./data/lua/script.lua") != LUA_OK) {

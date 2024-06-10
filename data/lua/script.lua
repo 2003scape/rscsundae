@@ -74,7 +74,7 @@ function script_engine_onuseobj(player, name)
 		end)
 		player_scripts[player] = ps
 	else
-		_default_action(player, npc)
+		mes(player, "Nothing interesting happens")
 	end
 end
 
