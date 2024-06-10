@@ -100,9 +100,3 @@ function eat_bread(player)
 end
 
 register_useobj("bread", eat_bread)
-
-function eat_stew(player)
-	eat_simple(player, "stew", 9)
-end
-
-register_useobj("stew", eat_stew)
