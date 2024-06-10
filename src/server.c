@@ -271,11 +271,11 @@ server_tick(void)
 		if (s.players[i]->plane_changed) {
 			player_send_plane_init(s.players[i]);
 		}
-		if (s.players[i]->stats_changed) {
-			player_send_init_stats(s.players[i]);
-		}
 		if (s.players[i]->inv_changed) {
 			player_send_inv(s.players[i]);
+		}
+		if (s.players[i]->stats_changed) {
+			player_send_init_stats(s.players[i]);
 		}
 		if (s.players[i]->bonus_changed) {
 			player_send_equip_bonuses(s.players[i]);
@@ -287,10 +287,10 @@ server_tick(void)
 			player_send_partner_trade_offer(s.players[i]);
 		}
 		player_send_movement(s.players[i]);
-		player_send_npc_movement(s.players[i]);
 		player_send_appearance_update(s.players[i]);
-		player_send_ground_items(s.players[i]);
+		player_send_npc_movement(s.players[i]);
 		player_send_locs(s.players[i]);
+		player_send_ground_items(s.players[i]);
 		player_send_bounds(s.players[i]);
 		net_player_send(s.players[i]);
 	}
