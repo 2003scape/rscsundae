@@ -128,10 +128,10 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 
 			p->name = name;
 
+			player_send_privacy_settings(p);
 			player_send_design_ui(p);
 			player_send_message(p, "@que@Welcome to RSCSundae!");
 			player_send_client_settings(p);
-			player_send_privacy_settings(p);
 			player_send_init_friends(p);
 			player_send_init_ignore(p);
 
