@@ -56,7 +56,7 @@ function man1_talknpc(player, npc)
 	elseif random(12) then
 		npcsay(npc, "Not too bad")
 	elseif random(12) then
-		mes(player, "The man ignores you")
+		mes(player, "@que@The man ignores you")
 	elseif random(12) then
 		npcsay(npc, "None of your business")
 	elseif random(12) then
