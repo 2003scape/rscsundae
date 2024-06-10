@@ -8,6 +8,8 @@
 void
 player_inv_give(struct player *p, struct item_config *item, uint32_t count)
 {
+	assert(p != NULL);
+	assert(item != NULL);
 	if (item->weight == 0) {
 		/* if weightless, find an existing stack */
 		for (int i = 0; i < p->inv_count; ++i) {
@@ -51,6 +53,9 @@ player_inv_remove(struct player *p, struct item_config *item, uint32_t count)
 {
 	uint32_t removed = 0;
 
+	assert(p != NULL);
+	assert(item != NULL);
+
 	if (item->weight == 0) {
 		for (int i = 0; i < p->inv_count; ++i) {
 			if (p->inventory[i].id != item->id) {
@@ -86,6 +91,9 @@ player_inv_held(struct player *p, struct item_config *item, uint32_t count)
 {
 	uint32_t found = 0;
 
+	assert(p != NULL);
+	assert(item != NULL);
+
 	for (int i = 0; i < p->inv_count; ++i) {
 		if (p->inventory[i].id == item->id) {
 			if (item->weight == 0) {
@@ -101,6 +109,9 @@ player_inv_held(struct player *p, struct item_config *item, uint32_t count)
 bool
 player_inv_worn(struct player *p, struct item_config *item)
 {
+	assert(p != NULL);
+	assert(item != NULL);
+
 	for (int i = 0; i < p->inv_count; ++i) {
 		if (p->inventory[i].id != item->id) {
 			continue;
@@ -114,6 +125,8 @@ player_inv_worn(struct player *p, struct item_config *item)
 int
 player_inv_clear(struct player *p)
 {
+	assert(p != NULL);
+
 	p->inv_count = 0;
 	p->inv_changed = true;
 	return 0;
