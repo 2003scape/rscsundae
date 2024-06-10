@@ -31,5 +31,6 @@ RSC Sundae will never support:
 Resources:
 
 * https://github.com/2003scape/rsc-c
-* https://classic.runescape.wiki/w/User:Stormykins/135_Protocol
+* https://web.archive.org/web/20011122124112/http://www.jagex.com/manual/index.html
 * https://web.archive.org/web/20080907105147/http://gowerarchive.googlepages.com/documents#Runescript
+* https://classic.runescape.wiki/w/User:Stormykins/135_Protocol

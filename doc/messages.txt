@@ -29,6 +29,9 @@ You have run out of prayer points. Return to a church to recharge
 @que@You eat the tuna
 @que@You eat the lobster
 @que@You eat the swordfish
+@que@You eat half of a redberry pie
+@que@You eat half of a meat pie
+@que@You eat half of an apple pie
 @que@It heals some health
 Your defence ability has returned to normal
 Your strength ability has returned to normal
