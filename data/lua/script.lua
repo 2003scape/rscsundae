@@ -103,5 +103,5 @@ function npcsay(npc, mes)
 	delay(2)
 end
 
-dofile("./src/lua/rs1/npc/man.lua")
-dofile("./src/lua/rs1/skill_prayer/bones.lua")
+dofile("./data/lua/rs1/npc/man.lua")
+dofile("./data/lua/rs1/skill_prayer/bones.lua")
