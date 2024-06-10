@@ -23,6 +23,17 @@ static int script_statup(lua_State *);
 static int script_statdown(lua_State *);
 static int script_thinkbubble(lua_State *);
 static int script_default_talk(lua_State *);
+static struct player *id_to_player(lua_Integer);
+
+static struct player *
+id_to_player(lua_Integer id)
+{
+	if (id < 0 || id >= MAXPLAYERS) {
+		printf("script warning: player id %ld out of range\n", id);
+		return NULL;
+	}
+	return serv->players[id];
+}
 
 static int
 script_say(lua_State *L)
@@ -80,11 +91,7 @@ script_mes(lua_State *L)
 
 	player_id = luaL_checkinteger(L, 1);
 	mes = luaL_checkstring(L, 2);
-	if (player_id < 0 || player_id >= MAXPLAYERS) {
-		printf("script warning: played id %ld out of range\n", player_id);
-		return 0;
-	}
-	p = serv->players[player_id];
+	p = id_to_player(player_id);
 	if (p == NULL) {
 		/* TODO should cancel script here */
 		printf("script warning: player %ld is undefined\n", player_id);
@@ -105,11 +112,7 @@ script_advancestat(lua_State *L)
 	stat = luaL_checkinteger(L, 2);
 	base = luaL_checkinteger(L, 3);
 	exp = luaL_checkinteger(L, 4);
-	if (player_id < 0 || player_id >= MAXPLAYERS) {
-		printf("script warning: player id %ld out of range\n", player_id);
-		return 0;
-	}
-	p = serv->players[player_id];
+	p = id_to_player(player_id);
 	if (p == NULL) {
 		/* TODO should cancel script here */
 		printf("script warning: player %ld is undefined\n", player_id);
@@ -135,11 +138,7 @@ script_healstat(lua_State *L)
 	stat = luaL_checkinteger(L, 2);
 	constant = luaL_checkinteger(L, 3);
 	percent = luaL_checkinteger(L, 4);
-	if (player_id < 0 || player_id >= MAXPLAYERS) {
-		printf("script warning: player id %ld out of range\n", player_id);
-		return 0;
-	}
-	p = serv->players[player_id];
+	p = id_to_player(player_id);
 	if (p == NULL) {
 		/* TODO should cancel script here */
 		printf("script warning: player %ld is undefined\n", player_id);
@@ -166,11 +165,7 @@ script_addstat(lua_State *L)
 	stat = luaL_checkinteger(L, 2);
 	constant = luaL_checkinteger(L, 3);
 	percent = luaL_checkinteger(L, 4);
-	if (player_id < 0 || player_id >= MAXPLAYERS) {
-		printf("script warning: player id %ld out of range\n", player_id);
-		return 0;
-	}
-	p = serv->players[player_id];
+	p = id_to_player(player_id);
 	if (p == NULL) {
 		/* TODO should cancel script here */
 		printf("script warning: player %ld is undefined\n", player_id);
@@ -195,11 +190,7 @@ script_statup(lua_State *L)
 
 	player_id = luaL_checkinteger(L, 1);
 	stat = luaL_checkinteger(L, 2);
-	if (player_id < 0 || player_id >= MAXPLAYERS) {
-		printf("script warning: player id %ld out of range\n", player_id);
-		return 0;
-	}
-	p = serv->players[player_id];
+	p = id_to_player(player_id);
 	if (p == NULL) {
 		/* TODO should cancel script here */
 		printf("script warning: player %ld is undefined\n", player_id);
@@ -224,11 +215,7 @@ script_statdown(lua_State *L)
 
 	player_id = luaL_checkinteger(L, 1);
 	stat = luaL_checkinteger(L, 2);
-	if (player_id < 0 || player_id >= MAXPLAYERS) {
-		printf("script warning: player id %ld out of range\n", player_id);
-		return 0;
-	}
-	p = serv->players[player_id];
+	p = id_to_player(player_id);
 	if (p == NULL) {
 		/* TODO should cancel script here */
 		printf("script warning: player %ld is undefined\n", player_id);
@@ -255,11 +242,7 @@ script_substat(lua_State *L)
 	stat = luaL_checkinteger(L, 2);
 	constant = luaL_checkinteger(L, 3);
 	percent = luaL_checkinteger(L, 4);
-	if (player_id < 0 || player_id >= MAXPLAYERS) {
-		printf("script warning: player id %ld out of range\n", player_id);
-		return 0;
-	}
-	p = serv->players[player_id];
+	p = id_to_player(player_id);
 	if (p == NULL) {
 		/* TODO should cancel script here */
 		printf("script warning: player %ld is undefined\n", player_id);
@@ -288,11 +271,7 @@ script_give(lua_State *L)
 	item_name = luaL_checkstring(L, 2);
 	amount = luaL_checkinteger(L, 3);
 
-	if (player_id < 0 || player_id >= MAXPLAYERS) {
-		printf("script warning: played id %ld out of range\n", player_id);
-		return 0;
-	}
-	p = serv->players[player_id];
+	p = id_to_player(player_id);
 	if (p == NULL) {
 		/* TODO should cancel script here */
 		printf("script warning: player %ld is undefined\n", player_id);
@@ -323,11 +302,7 @@ script_remove(lua_State *L)
 	item_name = luaL_checkstring(L, 2);
 	amount = luaL_checkinteger(L, 3);
 
-	if (player_id < 0 || player_id >= MAXPLAYERS) {
-		printf("script warning: played id %ld out of range\n", player_id);
-		return 0;
-	}
-	p = serv->players[player_id];
+	p = id_to_player(player_id);
 	if (p == NULL) {
 		/* TODO should cancel script here */
 		printf("script warning: player %ld is undefined\n", player_id);
@@ -366,11 +341,7 @@ script_thinkbubble(lua_State *L)
 	player_id = luaL_checkinteger(L, 1);
 	item_name = luaL_checkstring(L, 2);
 
-	if (player_id < 0 || player_id >= MAXPLAYERS) {
-		printf("script warning: played id %ld out of range\n", player_id);
-		return 0;
-	}
-	p = serv->players[player_id];
+	p = id_to_player(player_id);
 	if (p == NULL) {
 		/* TODO should cancel script here */
 		printf("script warning: player %ld is undefined\n", player_id);
