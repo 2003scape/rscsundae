@@ -6,7 +6,7 @@
 -- https://classic.runescape.wiki/w/Asgarnian_Ale
 
 function drink_mindbomb(player)
-	thinkbubble("wizard's mind bomb")
+	thinkbubble(player, "wizard's mind bomb")
 	mes(player, "@que@you drink the Wizard's Mind Bomb")
 	mes(player, "@que@You feel very strange")
 	remove(player, "wizard's mind bomb", 1)
@@ -18,7 +18,7 @@ function drink_mindbomb(player)
 end
 
 function drink_stout(player)
-	thinkbubble("dwarven stout")
+	thinkbubble(player, "dwarven stout")
 	mes(player, "@que@You drink the Dwarven Stout")
 	mes(player, "@que@It tastes foul")
 	delay(1)
@@ -33,7 +33,7 @@ function drink_stout(player)
 end
 
 function drink_ale(player)
-	thinkbubble("asgarnian ale")
+	thinkbubble(player, "asgarnian ale")
 	mes(player, "@que@You drink the Ale")
 	mes(player, "@que@You feel slightly reinvigorated")
 	mes(player, "@que@And slightly dizzy too")

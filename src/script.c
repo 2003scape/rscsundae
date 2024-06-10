@@ -335,8 +335,33 @@ script_default_action(lua_State *L)
 static int
 script_thinkbubble(lua_State *L)
 {
-	(void)L;
-	/* TODO: implement */
+	lua_Integer player_id;
+	const char *item_name;
+	struct player *p;
+	struct item_config *item;
+
+	player_id = luaL_checkinteger(L, 1);
+	item_name = luaL_checkstring(L, 2);
+
+	if (player_id < 0 || player_id >= MAXPLAYERS) {
+		printf("script warning: played id %ld out of range\n", player_id);
+		return 0;
+	}
+	p = serv->players[player_id];
+	if (p == NULL) {
+		/* TODO should cancel script here */
+		printf("script warning: player %ld is undefined\n", player_id);
+		return 0;
+	}
+
+	item = server_find_item_config(item_name);
+	if (item == NULL) {
+		/* TODO should cancel script here */
+		printf("script warning: item %s is undefined\n", item_name);
+		return 0;
+	}
+
+	p->bubble_id = item->id;
 	return 0;
 }
 

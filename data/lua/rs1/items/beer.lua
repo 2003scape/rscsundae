@@ -1,7 +1,7 @@
 -- ./rscplus-replays-master/RSC 2001/replays master archive/Stat effects/Consumable Stat effects/Alcohol/beer- (level 99-99-99 base)
 
 function drink_beer(player)
-	thinkbubble("beer")
+	thinkbubble(player, "beer")
 	mes(player, "@que@You drink the beer")
 	mes(player, "@que@You feel slightly reinvigorated")
 	mes(player, "@que@And slightly dizzy too")

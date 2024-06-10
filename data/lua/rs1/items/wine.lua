@@ -1,7 +1,7 @@
 -- ./rscplus-replays-master/RSC 2001/replays master archive/Stat effects/Consumable Stat effects/Alcohol/jug of wine- (level 1-1-1 base)
 
 function drink_wine(player)
-	thinkbubble("wine")
+	thinkbubble(player, "wine")
 	mes(player, "@que@You drink the wine")
 	mes(player, "@que@It makes you feel a bit dizzy")
 	remove(player, "wine", 1)
