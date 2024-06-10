@@ -112,14 +112,16 @@ These should all be implemented in Lua script:
 - [ ] Banker NPC dialogue
 - [ ] Cook's Guild
 - [ ] Champions' Guild
-- [ ] Alcohol (beers, wizards mind bomb)
-- [ ] Food (fish/meat)
+- [x] Alcohol (beers, wizards mind bomb)
+- [x] Food (fish/meat)
+- [x] Food (cabbage)
+- [ ] Food (bread)
 - [ ] Food (cake)
 - [ ] Food (pizzas)
 - [ ] Food (pies)
 - [ ] Food (stews)
 - [ ] Food (kebab)
-- [ ] Food (spinach roll)
+- [x] Food (spinach roll)
 - [ ] Strength Potions
 - [ ] Dying capes
 - [ ] Mixing dyes
