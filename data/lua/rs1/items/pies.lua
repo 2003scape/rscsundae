@@ -13,6 +13,7 @@ end
 
 function eat_redberry_pie_half(player)
 	remove(player, "half a redberry pie", 1)
+	give(player, "pie dish", 1)
 	mes(player, "@que@You eat half of a redberry pie")
 	if statdown(player, STAT_HITS) then
 		healstat(player, STAT_HITS, 3, 0)
@@ -32,6 +33,7 @@ end
 
 function eat_meat_pie_half(player)
 	remove(player, "half a meat pie", 1)
+	give(player, "pie dish", 1)
 	mes(player, "@que@You eat half of a meat pie")
 	if statdown(player, STAT_HITS) then
 		healstat(player, STAT_HITS, 4, 0)
@@ -51,6 +53,7 @@ end
 
 function eat_apple_pie_half(player)
 	remove(player, "half an apple pie", 1)
+	give(player, "pie dish", 1)
 	mes(player, "@que@You eat half of an apple pie")
 	if statdown(player, STAT_HITS) then
 		healstat(player, STAT_HITS, 5, 0)
