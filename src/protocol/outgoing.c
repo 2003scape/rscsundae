@@ -1321,8 +1321,10 @@ player_send_ground_items(struct player *p)
 		p->known_item_max = n;
 	}
 
+#if 0 /* just for testing efficiency */
 	printf("known items %zu new count %zu nearby %zu updates  %zu\n",
 	    p->known_item_count, new_known_count, nearby_count, update_count);
+#endif
 
 	memcpy(p->known_items, new_known,
 	    new_known_count * sizeof(struct ground_item));
