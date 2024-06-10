@@ -122,7 +122,7 @@ These should all be implemented in Lua script:
 - [ ] Food (stews)
 - [ ] Food (kebab)
 - [x] Food (spinach roll)
-- [ ] Strength Potions
+- [x] Strength Potions
 - [ ] Dying capes
 - [ ] Mixing dyes
 - [ ] Monk of Zamorak wine aggression
