@@ -93,8 +93,8 @@ script_mes(lua_State *L)
 	mes = luaL_checkstring(L, 2);
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		/* TODO should cancel script here */
 		printf("script warning: player %ld is undefined\n", player_id);
+		script_cancel(L, player_id);
 		return 0;
 	}
 	player_send_message(p, mes);
@@ -114,13 +114,13 @@ script_advancestat(lua_State *L)
 	exp = luaL_checkinteger(L, 4);
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		/* TODO should cancel script here */
 		printf("script warning: player %ld is undefined\n", player_id);
+		script_cancel(L, player_id);
 		return 0;
 	}
 	if (stat < 0 || stat >= MAX_SKILL_ID) {
-		/* TODO should cancel script here */
 		printf("script warning: invalid stat id %ld\n", stat);
+		script_cancel(L, player_id);
 		return 0;
 	}
 	stat_advance(p, stat, base, exp);
@@ -140,13 +140,13 @@ script_healstat(lua_State *L)
 	percent = luaL_checkinteger(L, 4);
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		/* TODO should cancel script here */
 		printf("script warning: player %ld is undefined\n", player_id);
+		script_cancel(L, player_id);
 		return 0;
 	}
 	if (stat < 0 || stat >= MAX_SKILL_ID) {
-		/* TODO should cancel script here */
 		printf("script warning: invalid stat id %ld\n", stat);
+		script_cancel(L, player_id);
 		return 0;
 	}
 	stat_heal(&p->mob, stat, constant, percent);
@@ -167,13 +167,13 @@ script_addstat(lua_State *L)
 	percent = luaL_checkinteger(L, 4);
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		/* TODO should cancel script here */
 		printf("script warning: player %ld is undefined\n", player_id);
+		script_cancel(L, player_id);
 		return 0;
 	}
 	if (stat < 0 || stat >= MAX_SKILL_ID) {
-		/* TODO should cancel script here */
 		printf("script warning: invalid stat id %ld\n", stat);
+		script_cancel(L, player_id);
 		return 0;
 	}
 	stat_add(&p->mob, stat, constant, percent);
@@ -192,13 +192,13 @@ script_statup(lua_State *L)
 	stat = luaL_checkinteger(L, 2);
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		/* TODO should cancel script here */
 		printf("script warning: player %ld is undefined\n", player_id);
+		script_cancel(L, player_id);
 		return 0;
 	}
 	if (stat < 0 || stat >= MAX_SKILL_ID) {
-		/* TODO should cancel script here */
 		printf("script warning: invalid stat id %ld\n", stat);
+		script_cancel(L, player_id);
 		return 0;
 	}
 	b = stat_up(&p->mob, stat);
@@ -217,13 +217,13 @@ script_statdown(lua_State *L)
 	stat = luaL_checkinteger(L, 2);
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		/* TODO should cancel script here */
 		printf("script warning: player %ld is undefined\n", player_id);
+		script_cancel(L, player_id);
 		return 0;
 	}
 	if (stat < 0 || stat >= MAX_SKILL_ID) {
-		/* TODO should cancel script here */
 		printf("script warning: invalid stat id %ld\n", stat);
+		script_cancel(L, player_id);
 		return 0;
 	}
 	b = stat_down(&p->mob, stat);
@@ -244,13 +244,13 @@ script_substat(lua_State *L)
 	percent = luaL_checkinteger(L, 4);
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		/* TODO should cancel script here */
 		printf("script warning: player %ld is undefined\n", player_id);
+		script_cancel(L, player_id);
 		return 0;
 	}
 	if (stat < 0 || stat >= MAX_SKILL_ID) {
-		/* TODO should cancel script here */
 		printf("script warning: invalid stat id %ld\n", stat);
+		script_cancel(L, player_id);
 		return 0;
 	}
 	stat_remove(&p->mob, stat, constant, percent);
@@ -273,15 +273,15 @@ script_give(lua_State *L)
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		/* TODO should cancel script here */
 		printf("script warning: player %ld is undefined\n", player_id);
+		script_cancel(L, player_id);
 		return 0;
 	}
 
 	item = server_find_item_config(item_name);
 	if (item == NULL) {
-		/* TODO should cancel script here */
 		printf("script warning: item %s is undefined\n", item_name);
+		script_cancel(L, player_id);
 		return 0;
 	}
 
@@ -304,15 +304,15 @@ script_remove(lua_State *L)
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		/* TODO should cancel script here */
 		printf("script warning: player %ld is undefined\n", player_id);
+		script_cancel(L, player_id);
 		return 0;
 	}
 
 	item = server_find_item_config(item_name);
 	if (item == NULL) {
-		/* TODO should cancel script here */
 		printf("script warning: item %s is undefined\n", item_name);
+		script_cancel(L, player_id);
 		return 0;
 	}
 
@@ -343,15 +343,15 @@ script_thinkbubble(lua_State *L)
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		/* TODO should cancel script here */
 		printf("script warning: player %ld is undefined\n", player_id);
+		script_cancel(L, player_id);
 		return 0;
 	}
 
 	item = server_find_item_config(item_name);
 	if (item == NULL) {
-		/* TODO should cancel script here */
 		printf("script warning: item %s is undefined\n", item_name);
+		script_cancel(L, player_id);
 		return 0;
 	}
 
@@ -398,6 +398,18 @@ script_onuseobj(lua_State *L, struct player *p, const char *name)
 	lua_pushnumber(L, p->mob.id);
 	lua_pushstring(L, name);
 	lua_pcall(L, 2, 0, 0);
+}
+
+void
+script_cancel(lua_State *L, uint16_t player_id)
+{
+	lua_getglobal(L, "script_engine_cancel");
+	if (!lua_isfunction(L, -1)) {
+		puts("script error: can't find essential function script_engine_cancel");
+		return;
+	}
+	lua_pushnumber(L, player_id);
+	lua_pcall(L, 1, 0, 0);
 }
 
 lua_State *

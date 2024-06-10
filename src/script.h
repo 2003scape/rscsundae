@@ -5,6 +5,7 @@
 
 lua_State *script_init(struct server *);
 void script_process(lua_State *, struct player *);
+void script_cancel(lua_State *, uint16_t);
 void script_onnpctalk(lua_State *, struct player *, struct npc *);
 void script_onuseobj(lua_State *, struct player *, const char *);
 
