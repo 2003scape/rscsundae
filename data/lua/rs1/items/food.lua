@@ -82,3 +82,27 @@ function eat_cheese(player)
 end
 
 register_useobj("cheese", eat_cheese)
+
+function eat_banana(player)
+	eat_simple(player, "banana", 2)
+end
+
+register_useobj("banana", eat_banana)
+
+function eat_chocolate(player)
+	eat_simple(player, "chocolate bar", 3)
+end
+
+register_useobj("chocolate bar", eat_chocolate)
+
+function eat_bread(player)
+	eat_simple(player, "bread", 4)
+end
+
+register_useobj("bread", eat_bread)
+
+function eat_stew(player)
+	eat_simple(player, "stew", 9)
+end
+
+register_useobj("stew", eat_stew)
