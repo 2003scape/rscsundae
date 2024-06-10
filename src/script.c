@@ -150,6 +150,7 @@ script_addstat(lua_State *L)
 		return 0;
 	}
 	stat_add(&p->mob, stat, constant, percent);
+	player_send_stat(p, stat);
 	return 0;
 }
 
@@ -238,6 +239,7 @@ script_substat(lua_State *L)
 		return 0;
 	}
 	stat_remove(&p->mob, stat, constant, percent);
+	player_send_stat(p, stat);
 	return 0;
 }
 
