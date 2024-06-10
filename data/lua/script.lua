@@ -22,7 +22,6 @@ end
 function script_engine_process(player)
 	local ps = player_scripts[player]
 	if not ps then
-		print("player has no script")
 		return
 	end
 	active_script = ps 
@@ -30,10 +29,7 @@ function script_engine_process(player)
 		ps.delay = ps.delay - 1
 	end
 	if ps.delay == 0 then
-		print("resume coroutine")
 		coroutine.resume(ps.co)
-	else
-		print("not ready yet")
 	end
 end
 
@@ -45,11 +41,9 @@ end
 function script_engine_ontalknpc(player, name, npc)
 	local script = player_scripts[player]
 	if script then
-		print("already existing script")
 		return
 	end
 	name = string.lower(name)
-	print(name)
 	script = npc_scripts[name]
 	if script then
 		ps = {}
@@ -60,7 +54,6 @@ function script_engine_ontalknpc(player, name, npc)
 		end)
 		player_scripts[player] = ps
 	else
-		print("no such script")
 		_default_talk(player, npc)
 	end
 end
@@ -68,11 +61,9 @@ end
 function script_engine_onuseobj(player, name)
 	local script = player_scripts[player]
 	if script then
-		print("already existing script")
 		return
 	end
 	name = string.lower(name)
-	print(name)
 	script = useobj_scripts[name]
 	if script then
 		ps = {}
@@ -83,7 +74,6 @@ function script_engine_onuseobj(player, name)
 		end)
 		player_scripts[player] = ps
 	else
-		print("no such script")
 		_default_action(player, npc)
 	end
 end
