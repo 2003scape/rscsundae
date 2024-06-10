@@ -20,6 +20,7 @@ static int script_addstat(lua_State *);
 static int script_substat(lua_State *);
 static int script_statup(lua_State *);
 static int script_statdown(lua_State *);
+static int script_thinkbubble(lua_State *);
 static int script_default_talk(lua_State *);
 static int script_default_action(lua_State *);
 
@@ -331,6 +332,14 @@ script_default_action(lua_State *L)
 	return 0;
 }
 
+static int
+script_thinkbubble(lua_State *L)
+{
+	(void)L;
+	/* TODO: implement */
+	return 0;
+}
+
 void
 script_process(lua_State *L, struct player *p)
 {
@@ -417,6 +426,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_substat);
 	lua_setglobal(L, "substat");
+
+	lua_pushcfunction(L, script_thinkbubble);
+	lua_setglobal(L, "thinkbubble");
 
 	lua_pushcfunction(L, script_default_talk);
 	lua_setglobal(L, "_default_talk");
