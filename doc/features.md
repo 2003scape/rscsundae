@@ -48,7 +48,8 @@ These should all be implemented in Lua script:
 
 ### Skills
 
-- [ ] Prayer (bone burying, actual prayers are engine)
+- [x] Prayer (bone burying)
+- [ ] Prayer (altars)
 - [ ] Magic (missiles)
 - [ ] Magic (curses)
 - [ ] Magic (teleportation)
