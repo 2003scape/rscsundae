@@ -159,7 +159,6 @@ player_accept(struct server *s, int sock)
 	p->following_player = -1;
 	p->trading_player = -1;
 	p->projectile_sprite = UINT16_MAX;
-	p->drop_slot = UINT16_MAX;
 	p->last_packet = s->tick_counter;
 
 	player_recalculate_combat_level(p);
@@ -1336,41 +1335,9 @@ void
 player_clear_actions(struct player *p)
 {
 	p->action = ACTION_NONE;
-	p->take_item = NULL;
 	p->following_player = -1;
 	p->trading_player = -1;
 	p->ui_design_open = false;
-}
-
-void
-player_process_take_item(struct player *p)
-{
-	struct ground_item *item;
-	struct item_config *config;
-
-	if (p->take_item == NULL) {
-		return;
-	}
-	item = server_find_ground_item(p, p->take_item->x, p->take_item->y,
-	    p->take_item->id);
-	config = server_item_config_by_id(p->take_item->id);
-	if (item == NULL || config == NULL || p->inv_count >= MAX_INV_SIZE ||
-	    !player_can_see_item(p, item)) {
-		p->take_item = NULL;
-		return;
-	}
-	if (p->mob.x != item->x || p->mob.y != item->y) {
-		/* not reached it yet */
-		return;
-	}
-	player_inv_give(p, config, item->stack);
-	if (item->respawn) {
-		item->respawn_time = p->mob.server->tick_counter +
-		    (config->respawn_rate / 5);
-	} else {
-		server_remove_temp_item(item->unique_id);
-	}
-	p->take_item = NULL;
 }
 
 bool
@@ -1460,34 +1427,13 @@ player_get_nearby_items(struct player *p,
 }
 
 void
-player_process_drop_item(struct player *p)
-{
-	struct invitem item;
-	struct item_config *config;
-
-	if (p->drop_slot == UINT16_MAX || p->drop_slot >= p->inv_count) {
-		p->drop_slot = UINT16_MAX;
-		return;
-	}
-
-	if (p->walk_queue_len > 0 || p->ui_trade_open) {
-		return;
-	}
-
-	item = p->inventory[p->drop_slot];
-	config = server_item_config_by_id(item.id);
-	assert(config != NULL);
-	player_inv_remove(p, config, item.stack);
-	server_add_temp_item(p, p->mob.x, p->mob.y, item.id, item.stack);
-	p->drop_slot = UINT16_MAX;
-}
-
-void
 player_process_action(struct player *p)
 {
 	struct npc *npc;
 	struct item_config *item_config;
+	struct ground_item *item;
 	uint16_t id;
+	uint32_t stack;
 
 	switch (p->action) {
 	case ACTION_NPC_TALK:
@@ -1504,6 +1450,24 @@ player_process_action(struct player *p)
 		script_onnpctalk(p->mob.server->lua, p, npc);
 		p->action = ACTION_NONE;
 		break;
+	case ACTION_INV_DROP:
+		if (p->target_slot >= p->inv_count) {
+			p->action = ACTION_NONE;
+			return;
+		}
+
+		if (p->walk_queue_len > 0 || p->ui_trade_open) {
+			return;
+		}
+
+		id = p->inventory[p->target_slot].id;
+		stack = p->inventory[p->target_slot].stack;
+		item_config = server_item_config_by_id(id);
+		assert(item_config != NULL);
+		player_inv_remove(p, item_config, stack);
+		server_add_temp_item(p, p->mob.x, p->mob.y, id, stack);
+		p->action = ACTION_NONE;
+		break;
 	case ACTION_INV_USE:
 		if (p->target_slot >= p->inv_count) {
 			p->action = ACTION_NONE;
@@ -1514,6 +1478,34 @@ player_process_action(struct player *p)
 		for (int i = 0; i < item_config->name_count; ++i) {
 			script_onuseobj(p->mob.server->lua,
 			    p, item_config->names[i]);
+		}
+		p->action = ACTION_NONE;
+		break;
+	case ACTION_ITEM_TAKE:
+		if (p->target_item == NULL) {
+			p->action = ACTION_NONE;
+			return;
+		}
+		item = server_find_ground_item(p,
+		    p->target_item->x, p->target_item->y,
+		    p->target_item->id);
+		item_config = server_item_config_by_id(p->target_item->id);
+		if (item == NULL || item_config == NULL ||
+		    p->inv_count >= MAX_INV_SIZE ||
+		    !player_can_see_item(p, item)) {
+			p->action = ACTION_NONE;
+			return;
+		}
+		if (p->mob.x != item->x || p->mob.y != item->y) {
+			/* not reached it yet */
+			return;
+		}
+		player_inv_give(p, item_config, item->stack);
+		if (item->respawn) {
+			item->respawn_time = p->mob.server->tick_counter +
+			    (item_config->respawn_rate / 5);
+		} else {
+			server_remove_temp_item(item->unique_id);
 		}
 		p->action = ACTION_NONE;
 		break;

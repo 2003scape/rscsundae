@@ -242,8 +242,6 @@ server_tick(void)
 			s.players[i] = NULL;
 			continue;
 		}
-		player_process_take_item(s.players[i]);
-		player_process_drop_item(s.players[i]);
 		player_process_action(s.players[i]);
 		script_process(s.lua, s.players[i]);
 		net_player_recv(s.players[i]);

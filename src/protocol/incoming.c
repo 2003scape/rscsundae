@@ -410,9 +410,8 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			offset += 2;
-			if (slot < p->inv_count) {
-				p->drop_slot = slot;
-			}
+			p->action = ACTION_INV_DROP;
+			p->target_slot = slot;
 		}
 		break;
 	case OP_CLI_ITEM_TAKE:
@@ -431,7 +430,8 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			offset += 2;
-			p->take_item = server_find_ground_item(p, x, y, id);
+			p->action = ACTION_ITEM_TAKE;
+			p->target_item = server_find_ground_item(p, x, y, id);
 		}
 		break;
 	case OP_CLI_WALK_TILE:

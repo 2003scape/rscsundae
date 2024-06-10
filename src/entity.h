@@ -39,7 +39,9 @@ struct ground_item;
 enum action {
 	ACTION_NONE		= 0,
 	ACTION_NPC_TALK		= 1,
-	ACTION_INV_USE		= 2
+	ACTION_INV_DROP		= 2,
+	ACTION_INV_USE		= 3,
+	ACTION_ITEM_TAKE	= 4
 };
 
 enum trade_state {
@@ -237,8 +239,6 @@ struct player {
 	struct ground_item *known_items;
 	size_t known_item_count;
 	size_t known_item_max;
-	struct ground_item *take_item;
-	uint16_t drop_slot;
 	uint64_t last_update;
 	struct projectile_config *projectile;
 	uint16_t projectile_sprite;
@@ -246,6 +246,7 @@ struct player {
 	uint8_t action;
 	uint16_t target_npc;
 	uint16_t target_slot;
+	struct ground_item *target_item;
 };
 
 /* mob.c */
@@ -263,8 +264,6 @@ size_t mob_get_nearby_bounds(struct mob *, struct bound *, size_t);
 struct player *player_accept(struct server *, int);
 void player_process_walk_queue(struct player *);
 void player_process_combat(struct player *);
-void player_process_take_item(struct player *);
-void player_process_drop_item(struct player *);
 void player_die(struct player *, struct player *p);
 void player_close_ui(struct player *);
 void player_destroy(struct player *);
