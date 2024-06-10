@@ -144,6 +144,12 @@ player_accept(struct server *s, int sock)
 	p->inventory[p->inv_count++].stack = 25;
 	p->inventory[p->inv_count].id = 190;
 	p->inventory[p->inv_count++].stack = 25;
+	p->inventory[p->inv_count].id = 20;
+	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 20;
+	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 20;
+	p->inventory[p->inv_count++].stack = 1;
 
 	p->stats_changed = true;
 	p->bonus_changed = true;
@@ -1480,6 +1486,8 @@ void
 player_process_action(struct player *p)
 {
 	struct npc *npc;
+	struct item_config *item_config;
+	uint16_t id;
 
 	switch (p->action) {
 	case ACTION_NPC_TALK:
@@ -1494,6 +1502,20 @@ player_process_action(struct player *p)
 		p->walk_queue_len = 0;
 		p->walk_queue_pos = 0;
 		script_onnpctalk(p->mob.server->lua, p, npc);
+		p->action = ACTION_NONE;
+		break;
+	case ACTION_INV_USE:
+		if (p->target_slot >= p->inv_count) {
+			p->action = ACTION_NONE;
+			return;
+		}
+		id = p->inventory[p->target_slot].id;
+		item_config = server_item_config_by_id(id);
+		for (int i = 0; i < item_config->name_count; ++i) {
+			script_onuseobj(p->mob.server->lua,
+			    p, item_config->names[i]);
+		}
+		p->action = ACTION_NONE;
 		break;
 	}
 }

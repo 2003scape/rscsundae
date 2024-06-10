@@ -366,6 +366,20 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			}
 		}
 		break;
+	case OP_CLI_INV_ACTION:
+		{
+			uint16_t slot;
+
+			if (buf_getu16(data, offset, len, &slot) == -1) {
+				return;
+			}
+			if (slot >= p->inv_count) {
+				return;
+			}
+			p->action = ACTION_INV_USE;
+			p->target_slot = slot;
+		}
+		break;
 	case OP_CLI_INV_WEAR:
 		{
 			uint16_t slot;

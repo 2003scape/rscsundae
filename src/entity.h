@@ -38,7 +38,8 @@ struct ground_item;
 
 enum action {
 	ACTION_NONE		= 0,
-	ACTION_NPC_TALK		= 1
+	ACTION_NPC_TALK		= 1,
+	ACTION_INV_USE		= 2
 };
 
 enum trade_state {
@@ -244,6 +245,7 @@ struct player {
 	uint16_t projectile_target_player;
 	uint8_t action;
 	uint16_t target_npc;
+	uint16_t target_slot;
 };
 
 /* mob.c */
