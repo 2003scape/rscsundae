@@ -73,8 +73,6 @@ function script_engine_onuseobj(player, name)
 			player_scripts[player] = nil
 		end)
 		player_scripts[player] = ps
-	else
-		mes(player, "Nothing interesting happens")
 	end
 end
 
@@ -97,9 +95,10 @@ dofile("./data/lua/rs1/npc/man.lua")
 dofile("./data/lua/rs1/skill_prayer/bones.lua")
 dofile("./data/lua/rs1/items/food.lua")
 dofile("./data/lua/rs1/items/cabbage.lua")
-dofile("./data/lua/rs1/items/pumpkin.lua")
 dofile("./data/lua/rs1/items/spinachroll.lua")
 dofile("./data/lua/rs1/items/meat.lua")
 dofile("./data/lua/rs1/items/wine.lua")
 dofile("./data/lua/rs1/items/beer.lua")
+dofile("./data/lua/rs1/items/strengthpotion.lua")
 dofile("./data/lua/rs1/items/asgarniandrinks.lua")
+dofile("./data/lua/rs1/items/pumpkin.lua")
