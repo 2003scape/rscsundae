@@ -151,6 +151,8 @@ You feel a crunch
 @que@You fill your pie with redberries
 @que@You cook the pie in the oven...
 @que@You remove the pie from the oven
+@que@You eat half of the pizza
+@que@You eat the pizza
 You find nothing in the chest
 Banker is busy at the moment
 You don't have room to hold everything!
