@@ -27,7 +27,8 @@ player_inv_give(struct player *p, struct item_config *item, uint32_t count)
 			return;
 		}
 		if (p->inv_count >= MAX_INV_SIZE) {
-			/* TODO: should drop it on the floor here */
+			server_add_temp_item(p,
+			    p->mob.x, p->mob.y, item->id, count);
 			return;
 		}
 		p->inventory[p->inv_count].id = item->id;
@@ -37,13 +38,15 @@ player_inv_give(struct player *p, struct item_config *item, uint32_t count)
 		return;
 	}
 	for (unsigned i = 0; i < count; ++i) {
-		if (p->inv_count >= MAX_INV_SIZE) {
-			break;
+		if (p->inv_count < MAX_INV_SIZE) {
+			p->inventory[p->inv_count].id = item->id;
+			p->inventory[p->inv_count].stack = 1;
+			p->inventory[p->inv_count++].worn = false;
+			player_send_inv_slot(p, p->inv_count - 1);
+		} else {
+			server_add_temp_item(p,
+			    p->mob.x, p->mob.y, item->id, 1);
 		}
-		p->inventory[p->inv_count].id = item->id;
-		p->inventory[p->inv_count].stack = 1;
-		p->inventory[p->inv_count++].worn = false;
-		player_send_inv_slot(p, p->inv_count - 1);
 	}
 }
 
