@@ -159,6 +159,7 @@ player_accept(struct server *s, int sock)
 	p->following_player = -1;
 	p->trading_player = -1;
 	p->projectile_sprite = UINT16_MAX;
+	p->bubble_id = UINT16_MAX;
 	p->last_packet = s->tick_counter;
 
 	player_recalculate_combat_level(p);

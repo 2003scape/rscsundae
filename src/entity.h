@@ -246,6 +246,7 @@ struct player {
 	uint8_t action;
 	uint16_t target_npc;
 	uint16_t target_slot;
+	uint16_t bubble_id;
 	struct ground_item *target_item;
 };
 

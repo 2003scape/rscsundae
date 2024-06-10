@@ -498,6 +498,26 @@ player_send_damage(struct player *p, void *tmpbuf, size_t offset)
 }
 
 static ssize_t
+player_send_bubble(struct player *p, void *tmpbuf, size_t offset)
+{
+	if (buf_putu16(tmpbuf, offset, PLAYER_BUFSIZE,
+		       p->mob.id) == -1) {
+		return -1;
+	}
+	offset += 2;
+	if (buf_putu8(tmpbuf, offset++, PLAYER_BUFSIZE,
+		      PLAYER_UPDATE_BUBBLE) == -1) {
+		return -1;
+	}
+	if (buf_putu16(tmpbuf, offset, PLAYER_BUFSIZE,
+		       p->bubble_id) == -1) {
+		return -1;
+	}
+	offset += 2;
+	return offset;
+}
+
+static ssize_t
 player_send_projectile(struct player *p, void *tmpbuf, size_t offset)
 {
 	if (buf_putu16(tmpbuf, offset, PLAYER_BUFSIZE,
@@ -715,6 +735,14 @@ player_send_appearance_update(struct player *p)
 	lenofs = offset;
 	offset += 2;
 
+	if (p->bubble_id != UINT16_MAX) {
+		tmpofs = player_send_bubble(p, p->tmpbuf, offset);
+		if (tmpofs == -1) {
+			return -1;
+		}
+		offset = tmpofs;
+		update_count++;
+	}
 	if (p->appearance_changed) {
 		tmpofs = player_send_appearance(p, p->tmpbuf, offset);
 		if (tmpofs == -1) {
@@ -749,6 +777,14 @@ player_send_appearance_update(struct player *p)
 		p2 = p->mob.server->players[p->known_players[i]];
 		if (p2 == NULL || p2->logout_confirmed) {
 			continue;
+		}
+		if (p2->bubble_id != UINT16_MAX) {
+			tmpofs = player_send_bubble(p2, p->tmpbuf, offset);
+			if (tmpofs == -1) {
+				return -1;
+			}
+			offset = tmpofs;
+			update_count++;
 		}
 		if (p2->public_chat_len > 0 &&
 		    !player_is_blocked(p, p2->name, p->block_public)) {
