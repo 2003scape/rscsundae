@@ -62,6 +62,6 @@ end
 register_useobj("cake", eat_cake)
 register_useobj("partial cake", eat_cake_partial)
 register_useobj("slice of cake", eat_cake_slice)
-register_useobj("chocoltate cake", eat_choc_cake)
+register_useobj("chocolate cake", eat_choc_cake)
 register_useobj("partial chocolate cake", eat_choc_cake_partial)
 register_useobj("chocolate slice", eat_choc_cake_slice)
