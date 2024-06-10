@@ -11,6 +11,14 @@ You have defeated %s!
 Your opponent is retreating!
 You can't retreat during the first 3 rounds of combat
 You have run out of prayer points. Return to a church to recharge
+@que@You eat the cabbage. Yuck!
+@que@You eat the cabbage
+@que@It seems to taste nicer than normal
+@que@You eat the spinach roll
+@que@It tastes a bit weird, but fills you up
+@que@You eat the meat
+@que@You eat the tomato
+@que@You eat the cheese
 @que@You eat the shrimp
 @que@You eat the anchovies
 @que@You eat the sardine
@@ -42,10 +50,13 @@ Sending trade request
 Player has a protection from missiles prayer active!
 Your opponent already has weakend attack
 Your opponent already has weakend strength
+@que@You swing your bronze axe at the tree...
 @que@You swing your mithril axe at the tree...
+@que@You swing your rune axe at the tree...
 @que@You slip and fail to hit the tree
 @que@You get some wood
 @que@You attempt to light the logs
+@que@You fail to light a fire
 @que@The fire catches and the logs begin to burn
 @que@You dig a hole in the ground
 @que@You bury the bones
@@ -80,7 +91,10 @@ You pay 30 gold
 You board the ship
 The ship arrives at Karamja
 The ship arrives at Port Sarim
+@que@You climb up the ladder
 @que@You climb down the ladder
+@que@You go up the stairs
+@que@You go down the stairs
 @que@You just went through a secret door
 @que@The dragon breathes fire at you
 You are fried
@@ -98,3 +112,46 @@ You are out at sea
 The ship is sailing
 The ship is sailing
 You feel a crunch
+@que@You cook the dough in the oven...
+@que@You remove the bread from the oven
+@que@You place a lump of gold in the furnace
+@que@You retrieve a bar of gold
+@que@You smelt the copper and tin together in the furnace
+@que@You retrieve a bar of bronze
+@que@I should add the tomato first
+@que@You need to cook the anchovies
+@que@You add the tomato to the pizza
+@que@You add the cheese to the pizza
+@que@You add the anchovies to the pizza
+@que@You need a proper oven to cook this
+@que@You milk the cow
+@que@You cook the pizza in the oven...
+@que@You remove the pizza from the oven
+@que@You accidentally burn the pizza
+@que@You cook the meat on the stove...
+@que@The meat is now nicely cooked
+@que@I also need some flour to make a cake
+@que@I also need some milk to make a cake
+@que@I also need an egg to make a cake
+@que@You mix some milk, flour and egg together into a cake mixture
+@que@you need to precook the meat
+@que@You cut up the meat and put it into the bowl
+@que@You cut up the potato and put it into the stew
+@que@You pick a potato
+@que@You cook the stew on the range...
+@que@The stew is now nicely cooked
+@que@You cook the cake in the oven...
+@que@You accidentally burn the cake
+@que@You cook the anchovies on the stove
+@que@The anchovies are now nicely cooked
+@que@You make a chocolate cake!
+@que@You close the chest
+@que@You open the chest
+@que@The gate swings open
+@que@You fill your pie with redberries
+@que@You cook the pie in the oven...
+@que@You remove the pie from the oven
+You find nothing in the chest
+Banker is busy at the moment
+You don't have room to hold everything!
+The disk will only work from in Thordur's black hole
