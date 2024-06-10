@@ -8,6 +8,7 @@
 #include "../buffer.h"
 #include "../entity.h"
 #include "../server.h"
+#include "../utility.h"
 #include "../zone.h"
 
 #define UPDATE_RADIUS		(15)
