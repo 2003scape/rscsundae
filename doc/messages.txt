@@ -11,7 +11,16 @@ You have defeated %s!
 Your opponent is retreating!
 You can't retreat during the first 3 rounds of combat
 You have run out of prayer points. Return to a church to recharge
-@que@You eat the shark
+@que@You eat the shrimp
+@que@You eat the anchovies
+@que@You eat the sardine
+@que@You eat the herring
+@que@You eat the pike
+@que@You eat the trout
+@que@You eat the salmon
+@que@You eat the tuna
+@que@You eat the lobster
+@que@You eat the swordfish
 @que@It heals some health
 Your defence ability has returned to normal
 Your strength ability has returned to normal
