@@ -16,6 +16,7 @@ static int script_random(lua_State *);
 static int script_give(lua_State *);
 static int script_remove(lua_State *);
 static int script_advancestat(lua_State *);
+static int script_healstat(lua_State *);
 static int script_addstat(lua_State *);
 static int script_substat(lua_State *);
 static int script_statup(lua_State *);
@@ -120,6 +121,37 @@ script_advancestat(lua_State *L)
 		return 0;
 	}
 	stat_advance(p, stat, base, exp);
+	return 0;
+}
+
+static int
+script_healstat(lua_State *L)
+{
+	lua_Integer player_id;
+	lua_Integer stat, constant, percent;
+	struct player *p;
+
+	player_id = luaL_checkinteger(L, 1);
+	stat = luaL_checkinteger(L, 2);
+	constant = luaL_checkinteger(L, 3);
+	percent = luaL_checkinteger(L, 4);
+	if (player_id < 0 || player_id >= MAXPLAYERS) {
+		printf("script warning: player id %ld out of range\n", player_id);
+		return 0;
+	}
+	p = serv->players[player_id];
+	if (p == NULL) {
+		/* TODO should cancel script here */
+		printf("script warning: player %ld is undefined\n", player_id);
+		return 0;
+	}
+	if (stat < 0 || stat >= MAX_SKILL_ID) {
+		/* TODO should cancel script here */
+		printf("script warning: invalid stat id %ld\n", stat);
+		return 0;
+	}
+	stat_heal(&p->mob, stat, constant, percent);
+	player_send_stat(p, stat);
 	return 0;
 }
 
@@ -430,6 +462,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_advancestat);
 	lua_setglobal(L, "advancestat");
+
+	lua_pushcfunction(L, script_healstat);
+	lua_setglobal(L, "healstat");
 
 	lua_pushcfunction(L, script_statup);
 	lua_setglobal(L, "statup");
