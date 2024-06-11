@@ -21,6 +21,37 @@ mob_combat_roll_damage(struct ranctx *ran, int stat, int bonus)
 	return (int)((roll + 320.0f) / 640.0f);
 }
 
+void
+mob_face(struct mob *mob, int x, int y)
+{
+	int dif_x = mob->x - x;
+	int dif_y = mob->y - y;
+
+	if (dif_x == 0) {
+		if (dif_y > 0) {
+			mob->dir = MOB_DIR_NORTH;
+		} else if (dif_y < 0) {
+			mob->dir = MOB_DIR_SOUTH;
+		}
+	} else if (dif_x < 0) {
+		if (dif_y == 0) {
+			mob->dir = MOB_DIR_WEST;
+		} else if (dif_y < 0) {
+			mob->dir = MOB_DIR_SOUTHWEST;
+		} else if (dif_y > 0) {
+			mob->dir = MOB_DIR_NORTHWEST;
+		}
+	} else if (dif_x > 0) {
+		if (dif_y == 0) {
+			mob->dir = MOB_DIR_EAST;
+		} else if (dif_y < 0) {
+			mob->dir = MOB_DIR_SOUTHEAST;
+		} else if (dif_y > 0) {
+			mob->dir = MOB_DIR_NORTHEAST;
+		}
+	}
+}
+
 uint32_t
 mob_combat_xp(struct mob *mob)
 {

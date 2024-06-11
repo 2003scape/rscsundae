@@ -93,8 +93,7 @@ script_npcsay(lua_State *L)
 	const char *mes = luaL_checkstring(L, 2);
 	size_t len;
 	struct npc *npc;
-
-	/* TODO: player should face NPC */
+	struct player *player;
 
 	npc = id_to_npc(id);
 	if (npc == NULL) {
@@ -106,6 +105,16 @@ script_npcsay(lua_State *L)
 	len = strlen(mes);
 	if (len > MAX_CHAT_LEN) {
 		len = MAX_CHAT_LEN;
+	}
+
+	player = id_to_player(npc->talk_target);
+	if (player != NULL) {
+		/*
+		 * XXX: maybe too quick at the moment -
+		 * seems should be delayed by 1 tick
+		 */
+		mob_face(&npc->mob, player->mob.x, player->mob.y);
+		mob_face(&player->mob, npc->mob.x, npc->mob.y);
 	}
 
 	encode_chat_legacy(mes, (uint8_t *)npc->mob.chat_enc, len);

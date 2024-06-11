@@ -1449,6 +1449,7 @@ player_process_action(struct player *p)
 		npc->talk_target = p->mob.id;
 		p->walk_queue_len = 0;
 		p->walk_queue_pos = 0;
+		mob_face(&p->mob, npc->mob.x, npc->mob.y);
 		script_onnpctalk(p->mob.server->lua, p, npc);
 		p->action = ACTION_NONE;
 		break;
