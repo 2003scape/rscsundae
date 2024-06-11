@@ -38,6 +38,11 @@ encode_chat_legacy(const char *mes, uint8_t *out, size_t outlen)
 {
 	size_t inlen = strlen(mes);
 
+	/*
+	 * actual server for mudclient110 would also compress using
+	 * goodwords.txt but we can probably afford to not do that
+	 * in current year.
+	 */
 	for (size_t i = 0; i < inlen && i < outlen; ++i) {
 		out[i] = (uint8_t)encode_char_legacy(mes[i]);
 	}
