@@ -2,10 +2,46 @@
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
+#include <ctype.h>
 #include <stddef.h>
 #include <string.h>
 #include <time.h>
 #include "utility.h"
+
+const char legacy_chartab[] = {
+	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+	'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+	'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3',
+	'4', '5', '6', '7', '8', '9', ' ', '!', '?', '.',
+	',', ':', ';', '(', ')', '-', '&', '*', '\\', '\'',
+	'\0'
+};
+
+static int encode_char_legacy(char);
+
+static int
+encode_char_legacy(char ch)
+{
+	if (isalpha(ch)) {
+		ch = toupper(ch);
+	}
+	for (int i = 0; legacy_chartab[i] != '\0'; ++i) {
+		if (legacy_chartab[i] == ch) {
+			return i;
+		}
+	}
+	return encode_char_legacy(' ');
+}
+
+void
+encode_chat_legacy(const char *mes, uint8_t *out, size_t outlen)
+{
+	size_t inlen = strlen(mes);
+
+	for (size_t i = 0; i < inlen && i < outlen; ++i) {
+		out[i] = (uint8_t)encode_char_legacy(mes[i]);
+	}
+}
 
 char *
 mod37_namedec(int64_t encoded, char *decoded)

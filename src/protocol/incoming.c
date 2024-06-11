@@ -154,10 +154,12 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 		{
 			/* want to eventually decode this to moderate */
 			size_t msglen = len - 1;
-			if (msglen <= MAX_PUBLIC_CHAT_LEN) {
-				memcpy(p->public_chat_enc, data + offset, msglen);
-				p->public_chat_len = msglen;
+			if (msglen > MAX_CHAT_LEN) {
+				msglen = MAX_CHAT_LEN;
 			}
+			memcpy(p->mob.chat_enc, data + offset, msglen);
+			p->mob.chat_len = msglen;
+			p->chat_type = CHAT_TYPE_PUBLIC;
 		}
 		break;
 	case OP_CLI_PING:

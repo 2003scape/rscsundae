@@ -12,7 +12,7 @@
 
 #define MAX_KNOWN_PLAYERS	(255)
 #define MAX_KNOWN_NPCS		(255)
-#define MAX_PUBLIC_CHAT_LEN	(80)
+#define MAX_CHAT_LEN		(80)
 #define MAX_SKILL_ID		(16)
 #define MAX_CLIENT_SETTINGS	(3)
 #define MAX_INV_SIZE		(30)
@@ -86,6 +86,12 @@ enum combat_style {
 	COMBAT_STYLE_DEFENSIVE	= 3,
 };
 
+enum chat_type {
+	CHAT_TYPE_NONE		= 0,
+	CHAT_TYPE_PUBLIC	= 1,
+	CHAT_TYPE_QUEST		= 2,
+};
+
 /* TODO: expand with a they/them option */
 enum mobgender {
 	MOB_GENDER_MALE		= 1,
@@ -125,6 +131,8 @@ struct mob {
 	uint8_t cur_stats[MAX_SKILL_ID];
 	uint8_t base_stats[MAX_SKILL_ID];
 	uint8_t combat_level;
+	uint8_t chat_len;
+	char chat_enc[MAX_CHAT_LEN];
 	int16_t target_player;
 	int16_t target_npc;
 };
@@ -194,8 +202,7 @@ struct player {
 	uint64_t skull_timer;
 	uint64_t drain_counter;
 	uint64_t next_drain;
-	char public_chat_enc[MAX_PUBLIC_CHAT_LEN];
-	size_t public_chat_len;
+	uint8_t chat_type;
 	uint16_t walk_queue_x[WALK_QUEUE_LEN];
 	uint16_t walk_queue_y[WALK_QUEUE_LEN];
 	uint16_t walk_queue_pos;

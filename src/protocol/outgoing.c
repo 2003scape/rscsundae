@@ -19,11 +19,12 @@
 
 enum player_update_type {
 	PLAYER_UPDATE_BUBBLE		= 0,
-	PLAYER_UPDATE_CHAT		= 1,
+	PLAYER_UPDATE_CHAT_PUBLIC	= 1,
 	PLAYER_UPDATE_DAMAGE		= 2,
 	PLAYER_UPDATE_SHOOT_MONSTER	= 3,
 	PLAYER_UPDATE_SHOOT_PLAYER	= 4,
 	PLAYER_UPDATE_APPEARANCE	= 5,
+	PLAYER_UPDATE_CHAT_QUEST	= 6,
 };
 
 static ssize_t player_send_appearance(struct player *, void *, size_t);
@@ -767,6 +768,27 @@ player_send_appearance_update(struct player *p)
 		offset = tmpofs;
 		update_count++;
 	}
+	if (p->chat_type == CHAT_TYPE_QUEST) {
+		if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
+			       p->mob.id) == -1) {
+			return -1;
+		}
+		offset += 2;
+		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+				PLAYER_UPDATE_CHAT_QUEST) == -1) {
+			return -1;
+		}
+		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+			      p->mob.chat_len) == -1) {
+			return -1;
+		}
+		if (buf_putdata(p->tmpbuf, offset, PLAYER_BUFSIZE,
+		      p->mob.chat_enc, p->mob.chat_len) == -1) {
+			return -1;
+		}
+		offset += p->mob.chat_len;
+		update_count++;
+	}
 
 	for (int i = 0; i < p->known_player_count; ++i) {
 		struct player *p2;
@@ -786,7 +808,7 @@ player_send_appearance_update(struct player *p)
 			offset = tmpofs;
 			update_count++;
 		}
-		if (p2->public_chat_len > 0 &&
+		if (p2->mob.chat_len > 0 &&
 		    !player_is_blocked(p, p2->name, p->block_public)) {
 			if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
 				       p2->mob.id) == -1) {
@@ -794,18 +816,20 @@ player_send_appearance_update(struct player *p)
 			}
 			offset += 2;
 			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
-				      PLAYER_UPDATE_CHAT) == -1) {
+				      p2->chat_type == CHAT_TYPE_PUBLIC ?
+					PLAYER_UPDATE_CHAT_PUBLIC :
+					PLAYER_UPDATE_CHAT_QUEST) == -1) {
 				return -1;
 			}
 			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
-				      p2->public_chat_len) == -1) {
+				      p2->mob.chat_len) == -1) {
 				return -1;
 			}
 			if (buf_putdata(p->tmpbuf, offset, PLAYER_BUFSIZE,
-			      p2->public_chat_enc, p2->public_chat_len) == -1) {
+			      p2->mob.chat_enc, p2->mob.chat_len) == -1) {
 				return -1;
 			}
-			offset += p2->public_chat_len;
+			offset += p2->mob.chat_len;
 			update_count++;
 		}
 		if (p2->mob.damage != UINT8_MAX) {

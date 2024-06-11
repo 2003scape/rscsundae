@@ -2,11 +2,13 @@
 #include <lauxlib.h>
 #include <lualib.h>
 #include <stdio.h>
+#include <string.h>
 #include "ext/flea.h"
 #include "script.h"
 #include "server.h"
 #include "inventory.h"
 #include "stat.h"
+#include "utility.h"
 
 static struct server *serv;
 static int script_say(lua_State *);
@@ -40,9 +42,27 @@ script_say(lua_State *L)
 {
 	lua_Integer id = luaL_checkinteger(L, 1);
 	const char *mes = luaL_checkstring(L, 2);
+	size_t len;
+	struct player *p;
 
 	(void)id;
 	printf("say %s\n", mes);
+
+	p = id_to_player(id);
+	if (p == NULL) {
+		printf("script warning: player %ld is undefined\n", id);
+		script_cancel(L, id);
+		return 0;
+	}
+
+	len = strlen(mes);
+	if (len > MAX_CHAT_LEN) {
+		len = MAX_CHAT_LEN;
+	}
+
+	encode_chat_legacy(mes, (uint8_t *)p->mob.chat_enc, len);
+	p->mob.chat_len = len;
+	p->chat_type = CHAT_TYPE_QUEST;
 
 	return 0;
 }

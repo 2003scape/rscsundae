@@ -299,7 +299,8 @@ server_tick(void)
 		if (s.players[i] == NULL) {
 			continue;
 		}
-		s.players[i]->public_chat_len = 0;
+		s.players[i]->chat_type = CHAT_TYPE_NONE;
+		s.players[i]->mob.chat_len = 0;
 		s.players[i]->appearance_changed = false;
 		s.players[i]->plane_changed = false;
 		s.players[i]->stats_changed = false;
