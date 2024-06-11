@@ -136,7 +136,8 @@ am_rscsundae_OBJECTS = buffer.$(OBJEXT) mob.$(OBJEXT) netio.$(OBJEXT) \
 	protocol/outgoing.$(OBJEXT) $(am__objects_1) $(am__objects_2) \
 	$(am__objects_3)
 rscsundae_OBJECTS = $(am_rscsundae_OBJECTS)
-rscsundae_DEPENDENCIES =
+am__DEPENDENCIES_1 =
+rscsundae_DEPENDENCIES = $(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -317,7 +318,7 @@ rscsundae_SOURCES = buffer.c mob.c netio.c player.c inventory.c \
 	ext/libjag/lib/jag_unpack_file.c ext/reallocarr.c \
 	protocol/incoming.c protocol/outgoing.c $(am__append_1) \
 	$(am__append_2) $(am__append_3)
-rscsundae_LDADD = $(libev_LIBS) $(LUA_LIB) -lm
+rscsundae_LDADD = $(libev_LIBS) $(LUA_LIBS) -lm
 all: all-am
 
 .SUFFIXES:
