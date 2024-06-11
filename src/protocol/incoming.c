@@ -7,6 +7,7 @@
 #include "../buffer.h"
 #include "../entity.h"
 #include "../netio.h"
+#include "../script.h"
 #include "../server.h"
 #include "../trade.h"
 #include "../utility.h"
@@ -591,6 +592,20 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			player_recalculate_sprites(p);
 			p->appearance_changed = true;
 			p->ui_design_open = false;
+		}
+		break;
+	case OP_CLI_ANSWER_MULTI:
+		{
+			uint8_t option;
+
+			if (!p->ui_multi_open) {
+				return;
+			}
+			if (buf_getu8(data, offset++, len, &option) == -1) {
+				return;
+			}
+			script_multi_answer(p->mob.server->lua, p, option);
+			p->ui_multi_open = false;
 		}
 		break;
 	}

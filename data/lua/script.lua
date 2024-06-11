@@ -28,14 +28,38 @@ function script_engine_process(player)
 	if ps.delay > 0 then
 		ps.delay = ps.delay - 1
 	end
-	if ps.delay == 0 then
-		coroutine.resume(ps.co)
+	if ps.option_count > 0 then
+		if os.time() >= (ps.last_active + 10) then
+			print("script cancelled due to inactivity")
+			script_engine_cancel(player)
+		end
+	else
+		if ps.delay == 0 then
+			coroutine.resume(ps.co)
+		end
 	end
 end
 
 function script_engine_cancel(player)
-	couroutine.close(player_scripts[player].co)
+	local co = player_scripts[player].co
 	player_scripts[player] = nil
+	coroutine.close(co)
+end
+
+function script_engine_answer(player, answer)
+	-- got an answer on a multi dialog
+	local ps = player_scripts[player]
+	if not ps then
+		return
+	end
+	option_count = ps.option_count
+	if answer > option_count then
+		print("script cancelled due to invalid multi answer")
+		script_engine_cancel(player)
+		return
+	end
+	ps.answer = answer
+	coroutine.resume(ps.co)
 end
 
 function script_engine_ontalknpc(player, name, npc)
@@ -48,6 +72,7 @@ function script_engine_ontalknpc(player, name, npc)
 	if script then
 		ps = {}
 		ps.delay = 0
+		ps.option_count = 0
 		ps.co = coroutine.create(function()
 			script(player, npc)
 			player_scripts[player] = nil
@@ -68,6 +93,7 @@ function script_engine_onuseobj(player, name)
 	if script then
 		ps = {}
 		ps.delay = 0
+		ps.option_count = 0
 		ps.co = coroutine.create(function()
 			script(player)
 			player_scripts[player] = nil
@@ -83,12 +109,22 @@ end
 
 function say(player, mes)
 	_say(player, mes)
-	delay(2)
+	delay(3)
 end
 
 function npcsay(npc, mes)
 	_npcsay(npc, mes)
-	delay(2)
+	delay(3)
+end
+
+function multi(player, ...)
+	local arg = { ... }
+	active_script.option_count = #arg
+	active_script.last_active = os.time()
+	_multi(player, arg)
+	coroutine.yield(active_script.co)
+	active_script.option_count = 0
+	return active_script.answer
 end
 
 dofile("./data/lua/rs1/npc/man.lua")

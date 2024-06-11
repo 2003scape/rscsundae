@@ -25,6 +25,7 @@ static int script_statup(lua_State *);
 static int script_statdown(lua_State *);
 static int script_thinkbubble(lua_State *);
 static int script_default_talk(lua_State *);
+static int script_multi(lua_State *);
 static struct player *id_to_player(lua_Integer);
 static struct npc *id_to_npc(lua_Integer);
 
@@ -63,6 +64,12 @@ script_say(lua_State *L)
 		return 0;
 	}
 
+	if (mes == NULL) {
+		printf("script warning: no string specified for say\n");
+		script_cancel(L, id);
+		return 0;
+	}
+
 	len = strlen(mes);
 	if (len > MAX_CHAT_LEN) {
 		len = MAX_CHAT_LEN;
@@ -72,6 +79,40 @@ script_say(lua_State *L)
 	p->mob.chat_len = len;
 	p->chat_type = CHAT_TYPE_QUEST;
 
+	return 0;
+}
+
+static int
+script_multi(lua_State *L)
+{
+	lua_Integer id = luaL_checkinteger(L, 1);
+	const char *options[MAX_MULTI_SIZE];
+	struct player *p;
+	uint8_t option_count = 0;
+
+	p = id_to_player(id);
+	if (p == NULL) {
+		printf("script warning: player %ld is undefined\n", id);
+		script_cancel(L, id);
+		return 0;
+	}
+
+	for (int i = 1; i < (MAX_MULTI_SIZE + 1); ++i) {
+		lua_geti(L, 2, i);
+		if (!lua_isstring(L, -1)) {
+			lua_pop(L, 1);
+			break;
+		}
+		options[i - 1] = luaL_checkstring(L, -1);
+		if (options[i - 1] == NULL) {
+			printf("script warning: multi option is undefined\n");
+			return 0;
+		}
+		lua_pop(L, 1);
+		option_count++;
+	}
+
+	player_send_show_multi(p, options, option_count);
 	return 0;
 }
 
@@ -98,6 +139,12 @@ script_npcsay(lua_State *L)
 	npc = id_to_npc(id);
 	if (npc == NULL) {
 		printf("script warning: player %ld is undefined\n", id);
+		script_cancel(L, id);
+		return 0;
+	}
+
+	if (mes == NULL) {
+		printf("script warning: no string specified for npcsay\n");
 		script_cancel(L, id);
 		return 0;
 	}
@@ -147,6 +194,11 @@ script_mes(lua_State *L)
 	p = id_to_player(player_id);
 	if (p == NULL) {
 		printf("script warning: player %ld is undefined\n", player_id);
+		script_cancel(L, player_id);
+		return 0;
+	}
+	if (mes == NULL) {
+		printf("script warning: no string specified for mes\n");
 		script_cancel(L, player_id);
 		return 0;
 	}
@@ -465,6 +517,19 @@ script_cancel(lua_State *L, uint16_t player_id)
 	lua_pcall(L, 1, 0, 0);
 }
 
+void
+script_multi_answer(lua_State *L, struct player *p, int option)
+{
+	lua_getglobal(L, "script_engine_answer");
+	if (!lua_isfunction(L, -1)) {
+		puts("script error: can't find essential function script_engine_answer");
+		return;
+	}
+	lua_pushnumber(L, p->mob.id);
+	lua_pushnumber(L, option + 1);
+	lua_pcall(L, 2, 0, 0);
+}
+
 lua_State *
 script_init(struct server *s)
 {
@@ -480,6 +545,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_npcsay);
 	lua_setglobal(L, "_npcsay");
+
+	lua_pushcfunction(L, script_multi);
+	lua_setglobal(L, "_multi");
 
 	lua_pushcfunction(L, script_npcattack);
 	lua_setglobal(L, "npcattack");

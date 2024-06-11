@@ -1616,3 +1616,52 @@ player_send_trade_confirm(struct player *p)
 
 	return player_write_packet(p, p->tmpbuf, offset);
 }
+
+int
+player_send_show_multi(struct player *p,
+    const char **options, uint8_t option_count)
+{
+	size_t offset = 0;
+
+	assert(p != NULL);
+	assert(option_count <= MAX_MULTI_SIZE);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_SHOW_MULTI);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        option_count);
+
+	for (int i = 0; i < option_count; ++i) {
+		size_t len;
+
+		assert(options[i] != NULL);
+		len = strlen(options[i]);
+		if (buf_putu8(p->tmpbuf, offset++,
+				PLAYER_BUFSIZE, len) == -1) {
+			return -1;
+		}
+		if (buf_putdata(p->tmpbuf, offset, PLAYER_BUFSIZE,
+				(void *)options[i], len) != -1) {
+			offset += len;
+		}
+	}
+
+	p->ui_multi_open = true;
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+
+int
+player_send_hide_multi(struct player *p)
+{
+	size_t offset = 0;
+
+	assert(p != NULL);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_HIDE_MULTI);
+
+	p->ui_multi_open = false;
+	return player_write_packet(p, p->tmpbuf, offset);
+}

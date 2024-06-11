@@ -17,6 +17,7 @@
 #define MAX_CLIENT_SETTINGS	(3)
 #define MAX_INV_SIZE		(30)
 #define MAX_OFFER_SIZE		(12)
+#define MAX_MULTI_SIZE		(5)
 #define MAX_KNOWN_ZONES		(64)
 
 /* signed to accomodate java client */
@@ -208,7 +209,7 @@ struct player {
 	uint16_t walk_queue_y[WALK_QUEUE_LEN];
 	uint16_t walk_queue_pos;
 	uint16_t walk_queue_len;
-	uint8_t ui_dialog_open;
+	uint8_t ui_multi_open;
 	uint8_t ui_bank_open;
 	uint8_t ui_design_open;
 	uint8_t ui_trade_open;
@@ -346,6 +347,8 @@ int player_send_close_trade(struct player *);
 int player_send_trade_state(struct player *);
 int player_send_trade_state_remote(struct player *);
 int player_send_trade_confirm(struct player *);
+int player_send_show_multi(struct player *, const char **, uint8_t);
+int player_send_hide_multi(struct player *);
 int player_notify_friend_online(struct player *, int64_t);
 int player_notify_friend_offline(struct player *, int64_t);
 

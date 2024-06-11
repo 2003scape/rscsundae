@@ -272,10 +272,12 @@ player_close_ui(struct player *p)
 	if (p->ui_trade_open) {
 		player_send_close_trade(p);
 	}
+	if (p->ui_multi_open) {
+		player_send_hide_multi(p);
+	}
 	p->trade_state = TRADE_STATE_NONE;
 	p->trading_player = -1;
 	p->offer_count = 0;
-	p->ui_dialog_open = false;
 	p->ui_design_open = false;
 	p->ui_trade_open = false;
 }
