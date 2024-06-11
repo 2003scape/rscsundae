@@ -42,4 +42,4 @@ rscsundae_SOURCES += loop-poll.c
 endif
 endif
 
-rscsundae_LDADD = $(libev_LIBS) $(LUA_LIB) -lm
+rscsundae_LDADD = $(libev_LIBS) $(LUA_LIBS) -lm
