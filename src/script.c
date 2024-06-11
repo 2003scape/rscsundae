@@ -26,6 +26,7 @@ static int script_statdown(lua_State *);
 static int script_thinkbubble(lua_State *);
 static int script_default_talk(lua_State *);
 static struct player *id_to_player(lua_Integer);
+static struct npc *id_to_npc(lua_Integer);
 
 static struct player *
 id_to_player(lua_Integer id)
@@ -37,6 +38,16 @@ id_to_player(lua_Integer id)
 	return serv->players[id];
 }
 
+static struct npc *
+id_to_npc(lua_Integer id)
+{
+	if (id < 0 || id >= MAXNPCS) {
+		printf("script warning: npc id %ld out of range\n", id);
+		return NULL;
+	}
+	return serv->npcs[id];
+}
+
 static int
 script_say(lua_State *L)
 {
@@ -44,9 +55,6 @@ script_say(lua_State *L)
 	const char *mes = luaL_checkstring(L, 2);
 	size_t len;
 	struct player *p;
-
-	(void)id;
-	printf("say %s\n", mes);
 
 	p = id_to_player(id);
 	if (p == NULL) {
@@ -81,11 +89,27 @@ script_npcattack(lua_State *L)
 static int
 script_npcsay(lua_State *L)
 {
-	lua_Integer npc_id = luaL_checkinteger(L, 1);
+	lua_Integer id = luaL_checkinteger(L, 1);
 	const char *mes = luaL_checkstring(L, 2);
+	size_t len;
+	struct npc *npc;
 
-	(void)npc_id;
-	printf("npcsay %s\n", mes);
+	/* TODO: player should face NPC */
+
+	npc = id_to_npc(id);
+	if (npc == NULL) {
+		printf("script warning: player %ld is undefined\n", id);
+		script_cancel(L, id);
+		return 0;
+	}
+
+	len = strlen(mes);
+	if (len > MAX_CHAT_LEN) {
+		len = MAX_CHAT_LEN;
+	}
+
+	encode_chat_legacy(mes, (uint8_t *)npc->mob.chat_enc, len);
+	npc->mob.chat_len = len;
 
 	return 0;
 }
