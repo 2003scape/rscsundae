@@ -1443,7 +1443,7 @@ player_process_action(struct player *p)
 			p->action = ACTION_NONE;
 			return;
 		}
-		if (!mob_within_range(&p->mob, npc->mob.x, npc->mob.y, 1)) {
+		if (!mob_within_range(&p->mob, npc->mob.x, npc->mob.y, 2)) {
 			return;
 		}
 		p->walk_queue_len = 0;
