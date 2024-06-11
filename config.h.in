@@ -15,20 +15,8 @@
 /* Define if you have kqueue */
 #undef HAVE_KQUEUE
 
-/* Define to 1 if you have the <lauxlib.h> header file. */
-#undef HAVE_LAUXLIB_H
-
 /* Define if you have libev */
 #undef HAVE_LIBEV
-
-/* Define to 1 if you have the <luaconf.h> header file. */
-#undef HAVE_LUACONF_H
-
-/* Define to 1 if you have the <lualib.h> header file. */
-#undef HAVE_LUALIB_H
-
-/* Define to 1 if you have the <lua.h> header file. */
-#undef HAVE_LUA_H
 
 /* Define to 1 if you have the `reallocarr' function. */
 #undef HAVE_REALLOCARR
