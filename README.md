@@ -35,8 +35,8 @@ RSC Sundae is developed on NetBSD. I occasionally test it on
 Mac OS X 10.4 and Alpine Linux. If I break something on another
 UNIX-like platform, please send a patch.
 
-* BZip2
-* Lua 5.4
+* BZip2 (for decompressing Jagex Archives to load the original game data)
+* Lua 5.4 (for running content scripts)
 * libev (for the event loop; optional - mostly for macOS and Windows)
 
 On Debian Linux and derivatives, install the following:
