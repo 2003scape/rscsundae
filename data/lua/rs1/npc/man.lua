@@ -75,6 +75,7 @@ function man1_talknpc(player, npc)
 	elseif random(12) then
 		npcsay(npc, "That is classified information")
 	elseif random(12) then
+		npcsay(npc, "Who are you?")
 		say(player, "I am a bold adventurer")
 		npcsay(npc, "A very noble profession")
 	elseif random(12) then
