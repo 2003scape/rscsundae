@@ -28,7 +28,33 @@ RSC Sundae will never support:
 * Custom private server protocols or data formats
 * Integration with proprietary services like Discord
 
-Resources:
+Dependencies
+------------
+
+RSC Sundae is developed on NetBSD. I occasionally test it on
+Mac OS X 10.4 and Alpine Linux. If I break something on another
+UNIX-like platform, please send a patch.
+
+* BZip2
+* Lua 5.4
+* libev (for the event loop; optional - mostly for macOS and Windows)
+
+On Debian Linux and derivatives, install the following:
+
+```
+build-essential pkgconf libbz2-dev liblua5.4-dev
+```
+
+On Alpine Linux, install the following:
+
+```
+build-base pkgconf bzip2-dev lua5.4-dev
+```
+
+Run `./configure && make -j2` to build the server.
+
+Resources
+---------
 
 * https://github.com/2003scape/rsc-c
 * https://web.archive.org/web/20011122124112/http://www.jagex.com/manual/index.html
