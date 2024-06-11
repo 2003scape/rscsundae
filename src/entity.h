@@ -161,6 +161,7 @@ struct invitem {
 struct npc {
 	struct mob mob;
 	struct npc_config *config;
+	uint16_t talk_target;
 };
 
 struct player {
@@ -315,6 +316,7 @@ int player_parse_incoming(struct player *);
 int player_send_plane_init(struct player *);
 int player_send_movement(struct player *);
 int player_send_npc_movement(struct player *);
+int player_send_npc_appearance_update(struct player *);
 int player_send_appearance_update(struct player *);
 int player_send_design_ui(struct player *);
 int player_send_logout(struct player *);

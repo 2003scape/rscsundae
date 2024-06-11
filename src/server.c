@@ -289,6 +289,7 @@ server_tick(void)
 		player_send_movement(s.players[i]);
 		player_send_appearance_update(s.players[i]);
 		player_send_npc_movement(s.players[i]);
+		player_send_npc_appearance_update(s.players[i]);
 		player_send_locs(s.players[i]);
 		player_send_ground_items(s.players[i]);
 		player_send_bounds(s.players[i]);
@@ -314,6 +315,12 @@ server_tick(void)
 		s.players[i]->mob.damage = UINT8_MAX;
 		s.players[i]->mob.prev_dir = s.players[i]->mob.dir;
 		s.players[i]->last_update = s.tick_counter;
+	}
+
+	for (int i = 0; i < s.max_npc_id; ++i) {
+		s.npcs[i]->mob.chat_len = 0;
+		s.npcs[i]->mob.damage = UINT8_MAX;
+		s.npcs[i]->mob.prev_dir = s.npcs[i]->mob.dir;
 	}
 
 	s.tick_counter++;
