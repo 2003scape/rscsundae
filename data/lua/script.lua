@@ -139,10 +139,12 @@ end
 
 dofile("./data/lua/rs1/npc/bartender.lua")
 dofile("./data/lua/rs1/npc/man.lua")
+dofile("./data/lua/rs1/npc/kebabseller.lua")
 dofile("./data/lua/rs1/npc/silktrader.lua")
 dofile("./data/lua/rs1/skill_prayer/bones.lua")
 dofile("./data/lua/rs1/items/food.lua")
 dofile("./data/lua/rs1/items/cabbage.lua")
+dofile("./data/lua/rs1/items/kebab.lua")
 dofile("./data/lua/rs1/items/spinachroll.lua")
 dofile("./data/lua/rs1/items/meat.lua")
 dofile("./data/lua/rs1/items/wine.lua")
