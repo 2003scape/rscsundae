@@ -96,7 +96,7 @@ These should all be implemented in Lua script:
 - [ ] Brass key
 - [ ] Muddy key and chest
 - [ ] Hans NPC dialogue
-- [ ] Silk trader NPC dialogue
+- [x] Silk trader NPC dialogue
 - [ ] Tanner NPC dialogue
 - [ ] Kebab Seller NPC dialogue
 - [ ] Aggie NPC dialogue
