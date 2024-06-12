@@ -1,7 +1,7 @@
 -- https://web.archive.org/web/20020204224007/http://www.jagex.com/manual/cooking.html
 -- messages came from grepping pcaps
 
-function eat_redberry_pie(player)
+function useobj_redberry_pie(player)
 	remove(player, "redberry pie", 1)
 	give(player, "half a redberry pie", 1)
 	mes(player, "@que@You eat half of a redberry pie")
@@ -11,7 +11,7 @@ function eat_redberry_pie(player)
 	end
 end
 
-function eat_redberry_pie_half(player)
+function useobj_half_a_redberry_pie(player)
 	remove(player, "half a redberry pie", 1)
 	give(player, "pie dish", 1)
 	mes(player, "@que@You eat half of a redberry pie")
@@ -21,7 +21,7 @@ function eat_redberry_pie_half(player)
 	end
 end
 
-function eat_meat_pie(player)
+function useobj_meat_pie(player)
 	remove(player, "meat pie", 1)
 	give(player, "half a meat pie", 1)
 	mes(player, "@que@You eat half of a meat pie")
@@ -31,7 +31,7 @@ function eat_meat_pie(player)
 	end
 end
 
-function eat_meat_pie_half(player)
+function useobj_half_a_meat_pie(player)
 	remove(player, "half a meat pie", 1)
 	give(player, "pie dish", 1)
 	mes(player, "@que@You eat half of a meat pie")
@@ -41,7 +41,7 @@ function eat_meat_pie_half(player)
 	end
 end
 
-function eat_apple_pie(player)
+function useobj_apple_pie(player)
 	remove(player, "apple pie", 1)
 	give(player, "half an apple pie", 1)
 	mes(player, "@que@You eat half of an apple pie")
@@ -51,7 +51,7 @@ function eat_apple_pie(player)
 	end
 end
 
-function eat_apple_pie_half(player)
+function useobj_half_an_apple_pie(player)
 	remove(player, "half an apple pie", 1)
 	give(player, "pie dish", 1)
 	mes(player, "@que@You eat half of an apple pie")
@@ -60,10 +60,3 @@ function eat_apple_pie_half(player)
 		mes(player, "@que@It heals some health")
 	end
 end
-
-register_useobj("redberry pie", eat_redberry_pie)
-register_useobj("meat pie", eat_meat_pie)
-register_useobj("apple pie", eat_apple_pie)
-register_useobj("half a redberry pie", eat_redberry_pie_half)
-register_useobj("half a meat pie", eat_meat_pie_half)
-register_useobj("half an apple pie", eat_apple_pie_half)

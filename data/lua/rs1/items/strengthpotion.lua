@@ -6,7 +6,8 @@ function drink_strength(player)
 	addstat(player, STAT_STRENGTH, 3, 10)
 end
 
-function drink_strength_dose4(player)
+-- inconsistency in config46.jag, probably bugged at the time
+function useobj_strength4(player)
 	drink_strength(player)
 	remove(player, "strength4", 1)
 	give(player, "3dose1strength", 1)
@@ -14,7 +15,7 @@ function drink_strength_dose4(player)
 	mes(player, "You have 3 doses of potion left")
 end
 
-function drink_strength_dose3(player)
+function useobj_3dose1strength(player)
 	drink_strength(player)
 	remove(player, "3dose1strength", 1)
 	give(player, "2dose1strength", 1)
@@ -22,7 +23,7 @@ function drink_strength_dose3(player)
 	mes(player, "You have 2 doses of potion left")
 end
 
-function drink_strength_dose2(player)
+function useobj_2dose1strength(player)
 	drink_strength(player)
 	remove(player, "2dose1strength", 1)
 	give(player, "1dose1strength", 1)
@@ -30,16 +31,10 @@ function drink_strength_dose2(player)
 	mes(player, "You have 1 doses of potion left")
 end
 
-function drink_strength_dose1(player)
+function useobj_1dose1strength(player)
 	drink_strength(player)
 	remove(player, "1dose1strength", 1)
 	give(player, "emptyvial", 1)
 	delay(1)
 	mes(player, "You have finished your potion")
 end
-
--- inconsistency in config46.jag, probably bugged at the time
-register_useobj("strength4", drink_strength_dose4)
-register_useobj("3dose1strength", drink_strength_dose3)
-register_useobj("2dose1strength", drink_strength_dose2)
-register_useobj("1dose1strength", drink_strength_dose1)

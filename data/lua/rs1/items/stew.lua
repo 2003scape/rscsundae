@@ -1,7 +1,7 @@
 -- pcaps/1e_Luis/Quests/Underground Pass/Underground Pass Part2.5.pcap
 -- https://web.archive.org/web/20020204224007/http://www.jagex.com/manual/cooking.html
 
-function eat_stew(player)
+function useobj_stew(player)
 	remove(player, "stew", 1)
 	give(player, "bowl", 1)
 	mes(player, "@que@You eat the stew")
@@ -10,5 +10,3 @@ function eat_stew(player)
 		mes(player, "@que@It heals some health")
 	end
 end
-
-register_useobj("stew", eat_stew)

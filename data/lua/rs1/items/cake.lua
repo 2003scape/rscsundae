@@ -1,7 +1,7 @@
 -- https://web.archive.org/web/20020204224007/http://www.jagex.com/manual/cooking.html
 -- messages came from grepping pcaps
 
-function eat_cake(player)
+function useobj_cake(player)
 	remove(player, "cake", 1)
 	give(player, "partial cake", 1)
 	mes(player, "@que@You eat part of the cake")
@@ -11,7 +11,7 @@ function eat_cake(player)
 	end
 end
 
-function eat_cake_partial(player)
+function useobj_partial_cake(player)
 	remove(player, "partial cake", 1)
 	give(player, "slice of cake", 1)
 	mes(player, "@que@You eat some more of the cake")
@@ -21,7 +21,7 @@ function eat_cake_partial(player)
 	end
 end
 
-function eat_cake_slice(player)
+function useobj_slice_of_cake(player)
 	remove(player, "slice of cake", 1)
 	mes(player, "@que@You eat the slice of cake")
 	if statdown(player, STAT_HITS) then
@@ -30,7 +30,7 @@ function eat_cake_slice(player)
 	end
 end
 
-function eat_choc_cake(player)
+function useobj_chocolate_cake(player)
 	remove(player, "chocolate cake", 1)
 	give(player, "partial chocolate cake", 1)
 	mes(player, "@que@You eat part of the chocolate cake")
@@ -40,7 +40,7 @@ function eat_choc_cake(player)
 	end
 end
 
-function eat_choc_cake_partial(player)
+function useobj_partial_chocolate_cake(player)
 	remove(player, "partial chocolate cake", 1)
 	give(player, "chocolate slice", 1)
 	mes(player, "@que@You eat some more of the chocolate cake")
@@ -50,7 +50,7 @@ function eat_choc_cake_partial(player)
 	end
 end
 
-function eat_choc_cake_slice(player)
+function useobj_chocolate_slice(player)
 	remove(player, "chocolate slice", 1)
 	mes(player, "@que@You eat the chocolate slice")
 	if statdown(player, STAT_HITS) then
@@ -58,10 +58,3 @@ function eat_choc_cake_slice(player)
 		mes(player, "@que@It heals some health")
 	end
 end
-
-register_useobj("cake", eat_cake)
-register_useobj("partial cake", eat_cake_partial)
-register_useobj("slice of cake", eat_cake_slice)
-register_useobj("chocolate cake", eat_choc_cake)
-register_useobj("partial chocolate cake", eat_choc_cake_partial)
-register_useobj("chocolate slice", eat_choc_cake_slice)

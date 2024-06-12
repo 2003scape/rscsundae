@@ -156,3 +156,23 @@ dofile("./data/lua/rs1/items/stew.lua")
 dofile("./data/lua/rs1/items/cake.lua")
 dofile("./data/lua/rs1/items/pizza.lua")
 dofile("./data/lua/rs1/items/pumpkin.lua")
+
+--
+-- automatically register triggers
+-- note that this does not work for entities that contain special
+-- characters, like "wizard's mind bomb"
+--
+-- it will also not work for operations that involve two entities as the key
+--
+for k in pairs(_G) do
+	v = _G[k]
+	if type(v) == "function" then
+		if string.match(k, "useobj_.*") then
+			target = string.gsub(string.sub(k, 8), "_", " ")
+			register_useobj(target, v)
+		elseif string.match(k, "talknpc_.*") then
+			target = string.gsub(string.sub(k, 9), "_", " ")
+			register_talknpc(target, v)
+                end
+        end
+end

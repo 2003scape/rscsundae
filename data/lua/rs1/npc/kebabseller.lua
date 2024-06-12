@@ -20,5 +20,3 @@ function talknpc_kebab_seller(player, npc)
 		end
 	end
 end
-
-register_talknpc("kebab seller", talknpc_kebab_seller)

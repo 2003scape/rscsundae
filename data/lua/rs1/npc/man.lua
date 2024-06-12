@@ -20,7 +20,7 @@ function man1_enemies(player, npc)
 	npcsay(npc, "I've heard there are many fearsome creatures under the ground")
 end
 
-function man1_talknpc(player, npc)
+function talknpc_man1(player, npc)
 	say(player, "Hello")
 	say(player, "How's it going?")
 
@@ -95,6 +95,3 @@ function man1_talknpc(player, npc)
 		npcsay(npc, "Hello")
 	end
 end
-
-
-register_talknpc("man1", man1_talknpc)

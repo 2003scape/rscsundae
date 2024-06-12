@@ -11,92 +11,62 @@ function eat_simple(player, type, amount)
 	end
 end
 
-function eat_anchovies(player)
+function useobj_anchovies(player)
 	eat_simple(player, "anchovies", 1)
 end
 
-register_useobj("anchovies", eat_anchovies)
-
-function eat_shrimp(player)
+function useobj_shrimp(player)
 	eat_simple(player, "shrimp", 3)
 end
 
-register_useobj("shrimp", eat_shrimp)
-
-function eat_sardine(player)
+function useobj_sardine(player)
 	eat_simple(player, "sardine", 4)
 end
 
-register_useobj("sardine", eat_sardine)
-
-function eat_herring(player)
+function useobj_herring(player)
 	eat_simple(player, "herring", 5)
 end
 
-register_useobj("herring", eat_herring)
-
-function eat_trout(player)
+function useobj_trout(player)
 	eat_simple(player, "trout", 7)
 end
 
-register_useobj("trout", eat_trout)
-
-function eat_pike(player)
+function useobj_pike(player)
 	eat_simple(player, "pike", 8)
 end
 
-register_useobj("pike", eat_pike)
-
-function eat_salmon(player)
+function useobj_salmon(player)
 	eat_simple(player, "salmon", 9)
 end
 
-register_useobj("salmon", eat_salmon)
-
-function eat_tuna(player)
+function useobj_tuna(player)
 	eat_simple(player, "tuna", 10)
 end
 
-register_useobj("tuna", eat_tuna)
-
-function eat_lobster(player)
+function useobj_lobster(player)
 	eat_simple(player, "lobster", 12)
 end
 
-register_useobj("lobster", eat_lobster)
-
-function eat_swordfish(player)
+function useobj_swordfish(player)
 	eat_simple(player, "swordfish", 14)
 end
 
-register_useobj("swordfish", eat_swordfish)
-
-function eat_tomato(player)
+function useobj_tomato(player)
 	eat_simple(player, "tomato", 2)
 end
 
-register_useobj("tomato", eat_tomato)
-
-function eat_cheese(player)
+function useobj_cheese(player)
 	eat_simple(player, "cheese", 2)
 end
 
-register_useobj("cheese", eat_cheese)
-
-function eat_banana(player)
+function useobj_banana(player)
 	eat_simple(player, "banana", 2)
 end
 
-register_useobj("banana", eat_banana)
-
-function eat_chocolate(player)
+function useobj_chocolate_bar(player)
 	eat_simple(player, "chocolate bar", 3)
 end
 
-register_useobj("chocolate bar", eat_chocolate)
-
-function eat_bread(player)
+function useobj_bread(player)
 	eat_simple(player, "bread", 4)
 end
-
-register_useobj("bread", eat_bread)

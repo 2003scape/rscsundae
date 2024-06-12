@@ -50,5 +50,3 @@ function talknpc_silk_trader(player, npc)
 		say(player, "No. Silk doesn't suit me")
 	end
 end
-
-register_talknpc("silk trader", talknpc_silk_trader)

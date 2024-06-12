@@ -1,6 +1,6 @@
 -- https://oldschool.runescape.wiki/w/Kebab
 
-function eat_kebab(player)
+function useobj_kebab(player)
 	mes(player, "@que@You eat the Kebab")
 	remove(player, "kebab", 1)
 	if random(64) then
@@ -51,5 +51,3 @@ function eat_kebab(player)
 		end
 	end
 end
-
-register_useobj("kebab", eat_kebab)

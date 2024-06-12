@@ -89,6 +89,3 @@ function talknpc_jolly(player, npc)
 		npcsay(npc, "That's probably old news by now though")
 	end
 end
-
-register_talknpc("moon", talknpc_moon)
-register_talknpc("jolly", talknpc_jolly)
