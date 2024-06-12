@@ -101,11 +101,11 @@ These should all be implemented in Lua script:
 - [ ] Kebab Seller NPC dialogue
 - [ ] Aggie NPC dialogue
 - [ ] Certing (Miles, Niles, Giles NPCs)
-- [ ] Bartender NPC dialogue
+- [x] Bartender NPC dialogue
 - [ ] Monk NPC dialogue
 - [ ] Brother Jered NPC dialogue
 - [ ] Barbarian NPC dialogue
-- [ ] Man NPC dialogue
+- [x] Man NPC dialogue
 - [ ] Thrander NPC dialogue
 - [ ] Bareak NPC dialogue
 - [ ] Apothecary NPC dialogue
