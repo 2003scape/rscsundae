@@ -17,6 +17,7 @@ static int script_npcsay(lua_State *);
 static int script_random(lua_State *);
 static int script_give(lua_State *);
 static int script_remove(lua_State *);
+static int script_held(lua_State *);
 static int script_advancestat(lua_State *);
 static int script_healstat(lua_State *);
 static int script_addstat(lua_State *);
@@ -425,6 +426,39 @@ script_remove(lua_State *L)
 }
 
 static int
+script_held(lua_State *L)
+{
+	const char *item_name;
+	lua_Integer amount;
+	lua_Integer player_id;
+	struct player *p;
+	struct item_config *item;
+	int result;
+
+	player_id = luaL_checkinteger(L, 1);
+	item_name = luaL_checkstring(L, 2);
+	amount = luaL_checkinteger(L, 3);
+
+	p = id_to_player(player_id);
+	if (p == NULL) {
+		printf("script warning: player %ld is undefined\n", player_id);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	item = server_find_item_config(item_name);
+	if (item == NULL) {
+		printf("script warning: item %s is undefined\n", item_name);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	result = player_inv_held(p, item, amount);
+	lua_pushboolean(L, result);
+	return 1;
+}
+
+static int
 script_thinkbubble(lua_State *L)
 {
 	lua_Integer player_id;
@@ -571,6 +605,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_remove);
 	lua_setglobal(L, "remove");
+
+	lua_pushcfunction(L, script_held);
+	lua_setglobal(L, "held");
 
 	lua_pushcfunction(L, script_random);
 	lua_setglobal(L, "random");
