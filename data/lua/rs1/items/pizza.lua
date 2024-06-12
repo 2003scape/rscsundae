@@ -39,7 +39,7 @@ function useobj_anchovie_pizza(player)
 	end
 end
 
-function useobj_half_anchovie_pizz(player)
+function useobj_half_anchovie_pizza(player)
 	remove(player, "half anchovie pizza", 1)
 	mes(player, "@que@You eat half of the pizza")
 	if statdown(player, STAT_HITS) then
