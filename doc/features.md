@@ -50,10 +50,13 @@ These should all be implemented in Lua script:
 
 - [x] Prayer (bone burying)
 - [ ] Prayer (altars)
-- [ ] Magic (missiles)
+- [ ] Magic (missiles vs. players)
+- [ ] Magic (missiles vs. NPCs)
 - [ ] Magic (curses)
 - [ ] Magic (teleportation)
+- [ ] Magic (telegrab)
 - [ ] Magic (alchemy)
+- [ ] Magic (enchantment)
 - [ ] Woodcutting
 - [ ] Firemaking
 - [ ] Crafting (pottery)
@@ -98,7 +101,7 @@ These should all be implemented in Lua script:
 - [ ] Hans NPC dialogue
 - [x] Silk trader NPC dialogue
 - [ ] Tanner NPC dialogue
-- [ ] Kebab Seller NPC dialogue
+- [x] Kebab Seller NPC dialogue
 - [ ] Aggie NPC dialogue
 - [ ] Certing (Miles, Niles, Giles NPCs)
 - [x] Bartender NPC dialogue
@@ -120,7 +123,7 @@ These should all be implemented in Lua script:
 - [x] Food (pizzas)
 - [x] Food (pies)
 - [x] Food (stews)
-- [ ] Food (kebab)
+- [x] Food (kebab)
 - [x] Food (spinach roll)
 - [x] Strength Potions
 - [ ] Dying capes
