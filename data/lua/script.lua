@@ -41,7 +41,11 @@ function script_engine_process(player)
 end
 
 function script_engine_cancel(player)
-	local co = player_scripts[player].co
+	local ps = player_scripts[player]
+	local co = ps.co
+	if ps.npc ~= nil then
+		npcunbusy(ps.npc)
+	end
 	player_scripts[player] = nil
 	coroutine.close(co)
 end
@@ -73,11 +77,14 @@ function script_engine_ontalknpc(player, name, npc)
 		ps = {}
 		ps.delay = 0
 		ps.option_count = 0
+		ps.npc = npc
 		ps.co = coroutine.create(function()
 			script(player, npc)
 			player_scripts[player] = nil
+			npcunbusy(npc)
 		end)
 		player_scripts[player] = ps
+		npcbusy(npc)
 		return true
 	end
 	return false
@@ -94,6 +101,7 @@ function script_engine_onuseobj(player, name)
 		ps = {}
 		ps.delay = 0
 		ps.option_count = 0
+		ps.npc = nil
 		ps.co = coroutine.create(function()
 			script(player)
 			player_scripts[player] = nil

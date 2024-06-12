@@ -163,6 +163,7 @@ struct npc {
 	struct mob mob;
 	struct npc_config *config;
 	uint16_t talk_target;
+	uint8_t busy;
 };
 
 struct player {

@@ -1448,6 +1448,15 @@ player_process_action(struct player *p)
 		if (!mob_within_range(&p->mob, npc->mob.x, npc->mob.y, 2)) {
 			return;
 		}
+		if (npc->busy) {
+			char mes[128];
+
+			(void)snprintf(mes, sizeof(mes),
+			    "%s is busy at the moment", npc->config->names[0]);
+			player_send_message(p, mes);
+			p->action = ACTION_NONE;
+			return;
+		}
 		npc->talk_target = p->mob.id;
 		p->walk_queue_len = 0;
 		p->walk_queue_pos = 0;
