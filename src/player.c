@@ -1480,10 +1480,7 @@ player_process_action(struct player *p)
 		}
 		id = p->inventory[p->target_slot].id;
 		item_config = server_item_config_by_id(id);
-		for (int i = 0; i < item_config->name_count; ++i) {
-			script_onuseobj(p->mob.server->lua,
-			    p, item_config->names[i]);
-		}
+		script_onuseobj(p->mob.server->lua, p, item_config);
 		p->action = ACTION_NONE;
 		break;
 	case ACTION_ITEM_TAKE:

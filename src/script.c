@@ -24,7 +24,6 @@ static int script_substat(lua_State *);
 static int script_statup(lua_State *);
 static int script_statdown(lua_State *);
 static int script_thinkbubble(lua_State *);
-static int script_default_talk(lua_State *);
 static int script_multi(lua_State *);
 static struct player *id_to_player(lua_Integer);
 static struct npc *id_to_npc(lua_Integer);
@@ -426,16 +425,6 @@ script_remove(lua_State *L)
 }
 
 static int
-script_default_talk(lua_State *L)
-{
-	(void)L;
-
-	/* TODO */
-	puts("The avocado does not appear interested in talking");
-	return 0;
-}
-
-static int
 script_thinkbubble(lua_State *L)
 {
 	lua_Integer player_id;
@@ -481,28 +470,50 @@ script_process(lua_State *L, struct player *p)
 void
 script_onnpctalk(lua_State *L, struct player *p, struct npc *npc)
 {
-	lua_getglobal(L, "script_engine_ontalknpc");
-	if (!lua_isfunction(L, -1)) {
-		puts("script error: can't find essential function script_engine_ontalknpc");
-		return;
+	char mes[128];
+	int result = 0;
+
+	for (size_t i = 0; i < npc->config->name_count; ++i) {
+		lua_getglobal(L, "script_engine_ontalknpc");
+		if (!lua_isfunction(L, -1)) {
+			puts("script error: can't find essential function script_engine_ontalknpc");
+			return;
+		}
+		lua_pushnumber(L, p->mob.id);
+		lua_pushstring(L, npc->config->names[i]);
+		lua_pushnumber(L, npc->mob.id);
+		lua_pcall(L, 3, 1, 0);
+		result = lua_toboolean(L, -1);
+		if (result != 0) {
+			return;
+		}
 	}
-	lua_pushnumber(L, p->mob.id);
-	lua_pushstring(L, "man1");
-	lua_pushnumber(L, npc->mob.id);
-	lua_pcall(L, 3, 0, 0);
+	(void)snprintf(mes, sizeof(mes),
+	    "The %s does not appear interested in talking",
+	    npc->config->names[0]);
+	player_send_message(p, mes);
 }
 
 void
-script_onuseobj(lua_State *L, struct player *p, const char *name)
+script_onuseobj(lua_State *L, struct player *p, struct item_config *item)
 {
-	lua_getglobal(L, "script_engine_onuseobj");
-	if (!lua_isfunction(L, -1)) {
-		puts("script error: can't find essential function script_engine_onuseobj");
-		return;
+	int result = 0;
+
+	for (size_t i = 0; i < item->name_count; ++i) {
+		lua_getglobal(L, "script_engine_onuseobj");
+		if (!lua_isfunction(L, -1)) {
+			puts("script error: can't find essential function script_engine_onuseobj");
+			return;
+		}
+		lua_pushnumber(L, p->mob.id);
+		lua_pushstring(L, item->names[i]);
+		lua_pcall(L, 2, 1, 0);
+		result = lua_toboolean(L, -1);
+		if (result != 0) {
+			return;
+		}
 	}
-	lua_pushnumber(L, p->mob.id);
-	lua_pushstring(L, name);
-	lua_pcall(L, 2, 0, 0);
+	player_send_message(p, "Nothing interesting happens");
 }
 
 void
@@ -584,9 +595,6 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_thinkbubble);
 	lua_setglobal(L, "thinkbubble");
-
-	lua_pushcfunction(L, script_default_talk);
-	lua_setglobal(L, "_default_talk");
 
 	/* TODO: configurable path */
 	if (luaL_dofile(L, "./data/lua/script.lua") != LUA_OK) {

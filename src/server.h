@@ -58,6 +58,7 @@ struct item_config *server_find_item_config(const char *);
 struct prayer_config *server_prayer_config_by_id(int);
 struct loc_config *server_loc_config_by_id(int);
 struct bound_config *server_bound_config_by_id(int);
+struct npc_config *server_npc_config_by_id(int);
 struct projectile_config *server_find_projectile(const char *);
 int server_add_npc(int, int, int);
 int server_add_temp_item(struct player *, int, int, int, uint32_t);

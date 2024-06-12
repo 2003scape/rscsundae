@@ -725,6 +725,15 @@ server_bound_config_by_id(int id)
 	return &s.bound_config[id];
 }
 
+struct npc_config *
+server_npc_config_by_id(int id)
+{
+	if (id < 0 || id >= (int)s.npc_config_count) {
+		return NULL;
+	}
+	return &s.npc_config[id];
+}
+
 struct projectile_config *
 server_find_projectile(const char *name)
 {
@@ -743,12 +752,6 @@ int
 server_add_npc(int id, int x, int y)
 {
 	struct npc *npc;
-	struct npc_config *config;
-
-	/* TODO: temporary placeholder until we get the proper config */
-	config = calloc(1, sizeof(struct npc_config));
-	assert(config != NULL);
-	config->id = id;
 
 	for (size_t i = 0; i < MAXNPCS; ++i) {
 		if (s.npcs[i] != NULL) {
@@ -758,7 +761,8 @@ server_add_npc(int id, int x, int y)
 		if (npc == NULL) {
 			return -1;
 		}
-		npc->config = config;
+		npc->config = server_npc_config_by_id(id);
+		assert(npc->config != NULL);
 		npc->mob.id = (uint16_t)i;
 		npc->mob.x = x;
 		npc->mob.y = y;

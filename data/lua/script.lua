@@ -65,7 +65,7 @@ end
 function script_engine_ontalknpc(player, name, npc)
 	local script = player_scripts[player]
 	if script then
-		return
+		return true
 	end
 	name = string.lower(name)
 	script = npc_scripts[name]
@@ -78,15 +78,15 @@ function script_engine_ontalknpc(player, name, npc)
 			player_scripts[player] = nil
 		end)
 		player_scripts[player] = ps
-	else
-		_default_talk(player, npc)
+		return true
 	end
+	return false
 end
 
 function script_engine_onuseobj(player, name)
 	local script = player_scripts[player]
 	if script then
-		return
+		return true
 	end
 	name = string.lower(name)
 	script = useobj_scripts[name]
@@ -99,7 +99,9 @@ function script_engine_onuseobj(player, name)
 			player_scripts[player] = nil
 		end)
 		player_scripts[player] = ps
+		return true
 	end
+	return false
 end
 
 function delay(length)
