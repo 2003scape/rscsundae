@@ -37,6 +37,8 @@ struct server {
 	size_t bound_config_count;
 	struct projectile_config *projectile_config;
 	size_t projectile_config_count;
+	struct npc_config *npc_config;
+	size_t npc_config_count;
 	uint16_t start_tile_x;
 	uint16_t start_tile_y;
 	int xp_multiplier;

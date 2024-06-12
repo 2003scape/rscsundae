@@ -7,6 +7,7 @@
 #define MAX_ITEM_NAMES	(4)
 #define MAX_LOC_NAMES	(4)
 #define MAX_BOUND_NAMES	(4)
+#define MAX_NPC_NAMES	(4)
 
 /* entities defined in config.jag */
 
@@ -116,12 +117,54 @@ struct projectile_config {
 	uint8_t type;
 };
 
+enum move_restrict {
+	MOVE_RESTRICT_NONE = 0,
+	MOVE_RESTRICT_OUTDOORS = 1,
+	MOVE_RESTRICT_INDOORS = 2,
+};
+
+struct npc_drop_config {
+	uint16_t id;
+	uint16_t amount;
+};
+
 /* npc.txt */
 struct npc_config {
 	uint16_t id;
-	/* TODO rest */
+	uint16_t name_count;
+	char *names[MAX_NPC_NAMES];
+	char *description;
+	uint8_t attack;
+	uint8_t defense;
+	uint8_t strength;
+	uint8_t hits;
+	uint8_t aggression;
+	uint8_t bravery;	/* hits at which to retreat */
+	uint8_t regeneration;
+	uint8_t perception;	/* unused */
+	uint8_t wander_range;
+	uint8_t move_restrict;
+	uint16_t respawn;
+	uint8_t unused1;
+	uint8_t unused2;
+	uint8_t hunt_range;
+	uint8_t unused3;
+	int16_t sprites[12];
+	uint32_t colour_hair;
+	uint32_t colour_top;
+	uint32_t colour_bottom;
+	uint32_t colour_skin;
+	uint16_t width;
+	uint16_t height;
+	uint8_t walk_speed;	/* sprite */
+	uint8_t combat_speed;
+	uint8_t combat_width;
+	uint16_t drop_count;
+	struct npc_drop_config *drops;
 };
 
+int config_find_entity(const char *, struct entity_config *, size_t);
+int config_find_item(const char *, struct item_config *, size_t);
 struct item_config *config_parse_items(char *, size_t, size_t *,
     struct entity_config *, size_t);
 struct entity_config *config_parse_entity(char *, size_t, size_t *);
@@ -129,6 +172,8 @@ struct prayer_config *config_parse_prayers(char *, size_t, size_t *);
 struct loc_config *config_parse_locs(char *, size_t, size_t *);
 struct bound_config *config_parse_bounds(char *, size_t, size_t *);
 struct projectile_config *config_parse_projectiles(char *, size_t, size_t *);
+struct npc_config *config_parse_npcs(char *, size_t, size_t *,
+    struct entity_config *, size_t, struct item_config *, size_t);
 bool item_equip_clear(struct item_config *, int);
 
 #endif

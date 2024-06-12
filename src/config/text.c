@@ -13,7 +13,6 @@ static ssize_t next_line(char *, size_t, size_t);
 static ssize_t next_token(char *, size_t, size_t);
 static ssize_t next_token_int(char *, size_t, size_t, long *);
 static ssize_t next_token_hex(char *, size_t, size_t, unsigned long *);
-static int find_entity(const char *, struct entity_config *, size_t);
 
 static ssize_t
 next_line(char *buffer, size_t offset, size_t len)
@@ -103,8 +102,8 @@ next_token_hex(char *buffer, size_t offset, size_t len, unsigned long *out)
 	return n + strlen(buffer + n) + 1;
 }
 
-static int
-find_entity(const char *name,
+int
+config_find_entity(const char *name,
     struct entity_config *entities, size_t num_entities)
 {
 	if (strcasecmp(name, "na") == 0) {
@@ -116,6 +115,24 @@ find_entity(const char *name,
 		}
 	}
 	printf("warning: entity sprite not found: %s\n", name);
+	return -1;
+}
+
+int
+config_find_item(const char *name,
+    struct item_config *items, size_t num_items)
+{
+	if (strcasecmp(name, "na") == 0) {
+		return -1;
+	}
+	for (size_t i = 0; i < num_items; ++i) {
+		for (size_t j = 0; j < items[i].name_count; ++j) {
+			if (strcasecmp(name, items[i].names[j]) == 0) {
+				return (int)i;
+			}
+		}
+	}
+	printf("warning: item not found: %s\n", name);
 	return -1;
 }
 
@@ -292,7 +309,7 @@ config_parse_items(char *buffer, size_t len, size_t *num_items,
 		if (tmp == -1) {
 			goto err;
 		}
-		items[i].entity_sprite = find_entity(buffer + tmp,
+		items[i].entity_sprite = config_find_entity(buffer + tmp,
 		    entities, num_entities);
 		offset = tmp + strlen((char *)buffer + tmp) + 1;
 
@@ -819,5 +836,336 @@ err:
 	assert(0);
 	free(projectiles);
 	projectiles = NULL;
+	return NULL;
+}
+
+struct npc_config *
+config_parse_npcs(char *buffer, size_t len, size_t *num_npcs,
+	struct entity_config *entities, size_t num_entities,
+	struct item_config *items, size_t num_items)
+{
+	struct npc_config *npcs = NULL;
+	size_t max_npcs;
+	size_t offset;
+	ssize_t tmp;
+	long tmpl;
+	unsigned long tmpul;
+
+	offset = 0;
+	tmp = next_token_int(buffer, offset, len, &tmpl);
+	if (tmp == -1) {
+		return NULL;
+	}
+	offset = tmp;
+	max_npcs = tmpl;
+
+	npcs = calloc(max_npcs,
+	    sizeof(struct npc_config));
+	if (npcs == NULL) {
+		return NULL;
+	}
+
+	for (size_t i = 0; i < max_npcs; ++i) {
+		npcs[i].id = i;
+
+		/* first line: names, description */
+
+		tmp = next_line(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > MAX_NPC_NAMES) {
+			goto err;
+		}
+		npcs[i].name_count = tmpl;
+		offset = tmp;
+
+		for (size_t j = 0; j < npcs[i].name_count; ++j) {
+			tmp = next_token(buffer, offset, len);
+			if (tmp == -1) {
+				goto err;
+			}
+			npcs[i].names[j] = buffer + tmp;
+			offset = tmp + strlen(buffer + tmp) + 1;
+		}
+
+		tmp = next_token(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		npcs[i].description = buffer + tmp;
+		offset = tmp + strlen(buffer + tmp) + 1;
+
+		/* second line: stats */
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > UINT8_MAX) {
+			goto err;
+		}
+		npcs[i].attack = tmpl;
+		offset = tmp;
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > UINT8_MAX) {
+			goto err;
+		}
+		npcs[i].defense = tmpl;
+		offset = tmp;
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > UINT8_MAX) {
+			goto err;
+		}
+		npcs[i].strength = tmpl;
+		offset = tmp;
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > UINT8_MAX) {
+			goto err;
+		}
+		npcs[i].hits = tmpl;
+		offset = tmp;
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > UINT8_MAX) {
+			goto err;
+		}
+		npcs[i].aggression = tmpl;
+		offset = tmp;
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > UINT8_MAX) {
+			goto err;
+		}
+		npcs[i].bravery = tmpl;
+		offset = tmp;
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > UINT8_MAX) {
+			goto err;
+		}
+		npcs[i].regeneration = tmpl;
+		offset = tmp;
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > UINT8_MAX) {
+			goto err;
+		}
+		npcs[i].perception = tmpl;
+		offset = tmp;
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > UINT8_MAX) {
+			goto err;
+		}
+		npcs[i].wander_range = tmpl;
+		offset = tmp;
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > UINT8_MAX) {
+			goto err;
+		}
+		npcs[i].move_restrict = tmpl;
+		offset = tmp;
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > UINT16_MAX) {
+			goto err;
+		}
+		npcs[i].respawn = tmpl;
+		offset = tmp;
+
+		/* third line: ??? */
+
+		tmp = next_line(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > UINT8_MAX) {
+			goto err;
+		}
+		npcs[i].unused1 = tmpl;
+		offset = tmp;
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > UINT8_MAX) {
+			goto err;
+		}
+		npcs[i].unused2 = tmpl;
+		offset = tmp;
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > UINT8_MAX) {
+			goto err;
+		}
+		npcs[i].hunt_range = tmpl;
+		offset = tmp;
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > UINT8_MAX) {
+			goto err;
+		}
+		npcs[i].unused3 = tmpl;
+		offset = tmp;
+
+		/* fourth line: sprites */
+
+		tmp = next_line(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+
+		for (size_t j = 0; j < 12; ++j) {
+			tmp = next_token(buffer, offset, len);
+			if (tmp == -1) {
+				goto err;
+			}
+			npcs[i].sprites[j] = config_find_entity(buffer + tmp,
+			    entities, num_entities);
+			offset = tmp + strlen(buffer + tmp) + 1;
+		}
+
+		/* fifth line: sprite colour masks */
+
+		tmp = next_line(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+
+		tmp = next_token_hex(buffer, offset, len, &tmpul);
+		if (tmp == -1) {
+			goto err;
+		}
+		npcs[i].colour_hair = tmpul;
+		offset = tmp;
+
+		tmp = next_token_hex(buffer, offset, len, &tmpul);
+		if (tmp == -1) {
+			goto err;
+		}
+		npcs[i].colour_top = tmpul;
+		offset = tmp;
+
+		tmp = next_token_hex(buffer, offset, len, &tmpul);
+		if (tmp == -1) {
+			goto err;
+		}
+		npcs[i].colour_bottom = tmpul;
+		offset = tmp;
+
+		tmp = next_token_hex(buffer, offset, len, &tmpul);
+		if (tmp == -1) {
+			goto err;
+		}
+		npcs[i].colour_skin = tmpul;
+		offset = tmp;
+
+		/* sixth line: sprite metadata */
+
+		tmp = next_line(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		npcs[i].width = tmpl;
+		offset = tmp;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		npcs[i].height = tmpl;
+		offset = tmp;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		npcs[i].walk_speed = tmpl;
+		offset = tmp;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		npcs[i].combat_speed = tmpl;
+		offset = tmp;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		npcs[i].combat_width = tmpl;
+		offset = tmp;
+
+		/* seventh line: constant drops */
+
+		tmpl = 0;
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		npcs[i].drop_count = tmpl;
+		offset = tmp;
+
+		npcs[i].drops = calloc(npcs[i].drop_count,
+		    sizeof(struct npc_config));
+		if (npcs[i].drops == NULL) {
+			goto err;
+		}
+
+		for (size_t j = 0; j < npcs[i].drop_count; ++j) {
+			tmp = next_token(buffer, offset, len);
+			if (tmp == -1) {
+				goto err;
+			}
+			npcs[i].drops[j].id = config_find_item(buffer + tmp,
+			    items, num_items);
+			offset = tmp + strlen(buffer + tmp) + 1;
+
+			tmp = next_token_int(buffer, offset, len, &tmpl);
+			if (tmp == -1) {
+				goto err;
+			}
+			npcs[i].drops[j].amount = tmpl;
+			offset = tmp;
+		}
+	}
+
+	*num_npcs = max_npcs;
+	return npcs;
+err:
+	assert(0);
+	free(npcs);
+	npcs = NULL;
 	return NULL;
 }

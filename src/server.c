@@ -443,6 +443,20 @@ load_config_jag(void)
 	printf("read configuration for %zu projectiles\n",
 	    s.projectile_config_count);
 
+	if (jag_find_entry(&archive, "npc.txt", &entry) == -1 ||
+	    jag_unpack_entry(&entry) == -1) {
+		goto err;
+	}
+	s.npc_config = config_parse_npcs((char *)entry.data,
+	    entry.unpacked_len, &s.npc_config_count,
+	    s.entity_config, s.entity_config_count,
+	    s.item_config, s.item_config_count);
+	if (s.npc_config == NULL) {
+		goto err;
+	}
+	printf("read configuration for %zu npcs\n",
+	    s.npc_config_count);
+
 	return 0;
 err:
 	if (entry.must_free) {
@@ -677,17 +691,11 @@ server_item_config_by_id(int id)
 struct item_config *
 server_find_item_config(const char *name)
 {
-	if (strcmp("na", name) == 0) {
+	int id = config_find_item(name, s.item_config, s.item_config_count);
+	if (id == -1) {
 		return NULL;
 	}
-	for (size_t i = 0; i < s.item_config_count; ++i) {
-		for (size_t j = 0; j < s.item_config[i].name_count; ++j) {
-			if (strcasecmp(s.item_config[i].names[j], name) == 0) {
-				return &s.item_config[i];
-			}
-		}
-	}
-	return NULL;
+	return &s.item_config[id];
 }
 
 struct prayer_config *
