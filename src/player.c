@@ -129,18 +129,6 @@ player_accept(struct server *s, int sock)
 	p->inventory[p->inv_count].id = 17;
 	p->inventory[p->inv_count++].stack = 1;
 	p->inventory[p->inv_count].id = 59;
-	p->inventory[p->inv_count++].stack = 1;
-	p->inventory[p->inv_count].id = 215;
-	p->inventory[p->inv_count++].stack = 1;
-	p->inventory[p->inv_count].id = 0;
-	p->inventory[p->inv_count++].stack = 1;
-	p->inventory[p->inv_count].id = 317;
-	p->inventory[p->inv_count++].stack = 1;
-	p->inventory[p->inv_count].id = 185;
-	p->inventory[p->inv_count++].stack = 1;
-	p->inventory[p->inv_count].id = 184;
-	p->inventory[p->inv_count++].stack = 1;
-	p->inventory[p->inv_count].id = 11;
 	p->inventory[p->inv_count++].stack = 25;
 	p->inventory[p->inv_count].id = 190;
 	p->inventory[p->inv_count++].stack = 25;
@@ -150,6 +138,18 @@ player_accept(struct server *s, int sock)
 	p->inventory[p->inv_count++].stack = 1;
 	p->inventory[p->inv_count].id = 20;
 	p->inventory[p->inv_count++].stack = 1;
+	p->inventory[p->inv_count].id = 31;
+	p->inventory[p->inv_count++].stack = 100;
+	p->inventory[p->inv_count].id = 32;
+	p->inventory[p->inv_count++].stack = 100;
+	p->inventory[p->inv_count].id = 33;
+	p->inventory[p->inv_count++].stack = 100;
+	p->inventory[p->inv_count].id = 34;
+	p->inventory[p->inv_count++].stack = 100;
+	p->inventory[p->inv_count].id = 35;
+	p->inventory[p->inv_count++].stack = 100;
+	p->inventory[p->inv_count].id = 36;
+	p->inventory[p->inv_count++].stack = 100;
 
 	p->stats_changed = true;
 	p->bonus_changed = true;
@@ -1525,5 +1525,22 @@ player_process_action(struct player *p)
 		}
 		p->action = ACTION_NONE;
 		break;
+	case ACTION_NPC_CAST:
+		printf("attempt cast on npc %s\n", p->spell->name);
+		p->action = ACTION_NONE;
+		break;
+	case ACTION_PLAYER_CAST:
+		printf("attempt cast on player %s\n", p->spell->name);
+		p->action = ACTION_NONE;
+		break;
 	}
+}
+
+bool
+player_has_reagents(struct player *p, struct spell_config *spell)
+{
+	/* TODO implement */
+	(void)p;
+	(void)spell;
+	return true;
 }

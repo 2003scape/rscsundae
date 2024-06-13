@@ -322,6 +322,81 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			p->following_player = (int16_t)target;
 		}
 		break;
+	case OP_CLI_NPC_CAST:
+		{
+			uint16_t target_id, spell_id;
+			struct npc *npc;
+			struct spell_config *spell;
+
+			if (buf_getu16(data, offset, len, &target_id) == -1) {
+				return;
+			}
+			offset += 2;
+			if (buf_getu16(data, offset, len, &spell_id) == -1) {
+				return;
+			}
+			offset += 2;
+			if (target_id >= MAXNPCS) {
+				printf("not valid npc\n");
+				return;
+			}
+			spell = server_spell_config_by_id(spell_id);
+			printf("spell id is %d\n", spell_id);
+			if (spell == NULL ||
+			    spell->level > p->mob.cur_stats[SKILL_MAGIC] ||
+			    spell->type != SPELL_CAST_ON_MOB ||
+			    !player_has_reagents(p, spell)) {
+				/*
+				 * normally the client validates this and produces
+				 * a nice message
+				 */
+				return;
+			}
+			npc = p->mob.server->npcs[target_id];
+			if (npc != NULL) {
+				p->action = ACTION_NPC_CAST;
+				p->spell = spell;
+				p->target_npc = npc->mob.id;
+			}
+		}
+		break;
+	case OP_CLI_PLAYER_CAST:
+		{
+			uint16_t target_id, spell_id;
+			struct player *target;
+			struct spell_config *spell;
+
+			if (buf_getu16(data, offset, len, &target_id) == -1) {
+				return;
+			}
+			offset += 2;
+			if (buf_getu16(data, offset, len, &spell_id) == -1) {
+				return;
+			}
+			offset += 2;
+			if (target_id >= MAXPLAYERS) {
+				return;
+			}
+			target = p->mob.server->players[target_id];
+			spell = server_spell_config_by_id(spell_id);
+			if (spell == NULL ||
+			    spell->level > p->mob.cur_stats[SKILL_MAGIC] ||
+			    (spell->type != SPELL_CAST_ON_MOB &&
+				spell->type != SPELL_CAST_ON_PLAYER) ||
+			    !player_has_reagents(p, spell)) {
+				/*
+				 * normally the client validates this and produces
+				 * a nice message
+				 */
+				return;
+			}
+			if (target != NULL) {
+				p->action = ACTION_PLAYER_CAST;
+				p->spell = spell;
+				p->target_npc = target->mob.id;
+			}
+		}
+		break;
 	case OP_CLI_ATTACK_PLAYER:
 		{
 			struct player *t;

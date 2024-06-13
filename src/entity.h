@@ -40,9 +40,11 @@ struct ground_item;
 enum action {
 	ACTION_NONE		= 0,
 	ACTION_NPC_TALK		= 1,
-	ACTION_INV_DROP		= 2,
-	ACTION_INV_USE		= 3,
-	ACTION_ITEM_TAKE	= 4
+	ACTION_NPC_CAST		= 2,
+	ACTION_INV_DROP		= 3,
+	ACTION_INV_USE		= 4,
+	ACTION_ITEM_TAKE	= 5,
+	ACTION_PLAYER_CAST	= 6
 };
 
 enum trade_state {
@@ -254,6 +256,7 @@ struct player {
 	uint16_t projectile_sprite;
 	uint16_t projectile_target_player;
 	uint8_t action;
+	struct spell_config *spell;
 	uint16_t target_npc;
 	uint16_t target_slot;
 	uint16_t bubble_id;
@@ -311,6 +314,7 @@ size_t player_get_nearby_items(struct player *, struct ground_item *, size_t);
 void player_clear_actions(struct player *);
 void player_process_action(struct player *);
 void player_trade_request(struct player *, uint16_t);
+bool player_has_reagents(struct player *, struct spell_config *);
 
 /* incoming.c */
 int player_parse_incoming(struct player *);
