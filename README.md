@@ -2,9 +2,10 @@ RSC Sundae
 ==========
 
 RSC Sundae is a simple, single-threaded RS Classic server emulator
-written in C99.  It is based on clean-room reverse engineering.
-For content scripting, it features an implementation of the original
-RuneScript API in Lua.
+written in C99.  It is based on clean-room reverse engineering and
+contains no copyrighted source code.  For content scripting, it
+features an implementation of the original RuneScript API in Lua
+based on public documents.
 
 It was inspired by the RSC-C client's lack of a native server.
 Since RSC-C runs on old and low-power mobile devices, RSC Sundae
@@ -28,12 +29,14 @@ RSC Sundae will never support:
 * Custom private server protocols or data formats
 * Integration with proprietary services like Discord
 
-Dependencies
-------------
+Building
+--------
 
 RSC Sundae is developed on NetBSD. I occasionally test it on
 Mac OS X 10.4 and Alpine Linux. If I break something on another
 UNIX-like platform, please send a patch.
+
+Dependencies:
 
 * BZip2 (for decompressing Jagex Archives to load the original game data)
 * Lua 5.4 (for running content scripts)
