@@ -722,9 +722,14 @@ player_process_combat(struct player *p)
 			if (difference > depth) {
 				char msgdepth[64];
 
-				(void)snprintf(msgdepth, sizeof(msgdepth),
-				    "You can only attack players within %d levels of your own here",
-				    depth);
+				if (depth == 1) {
+					(void)snprintf(msgdepth, sizeof(msgdepth),
+					    "You can only attack players within 1 level of your own here");
+				} else {
+					(void)snprintf(msgdepth, sizeof(msgdepth),
+					    "You can only attack players within %d levels of your own here",
+					    depth);
+				}
 				player_send_message(p, msgdepth);
 				player_send_message(p, "Move further into the wilderness for less restrictions");
 				mob_combat_reset(&p->mob);
