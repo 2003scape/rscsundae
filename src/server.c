@@ -242,11 +242,11 @@ server_tick(void)
 			s.players[i] = NULL;
 			continue;
 		}
-		player_process_action(s.players[i]);
-		script_process(s.lua, s.players[i]);
 		net_player_recv(s.players[i]);
 		player_parse_incoming(s.players[i]);
 		player_process_combat(s.players[i]);
+		player_process_action(s.players[i]);
+		script_process(s.lua, s.players[i]);
 		player_process_walk_queue(s.players[i]);
 		if (drain_tick) {
 			player_prayer_drain(s.players[i]);
