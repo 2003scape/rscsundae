@@ -123,7 +123,7 @@ stat_advance(struct player *player, int stat,
 	}
 }
 
-/* corresponds to runescript statadd */
+/* corresponds to runescript addstat */
 void
 stat_add(struct mob *mob, int stat, int constant, int percent)
 {
@@ -142,7 +142,7 @@ stat_add(struct mob *mob, int stat, int constant, int percent)
 	mob->cur_stats[stat] = (uint16_t)(new > max ? max : new);
 }
 
-/* corresponds to runescript statremove */
+/* corresponds to runescript substat */
 void
 stat_remove(struct mob *mob, int stat, int constant, int percent)
 {
@@ -155,7 +155,7 @@ stat_remove(struct mob *mob, int stat, int constant, int percent)
 	mob->cur_stats[stat] = (uint16_t)(new < 0 ? 0 : new);
 }
 
-/* corresponds to runescript statheal */
+/* corresponds to runescript healstat */
 void
 stat_heal(struct mob *mob, int stat, int constant, int percent)
 {
