@@ -457,6 +457,19 @@ load_config_jag(void)
 	printf("read configuration for %zu npcs\n",
 	    s.npc_config_count);
 
+	if (jag_find_entry(&archive, "spells.txt", &entry) == -1 ||
+	    jag_unpack_entry(&entry) == -1) {
+		goto err;
+	}
+	s.spell_config = config_parse_spells((char *)entry.data,
+	    entry.unpacked_len, &s.spell_config_count,
+	    s.item_config, s.item_config_count);
+	if (s.spell_config == NULL) {
+		goto err;
+	}
+	printf("read configuration for %zu spells\n",
+	    s.spell_config_count);
+
 	return 0;
 err:
 	if (entry.must_free) {
@@ -723,6 +736,15 @@ server_bound_config_by_id(int id)
 		return NULL;
 	}
 	return &s.bound_config[id];
+}
+
+struct spell_config *
+server_spell_config_by_id(int id)
+{
+	if (id < 0 || id >= (int)s.spell_config_count) {
+		return NULL;
+	}
+	return &s.spell_config[id];
 }
 
 struct npc_config *

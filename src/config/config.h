@@ -9,6 +9,8 @@
 #define MAX_BOUND_NAMES	(4)
 #define MAX_NPC_NAMES	(4)
 
+#define MAX_SPELL_REAGENTS	(4)
+
 /* entities defined in config.jag */
 
 enum equip_type {
@@ -163,6 +165,31 @@ struct npc_config {
 	struct npc_drop_config *drops;
 };
 
+enum spell_type {
+	SPELL_CAST_ON_SELF	= 0,
+	SPELL_CAST_ON_PLAYER	= 1,
+	SPELL_CAST_ON_MOB	= 2,
+	SPELL_CAST_ON_ITEM	= 3,
+	SPELL_CAST_ON_BOUND	= 4,
+	SPELL_CAST_ON_LOC	= 5,
+	SPELL_CAST_ON_TILE	= 6,
+};
+
+struct spell_reagent {
+	uint16_t item_id;
+	uint8_t amount;
+};
+
+struct spell_config {
+	uint16_t id;
+	char *name;
+	uint8_t level;
+	char *description;
+	uint8_t type;
+	uint8_t reagent_count;
+	struct spell_reagent reagents[MAX_SPELL_REAGENTS];
+};
+
 int config_find_entity(const char *, struct entity_config *, size_t);
 int config_find_item(const char *, struct item_config *, size_t);
 struct item_config *config_parse_items(char *, size_t, size_t *,
@@ -174,6 +201,8 @@ struct bound_config *config_parse_bounds(char *, size_t, size_t *);
 struct projectile_config *config_parse_projectiles(char *, size_t, size_t *);
 struct npc_config *config_parse_npcs(char *, size_t, size_t *,
     struct entity_config *, size_t, struct item_config *, size_t);
+struct spell_config *config_parse_spells(char *, size_t, size_t *,
+    struct item_config *, size_t);
 bool item_equip_clear(struct item_config *, int);
 
 #endif

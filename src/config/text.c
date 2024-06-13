@@ -1169,3 +1169,108 @@ err:
 	npcs = NULL;
 	return NULL;
 }
+
+struct spell_config *
+config_parse_spells(char *buffer, size_t len, size_t *num_spells,
+    struct item_config *items, size_t num_items)
+{
+	struct spell_config *spells = NULL;
+	size_t max_spells;
+	size_t offset;
+	ssize_t tmp;
+	long tmpl;
+
+	offset = 0;
+	tmp = next_token_int(buffer, offset, len, &tmpl);
+	if (tmp == -1) {
+		return NULL;
+	}
+	offset = tmp;
+	max_spells = tmpl;
+
+	spells = calloc(max_spells, sizeof(struct spell_config));
+	if (spells == NULL) {
+		return NULL;
+	}
+	for (size_t i = 0; i < max_spells; ++i) {
+		spells[i].id = i;
+
+		/* first line: name, level, type */
+
+		tmp = next_line(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+
+		tmp = next_token(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		spells[i].name = buffer + tmp;
+		offset = tmp + strlen(buffer + tmp) + 1;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > UINT8_MAX) {
+			goto err;
+		}
+		spells[i].level = tmpl;
+		offset = tmp;
+
+		tmp = next_token(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		spells[i].description = buffer + tmp;
+		offset = tmp + strlen(buffer + tmp) + 1;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > UINT8_MAX) {
+			goto err;
+		}
+		spells[i].type = tmpl;
+		offset = tmp;
+
+		/* second line: reagents */
+
+		tmp = next_line(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > UINT8_MAX) {
+			goto err;
+		}
+		spells[i].reagent_count = tmpl;
+		offset = tmp;
+
+		assert(spells[i].reagent_count <= MAX_SPELL_REAGENTS);
+
+		for (int j = 0; j < spells[i].reagent_count; ++j) {
+			tmp = next_token(buffer, offset, len);
+			if (tmp == -1) {
+				goto err;
+			}
+			spells[i].reagents[j].item_id =
+			    config_find_item(buffer + tmp, items, num_items);
+			offset = tmp + strlen(buffer + tmp) + 1;
+
+			tmp = next_token_int(buffer, offset, len, &tmpl);
+			if (tmp == -1 || tmpl > UINT8_MAX) {
+				goto err;
+			}
+			spells[i].reagents[j].amount = tmpl;
+			offset = tmp;
+		}
+	}
+
+	*num_spells = max_spells;
+	return spells;
+err:
+	assert(0);
+	free(spells);
+	spells = NULL;
+	return NULL;
+}

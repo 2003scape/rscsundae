@@ -39,6 +39,8 @@ struct server {
 	size_t projectile_config_count;
 	struct npc_config *npc_config;
 	size_t npc_config_count;
+	struct spell_config *spell_config;
+	size_t spell_config_count;
 	uint16_t start_tile_x;
 	uint16_t start_tile_y;
 	int xp_multiplier;
@@ -59,6 +61,7 @@ struct prayer_config *server_prayer_config_by_id(int);
 struct loc_config *server_loc_config_by_id(int);
 struct bound_config *server_bound_config_by_id(int);
 struct npc_config *server_npc_config_by_id(int);
+struct spell_config *server_spell_config_by_id(int);
 struct projectile_config *server_find_projectile(const char *);
 int server_add_npc(int, int, int);
 int server_add_temp_item(struct player *, int, int, int, uint32_t);
