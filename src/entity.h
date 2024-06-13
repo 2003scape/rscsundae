@@ -257,8 +257,9 @@ struct player {
 	uint16_t projectile_target_player;
 	uint8_t action;
 	struct spell_config *spell;
-	uint16_t target_npc;
-	uint16_t target_slot;
+	uint16_t action_npc;
+	uint16_t action_player;
+	uint16_t action_slot;
 	uint16_t bubble_id;
 	struct ground_item *target_item;
 };
@@ -315,6 +316,9 @@ void player_clear_actions(struct player *);
 void player_process_action(struct player *);
 void player_trade_request(struct player *, uint16_t);
 bool player_has_reagents(struct player *, struct spell_config *);
+void player_damage(struct player *, struct player *, int);
+void player_shoot_pvp(struct player *, struct projectile_config *,
+    struct player *);
 
 /* incoming.c */
 int player_parse_incoming(struct player *);

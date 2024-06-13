@@ -10,5 +10,7 @@ void script_multi_answer(lua_State *, struct player *, int);
 void script_cancel(lua_State *, uint16_t);
 void script_onnpctalk(lua_State *, struct player *, struct npc *);
 void script_onuseobj(lua_State *, struct player *, struct item_config *);
+void script_onskillplayer(lua_State *, struct player *,
+    struct player *, struct spell_config *);
 
 #endif

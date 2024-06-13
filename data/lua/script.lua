@@ -1,5 +1,6 @@
-npc_scripts = {}
-useobj_scripts = {}
+ontalknpc_scripts = {}
+onuseobj_scripts = {}
+onskillplayer_scripts = {}
 player_scripts = {}
 active_script = nil
 
@@ -12,11 +13,19 @@ STAT_PRAYER		= 5
 STAT_MAGIC		= 6
 
 function register_talknpc(name, callback)
-	npc_scripts[name] = callback;
+	ontalknpc_scripts[name] = callback;
 end
 
 function register_useobj(name, callback)
-	useobj_scripts[name] = callback;
+	onuseobj_scripts[name] = callback;
+end
+
+function register_skillplayer(name, callback)
+	onskillplayer_scripts[name] = callback;
+end
+
+function register_skillnpc(name, callback)
+	-- TODO implement
 end
 
 function script_engine_process(player)
@@ -72,7 +81,7 @@ function script_engine_ontalknpc(player, name, npc)
 		return true
 	end
 	name = string.lower(name)
-	script = npc_scripts[name]
+	script = ontalknpc_scripts[name]
 	if script then
 		ps = {}
 		ps.delay = 0
@@ -96,7 +105,7 @@ function script_engine_onuseobj(player, name)
 		return true
 	end
 	name = string.lower(name)
-	script = useobj_scripts[name]
+	script = onuseobj_scripts[name]
 	if script then
 		ps = {}
 		ps.delay = 0
@@ -110,6 +119,35 @@ function script_engine_onuseobj(player, name)
 		return true
 	end
 	return false
+end
+
+function script_engine_onskillplayer(player, target, name)
+	local script = player_scripts[player]
+	if script then
+		return true
+	end
+	name = string.lower(name)
+	script = onskillplayer_scripts[name]
+	if script then
+		ps = {}
+		ps.delay = 0
+		ps.option_count = 0
+		ps.npc = nil
+		ps.co = coroutine.create(function()
+			script(player, target)
+			player_scripts[player] = nil
+		end)
+		player_scripts[player] = ps
+		return true
+	else
+		print("no such script")
+	end
+	return false
+end
+
+function delay(length)
+	active_script.delay = length
+	coroutine.yield(active_script.co)
 end
 
 function delay(length)
@@ -141,6 +179,8 @@ dofile("./data/lua/rs1/npc/bartender.lua")
 dofile("./data/lua/rs1/npc/man.lua")
 dofile("./data/lua/rs1/npc/kebabseller.lua")
 dofile("./data/lua/rs1/npc/silktrader.lua")
+dofile("./data/lua/rs1/skill_magic/curses.lua")
+dofile("./data/lua/rs1/skill_magic/missiles.lua")
 dofile("./data/lua/rs1/skill_prayer/bones.lua")
 dofile("./data/lua/rs1/items/food.lua")
 dofile("./data/lua/rs1/items/cabbage.lua")
@@ -173,6 +213,9 @@ for k in pairs(_G) do
 		elseif string.match(k, "talknpc_.*") then
 			target = string.gsub(string.sub(k, 9), "_", " ")
 			register_talknpc(target, v)
-                end
-        end
+		elseif string.match(k, "skillplayer_.*") then
+			target = string.gsub(string.sub(k, 13), "_", " ")
+			register_skillplayer(target, v)
+		end
+	end
 end

@@ -50,9 +50,9 @@ These should all be implemented in Lua script:
 
 - [x] Prayer (bone burying)
 - [ ] Prayer (altars)
-- [ ] Magic (missiles vs. players)
+- [x] Magic (missiles vs. players)
 - [ ] Magic (missiles vs. NPCs)
-- [ ] Magic (curses)
+- [x] Magic (curses)
 - [ ] Magic (teleportation)
 - [ ] Magic (telegrab)
 - [ ] Magic (alchemy)
@@ -108,6 +108,7 @@ These should all be implemented in Lua script:
 - [ ] Monk NPC dialogue
 - [ ] Brother Jered NPC dialogue
 - [ ] Barbarian NPC dialogue
+- [ ] Pirate NPC dialogue
 - [x] Man NPC dialogue
 - [ ] Thrander NPC dialogue
 - [ ] Bareak NPC dialogue

@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <math.h>
 #include "config/anim.h"
 #include "protocol/opcodes.h"
 #include "inventory.h"
@@ -24,7 +25,7 @@ static int player_get_defense_boosted(struct player *);
 static int player_get_strength_boosted(struct player *);
 static int player_pvp_roll(struct player *, struct player *);
 static int player_pvp_ranged_roll(struct player *, struct player *);
-static void player_process_ranged_pvp(struct player *, struct player *);
+static bool player_wilderness_check(struct player *, struct player *);
 static void player_recalculate_bonus(struct player *);
 
 struct player *
@@ -605,42 +606,63 @@ player_die(struct player *p, struct player *victor)
 	p->appearance_changed = true;
 }
 
-static void
-player_process_ranged_pvp(struct player *p, struct player *target)
+void
+player_damage(struct player *p, struct player *aggressor, int roll)
+{
+	if (roll >= p->mob.cur_stats[SKILL_HITS]) {
+		char name[32], msg[64];
+
+		p->mob.target_player = -1;
+		player_die(p, aggressor);
+		if (aggressor != NULL) {
+			mod37_namedec(p->name, name);
+			(void)snprintf(msg, sizeof(msg),
+			    "You have defeated %s!", name);
+			player_send_message(aggressor, msg);
+		}
+		return;
+	}
+
+	p->mob.cur_stats[SKILL_HITS] -= roll;
+	p->mob.damage = roll;
+	p->mob.damage_timer = p->mob.server->tick_counter;
+}
+
+void
+player_shoot_pvp(struct player *p, struct projectile_config *projectile,
+    struct player *target)
 {
 	struct item_config *ammo_config;
 	char name[32], message[64];
 	int range;
-	int roll;
+	int roll = 0;
 
 	assert(p != NULL);
 	assert(target != NULL);
-	assert(p->projectile != NULL);
+	assert(projectile != NULL);
 
-	range = p->projectile->range;
 
 	p->walk_queue_len = 0;
 	p->walk_queue_pos = 0;
 	p->following_player = -1;
 
-	if (p->mob.server->tick_counter < p->mob.combat_next_hit) {
-		return;
+	if (projectile->type != PROJECTILE_TYPE_MAGIC) {
+		range = projectile->range;
+		if ((abs(p->mob.x - (int)target->mob.x) > range) ||
+		    (abs(p->mob.y - (int)target->mob.y) > range)) {
+			p->following_player = target->mob.id;
+			return;
+		}
+
+		if (target->prayers[PRAY_PROTECT_FROM_MISSILES]) {
+			player_send_message(p,
+			    "Player has a protection from missiles prayer active!");
+			p->mob.target_player = -1;
+			return;
+		}
 	}
 
-	if ((abs(p->mob.x - (int)target->mob.x) > range) ||
-	    (abs(p->mob.y - (int)target->mob.y) > range)) {
-		p->following_player = target->mob.id;
-		return;
-	}
-
-	if (target->prayers[PRAY_PROTECT_FROM_MISSILES]) {
-		player_send_message(p,
-		    "Player has a protection from missiles prayer active!");
-		p->mob.target_player = -1;
-		return;
-	}
-
-	ammo_config = server_find_item_config(p->projectile->item);
+	ammo_config = server_find_item_config(projectile->item);
 	if (ammo_config != NULL) {
 		if (player_inv_held(p, ammo_config, 1)) {
 			player_inv_remove(p, ammo_config, 1);
@@ -653,8 +675,10 @@ player_process_ranged_pvp(struct player *p, struct player *target)
 
 	/* TODO: verify reachability */
 
-	/* XXX verify if it's always northwest */
-	p->mob.dir = MOB_DIR_NORTHWEST;
+	if (projectile->type != PROJECTILE_TYPE_MAGIC) {
+		/* XXX verify if it's always northwest */
+		p->mob.dir = MOB_DIR_NORTHWEST;
+	}
 
 	if (!p->skulled) {
 		/* skull remains for 20 minutes */
@@ -665,35 +689,60 @@ player_process_ranged_pvp(struct player *p, struct player *target)
 		p->appearance_changed = true;
 	}
 
-	roll = player_pvp_ranged_roll(p, target);
-	if (roll > 0) {
-		stat_advance(p, SKILL_RANGED, roll * 16, 0);
-	}
-	if (roll >= target->mob.cur_stats[SKILL_HITS]) {
-		char name[32], msg[64];
+	if (projectile->type != PROJECTILE_TYPE_MAGIC) {
+		roll = player_pvp_ranged_roll(p, target);
+		if (roll > 0) {
+			stat_advance(p, SKILL_RANGED, roll * 16, 0);
+		}
+	} else if (projectile->power > 0) {
+		double rand = ranval(&p->mob.server->ran) / (double)UINT32_MAX;
+		double dmg = (projectile->power + 5.0) * rand;
 
-		p->mob.target_player = -1;
-		player_die(target, p);
-		mod37_namedec(target->name, name);
-		(void)snprintf(msg, sizeof(msg),
-		    "You have defeated %s!", name);
-		player_send_message(p, msg);
-		return;
+		roll = dmg / 10;
 	}
 
-	target->mob.cur_stats[SKILL_HITS] -= roll;
-	target->mob.damage = roll;
-	target->mob.damage_timer = p->mob.server->tick_counter;
+	if (projectile->power > 0) {
+		player_damage(target, p, roll);
+	}
 
-	p->projectile_sprite = p->projectile->sprite;
+	p->projectile_sprite = projectile->sprite;
 	p->projectile_target_player = target->mob.id;
 
 	mod37_namedec(p->name, name);
 	(void)snprintf(message, sizeof(message),
 	    "Warning! %s is shooting at you!", name);
 	player_send_message(target, message);
+}
 
-	p->mob.combat_next_hit = p->mob.server->tick_counter + 4;
+static bool
+player_wilderness_check(struct player *p, struct player *target)
+{
+	int depth = mob_wilderness_level(&target->mob);
+	if (depth <= 0) {
+		return false;
+	}
+
+	int difference = abs(target->mob.combat_level -
+	    (int)p->mob.combat_level);
+
+	if (difference > depth) {
+		char msgdepth[64];
+
+		if (depth == 1) {
+			(void)snprintf(msgdepth, sizeof(msgdepth),
+			    "You can only attack players within 1 level of your own here");
+		} else {
+			(void)snprintf(msgdepth, sizeof(msgdepth),
+			    "You can only attack players within %d levels of your own here",
+			    depth);
+		}
+		player_send_message(p, msgdepth);
+		player_send_message(p,
+		    "Move further into the wilderness for less restrictions");
+		return false;
+	}
+
+	return true;
 }
 
 void
@@ -710,34 +759,17 @@ player_process_combat(struct player *p)
 				return;
 			}
 
-			int depth = mob_wilderness_level(&target->mob);
-			if (depth <= 0) {
-				mob_combat_reset(&p->mob);
-				return;
-			}
-
-			int difference = abs(target->mob.combat_level -
-			    (int)p->mob.combat_level);
-
-			if (difference > depth) {
-				char msgdepth[64];
-
-				if (depth == 1) {
-					(void)snprintf(msgdepth, sizeof(msgdepth),
-					    "You can only attack players within 1 level of your own here");
-				} else {
-					(void)snprintf(msgdepth, sizeof(msgdepth),
-					    "You can only attack players within %d levels of your own here",
-					    depth);
-				}
-				player_send_message(p, msgdepth);
-				player_send_message(p, "Move further into the wilderness for less restrictions");
-				mob_combat_reset(&p->mob);
+			if (!player_wilderness_check(p, target)) {
+				p->mob.target_player = -1;
 				return;
 			}
 
 			if (p->projectile != NULL) {
-				player_process_ranged_pvp(p, target);
+				if (p->mob.server->tick_counter < p->mob.combat_next_hit) {
+					return;
+				}
+				player_shoot_pvp(p, p->projectile, target);
+				p->mob.combat_next_hit = p->mob.server->tick_counter + 4;
 				return;
 			}
 
@@ -849,23 +881,9 @@ player_process_combat(struct player *p)
 		}
 
 		roll = player_pvp_roll(p, target);
-		if (roll >= target->mob.cur_stats[SKILL_HITS]) {
-			char name[32], msg[64];
-
-			mob_combat_reset(&p->mob);
-			player_award_combat_xp(p, &target->mob);
-			player_die(target, p);
-			mod37_namedec(target->name, name);
-			(void)snprintf(msg, sizeof(msg),
-			    "You have defeated %s!", name);
-			player_send_message(p, msg);
-			return;
-		}
-		target->mob.cur_stats[SKILL_HITS] -= roll;
-		target->mob.damage = roll;
+		player_damage(target, p, roll);
 		target->mob.combat_rounds++;
 		target->mob.combat_timer = p->mob.server->tick_counter;
-		target->mob.damage_timer = p->mob.server->tick_counter;
 	}
 
 	p->mob.combat_next_hit = p->mob.server->tick_counter + 4;
@@ -1438,6 +1456,7 @@ void
 player_process_action(struct player *p)
 {
 	struct npc *npc;
+	struct player *target;
 	struct item_config *item_config;
 	struct ground_item *item;
 	uint16_t id;
@@ -1445,7 +1464,7 @@ player_process_action(struct player *p)
 
 	switch (p->action) {
 	case ACTION_NPC_TALK:
-		npc = p->mob.server->npcs[p->target_npc];
+		npc = p->mob.server->npcs[p->action_npc];
 		if (npc == NULL) {
 			p->action = ACTION_NONE;
 			return;
@@ -1470,7 +1489,7 @@ player_process_action(struct player *p)
 		p->action = ACTION_NONE;
 		break;
 	case ACTION_INV_DROP:
-		if (p->target_slot >= p->inv_count) {
+		if (p->action_slot >= p->inv_count) {
 			p->action = ACTION_NONE;
 			return;
 		}
@@ -1479,8 +1498,8 @@ player_process_action(struct player *p)
 			return;
 		}
 
-		id = p->inventory[p->target_slot].id;
-		stack = p->inventory[p->target_slot].stack;
+		id = p->inventory[p->action_slot].id;
+		stack = p->inventory[p->action_slot].stack;
 		item_config = server_item_config_by_id(id);
 		assert(item_config != NULL);
 		player_inv_remove(p, item_config, stack);
@@ -1488,11 +1507,11 @@ player_process_action(struct player *p)
 		p->action = ACTION_NONE;
 		break;
 	case ACTION_INV_USE:
-		if (p->target_slot >= p->inv_count) {
+		if (p->action_slot >= p->inv_count) {
 			p->action = ACTION_NONE;
 			return;
 		}
-		id = p->inventory[p->target_slot].id;
+		id = p->inventory[p->action_slot].id;
 		item_config = server_item_config_by_id(id);
 		script_onuseobj(p->mob.server->lua, p, item_config);
 		p->action = ACTION_NONE;
@@ -1530,7 +1549,23 @@ player_process_action(struct player *p)
 		p->action = ACTION_NONE;
 		break;
 	case ACTION_PLAYER_CAST:
-		printf("attempt cast on player %s\n", p->spell->name);
+		target = p->mob.server->players[p->action_player];
+		if (target == NULL ||
+		    !player_wilderness_check(p, target)) {
+			p->action = ACTION_NONE;
+			return;
+		}
+		/* should be able to shoot within 4 tiles */
+		if (!mob_within_range(&p->mob,
+		    target->mob.x, target->mob.y, 4)) {
+			return;
+		}
+		/* TODO: failing casts */
+		/* TODO: spell timer */
+		p->walk_queue_len = 0;
+		p->walk_queue_pos = 0;
+		script_onskillplayer(p->mob.server->lua,
+		    p, target, p->spell);
 		p->action = ACTION_NONE;
 		break;
 	}
@@ -1539,7 +1574,7 @@ player_process_action(struct player *p)
 bool
 player_has_reagents(struct player *p, struct spell_config *spell)
 {
-	/* TODO implement */
+	/* TODO implement. prioritize since it enales cheating */
 	(void)p;
 	(void)spell;
 	return true;

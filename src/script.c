@@ -20,6 +20,7 @@ static int script_random(lua_State *);
 static int script_give(lua_State *);
 static int script_remove(lua_State *);
 static int script_held(lua_State *);
+static int script_worn(lua_State *);
 static int script_advancestat(lua_State *);
 static int script_healstat(lua_State *);
 static int script_addstat(lua_State *);
@@ -27,6 +28,7 @@ static int script_substat(lua_State *);
 static int script_statup(lua_State *);
 static int script_statdown(lua_State *);
 static int script_thinkbubble(lua_State *);
+static int script_shootplayer(lua_State *);
 static int script_multi(lua_State *);
 static struct player *id_to_player(lua_Integer);
 static struct npc *id_to_npc(lua_Integer);
@@ -394,8 +396,16 @@ script_substat(lua_State *L)
 		script_cancel(L, player_id);
 		return 0;
 	}
-	stat_remove(&p->mob, stat, constant, percent);
-	player_send_stat(p, stat);
+	if (stat != SKILL_HITS) {
+		stat_remove(&p->mob, stat, constant, percent);
+		player_send_stat(p, stat);
+	} else {
+		int extra;
+
+		extra = (int)((p->mob.base_stats[stat] *
+		    (double)percent) / 100.0);
+		player_damage(p, NULL, constant + extra);
+	}
 	return 0;
 }
 
@@ -495,6 +505,37 @@ script_held(lua_State *L)
 }
 
 static int
+script_worn(lua_State *L)
+{
+	const char *item_name;
+	lua_Integer player_id;
+	struct player *p;
+	struct item_config *item;
+	int result;
+
+	player_id = luaL_checkinteger(L, 1);
+	item_name = luaL_checkstring(L, 2);
+
+	p = id_to_player(player_id);
+	if (p == NULL) {
+		printf("script warning: player %ld is undefined\n", player_id);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	item = server_find_item_config(item_name);
+	if (item == NULL) {
+		printf("script warning: item %s is undefined\n", item_name);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	result = player_inv_worn(p, item);
+	lua_pushboolean(L, result);
+	return 1;
+}
+
+static int
 script_thinkbubble(lua_State *L)
 {
 	lua_Integer player_id;
@@ -520,6 +561,43 @@ script_thinkbubble(lua_State *L)
 	}
 
 	p->bubble_id = item->id;
+	return 0;
+}
+
+static int
+script_shootplayer(lua_State *L)
+{
+	lua_Integer player_id, target_id;
+	const char *proj_name;
+	struct player *p, *target;
+	struct projectile_config *proj;
+
+	player_id = luaL_checkinteger(L, 1);
+	target_id = luaL_checkinteger(L, 2);
+	proj_name = luaL_checkstring(L, 3);
+
+	p = id_to_player(player_id);
+	if (p == NULL) {
+		printf("script warning: player %ld is undefined\n", player_id);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	target = id_to_player(target_id);
+	if (target == NULL) {
+		printf("script warning: player %ld is undefined\n", target_id);
+		script_cancel(L, target_id);
+		return 0;
+	}
+
+	proj = server_find_projectile(proj_name);
+	if (proj == NULL) {
+		printf("script warning: projectile %s is undefined\n", proj_name);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	player_shoot_pvp(p, proj, target);
 	return 0;
 }
 
@@ -584,6 +662,22 @@ script_onuseobj(lua_State *L, struct player *p, struct item_config *item)
 		}
 	}
 	player_send_message(p, "Nothing interesting happens");
+}
+
+/* XXX: this name is assumed, not actually found in runescript docs */
+void
+script_onskillplayer(lua_State *L, struct player *p,
+    struct player *target, struct spell_config *spell)
+{
+	lua_getglobal(L, "script_engine_onskillplayer");
+	if (!lua_isfunction(L, -1)) {
+		puts("script error: can't find essential function script_engine_onskillplayer");
+		return;
+	}
+	lua_pushnumber(L, p->mob.id);
+	lua_pushnumber(L, target->mob.id);
+	lua_pushstring(L, spell->name);
+	lua_pcall(L, 3, 0, 0);
 }
 
 void
@@ -651,6 +745,9 @@ script_init(struct server *s)
 	lua_pushcfunction(L, script_held);
 	lua_setglobal(L, "held");
 
+	lua_pushcfunction(L, script_worn);
+	lua_setglobal(L, "worn");
+
 	lua_pushcfunction(L, script_random);
 	lua_setglobal(L, "random");
 
@@ -674,6 +771,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_thinkbubble);
 	lua_setglobal(L, "thinkbubble");
+
+	lua_pushcfunction(L, script_shootplayer);
+	lua_setglobal(L, "shootplayer");
 
 	/* TODO: configurable path */
 	if (luaL_dofile(L, "./data/lua/script.lua") != LUA_OK) {

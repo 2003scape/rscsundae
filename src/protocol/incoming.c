@@ -356,7 +356,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			if (npc != NULL) {
 				p->action = ACTION_NPC_CAST;
 				p->spell = spell;
-				p->target_npc = npc->mob.id;
+				p->action_npc = npc->mob.id;
 			}
 		}
 		break;
@@ -393,7 +393,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			if (target != NULL) {
 				p->action = ACTION_PLAYER_CAST;
 				p->spell = spell;
-				p->target_npc = target->mob.id;
+				p->action_player = target->mob.id;
 			}
 		}
 		break;
@@ -440,7 +440,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			npc = p->mob.server->npcs[id];
 			if (npc != NULL) {
 				p->action = ACTION_NPC_TALK;
-				p->target_npc = npc->mob.id;
+				p->action_npc = npc->mob.id;
 			}
 		}
 		break;
@@ -455,7 +455,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			p->action = ACTION_INV_USE;
-			p->target_slot = slot;
+			p->action_slot = slot;
 		}
 		break;
 	case OP_CLI_INV_WEAR:
@@ -489,7 +489,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			}
 			offset += 2;
 			p->action = ACTION_INV_DROP;
-			p->target_slot = slot;
+			p->action_slot = slot;
 		}
 		break;
 	case OP_CLI_ITEM_TAKE:
@@ -518,9 +518,15 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			size_t steps;
 			int start_x, start_y;
 
-			if (len < 5 ||
-			    (p->mob.in_combat && player_retreat(p) == -1)) {
+			if (len < 5) {
 				return;
+			}
+			if (p->mob.in_combat) {
+				if (opcode == OP_CLI_WALK_ENTITY) {
+					return;
+				} else if (player_retreat(p) == -1) {
+					return;
+				}
 			}
 			steps = (len - 5) / 2;
 			if (buf_getu16(data, offset, len, &p->walk_queue_x[0]) == -1) {
