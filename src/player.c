@@ -549,6 +549,9 @@ player_die(struct player *p, struct player *victor)
 	player_clear_actions(p);
 
 	mob_combat_reset(&p->mob);
+	if (victor != NULL) {
+		mob_combat_reset(&victor->mob);
+	}
 
 	item = server_find_item_config("bones");
 	assert(item != NULL);
@@ -604,22 +607,22 @@ player_die(struct player *p, struct player *victor)
 
 	player_send_death(p);
 	p->appearance_changed = true;
+
+	if (victor != NULL) {
+		char name[32], msg[64];
+
+		mod37_namedec(p->name, name);
+		(void)snprintf(msg, sizeof(msg),
+		    "You have defeated %s!", name);
+		player_send_message(victor, msg);
+	}
 }
 
 void
 player_damage(struct player *p, struct player *aggressor, int roll)
 {
 	if (roll >= p->mob.cur_stats[SKILL_HITS]) {
-		char name[32], msg[64];
-
-		p->mob.target_player = -1;
 		player_die(p, aggressor);
-		if (aggressor != NULL) {
-			mod37_namedec(p->name, name);
-			(void)snprintf(msg, sizeof(msg),
-			    "You have defeated %s!", name);
-			player_send_message(aggressor, msg);
-		}
 		return;
 	}
 
