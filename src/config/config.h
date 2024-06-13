@@ -107,6 +107,11 @@ struct bound_config {
 	char *option_alt;
 };
 
+enum projectile_type {
+	PROJECTILE_TYPE_MAGIC	= 0,
+	PROJECTILE_TYPE_RANGED	= 1,
+};
+
 /* "projectile.txt" */
 struct projectile_config {
 	uint16_t id;
