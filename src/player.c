@@ -850,7 +850,7 @@ player_process_combat(struct player *p)
 					return;
 				}
 				player_shoot_pvp(p, p->projectile, target);
-				p->mob.combat_next_hit = p->mob.server->tick_counter + 4;
+				p->mob.combat_next_hit = p->mob.server->tick_counter + 3;
 				return;
 			}
 
@@ -915,7 +915,7 @@ player_process_combat(struct player *p)
 			target->mob.target_npc = -1;
 			target->mob.in_combat = true;
 			target->mob.combat_next_hit =
-			    target->mob.server->tick_counter + 3;
+			    target->mob.server->tick_counter + 4;
 			target->mob.combat_rounds = 0;
 			target->mob.dir = MOB_DIR_COMBAT_LEFT;
 
@@ -960,7 +960,7 @@ player_process_combat(struct player *p)
 		target->mob.combat_timer = p->mob.server->tick_counter;
 	}
 
-	p->mob.combat_next_hit = p->mob.server->tick_counter + 4;
+	p->mob.combat_next_hit = p->mob.server->tick_counter + 3;
 }
 
 int

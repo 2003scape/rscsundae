@@ -200,13 +200,19 @@ server_send_pm(struct player *from, int64_t target, uint8_t *msg, size_t len)
 void
 server_tick(void)
 {
-	bool drain_tick = s.tick_counter >= s.next_prayer_drain;
-	bool restore_tick = s.tick_counter >= s.next_restore;
-	bool rapid_restore_tick = s.tick_counter >= s.next_rapid_restore;
+	bool drain_tick;
+	bool restore_tick;
+	bool rapid_restore_tick;
 	uint64_t start_time;
 	uint64_t time_delay = 0;
 
 	start_time = get_time_ms();
+
+	s.tick_counter++;
+
+	drain_tick = s.tick_counter >= s.next_prayer_drain;
+	restore_tick = s.tick_counter >= s.next_restore;
+	rapid_restore_tick = s.tick_counter >= s.next_rapid_restore;
 
 	if (s.last_tick != 0) {
 		int64_t difference = start_time - s.last_tick;
@@ -338,8 +344,6 @@ server_tick(void)
 		s.npcs[i]->mob.damage = UINT8_MAX;
 		s.npcs[i]->mob.prev_dir = s.npcs[i]->mob.dir;
 	}
-
-	s.tick_counter++;
 
 	if (drain_tick) {
 		s.next_prayer_drain = s.tick_counter + 3;
