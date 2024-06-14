@@ -58,7 +58,7 @@ function skillnpc_weaken(player, target)
 		advancestat(player, STAT_MAGIC, 168, 0)
 		remove_curse_runes(player)
 		shootnpc(player, target, "dummybolt")
-		subnpcstat(target, STAT_STRENGTH, 0, 5)
+		subnpcstat(target, STAT_STRENGTH, 1, 5)
 	end
 end
 
@@ -70,7 +70,7 @@ function skillplayer_curse(player, target)
 		advancestat(player, STAT_MAGIC, 232, 0)
 		remove_curse_runes(player)
 		shootplayer(player, target, "dummybolt")
-		substat(target, STAT_DEFENSE, 0, 5)
+		substat(target, STAT_DEFENSE, 1, 5)
 		mes(target, "Your defense has been reduced by a curse spell!")
 	end
 end
@@ -83,7 +83,7 @@ function skillnpc_curse(player, target)
 		advancestat(player, STAT_MAGIC, 232, 0)
 		remove_curse_runes(player)
 		shootnpc(player, target, "dummybolt")
-		subnpcstat(target, STAT_DEFENSE, 0, 5)
+		subnpcstat(target, STAT_DEFENSE, 1, 5)
 	end
 end
 
