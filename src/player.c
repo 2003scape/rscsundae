@@ -26,7 +26,10 @@ static int player_get_defense_boosted(struct player *);
 static int player_get_strength_boosted(struct player *);
 static int player_pvp_roll(struct player *, struct player *);
 static int player_pvp_ranged_roll(struct player *, struct player *);
+static int player_pvm_ranged_roll(struct player *, struct npc *);
+static int player_magic_damage_roll(struct player *, int);
 static bool player_wilderness_check(struct player *, struct player *);
+static bool player_consume_ammo(struct player *, struct projectile_config *);
 static void player_recalculate_bonus(struct player *);
 
 struct player *
@@ -160,7 +163,8 @@ player_accept(struct server *s, int sock)
 	p->ui_design_open = true;
 	p->following_player = -1;
 	p->trading_player = -1;
-	p->projectile_sprite = UINT16_MAX;
+	p->projectile_target_player = UINT16_MAX;
+	p->projectile_target_npc = UINT16_MAX;
 	p->bubble_id = UINT16_MAX;
 	p->last_packet = s->tick_counter;
 
@@ -509,6 +513,19 @@ player_pvp_ranged_roll(struct player *attacker, struct player *defender)
 }
 
 static int
+player_pvm_ranged_roll(struct player *attacker, struct npc *npc)
+{
+	assert(attacker->projectile != NULL);
+
+	return mob_combat_roll(&attacker->mob.server->ran,
+	    8 + attacker->mob.cur_stats[SKILL_RANGED],
+	    attacker->projectile->aim,
+	    npc->mob.cur_stats[SKILL_DEFENSE], 0,
+	    8 + attacker->mob.cur_stats[SKILL_RANGED],
+	    attacker->projectile->power);
+}
+
+static int
 player_pvp_roll(struct player *attacker, struct player *defender)
 {
 	int att = player_get_attack_boosted(attacker);
@@ -521,6 +538,14 @@ player_pvp_roll(struct player *attacker, struct player *defender)
 	    str, attacker->bonus_weaponpower);
 }
 
+static int
+player_magic_damage_roll(struct player *p, int power)
+{
+	double rand = ranval(&p->mob.server->ran) / (double)UINT32_MAX;
+	double dmg = (power + 5.0) * rand;
+
+	return dmg / 10;
+}
 void
 player_pvp_attack(struct player *attacker, struct player *target)
 {
@@ -538,19 +563,16 @@ player_die(struct player *p, struct player *victor)
 	struct item_config *item;
 	int kept_max = 3;
 
-	/* TODO teleportation */
-	for (int i = 0; i < MAX_SKILL_ID; ++i) {
-		p->mob.cur_stats[i] = p->mob.base_stats[i];
-	}
+	mob_die(&p->mob);
 
-	p->mob.damage_timer = 0;
-	p->mob.combat_timer = 0;
+	/* TODO teleportation */
+
 	p->walk_queue_len = 0;
 	p->walk_queue_pos = 0;
 	player_clear_actions(p);
 
 	mob_combat_reset(&p->mob);
-	if (victor != NULL) {
+	if (victor != NULL && victor->mob.target_player == p->mob.id) {
 		mob_combat_reset(&victor->mob);
 	}
 
@@ -632,11 +654,83 @@ player_damage(struct player *p, struct player *aggressor, int roll)
 	p->mob.damage_timer = p->mob.server->tick_counter;
 }
 
+static bool
+player_consume_ammo(struct player *p, struct projectile_config *projectile)
+{
+	struct item_config *ammo_config;
+
+	ammo_config = server_find_item_config(projectile->item);
+	if (ammo_config == NULL) {
+		return true;
+	}
+	if (player_inv_held(p, ammo_config, 1)) {
+		player_inv_remove(p, ammo_config, 1);
+		return true;
+	}
+	player_send_message(p, "I've run out of ammo!");
+	p->mob.target_player = -1;
+	p->mob.target_npc = -1;
+	return false;
+}
+
+void
+player_skull(struct player *p, struct player *target)
+{
+	/* skull remains for 20 minutes */
+	/* TODO: should track players who attacked us */
+	(void)target;
+	p->skull_timer =
+	    p->mob.server->tick_counter + 2000;
+
+	if (!p->skulled) {
+		p->skulled = true;
+		p->appearance_changed = true;
+	}
+}
+
+void
+player_shoot_pvm(struct player *p, struct projectile_config *projectile,
+    struct npc *target)
+{
+	int roll = 0;
+
+	p->walk_queue_len = 0;
+	p->walk_queue_pos = 0;
+	p->following_player = -1;
+
+	if (!player_consume_ammo(p, projectile)) {
+		return;
+	}
+
+	/* TODO: verify reachability */
+
+	if (projectile->type != PROJECTILE_TYPE_MAGIC) {
+		/* XXX verify if it's always northwest */
+		p->mob.dir = MOB_DIR_NORTHWEST;
+	}
+
+	if (projectile->type != PROJECTILE_TYPE_MAGIC) {
+		roll = player_pvm_ranged_roll(p, target);
+		if (roll > 0) {
+			stat_advance(p, SKILL_RANGED, roll * 16, 0);
+		}
+	} else if (projectile->power > 0) {
+		roll = player_magic_damage_roll(p, projectile->power);
+	}
+
+	if (projectile->power > 0) {
+		npc_damage(target, p, roll);
+	}
+
+	p->projectile_sprite = projectile->sprite;
+	p->projectile_target_npc = target->mob.id;
+	p->projectile_target_player = UINT16_MAX;
+}
+
 void
 player_shoot_pvp(struct player *p, struct projectile_config *projectile,
     struct player *target)
 {
-	struct item_config *ammo_config;
 	char name[32], message[64];
 	int range;
 	int roll = 0;
@@ -644,7 +738,6 @@ player_shoot_pvp(struct player *p, struct projectile_config *projectile,
 	assert(p != NULL);
 	assert(target != NULL);
 	assert(projectile != NULL);
-
 
 	p->walk_queue_len = 0;
 	p->walk_queue_pos = 0;
@@ -666,31 +759,17 @@ player_shoot_pvp(struct player *p, struct projectile_config *projectile,
 		}
 	}
 
-	ammo_config = server_find_item_config(projectile->item);
-	if (ammo_config != NULL) {
-		if (player_inv_held(p, ammo_config, 1)) {
-			player_inv_remove(p, ammo_config, 1);
-		} else {
-			player_send_message(p, "I've run out of ammo!");
-			p->mob.target_player = -1;
-			return;
-		}
+	if (!player_consume_ammo(p, projectile)) {
+		return;
 	}
 
 	/* TODO: verify reachability */
 
+	player_skull(p, target);
+
 	if (projectile->type != PROJECTILE_TYPE_MAGIC) {
 		/* XXX verify if it's always northwest */
 		p->mob.dir = MOB_DIR_NORTHWEST;
-	}
-
-	if (!p->skulled) {
-		/* skull remains for 20 minutes */
-		/* TODO: should track players who attacked us */
-		p->skulled = true;
-		p->skull_timer =
-		    p->mob.server->tick_counter + 2000;
-		p->appearance_changed = true;
 	}
 
 	if (projectile->type != PROJECTILE_TYPE_MAGIC) {
@@ -699,10 +778,7 @@ player_shoot_pvp(struct player *p, struct projectile_config *projectile,
 			stat_advance(p, SKILL_RANGED, roll * 16, 0);
 		}
 	} else if (projectile->power > 0) {
-		double rand = ranval(&p->mob.server->ran) / (double)UINT32_MAX;
-		double dmg = (projectile->power + 5.0) * rand;
-
-		roll = dmg / 10;
+		roll = player_magic_damage_roll(p, projectile->power);
 	}
 
 	if (projectile->power > 0) {
@@ -710,6 +786,7 @@ player_shoot_pvp(struct player *p, struct projectile_config *projectile,
 	}
 
 	p->projectile_sprite = projectile->sprite;
+	p->projectile_target_npc = UINT16_MAX;
 	p->projectile_target_player = target->mob.id;
 
 	mod37_namedec(p->name, name);
@@ -820,14 +897,7 @@ player_process_combat(struct player *p)
 			target->walk_queue_len = 0;
 			target->walk_queue_pos = 0;
 
-			if (!p->skulled) {
-				/* skull remains for 20 minutes */
-				/* TODO: should track players who attacked us */
-				p->skulled = true;
-				p->skull_timer =
-				    p->mob.server->tick_counter + 2000;
-				p->appearance_changed = true;
-			}
+			player_skull(p, target);
 
 			player_close_ui(p);
 			player_clear_actions(p);
@@ -1549,25 +1619,36 @@ player_process_action(struct player *p)
 		p->action = ACTION_NONE;
 		break;
 	case ACTION_NPC_CAST:
-		if (!player_can_cast(p, p->spell)) {
+		npc = p->mob.server->npcs[p->action_npc];
+		if (npc == NULL) {
 			p->action = ACTION_NONE;
 			p->walk_queue_len = 0;
 			p->walk_queue_pos = 0;
+			assert(0);
 			return;
 		}
-		printf("attempt cast on npc %s\n", p->spell->name);
+		/* should be able to shoot within 4 tiles */
+		if (!mob_within_range(&p->mob,
+		    npc->mob.x, npc->mob.y, 4)) {
+			printf("npc not in range %d %d %d %d\n", p->mob.x, p->mob.y, npc->mob.x, npc->mob.y);
+			return;
+		}
+		p->walk_queue_len = 0;
+		p->walk_queue_pos = 0;
 		p->action = ACTION_NONE;
+		if (!player_can_cast(p, p->spell)) {
+			printf("can't cast\n");
+			return;
+		}
+		/*
+		 * line of sight check should be AFTER spell timer is set
+		 * see Logg/Tylerbeg/08-05-2018 20.12.26 for some reason, I go to the wizards tower, cast fire blast on the demon for a little while, forget what Im doing and leave
+		 */
+		script_onskillnpc(p->mob.server->lua, p, npc, p->spell);
 		break;
 	case ACTION_PLAYER_CAST:
 		target = p->mob.server->players[p->action_player];
-		if (target == NULL ||
-		    !player_wilderness_check(p, target)) {
-			p->action = ACTION_NONE;
-			p->walk_queue_len = 0;
-			p->walk_queue_pos = 0;
-			return;
-		}
-		if (!player_can_cast(p, p->spell)) {
+		if (target == NULL) {
 			p->action = ACTION_NONE;
 			p->walk_queue_len = 0;
 			p->walk_queue_pos = 0;
@@ -1578,14 +1659,18 @@ player_process_action(struct player *p)
 		    target->mob.x, target->mob.y, 4)) {
 			return;
 		}
-		p->spell_timer = 3;
+		p->walk_queue_len = 0;
+		p->walk_queue_pos = 0;
+		p->action = ACTION_NONE;
+		if (!player_wilderness_check(p, target) ||
+		    !player_can_cast(p, p->spell)) {
+			return;
+		}
 		/*
 		 * line of sight check should be AFTER spell timer is set
 		 * see Logg/Tylerbeg/08-05-2018 20.12.26 for some reason, I go to the wizards tower, cast fire blast on the demon for a little while, forget what Im doing and leave
 		 */
-		script_onskillplayer(p->mob.server->lua,
-		    p, target, p->spell);
-		p->action = ACTION_NONE;
+		script_onskillplayer(p->mob.server->lua, p, target, p->spell);
 		break;
 	}
 }
@@ -1675,5 +1760,6 @@ player_can_cast(struct player *p, struct spell_config *spell)
 			return false;
 		}
 	}
+	p->spell_timer = 3;
 	return true;
 }

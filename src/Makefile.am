@@ -11,6 +11,7 @@ rscsundae_SOURCES = \
 	netio.c \
 	player.c \
 	inventory.c \
+	npc.c \
 	script.c \
 	server.c \
 	stat.c \

@@ -601,6 +601,44 @@ script_shootplayer(lua_State *L)
 	return 0;
 }
 
+static int
+script_shootnpc(lua_State *L)
+{
+	lua_Integer player_id, target_id;
+	const char *proj_name;
+	struct player *p;
+	struct npc *target;
+	struct projectile_config *proj;
+
+	player_id = luaL_checkinteger(L, 1);
+	target_id = luaL_checkinteger(L, 2);
+	proj_name = luaL_checkstring(L, 3);
+
+	p = id_to_player(player_id);
+	if (p == NULL) {
+		printf("script warning: player %ld is undefined\n", player_id);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	target = id_to_npc(target_id);
+	if (target == NULL) {
+		printf("script warning: npc %ld is undefined\n", target_id);
+		script_cancel(L, target_id);
+		return 0;
+	}
+
+	proj = server_find_projectile(proj_name);
+	if (proj == NULL) {
+		printf("script warning: projectile %s is undefined\n", proj_name);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	player_shoot_pvm(p, proj, target);
+	return 0;
+}
+
 void
 script_process(lua_State *L, struct player *p)
 {
@@ -678,6 +716,48 @@ script_onskillplayer(lua_State *L, struct player *p,
 	lua_pushnumber(L, target->mob.id);
 	lua_pushstring(L, spell->name);
 	lua_pcall(L, 3, 0, 0);
+}
+
+void
+script_onskillnpc(lua_State *L, struct player *p,
+    struct npc *npc, struct spell_config *spell)
+{
+	bool result;
+
+	printf("attempt to find an onskillnpc handler\n");
+
+	for (size_t i = 0; i < npc->config->name_count; ++i) {
+		lua_getglobal(L, "script_engine_onskillnpc");
+		if (!lua_isfunction(L, -1)) {
+			puts("script error: can't find essential function script_engine_onskillnpc");
+			return;
+		}
+		lua_pushnumber(L, p->mob.id);
+		lua_pushstring(L, npc->config->names[i]);
+		lua_pushnumber(L, npc->mob.id);
+		lua_pushstring(L, spell->name);
+		lua_pcall(L, 4, 1, 0);
+		result = lua_toboolean(L, -1);
+		if (result != 0) {
+			printf("found onskillnpc handler\n");
+			return;
+		} else {
+			printf("thingy invalid\n");
+		}
+	}
+
+	lua_getglobal(L, "script_engine_onskillnpc");
+	if (!lua_isfunction(L, -1)) {
+		puts("script error: can't find essential function script_engine_onskillnpc");
+		return;
+	}
+	lua_pushnumber(L, p->mob.id);
+	lua_pushstring(L, "_");
+	lua_pushnumber(L, npc->mob.id);
+	lua_pushstring(L, spell->name);
+	lua_pcall(L, 4, 1, 0);
+	lua_pop(L, -1);
+	printf("running default onskillnpc handler\n");
 }
 
 void
@@ -774,6 +854,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_shootplayer);
 	lua_setglobal(L, "shootplayer");
+
+	lua_pushcfunction(L, script_shootnpc);
+	lua_setglobal(L, "shootnpc");
 
 	/* TODO: configurable path */
 	if (luaL_dofile(L, "./data/lua/script.lua") != LUA_OK) {

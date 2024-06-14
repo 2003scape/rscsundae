@@ -12,5 +12,7 @@ void script_onnpctalk(lua_State *, struct player *, struct npc *);
 void script_onuseobj(lua_State *, struct player *, struct item_config *);
 void script_onskillplayer(lua_State *, struct player *,
     struct player *, struct spell_config *);
+void script_onskillnpc(lua_State *, struct player *,
+    struct npc *, struct spell_config *);
 
 #endif

@@ -255,6 +255,7 @@ struct player {
 	struct projectile_config *projectile;
 	uint16_t projectile_sprite;
 	uint16_t projectile_target_player;
+	uint16_t projectile_target_npc;
 	uint8_t action;
 	struct spell_config *spell;
 	uint16_t action_npc;
@@ -276,6 +277,7 @@ void mob_combat_reset(struct mob *);
 uint32_t mob_combat_xp(struct mob *);
 size_t mob_get_nearby_locs(struct mob *, struct loc *, size_t);
 size_t mob_get_nearby_bounds(struct mob *, struct bound *, size_t);
+void mob_die(struct mob *);
 
 /* player.c */
 struct player *player_accept(struct server *, int);
@@ -321,6 +323,9 @@ bool player_can_cast(struct player *, struct spell_config *);
 void player_damage(struct player *, struct player *, int);
 void player_shoot_pvp(struct player *, struct projectile_config *,
     struct player *);
+void player_shoot_pvm(struct player *, struct projectile_config *,
+    struct npc *);
+void player_skull(struct player *, struct player *);
 
 /* incoming.c */
 int player_parse_incoming(struct player *);
@@ -362,5 +367,9 @@ int player_send_show_multi(struct player *, const char **, uint8_t);
 int player_send_hide_multi(struct player *);
 int player_notify_friend_online(struct player *, int64_t);
 int player_notify_friend_offline(struct player *, int64_t);
+
+/* npc.c */
+void npc_damage(struct npc *, struct player * , int);
+void npc_die(struct npc *, struct player *);
 
 #endif

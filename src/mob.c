@@ -232,3 +232,16 @@ mob_get_nearby_bounds(struct mob *mob,
 
 	return count;
 }
+
+void
+mob_die(struct mob *mob)
+{
+	for (int i = 0; i < MAX_SKILL_ID; ++i) {
+		mob->cur_stats[i] = mob->base_stats[i];
+	}
+
+	mob->combat_timer = 0;
+	mob->damage_timer = 0;
+
+	mob_combat_reset(mob);
+}

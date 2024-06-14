@@ -314,7 +314,8 @@ server_tick(void)
 		s.players[i]->prayers_changed = false;
 		s.players[i]->partner_offer_changed = false;
 		s.players[i]->moved = false;
-		s.players[i]->projectile_sprite = UINT16_MAX;
+		s.players[i]->projectile_target_npc = UINT16_MAX;
+		s.players[i]->projectile_target_player = UINT16_MAX;
 		s.players[i]->bubble_id = UINT16_MAX;
 		s.players[i]->mob.damage = UINT8_MAX;
 		s.players[i]->mob.prev_dir = s.players[i]->mob.dir;
@@ -322,6 +323,14 @@ server_tick(void)
 	}
 
 	for (int i = 0; i < s.max_npc_id; ++i) {
+		if (restore_tick) {
+			for (int j = 0; j < MAX_SKILL_ID; ++j) {
+				if (s.npcs[i]->mob.cur_stats[j] <
+				    s.npcs[i]->mob.base_stats[j]) {
+					s.npcs[i]->mob.cur_stats[j]++;
+				}
+			}
+		}
 		s.npcs[i]->mob.chat_len = 0;
 		s.npcs[i]->mob.damage = UINT8_MAX;
 		s.npcs[i]->mob.prev_dir = s.npcs[i]->mob.dir;
@@ -794,6 +803,14 @@ server_add_npc(int id, int x, int y)
 		npc->mob.y = y;
 		npc->mob.server = &s;
 		npc->mob.damage = UINT8_MAX;
+		npc->mob.cur_stats[SKILL_ATTACK] =
+		    npc->mob.base_stats[SKILL_ATTACK] = npc->config->attack;
+		npc->mob.cur_stats[SKILL_DEFENSE] =
+		    npc->mob.base_stats[SKILL_DEFENSE] = npc->config->defense;
+		npc->mob.cur_stats[SKILL_STRENGTH] =
+		    npc->mob.base_stats[SKILL_STRENGTH] = npc->config->strength;
+		npc->mob.cur_stats[SKILL_HITS] =
+		    npc->mob.base_stats[SKILL_HITS] = npc->config->hits;
 		s.npcs[i] = npc;
 		if (i > s.max_npc_id) {
 			s.max_npc_id = i;

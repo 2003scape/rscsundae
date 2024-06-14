@@ -29,7 +29,8 @@ enum player_update_type {
 
 static ssize_t player_send_appearance(struct player *, void *, size_t);
 static ssize_t player_send_damage(struct mob *, void *, size_t);
-static ssize_t player_send_projectile(struct player *, void *, size_t);
+static ssize_t player_send_projectile_pvp(struct player *, void *, size_t);
+static ssize_t player_send_projectile_pvm(struct player *, void *, size_t);
 static int player_write_packet(struct player *, void *, size_t);
 
 static int
@@ -518,7 +519,7 @@ player_send_bubble(struct player *p, void *tmpbuf, size_t offset)
 }
 
 static ssize_t
-player_send_projectile(struct player *p, void *tmpbuf, size_t offset)
+player_send_projectile_pvp(struct player *p, void *tmpbuf, size_t offset)
 {
 	if (buf_putu16(tmpbuf, offset, PLAYER_BUFSIZE,
 		       p->mob.id) == -1) {
@@ -536,6 +537,31 @@ player_send_projectile(struct player *p, void *tmpbuf, size_t offset)
 	offset += 2;
 	if (buf_putu16(tmpbuf, offset, PLAYER_BUFSIZE,
 		      p->projectile_target_player) == -1) {
+		return -1;
+	}
+	offset += 2;
+	return offset;
+}
+
+static ssize_t
+player_send_projectile_pvm(struct player *p, void *tmpbuf, size_t offset)
+{
+	if (buf_putu16(tmpbuf, offset, PLAYER_BUFSIZE,
+		       p->mob.id) == -1) {
+		return -1;
+	}
+	offset += 2;
+	if (buf_putu8(tmpbuf, offset++, PLAYER_BUFSIZE,
+		      PLAYER_UPDATE_SHOOT_MONSTER) == -1) {
+		return -1;
+	}
+	if (buf_putu16(tmpbuf, offset, PLAYER_BUFSIZE,
+		      p->projectile_sprite) == -1) {
+		return -1;
+	}
+	offset += 2;
+	if (buf_putu16(tmpbuf, offset, PLAYER_BUFSIZE,
+		      p->projectile_target_npc) == -1) {
 		return -1;
 	}
 	offset += 2;
@@ -827,8 +853,16 @@ player_send_appearance_update(struct player *p)
 		offset = tmpofs;
 		update_count++;
 	}
-	if (p->projectile_sprite != UINT16_MAX) {
-		tmpofs = player_send_projectile(p, p->tmpbuf, offset);
+	if (p->projectile_target_player != UINT16_MAX) {
+		tmpofs = player_send_projectile_pvp(p, p->tmpbuf, offset);
+		if (tmpofs == -1) {
+			return -1;
+		}
+		offset = tmpofs;
+		update_count++;
+	}
+	if (p->projectile_target_npc != UINT16_MAX) {
+		tmpofs = player_send_projectile_pvm(p, p->tmpbuf, offset);
 		if (tmpofs == -1) {
 			return -1;
 		}
@@ -907,8 +941,16 @@ player_send_appearance_update(struct player *p)
 			offset = tmpofs;
 			update_count++;
 		}
-		if (p2->projectile_sprite != UINT16_MAX) {
-			tmpofs = player_send_projectile(p2, p->tmpbuf, offset);
+		if (p2->projectile_target_player != UINT16_MAX) {
+			tmpofs = player_send_projectile_pvp(p2, p->tmpbuf, offset);
+			if (tmpofs == -1) {
+				return -1;
+			}
+			offset = tmpofs;
+			update_count++;
+		}
+		if (p2->projectile_target_npc != UINT16_MAX) {
+			tmpofs = player_send_projectile_pvm(p2, p->tmpbuf, offset);
 			if (tmpofs == -1) {
 				return -1;
 			}

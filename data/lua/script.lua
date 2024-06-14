@@ -1,6 +1,7 @@
 ontalknpc_scripts = {}
 onuseobj_scripts = {}
 onskillplayer_scripts = {}
+onskillnpc_scripts = {}
 player_scripts = {}
 active_script = nil
 
@@ -20,12 +21,16 @@ function register_useobj(name, callback)
 	onuseobj_scripts[name] = callback;
 end
 
-function register_skillplayer(name, callback)
-	onskillplayer_scripts[name] = callback;
+function register_skillplayer(spell, callback)
+	onskillplayer_scripts[spell] = callback;
 end
 
-function register_skillnpc(name, callback)
-	-- TODO implement
+function register_skillnpc(name, spell, callback)
+	print(string.format("register skillnpc %s %s", spell, name))
+	if not onskillnpc_scripts[spell] then
+		onskillnpc_scripts[spell] = {}
+	end
+	onskillnpc_scripts[spell][name] = callback
 end
 
 function script_engine_process(player)
@@ -94,6 +99,39 @@ function script_engine_ontalknpc(player, name, npc)
 		end)
 		player_scripts[player] = ps
 		npcbusy(npc)
+		return true
+	end
+	return false
+end
+
+function script_engine_onskillnpc(player, name, npc, spell)
+	local script = player_scripts[player]
+	if script then
+		return true
+	end
+	spell = string.lower(spell)
+	name = string.lower(name)
+	if not onskillnpc_scripts[spell] then
+		print("should not happen!!!")
+		return false
+	end
+	script = onskillnpc_scripts[spell][name]
+	if not script then
+		script = onskillnpc_scripts[spell]["_"]
+		print("trying default onskillnpc handler")
+	end
+	if script then
+		print("found onskillnpc handler")
+		ps = {}
+		ps.delay = 0
+		ps.option_count = 0
+		ps.npc = nil
+		ps.co = coroutine.create(function()
+			print("invoking it")
+			script(player, npc)
+			player_scripts[player] = nil
+		end)
+		player_scripts[player] = ps
 		return true
 	end
 	return false
