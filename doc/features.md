@@ -131,3 +131,9 @@ These should all be implemented in Lua script:
 - [ ] Dying capes
 - [ ] Mixing dyes
 - [ ] Monk of Zamorak wine aggression
+
+
+Misc.
+-----
+
+* There should be a way of preventing door jamming.

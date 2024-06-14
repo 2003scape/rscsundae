@@ -107,7 +107,7 @@ Smithing, Mining
 
 ### Other
 
-- Worlds could hold a maximum of 1000 players at a time.
+- Worlds could hold a maximum of 1500 players at a time.
 - Compared to earlier in 2001, PvP was restricted to the Wilderness,
   and item banks were fully available.
 - There was no makeover mage.  This is unfortunate, and will
@@ -125,3 +125,6 @@ Smithing, Mining
   tool on object). There will be a server option to allow
   the one-click system players are used to, enabled by
   default for newer protocol revisions.
+- There was no spell timer until widespread abuse of
+  Runebot and AutoRune in 2002.  This will be a config option,
+  with the spell timer enabled by default.
