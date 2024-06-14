@@ -33,7 +33,7 @@ Engine
 - [x] Inventory
 - [x] Experience and levelling up
 - [x] Stat restoration
-- [ ] Lua scripting
+- [x] Lua scripting
 - [ ] Shops
 - [ ] Item banking
 - [ ] Player saving (SQLite)
@@ -52,7 +52,7 @@ These should all be implemented in Lua script:
 - [x] Prayer (bone burying)
 - [ ] Prayer (altars)
 - [x] Magic (missiles vs. players)
-- [ ] Magic (missiles vs. NPCs)
+- [x] Magic (missiles vs. NPCs)
 - [x] Magic (curses)
 - [ ] Magic (teleportation)
 - [ ] Magic (telegrab)
