@@ -1636,6 +1636,10 @@ player_process_action(struct player *p)
 		p->walk_queue_len = 0;
 		p->walk_queue_pos = 0;
 		p->action = ACTION_NONE;
+		if (npc->config->aggression == 0) {
+			player_send_message(p, "I can't attack that");
+			return;
+		}
 		if (!player_can_cast(p, p->spell)) {
 			printf("can't cast\n");
 			return;
