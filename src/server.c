@@ -758,6 +758,19 @@ server_bound_config_by_id(int id)
 	return &s.bound_config[id];
 }
 
+struct bound_config *
+server_find_bound_config(const char *name)
+{
+	for (size_t i = 0; i < s.bound_config_count; ++i) {
+		for (size_t j = 0; j < s.bound_config[i].name_count; ++j) {
+			if (strcasecmp(name, s.bound_config[i].names[j]) == 0) {
+				return &s.bound_config[i];
+			}
+		}
+	}
+	return NULL;
+}
+
 struct spell_config *
 server_spell_config_by_id(int id)
 {

@@ -64,6 +64,7 @@ struct item_config *server_find_item_config(const char *);
 struct prayer_config *server_prayer_config_by_id(int);
 struct loc_config *server_loc_config_by_id(int);
 struct bound_config *server_bound_config_by_id(int);
+struct bound_config *server_find_bound_config(const char *);
 struct npc_config *server_npc_config_by_id(int);
 struct spell_config *server_spell_config_by_id(int);
 struct projectile_config *server_find_projectile(const char *);
