@@ -1630,7 +1630,6 @@ player_process_action(struct player *p)
 		/* should be able to shoot within 4 tiles */
 		if (!mob_within_range(&p->mob,
 		    npc->mob.x, npc->mob.y, 4)) {
-			printf("npc not in range %d %d %d %d\n", p->mob.x, p->mob.y, npc->mob.x, npc->mob.y);
 			return;
 		}
 		p->walk_queue_len = 0;
@@ -1641,7 +1640,6 @@ player_process_action(struct player *p)
 			return;
 		}
 		if (!player_can_cast(p, p->spell)) {
-			printf("can't cast\n");
 			return;
 		}
 		/*

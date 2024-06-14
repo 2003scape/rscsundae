@@ -26,7 +26,6 @@ function register_skillplayer(spell, callback)
 end
 
 function register_skillnpc(name, spell, callback)
-	print(string.format("register skillnpc %s %s", spell, name))
 	if not onskillnpc_scripts[spell] then
 		onskillnpc_scripts[spell] = {}
 	end
@@ -112,22 +111,18 @@ function script_engine_onskillnpc(player, name, npc, spell)
 	spell = string.lower(spell)
 	name = string.lower(name)
 	if not onskillnpc_scripts[spell] then
-		print("should not happen!!!")
 		return false
 	end
 	script = onskillnpc_scripts[spell][name]
 	if not script then
 		script = onskillnpc_scripts[spell]["_"]
-		print("trying default onskillnpc handler")
 	end
 	if script then
-		print("found onskillnpc handler")
 		ps = {}
 		ps.delay = 0
 		ps.option_count = 0
 		ps.npc = nil
 		ps.co = coroutine.create(function()
-			print("invoking it")
 			script(player, npc)
 			player_scripts[player] = nil
 		end)
@@ -177,8 +172,6 @@ function script_engine_onskillplayer(player, target, name)
 		end)
 		player_scripts[player] = ps
 		return true
-	else
-		print("no such script")
 	end
 	return false
 end
