@@ -331,6 +331,9 @@ server_tick(void)
 				}
 			}
 		}
+		if (s.npcs[i]->respawn_time > 0) {
+			s.npcs[i]->respawn_time--;
+		}
 		s.npcs[i]->mob.chat_len = 0;
 		s.npcs[i]->mob.damage = UINT8_MAX;
 		s.npcs[i]->mob.prev_dir = s.npcs[i]->mob.dir;

@@ -8,6 +8,8 @@ npc_die(struct npc *npc, struct player *p)
 {
 	struct item_config *item_config;
 
+	npc->respawn_time = npc->config->respawn / 5;
+
 	mob_die(&npc->mob);
 
 	if (p->mob.target_npc == npc->mob.id) {

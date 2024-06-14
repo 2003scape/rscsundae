@@ -131,7 +131,8 @@ player_send_npc_movement(struct player *p)
 		known_npc = p->mob.server->npcs[p->known_npcs[i]];
 		if (known_npc == NULL ||
 		    !mob_within_range(&known_npc->mob,
-			p->mob.x, p->mob.y, UPDATE_RADIUS)) {
+			p->mob.x, p->mob.y, UPDATE_RADIUS) ||
+		    known_npc->respawn_time > 0) {
 			if (buf_putbits(p->tmpbuf, bitpos,
 					PLAYER_BUFSIZE, 4, 15) == -1) {
 				return -1;
@@ -185,6 +186,10 @@ player_send_npc_movement(struct player *p)
 		if (p->known_npc_count >= MAX_KNOWN_NPCS) {
 			break;
 		}
+		if (nearby[i]->respawn_time > 0) {
+			continue;
+		}
+
 		bool known = false;
 		for (size_t j = 0; j < new_known_count; ++j) {
 			if (new_known[j] == nearby[i]->mob.id) {
