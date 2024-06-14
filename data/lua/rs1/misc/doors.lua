@@ -1,4 +1,5 @@
 function opbound1_normdoor(player, name, x, y, dir)
+	mes(player, "@que@The door swings open")
 	changebound(x, y, dir, "normdoorframe")
 end
 
@@ -7,6 +8,7 @@ function opbound2_normdoorframe(player, name, x, y, dir)
 end
 
 function opbound1_highdoor(player, name, x, y, dir)
+	mes(player, "@que@The door swings open")
 	changebound(x, y, dir, "highdoorframe")
 end
 
