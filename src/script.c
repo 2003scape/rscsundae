@@ -346,7 +346,7 @@ script_statup(lua_State *L)
 	}
 	b = stat_up(&p->mob, stat);
 	lua_pushboolean(L, b);
-	return 0;
+	return 1;
 }
 
 static int
@@ -371,7 +371,7 @@ script_statdown(lua_State *L)
 	}
 	b = stat_down(&p->mob, stat);
 	lua_pushboolean(L, b);
-	return 0;
+	return 1;
 }
 
 static int
