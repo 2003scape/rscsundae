@@ -226,11 +226,6 @@ function delay(length)
 	coroutine.yield(active_script.co)
 end
 
-function delay(length)
-	active_script.delay = length
-	coroutine.yield(active_script.co)
-end
-
 function say(player, mes)
 	_say(player, mes)
 	delay(3)
