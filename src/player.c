@@ -1629,7 +1629,6 @@ player_process_action(struct player *p)
 			p->action = ACTION_NONE;
 			p->walk_queue_len = 0;
 			p->walk_queue_pos = 0;
-			assert(0);
 			return;
 		}
 		/* should be able to shoot within 4 tiles */
