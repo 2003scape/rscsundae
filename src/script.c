@@ -25,8 +25,13 @@ static int script_advancestat(lua_State *);
 static int script_healstat(lua_State *);
 static int script_addstat(lua_State *);
 static int script_substat(lua_State *);
+static int script_npchealstat(lua_State *);
+static int script_npcaddstat(lua_State *);
+static int script_npcsubstat(lua_State *);
 static int script_statup(lua_State *);
 static int script_statdown(lua_State *);
+static int script_npcstatup(lua_State *);
+static int script_npcstatdown(lua_State *);
 static int script_thinkbubble(lua_State *);
 static int script_shootplayer(lua_State *);
 static int script_multi(lua_State *);
@@ -375,6 +380,56 @@ script_statdown(lua_State *L)
 }
 
 static int
+script_npcstatup(lua_State *L)
+{
+	lua_Integer npc_id, stat;
+	struct npc *npc;
+	int b;
+
+	npc_id = luaL_checkinteger(L, 1);
+	stat = luaL_checkinteger(L, 2);
+	npc = id_to_npc(npc_id);
+	if (npc == NULL) {
+		printf("script warning: npc %ld is undefined\n", npc_id);
+		lua_pushboolean(L, false);
+		return 1;
+	}
+	if (stat < 0 || stat >= MAX_SKILL_ID) {
+		printf("script warning: invalid stat id %ld\n", stat);
+		lua_pushboolean(L, false);
+		return 1;
+	}
+	b = stat_up(&npc->mob, stat);
+	lua_pushboolean(L, b);
+	return 1;
+}
+
+static int
+script_npcstatdown(lua_State *L)
+{
+	lua_Integer npc_id, stat;
+	struct npc *npc;
+	int b;
+
+	npc_id = luaL_checkinteger(L, 1);
+	stat = luaL_checkinteger(L, 2);
+	npc = id_to_npc(npc_id);
+	if (npc == NULL) {
+		printf("script warning: npc %ld is undefined\n", npc_id);
+		lua_pushboolean(L, false);
+		return 1;
+	}
+	if (stat < 0 || stat >= MAX_SKILL_ID) {
+		printf("script warning: invalid stat id %ld\n", stat);
+		lua_pushboolean(L, false);
+		return 1;
+	}
+	b = stat_down(&npc->mob, stat);
+	lua_pushboolean(L, b);
+	return 1;
+}
+
+static int
 script_substat(lua_State *L)
 {
 	lua_Integer player_id;
@@ -405,6 +460,89 @@ script_substat(lua_State *L)
 		extra = (int)((p->mob.base_stats[stat] *
 		    (double)percent) / 100.0);
 		player_damage(p, NULL, constant + extra);
+	}
+	return 0;
+}
+
+static int
+script_npcaddstat(lua_State *L)
+{
+	lua_Integer npc_id;
+	lua_Integer stat, constant, percent;
+	struct npc *npc;
+
+	npc_id = luaL_checkinteger(L, 1);
+	stat = luaL_checkinteger(L, 2);
+	constant = luaL_checkinteger(L, 3);
+	percent = luaL_checkinteger(L, 4);
+
+	npc = id_to_npc(npc_id);
+	if (npc == NULL) {
+		printf("script warning: npc %ld is undefined\n", npc_id);
+		return 0;
+	}
+	if (stat < 0 || stat >= MAX_SKILL_ID) {
+		printf("script warning: invalid stat id %ld\n", stat);
+		return 0;
+	}
+	stat_add(&npc->mob, stat, constant, percent);
+	return 0;
+}
+
+static int
+script_npchealstat(lua_State *L)
+{
+	lua_Integer npc_id;
+	lua_Integer stat, constant, percent;
+	struct npc *npc;
+
+	npc_id = luaL_checkinteger(L, 1);
+	stat = luaL_checkinteger(L, 2);
+	constant = luaL_checkinteger(L, 3);
+	percent = luaL_checkinteger(L, 4);
+
+	npc = id_to_npc(npc_id);
+	if (npc == NULL) {
+		printf("script warning: npc %ld is undefined\n", npc_id);
+		return 0;
+	}
+	if (stat < 0 || stat >= MAX_SKILL_ID) {
+		printf("script warning: invalid stat id %ld\n", stat);
+		return 0;
+	}
+	stat_heal(&npc->mob, stat, constant, percent);
+	return 0;
+}
+
+static int
+script_npcsubstat(lua_State *L)
+{
+	lua_Integer npc_id;
+	lua_Integer stat, constant, percent;
+	struct npc *npc;
+
+	npc_id = luaL_checkinteger(L, 1);
+	stat = luaL_checkinteger(L, 2);
+	constant = luaL_checkinteger(L, 3);
+	percent = luaL_checkinteger(L, 4);
+
+	npc = id_to_npc(npc_id);
+	if (npc == NULL) {
+		printf("script warning: npc %ld is undefined\n", npc_id);
+		return 0;
+	}
+	if (stat < 0 || stat >= MAX_SKILL_ID) {
+		printf("script warning: invalid stat id %ld\n", stat);
+		return 0;
+	}
+	if (stat != SKILL_HITS) {
+		stat_remove(&npc->mob, stat, constant, percent);
+	} else {
+		int extra;
+
+		extra = (int)((npc->mob.base_stats[stat] *
+		    (double)percent) / 100.0);
+		npc_damage(npc, NULL, constant + extra);
 	}
 	return 0;
 }
@@ -843,11 +981,26 @@ script_init(struct server *s)
 	lua_pushcfunction(L, script_statdown);
 	lua_setglobal(L, "statdown");
 
+	lua_pushcfunction(L, script_npcstatup);
+	lua_setglobal(L, "npcstatup");
+
+	lua_pushcfunction(L, script_npcstatdown);
+	lua_setglobal(L, "npcstatdown");
+
 	lua_pushcfunction(L, script_addstat);
 	lua_setglobal(L, "addstat");
 
 	lua_pushcfunction(L, script_substat);
 	lua_setglobal(L, "substat");
+
+	lua_pushcfunction(L, script_npcaddstat);
+	lua_setglobal(L, "npcaddstat");
+
+	lua_pushcfunction(L, script_npcsubstat);
+	lua_setglobal(L, "npcsubstat");
+
+	lua_pushcfunction(L, script_npchealstat);
+	lua_setglobal(L, "npchealstat");
 
 	lua_pushcfunction(L, script_thinkbubble);
 	lua_setglobal(L, "thinkbubble");
