@@ -1681,6 +1681,12 @@ player_process_action(struct player *p)
 		break;
 	case ACTION_BOUND_OP1:
 	case ACTION_BOUND_OP2:
+		if (p->action_bound == NULL) {
+			p->action = ACTION_NONE;
+			p->walk_queue_len = 0;
+			p->walk_queue_pos = 0;
+			return;
+		}
 		bound = server_find_bound(p->action_bound->x, p->action_bound->y,
 		    p->action_bound->dir);
 		if (bound == NULL) {
