@@ -226,6 +226,19 @@ script_random(lua_State *L)
 }
 
 static int
+script_randomvar(lua_State *L)
+{
+	lua_Integer probability;
+	double d, result;
+
+	probability = luaL_checkinteger(L, 1);
+	d = ranval(&serv->ran) / (double)UINT32_MAX;
+	result = d * probability;
+	lua_pushinteger(L, (lua_Integer)result);
+	return 1;
+}
+
+static int
 script_mes(lua_State *L)
 {
 	lua_Integer player_id;
@@ -862,8 +875,6 @@ script_onskillnpc(lua_State *L, struct player *p,
 {
 	bool result;
 
-	printf("attempt to find an onskillnpc handler\n");
-
 	for (size_t i = 0; i < npc->config->name_count; ++i) {
 		lua_getglobal(L, "script_engine_onskillnpc");
 		if (!lua_isfunction(L, -1)) {
@@ -877,10 +888,7 @@ script_onskillnpc(lua_State *L, struct player *p,
 		lua_pcall(L, 4, 1, 0);
 		result = lua_toboolean(L, -1);
 		if (result != 0) {
-			printf("found onskillnpc handler\n");
 			return;
-		} else {
-			printf("thingy invalid\n");
 		}
 	}
 
@@ -895,7 +903,6 @@ script_onskillnpc(lua_State *L, struct player *p,
 	lua_pushstring(L, spell->name);
 	lua_pcall(L, 4, 1, 0);
 	lua_pop(L, -1);
-	printf("running default onskillnpc handler\n");
 }
 
 void
@@ -968,6 +975,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_random);
 	lua_setglobal(L, "random");
+
+	lua_pushcfunction(L, script_randomvar);
+	lua_setglobal(L, "randomvar");
 
 	lua_pushcfunction(L, script_advancestat);
 	lua_setglobal(L, "advancestat");
