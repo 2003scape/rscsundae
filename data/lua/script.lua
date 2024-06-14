@@ -193,7 +193,7 @@ function script_engine_onopbound1(player, name, x, y, dir)
 	if script then
 		ps = new_player_script()
 		ps.co = coroutine.create(function()
-			script(player, name, x, y, dir)
+			script(player, x, y, dir)
 			player_scripts[player] = nil
 		end)
 		player_scripts[player] = ps
@@ -212,7 +212,7 @@ function script_engine_onopbound2(player, name, x, y, dir)
 	if script then
 		ps = new_player_script()
 		ps.co = coroutine.create(function()
-			script(player, name, x, y, dir)
+			script(player, x, y, dir)
 			player_scripts[player] = nil
 		end)
 		player_scripts[player] = ps
