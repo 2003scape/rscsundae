@@ -489,7 +489,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			}
 			offset += 2;
 			p->action = ACTION_ITEM_TAKE;
-			p->target_item = server_find_ground_item(p, x, y, id);
+			p->action_item = server_find_ground_item(p, x, y, id);
 		}
 		break;
 	case OP_CLI_WALK_TILE:
@@ -668,6 +668,28 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			}
 			script_multi_answer(p->mob.server->lua, p, option);
 			p->ui_multi_open = false;
+		}
+		break;
+	case OP_CLI_BOUND_OP1:
+	case OP_CLI_BOUND_OP2:
+		{
+			uint16_t x, y;
+			uint8_t dir;
+
+			if (buf_getu16(data, offset, len, &x) == -1) {
+				return;
+			}
+			offset += 2;
+			if (buf_getu16(data, offset, len, &y) == -1) {
+				return;
+			}
+			offset += 2;
+			if (buf_getu8(data, offset++, len, &dir) == -1) {
+				return;
+			}
+			p->action = (opcode == OP_CLI_BOUND_OP1) ?
+			    ACTION_BOUND_OP1 : ACTION_BOUND_OP2;
+			p->action_bound = server_find_bound(x, y, dir);
 		}
 		break;
 	}

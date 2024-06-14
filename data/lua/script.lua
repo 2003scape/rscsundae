@@ -2,6 +2,8 @@ ontalknpc_scripts = {}
 onuseobj_scripts = {}
 onskillplayer_scripts = {}
 onskillnpc_scripts = {}
+onopbound1_scripts = {}
+onopbound2_scripts = {}
 player_scripts = {}
 active_script = nil
 
@@ -13,6 +15,14 @@ STAT_RANGED		= 4
 STAT_PRAYER		= 5
 STAT_MAGIC		= 6
 
+function new_player_script()
+	local ps = {}
+	ps.delay = 0
+	ps.option_count = 0
+	ps.npc = nil
+	return ps
+end
+
 function register_talknpc(name, callback)
 	ontalknpc_scripts[name] = callback;
 end
@@ -23,6 +33,14 @@ end
 
 function register_skillplayer(spell, callback)
 	onskillplayer_scripts[spell] = callback;
+end
+
+function register_opbound1(name, callback)
+	onopbound1_scripts[name] = callback;
+end
+
+function register_opbound2(name, callback)
+	onopbound2_scripts[name] = callback;
 end
 
 function register_skillnpc(name, spell, callback)
@@ -87,9 +105,7 @@ function script_engine_ontalknpc(player, name, npc)
 	name = string.lower(name)
 	script = ontalknpc_scripts[name]
 	if script then
-		ps = {}
-		ps.delay = 0
-		ps.option_count = 0
+		ps = new_player_script()
 		ps.npc = npc
 		ps.co = coroutine.create(function()
 			script(player, npc)
@@ -118,10 +134,7 @@ function script_engine_onskillnpc(player, name, npc, spell)
 		script = onskillnpc_scripts[spell]["_"]
 	end
 	if script then
-		ps = {}
-		ps.delay = 0
-		ps.option_count = 0
-		ps.npc = nil
+		ps = new_player_script()
 		ps.co = coroutine.create(function()
 			script(player, npc)
 			player_scripts[player] = nil
@@ -140,10 +153,7 @@ function script_engine_onuseobj(player, name)
 	name = string.lower(name)
 	script = onuseobj_scripts[name]
 	if script then
-		ps = {}
-		ps.delay = 0
-		ps.option_count = 0
-		ps.npc = nil
+		ps = new_player_script()
 		ps.co = coroutine.create(function()
 			script(player)
 			player_scripts[player] = nil
@@ -162,12 +172,47 @@ function script_engine_onskillplayer(player, target, name)
 	name = string.lower(name)
 	script = onskillplayer_scripts[name]
 	if script then
-		ps = {}
-		ps.delay = 0
-		ps.option_count = 0
-		ps.npc = nil
+		ps = new_player_script()
 		ps.co = coroutine.create(function()
 			script(player, target)
+			player_scripts[player] = nil
+		end)
+		player_scripts[player] = ps
+		return true
+	end
+	return false
+end
+
+function script_engine_onopbound1(player, name, x, y, dir)
+	local script = player_scripts[player]
+	if script then
+		return true
+	end
+	name = string.lower(name)
+	script = onopbound1_scripts[name]
+	if script then
+		ps = new_player_script()
+		ps.co = coroutine.create(function()
+			script(player, name, x, y, dir)
+			player_scripts[player] = nil
+		end)
+		player_scripts[player] = ps
+		return true
+	end
+	return false
+end
+
+function script_engine_onopbound2(player, name, x, y, dir)
+	local script = player_scripts[player]
+	if script then
+		return true
+	end
+	name = string.lower(name)
+	script = onopbound2_scripts[name]
+	if script then
+		ps = new_player_script()
+		ps.co = coroutine.create(function()
+			script(player, name, x, y, dir)
 			player_scripts[player] = nil
 		end)
 		player_scripts[player] = ps
@@ -227,6 +272,7 @@ dofile("./data/lua/rs1/items/stew.lua")
 dofile("./data/lua/rs1/items/cake.lua")
 dofile("./data/lua/rs1/items/pizza.lua")
 dofile("./data/lua/rs1/items/pumpkin.lua")
+dofile("./data/lua/rs1/misc/doors.lua")
 
 --
 -- automatically register triggers
@@ -247,6 +293,12 @@ for k in pairs(_G) do
 		elseif string.match(k, "skillplayer_.*") then
 			target = string.gsub(string.sub(k, 13), "_", " ")
 			register_skillplayer(target, v)
+		elseif string.match(k, "opbound1_.*") then
+			target = string.gsub(string.sub(k, 10), "_", " ")
+			register_opbound1(target, v)
+		elseif string.match(k, "opbound2_.*") then
+			target = string.gsub(string.sub(k, 10), "_", " ")
+			register_opbound2(target, v)
 		end
 	end
 end

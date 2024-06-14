@@ -1537,6 +1537,7 @@ player_process_action(struct player *p)
 	struct player *target;
 	struct item_config *item_config;
 	struct ground_item *item;
+	struct bound *bound;
 	uint16_t id;
 	uint32_t stack;
 
@@ -1595,14 +1596,14 @@ player_process_action(struct player *p)
 		p->action = ACTION_NONE;
 		break;
 	case ACTION_ITEM_TAKE:
-		if (p->target_item == NULL) {
+		if (p->action_item == NULL) {
 			p->action = ACTION_NONE;
 			return;
 		}
 		item = server_find_ground_item(p,
-		    p->target_item->x, p->target_item->y,
-		    p->target_item->id);
-		item_config = server_item_config_by_id(p->target_item->id);
+		    p->action_item->x, p->action_item->y,
+		    p->action_item->id);
+		item_config = server_item_config_by_id(p->action_item->id);
 		if (item == NULL || item_config == NULL ||
 		    p->inv_count >= MAX_INV_SIZE ||
 		    !player_can_see_item(p, item)) {
@@ -1677,6 +1678,28 @@ player_process_action(struct player *p)
 		 * see Logg/Tylerbeg/08-05-2018 20.12.26 for some reason, I go to the wizards tower, cast fire blast on the demon for a little while, forget what Im doing and leave
 		 */
 		script_onskillplayer(p->mob.server->lua, p, target, p->spell);
+		break;
+	case ACTION_BOUND_OP1:
+	case ACTION_BOUND_OP2:
+		bound = server_find_bound(p->action_bound->x, p->action_bound->y,
+		    p->action_bound->dir);
+		if (bound == NULL) {
+			p->action = ACTION_NONE;
+			p->walk_queue_len = 0;
+			p->walk_queue_pos = 0;
+			return;
+		}
+		if (!mob_within_range(&p->mob, bound->x, bound->y, 2)) {
+			return;
+		}
+		p->walk_queue_len = 0;
+		p->walk_queue_pos = 0;
+		if (p->action == ACTION_BOUND_OP1) {
+			script_onopbound1(p->mob.server->lua, p, bound);
+		} else {
+			script_onopbound2(p->mob.server->lua, p, bound);
+		}
+		p->action = ACTION_NONE;
 		break;
 	}
 }

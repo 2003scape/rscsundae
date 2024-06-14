@@ -44,7 +44,9 @@ enum action {
 	ACTION_INV_DROP		= 3,
 	ACTION_INV_USE		= 4,
 	ACTION_ITEM_TAKE	= 5,
-	ACTION_PLAYER_CAST	= 6
+	ACTION_PLAYER_CAST	= 6,
+	ACTION_BOUND_OP1	= 7,
+	ACTION_BOUND_OP2	= 8
 };
 
 enum trade_state {
@@ -262,8 +264,9 @@ struct player {
 	uint16_t action_npc;
 	uint16_t action_player;
 	uint16_t action_slot;
+	struct ground_item *action_item;
+	struct bound *action_bound;
 	uint16_t bubble_id;
-	struct ground_item *target_item;
 	uint8_t ranged_timer;
 	uint8_t spell_timer;
 };

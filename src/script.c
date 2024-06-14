@@ -9,6 +9,7 @@
 #include "inventory.h"
 #include "stat.h"
 #include "utility.h"
+#include "zone.h"
 
 static struct server *serv;
 static int script_say(lua_State *);
@@ -33,7 +34,9 @@ static int script_statdown(lua_State *);
 static int script_npcstatup(lua_State *);
 static int script_npcstatdown(lua_State *);
 static int script_thinkbubble(lua_State *);
+static int script_changebound(lua_State *);
 static int script_shootplayer(lua_State *);
+static int script_shootnpc(lua_State *);
 static int script_multi(lua_State *);
 static struct player *id_to_player(lua_Integer);
 static struct npc *id_to_npc(lua_Integer);
@@ -716,6 +719,30 @@ script_thinkbubble(lua_State *L)
 }
 
 static int
+script_changebound(lua_State *L)
+{
+	const char *name;
+	struct bound_config *config;
+	struct bound b = {0};
+
+	b.x = luaL_checkinteger(L, 1);
+	b.y = luaL_checkinteger(L, 2);
+	b.dir = luaL_checkinteger(L, 3);
+	name = luaL_checkstring(L, 4);
+
+	config = server_find_bound_config(name);
+	if (config == NULL) {
+		printf("script warning: bound %s is undefined\n", name);
+		return 0;
+	}
+
+	b.id = config->id;
+
+	server_add_bound(&b);
+	return 0;
+}
+
+static int
 script_shootplayer(lua_State *L)
 {
 	lua_Integer player_id, target_id;
@@ -906,6 +933,62 @@ script_onskillnpc(lua_State *L, struct player *p,
 }
 
 void
+script_onopbound1(lua_State *L, struct player *p, struct bound *bound)
+{
+	bool result;
+	struct bound_config *config;
+
+	config = server_bound_config_by_id(bound->id);
+	assert(config != NULL);
+
+	for (size_t i = 0; i < config->name_count; ++i) {
+		lua_getglobal(L, "script_engine_onopbound1");
+		if (!lua_isfunction(L, -1)) {
+			puts("script error: can't find essential function script_engine_onopbound1");
+			return;
+		}
+		lua_pushnumber(L, p->mob.id);
+		lua_pushstring(L, config->names[i]);
+		lua_pushnumber(L, bound->x);
+		lua_pushnumber(L, bound->y);
+		lua_pushnumber(L, bound->dir);
+		lua_pcall(L, 5, 1, 0);
+		result = lua_toboolean(L, -1);
+		if (result != 0) {
+			break;
+		}
+	}
+}
+
+void
+script_onopbound2(lua_State *L, struct player *p, struct bound *bound)
+{
+	bool result;
+	struct bound_config *config;
+
+	config = server_bound_config_by_id(bound->id);
+	assert(config != NULL);
+
+	for (size_t i = 0; i < config->name_count; ++i) {
+		lua_getglobal(L, "script_engine_onopbound2");
+		if (!lua_isfunction(L, -1)) {
+			puts("script error: can't find essential function script_engine_onopbound2");
+			return;
+		}
+		lua_pushnumber(L, p->mob.id);
+		lua_pushstring(L, config->names[i]);
+		lua_pushnumber(L, bound->x);
+		lua_pushnumber(L, bound->y);
+		lua_pushnumber(L, bound->dir);
+		lua_pcall(L, 5, 1, 0);
+		result = lua_toboolean(L, -1);
+		if (result != 0) {
+			break;
+		}
+	}
+}
+
+void
 script_cancel(lua_State *L, uint16_t player_id)
 {
 	lua_getglobal(L, "script_engine_cancel");
@@ -1020,6 +1103,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_shootnpc);
 	lua_setglobal(L, "shootnpc");
+
+	lua_pushcfunction(L, script_changebound);
+	lua_setglobal(L, "changebound");
 
 	/* TODO: configurable path */
 	if (luaL_dofile(L, "./data/lua/script.lua") != LUA_OK) {
