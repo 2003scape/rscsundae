@@ -698,15 +698,20 @@ player_shoot_pvm(struct player *p, struct projectile_config *projectile,
 	p->walk_queue_pos = 0;
 	p->following_player = -1;
 
-	if (!player_consume_ammo(p, projectile)) {
-		return;
-	}
-
 	/* TODO: verify reachability */
 
 	if (projectile->type != PROJECTILE_TYPE_MAGIC) {
 		/* XXX verify if it's always northwest */
 		p->mob.dir = MOB_DIR_NORTHWEST;
+		if (p->ranged_timer > 0) {
+			p->ranged_timer--;
+			return;
+		}
+		p->ranged_timer = 3;
+	}
+
+	if (!player_consume_ammo(p, projectile)) {
+		return;
 	}
 
 	if (projectile->type != PROJECTILE_TYPE_MAGIC) {
@@ -759,6 +764,16 @@ player_shoot_pvp(struct player *p, struct projectile_config *projectile,
 		}
 	}
 
+	if (projectile->type != PROJECTILE_TYPE_MAGIC) {
+		/* XXX verify if it's always northwest */
+		p->mob.dir = MOB_DIR_NORTHWEST;
+		if (p->ranged_timer > 0) {
+			p->ranged_timer--;
+			return;
+		}
+		p->ranged_timer = 3;
+	}
+
 	if (!player_consume_ammo(p, projectile)) {
 		return;
 	}
@@ -766,11 +781,6 @@ player_shoot_pvp(struct player *p, struct projectile_config *projectile,
 	/* TODO: verify reachability */
 
 	player_skull(p, target);
-
-	if (projectile->type != PROJECTILE_TYPE_MAGIC) {
-		/* XXX verify if it's always northwest */
-		p->mob.dir = MOB_DIR_NORTHWEST;
-	}
 
 	if (projectile->type != PROJECTILE_TYPE_MAGIC) {
 		roll = player_pvp_ranged_roll(p, target);
@@ -845,12 +855,7 @@ player_process_combat(struct player *p)
 			}
 
 			if (p->projectile != NULL) {
-				if (p->ranged_timer > 0) {
-					p->ranged_timer--;
-					return;
-				}
 				player_shoot_pvp(p, p->projectile, target);
-				p->ranged_timer = 3;
 				return;
 			}
 
