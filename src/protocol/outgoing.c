@@ -1362,6 +1362,7 @@ player_send_bounds(struct player *p)
 			    PLAYER_BUFSIZE, bound->dir) == -1) {
 				return -1;
 			}
+			p->known_bounds[i].id = bound->id;
 			update_count++;
 		}
 	}
