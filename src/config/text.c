@@ -44,6 +44,11 @@ next_token(char *buffer, size_t offset, size_t len)
 
 	/* returns the start of the next token */
 
+	/*
+	 * TODO: handle "quoted strings" (there are only a few in the
+	 * entire game)
+	 */
+
 	while (buf_getu8((uint8_t *)buffer, offset++, len, &b) != -1) {
 		ch = (char)b;
 
