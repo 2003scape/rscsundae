@@ -22,6 +22,7 @@ Engine
 - [x] NPC spawn loading
 - [ ] NPC movement
 - [ ] NPC aggression
+- [ ] Line of sight checks
 - [x] Friends list
 - [x] Ignore list
 - [x] Locs
