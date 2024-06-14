@@ -130,7 +130,7 @@ struct mob {
 	uint32_t combat_rounds;
 	uint64_t combat_timer;
 	uint64_t damage_timer;
-	uint64_t combat_next_hit;
+	uint8_t combat_next_hit;
 	uint8_t cur_stats[MAX_SKILL_ID];
 	uint8_t base_stats[MAX_SKILL_ID];
 	uint8_t combat_level;
@@ -264,6 +264,7 @@ struct player {
 	uint16_t action_slot;
 	uint16_t bubble_id;
 	struct ground_item *target_item;
+	uint8_t ranged_timer;
 	uint8_t spell_timer;
 };
 

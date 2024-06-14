@@ -829,7 +829,6 @@ player_wilderness_check(struct player *p, struct player *target)
 void
 player_process_combat(struct player *p)
 {
-
 	if (!p->mob.in_combat) {
 		if (p->mob.target_player != -1) {
 			struct player *target;
@@ -846,11 +845,12 @@ player_process_combat(struct player *p)
 			}
 
 			if (p->projectile != NULL) {
-				if (p->mob.server->tick_counter < p->mob.combat_next_hit) {
+				if (p->ranged_timer > 0) {
+					p->ranged_timer--;
 					return;
 				}
 				player_shoot_pvp(p, p->projectile, target);
-				p->mob.combat_next_hit = p->mob.server->tick_counter + 3;
+				p->ranged_timer = 3;
 				return;
 			}
 
@@ -914,17 +914,12 @@ player_process_combat(struct player *p)
 			target->mob.target_player = p->mob.id;
 			target->mob.target_npc = -1;
 			target->mob.in_combat = true;
-			target->mob.combat_next_hit =
-			    target->mob.server->tick_counter + 4;
+			target->mob.combat_next_hit = 4;
 			target->mob.combat_rounds = 0;
 			target->mob.dir = MOB_DIR_COMBAT_LEFT;
 
 			player_send_message(target, "You are under attack!");
 		}
-		return;
-	}
-
-	if (p->mob.server->tick_counter < p->mob.combat_next_hit) {
 		return;
 	}
 
@@ -954,13 +949,17 @@ player_process_combat(struct player *p)
 			target->mob.dir = MOB_DIR_COMBAT_LEFT;
 		}
 
+		if (p->mob.combat_next_hit > 0) {
+			p->mob.combat_next_hit--;
+			return;
+		}
+
 		roll = player_pvp_roll(p, target);
 		player_damage(target, p, roll);
 		target->mob.combat_rounds++;
 		target->mob.combat_timer = p->mob.server->tick_counter;
+		p->mob.combat_next_hit = 3;
 	}
-
-	p->mob.combat_next_hit = p->mob.server->tick_counter + 3;
 }
 
 int
