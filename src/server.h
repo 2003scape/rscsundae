@@ -43,6 +43,8 @@ struct server {
 	size_t spell_config_count;
 	uint16_t start_tile_x;
 	uint16_t start_tile_y;
+	/* emulate bug in original server where checks were clientside */
+	uint8_t cast_without_runes;
 	int xp_multiplier;
 	lua_State *lua;
 };

@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <math.h>
 #include "config/anim.h"
+#include "config/item.h"
 #include "protocol/opcodes.h"
 #include "inventory.h"
 #include "server.h"
@@ -1577,8 +1578,42 @@ player_process_action(struct player *p)
 bool
 player_has_reagents(struct player *p, struct spell_config *spell)
 {
-	/* TODO implement. prioritize since it enales cheating */
-	(void)p;
-	(void)spell;
+	struct item_config *config;
+	struct item_config *staff;
+
+	if (p->mob.server->cast_without_runes) {
+		return true;
+	}
+	for (int i = 0; i < spell->reagent_count; ++i) {
+		switch (spell->reagents[i].item_id) {
+		case ITEM_FIRE_RUNE:
+			staff = server_find_item_config("staff of fire");
+			assert(staff != NULL);
+			break;
+		case ITEM_WATER_RUNE:
+			staff = server_find_item_config("staff of water");
+			assert(staff != NULL);
+			break;
+		case ITEM_AIR_RUNE:
+			staff = server_find_item_config("staff of air");
+			assert(staff != NULL);
+			break;
+		case ITEM_EARTH_RUNE:
+			staff = server_find_item_config("staff of earth");
+			assert(staff != NULL);
+			break;
+		default:
+			staff = NULL;
+			break;
+		}
+		if (staff != NULL && player_inv_worn(p, staff)) {
+			continue;
+		}
+		config = server_item_config_by_id(spell->reagents[i].item_id);
+		assert(config != NULL);
+		if (!player_inv_held(p, config, spell->reagents[i].amount)) {
+			return false;
+		}
+	}
 	return true;
 }
