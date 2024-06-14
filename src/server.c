@@ -47,6 +47,7 @@ main(int argc, char **argv)
 	s.next_prayer_drain = 0;
 	/* TODO: should be configurable somehow */
 	s.xp_multiplier = 1;
+	s.spell_timer = true;
 
 	(void)signal(SIGPIPE, on_signal_do_nothing);
 
@@ -299,6 +300,9 @@ server_tick(void)
 	for (int i = 0; i < s.max_player_id; ++i) {
 		if (s.players[i] == NULL) {
 			continue;
+		}
+		if (s.players[i]->spell_timer > 0) {
+			s.players[i]->spell_timer--;
 		}
 		s.players[i]->chat_type = CHAT_TYPE_NONE;
 		s.players[i]->mob.chat_len = 0;

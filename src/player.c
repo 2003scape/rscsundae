@@ -1549,6 +1549,12 @@ player_process_action(struct player *p)
 		p->action = ACTION_NONE;
 		break;
 	case ACTION_NPC_CAST:
+		if (!player_can_cast(p, p->spell)) {
+			p->action = ACTION_NONE;
+			p->walk_queue_len = 0;
+			p->walk_queue_pos = 0;
+			return;
+		}
 		printf("attempt cast on npc %s\n", p->spell->name);
 		p->action = ACTION_NONE;
 		break;
@@ -1557,6 +1563,14 @@ player_process_action(struct player *p)
 		if (target == NULL ||
 		    !player_wilderness_check(p, target)) {
 			p->action = ACTION_NONE;
+			p->walk_queue_len = 0;
+			p->walk_queue_pos = 0;
+			return;
+		}
+		if (!player_can_cast(p, p->spell)) {
+			p->action = ACTION_NONE;
+			p->walk_queue_len = 0;
+			p->walk_queue_pos = 0;
 			return;
 		}
 		/* should be able to shoot within 4 tiles */
@@ -1564,10 +1578,11 @@ player_process_action(struct player *p)
 		    target->mob.x, target->mob.y, 4)) {
 			return;
 		}
-		/* TODO: failing casts */
-		/* TODO: spell timer */
-		p->walk_queue_len = 0;
-		p->walk_queue_pos = 0;
+		p->spell_timer = 3;
+		/*
+		 * line of sight check should be AFTER spell timer is set
+		 * see Logg/Tylerbeg/08-05-2018 20.12.26 for some reason, I go to the wizards tower, cast fire blast on the demon for a little while, forget what Im doing and leave
+		 */
 		script_onskillplayer(p->mob.server->lua,
 		    p, target, p->spell);
 		p->action = ACTION_NONE;
@@ -1612,6 +1627,51 @@ player_has_reagents(struct player *p, struct spell_config *spell)
 		config = server_item_config_by_id(spell->reagents[i].item_id);
 		assert(config != NULL);
 		if (!player_inv_held(p, config, spell->reagents[i].amount)) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool
+player_can_cast(struct player *p, struct spell_config *spell)
+{
+	int magic_level;
+
+	assert(spell != NULL);
+
+	if (spell->level > p->mob.cur_stats[SKILL_MAGIC] ||
+	    !player_has_reagents(p, spell)) {
+		/*
+		 * normally the client validates this and produces
+		 * a nice message
+		 */
+		return false;
+	}
+	if (p->mob.server->spell_timer && p->spell_timer > 0) {
+		char mes[64];
+
+		(void)snprintf(mes, sizeof(mes),
+		    "You need to wait %d seconds before you can cast another spell",
+		    (p->spell_timer + 1) / 2);
+		player_send_message(p, mes);
+		return false;
+	}
+
+	/*
+	 * XXX unlikely we'll ever have enough data for this to be accurate
+	 * https://classic.runescape.wiki/w/User:Stormykins/Magic_research
+	 */
+	magic_level = p->mob.cur_stats[SKILL_MAGIC];
+	if ((magic_level - spell->level) < 10) {
+		double r1 = ranval(&p->mob.server->ran) / (double)UINT32_MAX;
+		double r2 = ranval(&p->mob.server->ran) / (double)UINT32_MAX;
+		double roll_spell = spell->level * r1;
+		double roll_player = (magic_level + (p->bonus_magic * 1.5)) * r2;
+		if (roll_player < roll_spell) {
+			player_send_message(p,
+			    "The spell fails! You may try again in 20 seconds");
+			p->spell_timer = 40;
 			return false;
 		}
 	}

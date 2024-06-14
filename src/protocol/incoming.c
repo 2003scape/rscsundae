@@ -337,23 +337,12 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			}
 			offset += 2;
 			if (target_id >= MAXNPCS) {
-				printf("not valid npc\n");
 				return;
 			}
 			spell = server_spell_config_by_id(spell_id);
-			printf("spell id is %d\n", spell_id);
-			if (spell == NULL ||
-			    spell->level > p->mob.cur_stats[SKILL_MAGIC] ||
-			    spell->type != SPELL_CAST_ON_MOB ||
-			    !player_has_reagents(p, spell)) {
-				/*
-				 * normally the client validates this and produces
-				 * a nice message
-				 */
-				return;
-			}
 			npc = p->mob.server->npcs[target_id];
-			if (npc != NULL) {
+			if (npc != NULL && spell != NULL &&
+			    spell->type == SPELL_CAST_ON_MOB) {
 				p->action = ACTION_NPC_CAST;
 				p->spell = spell;
 				p->action_npc = npc->mob.id;
@@ -379,18 +368,9 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			}
 			target = p->mob.server->players[target_id];
 			spell = server_spell_config_by_id(spell_id);
-			if (spell == NULL ||
-			    spell->level > p->mob.cur_stats[SKILL_MAGIC] ||
-			    (spell->type != SPELL_CAST_ON_MOB &&
-				spell->type != SPELL_CAST_ON_PLAYER) ||
-			    !player_has_reagents(p, spell)) {
-				/*
-				 * normally the client validates this and produces
-				 * a nice message
-				 */
-				return;
-			}
-			if (target != NULL) {
+			if (target != NULL && spell != NULL &&
+			    (spell->type == SPELL_CAST_ON_MOB ||
+			    spell->type == SPELL_CAST_ON_PLAYER)) {
 				p->action = ACTION_PLAYER_CAST;
 				p->spell = spell;
 				p->action_player = target->mob.id;

@@ -45,6 +45,8 @@ struct server {
 	uint16_t start_tile_y;
 	/* emulate bug in original server where checks were clientside */
 	uint8_t cast_without_runes;
+	/* original server had no spell timer until runebot was developed */
+	uint8_t spell_timer;
 	int xp_multiplier;
 	lua_State *lua;
 };

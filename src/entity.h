@@ -262,6 +262,7 @@ struct player {
 	uint16_t action_slot;
 	uint16_t bubble_id;
 	struct ground_item *target_item;
+	uint8_t spell_timer;
 };
 
 /* mob.c */
@@ -316,6 +317,7 @@ void player_clear_actions(struct player *);
 void player_process_action(struct player *);
 void player_trade_request(struct player *, uint16_t);
 bool player_has_reagents(struct player *, struct spell_config *);
+bool player_can_cast(struct player *, struct spell_config *);
 void player_damage(struct player *, struct player *, int);
 void player_shoot_pvp(struct player *, struct projectile_config *,
     struct player *);
