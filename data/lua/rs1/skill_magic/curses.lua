@@ -20,7 +20,7 @@ function skillplayer_confuse(player, target)
 		advancestat(player, STAT_MAGIC, 104, 0)
 		remove_curse_runes(player)
 		shootplayer(player, target, "dummybolt")
-		substat(target, STAT_ATTACK, 0, 5)
+		substat(target, STAT_ATTACK, 1, 5)
 		mes(target, "Your attack has been reduced by a confuse spell!")
 	end
 end
@@ -33,7 +33,7 @@ function skillnpc_confuse(player, target)
 		advancestat(player, STAT_MAGIC, 104, 0)
 		remove_curse_runes(player)
 		shootnpc(player, target, "dummybolt")
-		subnpcstat(target, STAT_ATTACK, 0, 5)
+		subnpcstat(target, STAT_ATTACK, 1, 5)
 	end
 end
 
@@ -45,7 +45,7 @@ function skillplayer_weaken(player, target)
 		advancestat(player, STAT_MAGIC, 168, 0)
 		remove_curse_runes(player)
 		shootplayer(player, target, "dummybolt")
-		substat(target, STAT_STRENGTH, 0, 5)
+		substat(target, STAT_STRENGTH, 1, 5)
 		mes(target, "Your strength has been reduced by a weaken spell!")
 	end
 end
