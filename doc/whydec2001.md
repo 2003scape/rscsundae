@@ -39,6 +39,8 @@ Content included in mudclient110
   that players could use for roleplaying and meetings.
   Earlier in 2001, these fully blocked the eastern exit and took up a lot
   of space, but they don't here.
+  There were also some giant rat spawns easily accessible in the south-east
+  of Varrock.
 
 ### Items
 
