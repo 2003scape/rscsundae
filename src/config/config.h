@@ -195,6 +195,31 @@ struct spell_config {
 	struct spell_reagent reagents[MAX_SPELL_REAGENTS];
 };
 
+struct shop_item {
+	uint16_t id;
+	uint16_t quantity;
+	uint16_t restock_time;
+};
+
+#define MAX_SHOP_ITEMS	(40)
+
+enum shop_type {
+	SHOP_TYPE_SPECIALTY_A	= 1,
+	SHOP_TYPE_SPECIALTY_B	= 2,
+	SHOP_TYPE_GENERAL	= 3,
+};
+
+struct shop_config {
+	uint16_t id;
+	char *name;
+	uint8_t sell_modifier;
+	uint8_t buy_modifier;
+	uint8_t type;
+	uint16_t removal_time;
+	uint8_t item_count;
+	struct shop_item items[MAX_SHOP_ITEMS];
+};
+
 int config_find_entity(const char *, struct entity_config *, size_t);
 int config_find_item(const char *, struct item_config *, size_t);
 struct item_config *config_parse_items(char *, size_t, size_t *,
@@ -207,6 +232,8 @@ struct projectile_config *config_parse_projectiles(char *, size_t, size_t *);
 struct npc_config *config_parse_npcs(char *, size_t, size_t *,
     struct entity_config *, size_t, struct item_config *, size_t);
 struct spell_config *config_parse_spells(char *, size_t, size_t *,
+    struct item_config *, size_t);
+struct shop_config *config_parse_shops(char *, size_t, size_t *,
     struct item_config *, size_t);
 bool item_equip_clear(struct item_config *, int);
 

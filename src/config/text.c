@@ -1279,3 +1279,120 @@ err:
 	spells = NULL;
 	return NULL;
 }
+
+struct shop_config *
+config_parse_shops(char *buffer, size_t len, size_t *num_shops,
+    struct item_config *items, size_t num_items)
+{
+	struct shop_config *shops = NULL;
+	size_t max_shops;
+	size_t offset;
+	ssize_t tmp;
+	long tmpl;
+
+	offset = 0;
+	tmp = next_token_int(buffer, offset, len, &tmpl);
+	if (tmp == -1) {
+		return NULL;
+	}
+	offset = tmp;
+	max_shops = tmpl;
+
+	shops = calloc(max_shops, sizeof(struct shop_config));
+	if (shops == NULL) {
+		return NULL;
+	}
+
+	for (size_t i = 0; i < max_shops; ++i) {
+		do {
+			tmp = next_line(buffer, offset, len);
+			if (tmp == -1) {
+				goto end;
+			}
+			offset = tmp;
+
+			tmp = next_token(buffer, offset, len);
+			if (tmp == -1) {
+				goto end;
+			}
+			shops[i].name = buffer + tmp;
+			offset = tmp + strlen((char *)buffer + tmp) + 1;
+
+			/* workaround for stupid syntax error in shop.txt */
+		} while (strstr(shops[i].name, "string") != NULL);
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > UINT8_MAX) {
+			goto err;
+		}
+		shops[i].item_count = tmpl;
+		offset = tmp;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > UINT8_MAX) {
+			goto err;
+		}
+		shops[i].sell_modifier = tmpl;
+		offset = tmp;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > UINT8_MAX) {
+			goto err;
+		}
+		shops[i].buy_modifier = tmpl;
+		offset = tmp;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > UINT8_MAX) {
+			goto err;
+		}
+		shops[i].type = tmpl;
+		offset = tmp;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1 || tmpl > UINT16_MAX) {
+			goto err;
+		}
+		shops[i].removal_time = tmpl;
+		offset = tmp;
+
+		for (size_t j = 0; j < shops[i].item_count; ++j) {
+			tmp = next_line(buffer, offset, len);
+			if (tmp == -1) {
+				goto err;
+			}
+			offset = tmp;
+
+			tmp = next_token(buffer, offset, len);
+			if (tmp == -1) {
+				goto err;
+			}
+			offset = tmp + strlen(buffer + tmp) + 1;
+			shops[i].items[j].id = config_find_item(buffer + tmp,
+			    items, num_items);
+
+			tmp = next_token_int(buffer, offset, len, &tmpl);
+			if (tmp == -1) {
+				goto err;
+			}
+			shops[i].items[j].quantity = tmpl;
+			offset = tmp;
+
+			tmp = next_token_int(buffer, offset, len, &tmpl);
+			if (tmp == -1) {
+				goto err;
+			}
+			shops[i].items[j].restock_time = tmpl;
+			offset = tmp;
+		}
+		*num_shops = *num_shops + 1;
+	}
+
+end:
+	return shops;
+err:
+	assert(0);
+	free(shops);
+	shops = NULL;
+	return NULL;
+}

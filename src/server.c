@@ -490,6 +490,19 @@ load_config_jag(void)
 	printf("read configuration for %zu spells\n",
 	    s.spell_config_count);
 
+	if (jag_find_entry(&archive, "shop.txt", &entry) == -1 ||
+	    jag_unpack_entry(&entry) == -1) {
+		goto err;
+	}
+	s.shop_config = config_parse_shops((char *)entry.data,
+	    entry.unpacked_len, &s.shop_config_count,
+	    s.item_config, s.item_config_count);
+	if (s.shop_config == NULL) {
+		goto err;
+	}
+	printf("read configuration for %zu shops\n",
+	    s.shop_config_count);
+
 	return 0;
 err:
 	if (entry.must_free) {

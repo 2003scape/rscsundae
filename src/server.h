@@ -41,12 +41,14 @@ struct server {
 	size_t npc_config_count;
 	struct spell_config *spell_config;
 	size_t spell_config_count;
+	struct shop_config *shop_config;
+	size_t shop_config_count;
 	uint16_t start_tile_x;
 	uint16_t start_tile_y;
 	/* emulate bug in original server where checks were clientside */
-	uint8_t cast_without_runes;
+	bool cast_without_runes;
 	/* original server had no spell timer until runebot was developed */
-	uint8_t spell_timer;
+	bool spell_timer;
 	int xp_multiplier;
 	lua_State *lua;
 };
