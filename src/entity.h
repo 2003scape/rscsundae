@@ -340,6 +340,10 @@ void player_shoot_pvm(struct player *, struct projectile_config *,
     struct npc *);
 void player_skull(struct player *, struct player *);
 
+/* bank.c */
+void player_deposit(struct player *, uint16_t, uint32_t);
+void player_withdraw(struct player *, uint16_t, uint32_t);
+
 /* incoming.c */
 int player_parse_incoming(struct player *);
 

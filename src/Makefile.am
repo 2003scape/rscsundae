@@ -6,6 +6,7 @@ AM_CPPFLAGS = -Iext/libjag/include
 AM_CPPFLAGS += $(LUA_INCLUDE)
 
 rscsundae_SOURCES = \
+	bank.c \
 	buffer.c \
 	mob.c \
 	netio.c \

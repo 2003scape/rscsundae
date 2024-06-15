@@ -263,6 +263,41 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 	case OP_CLI_TRADE_CONFIRM:
 		player_trade_confirm(p);
 		break;
+	case OP_CLI_BANK_DEPOSIT:
+		{
+			uint16_t id, amount;
+
+			if (buf_getu16(data, offset, len, &id) == -1) {
+				return;
+			}
+			offset += 2;
+
+			if (buf_getu16(data, offset, len, &amount) == -1) {
+				return;
+			}
+			offset += 2;
+			player_deposit(p, id, amount);
+		}
+		break;
+	case OP_CLI_BANK_WITHDRAW:
+		{
+			uint16_t id, amount;
+
+			if (buf_getu16(data, offset, len, &id) == -1) {
+				return;
+			}
+			offset += 2;
+
+			if (buf_getu16(data, offset, len, &amount) == -1) {
+				return;
+			}
+			offset += 2;
+			player_withdraw(p, id, amount);
+		}
+		break;
+	case OP_CLI_BANK_CLOSE:
+		p->ui_bank_open = false;
+		break;
 	case OP_CLI_PRAYER_OFF:
 		{
 			uint8_t id;

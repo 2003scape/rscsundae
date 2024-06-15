@@ -160,3 +160,6 @@ You find nothing in the chest
 Banker is busy at the moment
 You don't have room to hold everything!
 The disk will only work from in Thordur's black hole
+You can't hold the objects you are trying to buy!
+Other player doesn't have enough inventory space to receive the objects
+This object can't be sold in shops
