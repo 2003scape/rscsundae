@@ -198,6 +198,7 @@ struct spell_config {
 struct shop_item {
 	uint16_t id;
 	uint16_t quantity;
+	uint16_t cur_quantity;
 	uint16_t restock;
 };
 

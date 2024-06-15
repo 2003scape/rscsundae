@@ -8,6 +8,7 @@
 #include "../buffer.h"
 #include "../entity.h"
 #include "../server.h"
+#include "../shop.h"
 #include "../utility.h"
 #include "../zone.h"
 
@@ -1798,10 +1799,10 @@ player_send_shop(struct player *p, const char *shop_name)
 		        shop->pawn_limit != 0);
 
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
-		        shop->sell_modifier);
+		        shop->buy_modifier);
 
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
-		        shop->buy_modifier);
+		        shop->sell_modifier);
 
 	for (int i = 0; i < shop->item_count; ++i) {
 		if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
@@ -1810,12 +1811,12 @@ player_send_shop(struct player *p, const char *shop_name)
 		}
 		offset += 2;
 		if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
-				shop->items[i].quantity) == -1) {
+				shop->items[i].cur_quantity) == -1) {
 			return -1;
 		}
 		offset += 2;
-		/* TODO proper price calculations */
-		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, 0) == -1) {
+		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		    (int8_t)shop_price_modifier(shop, &shop->items[i])) == -1) {
 			return -1;
 		}
 	}

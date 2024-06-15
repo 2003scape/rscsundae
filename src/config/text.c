@@ -1376,6 +1376,7 @@ config_parse_shops(char *buffer, size_t len, size_t *num_shops,
 				goto err;
 			}
 			shops[i].items[j].quantity = tmpl;
+			shops[i].items[j].cur_quantity = tmpl;
 			offset = tmp;
 
 			tmp = next_token_int(buffer, offset, len, &tmpl);
