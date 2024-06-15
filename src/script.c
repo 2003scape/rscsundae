@@ -35,6 +35,7 @@ static int script_statdown(lua_State *);
 static int script_npcstatup(lua_State *);
 static int script_npcstatdown(lua_State *);
 static int script_thinkbubble(lua_State *);
+static int script_openshop(lua_State *);
 static int script_changebound(lua_State *);
 static int script_shootplayer(lua_State *);
 static int script_shootnpc(lua_State *);
@@ -729,6 +730,27 @@ script_worn(lua_State *L)
 }
 
 static int
+script_openshop(lua_State *L)
+{
+	lua_Integer player_id;
+	const char *shop_name;
+	struct player *p;
+
+	player_id = luaL_checkinteger(L, 1);
+	shop_name = luaL_checkstring(L, 2);
+
+	p = id_to_player(player_id);
+	if (p == NULL) {
+		printf("script warning: player %ld is undefined\n", player_id);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	player_send_shop(p, shop_name);
+	return 0;
+}
+
+static int
 script_thinkbubble(lua_State *L)
 {
 	lua_Integer player_id;
@@ -1136,6 +1158,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_thinkbubble);
 	lua_setglobal(L, "thinkbubble");
+
+	lua_pushcfunction(L, script_openshop);
+	lua_setglobal(L, "openshop");
 
 	lua_pushcfunction(L, script_shootplayer);
 	lua_setglobal(L, "shootplayer");

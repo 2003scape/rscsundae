@@ -284,6 +284,9 @@ player_close_ui(struct player *p)
 	if (p->ui_multi_open) {
 		player_send_hide_multi(p);
 	}
+	if (p->shop != NULL) {
+		player_send_close_shop(p);
+	}
 	p->trade_state = TRADE_STATE_NONE;
 	p->trading_player = -1;
 	p->offer_count = 0;

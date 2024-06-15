@@ -1382,7 +1382,7 @@ config_parse_shops(char *buffer, size_t len, size_t *num_shops,
 			if (tmp == -1) {
 				goto err;
 			}
-			shops[i].items[j].restock_time = tmpl;
+			shops[i].items[j].price = tmpl;
 			offset = tmp;
 		}
 		*num_shops = *num_shops + 1;

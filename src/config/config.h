@@ -198,7 +198,7 @@ struct spell_config {
 struct shop_item {
 	uint16_t id;
 	uint16_t quantity;
-	uint16_t restock_time;
+	uint16_t price;
 };
 
 #define MAX_SHOP_ITEMS	(40)

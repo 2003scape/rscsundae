@@ -1,6 +1,6 @@
 -- https://classic.runescape.wiki/w/Transcript:Banker
 
-function talknpc_guide(player, npc)
+function talknpc_banker(player, npc)
 	npcsay(npc, "Good day, how may I help you?")
 	local resp = multi(player,
 		"I'd like to access my bank account please",

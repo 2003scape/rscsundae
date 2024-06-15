@@ -809,8 +809,19 @@ server_find_projectile(const char *name)
 		return NULL;
 	}
 	for (size_t i = 0; i < s.projectile_config_count; ++i) {
-		if (strcmp(s.projectile_config[i].name, name) == 0) {
+		if (strcasecmp(s.projectile_config[i].name, name) == 0) {
 			return &s.projectile_config[i];
+		}
+	}
+	return NULL;
+}
+
+struct shop_config *
+server_find_shop(const char *name)
+{
+	for (size_t i = 0; i < s.shop_config_count; ++i) {
+		if (strcasecmp(s.shop_config[i].name, name) == 0) {
+			return &s.shop_config[i];
 		}
 	}
 	return NULL;

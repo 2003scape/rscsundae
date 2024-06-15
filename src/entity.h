@@ -277,6 +277,7 @@ struct player {
 	uint8_t spell_timer;
 	uint16_t bank_count;
 	struct bank_item bank[MAX_BANK_SIZE];
+	struct shop_config *shop;
 };
 
 /* mob.c */
@@ -384,6 +385,8 @@ int player_send_show_multi(struct player *, const char **, uint8_t);
 int player_send_hide_multi(struct player *);
 int player_send_show_bank(struct player *);
 int player_send_close_bank(struct player *);
+int player_send_shop(struct player *, const char *);
+int player_send_close_shop(struct player *);
 int player_notify_friend_online(struct player *, int64_t);
 int player_notify_friend_offline(struct player *, int64_t);
 

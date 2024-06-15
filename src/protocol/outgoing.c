@@ -1759,3 +1759,67 @@ player_send_close_bank(struct player *p)
 	p->ui_bank_open = false;
 	return player_write_packet(p, p->tmpbuf, offset);
 }
+
+int
+player_send_close_shop(struct player *p)
+{
+	size_t offset = 0;
+
+	assert(p != NULL);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_SHOP_CLOSE);
+
+	p->shop = NULL;
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
+player_send_shop(struct player *p, const char *shop_name)
+{
+	struct shop_config *shop;
+	size_t offset = 0;
+
+	assert(p != NULL);
+
+	shop = server_find_shop(shop_name);
+	if (shop == NULL) {
+		printf("warning: shop %s not known\n", shop_name);
+		return -1;
+	}
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_SHOP_OPEN);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        shop->item_count);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        shop->type == SHOP_TYPE_GENERAL);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        shop->sell_modifier);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        shop->buy_modifier);
+
+	for (int i = 0; i < shop->item_count; ++i) {
+		if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
+				shop->items[i].id) == -1) {
+			return -1;
+		}
+		offset += 2;
+		if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
+				shop->items[i].quantity) == -1) {
+			return -1;
+		}
+		offset += 2;
+		/* TODO proper price calculations */
+		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, 0) == -1) {
+			return -1;
+		}
+	}
+
+	p->shop = shop;
+	return player_write_packet(p, p->tmpbuf, offset);
+}

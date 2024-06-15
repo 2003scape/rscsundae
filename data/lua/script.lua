@@ -249,6 +249,8 @@ end
 dofile("./data/lua/rs1/npc/barbarian.lua")
 dofile("./data/lua/rs1/npc/bartender.lua")
 dofile("./data/lua/rs1/npc/banker.lua")
+dofile("./data/lua/rs1/npc/genstore.lua")
+dofile("./data/lua/rs1/npc/bob.lua")
 dofile("./data/lua/rs1/npc/man.lua")
 dofile("./data/lua/rs1/npc/kebabseller.lua")
 dofile("./data/lua/rs1/npc/silktrader.lua")
