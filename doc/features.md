@@ -106,6 +106,7 @@ These should all be implemented in Lua script:
 - [ ] Aggie NPC dialogue
 - [ ] Certing (Miles, Niles, Giles NPCs)
 - [x] Bartender NPC dialogue
+- [ ] Barmaid NPC dialogue
 - [ ] Monk NPC dialogue
 - [ ] Brother Jered NPC dialogue
 - [x] Barbarian NPC dialogue
@@ -131,3 +132,7 @@ These should all be implemented in Lua script:
 - [ ] Dying capes
 - [ ] Mixing dyes
 - [ ] Monk of Zamorak wine aggression
+- [ ] Picking plants
+- [ ] Using the windmill
+- [ ] Using ladders
+- [ ] Using stairs
