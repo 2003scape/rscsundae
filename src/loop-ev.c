@@ -36,14 +36,11 @@ server_sock_cb(EV_P_ ev_io *w, int revents)
 	int client_sock = accept(w->fd,
 	    (struct sockaddr *)&client_addr, &client_len);
 	if (client_sock != -1) {
-		int flags = fcntl(client_sock, F_GETFL, 0);
-		if (flags == -1) {
+		if (net_player_accept(client_sock) == -1) {
 			close(client_sock);
 			return;
 		}
-
-		(void)fcntl(client_sock, F_SETFL, flags | O_NONBLOCK);
-		if (player_accept(serv, client_sock) == NULL) {
+		if (player_create(serv, client_sock) == NULL) {
 			close(client_sock);
 		}
 	}

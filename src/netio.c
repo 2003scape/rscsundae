@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include "netio.h"
 
+static int net_set_flags(int);
+
 int
 net_establish_listener(int *sockets, int port)
 {
@@ -34,13 +36,10 @@ net_establish_listener(int *sockets, int port)
 			continue;
 		}
 
-		int flags = fcntl(s, F_GETFL, 0);
-		if (flags == -1) {
+		if (net_set_flags(s) == -1) {
 			close(s);
 			continue;
 		}
-
-		(void)fcntl(s, F_SETFL, flags | O_NONBLOCK);
 
 		if (bind(s, ai->ai_addr, ai->ai_addrlen) == -1) {
 			fprintf(stderr,
@@ -111,4 +110,41 @@ net_login_response(int sock, int response)
 	b[1] = response;
 
 	(void)send(sock, &b, sizeof(b), 0);
+}
+
+static int
+net_set_flags(int s)
+{
+	int flags;
+
+	flags = fcntl(s, F_GETFL, 0);
+	if (flags == -1) {
+		fprintf(stderr,
+		    "failed to get flags: %s\n", strerror(errno));
+		return -1;
+	}
+
+	if (fcntl(s, F_SETFL, flags | O_NONBLOCK) == -1) {
+		fprintf(stderr,
+		    "failed to set O_NONBLOCK: %s\n", strerror(errno));
+		return -1;
+	}
+
+#ifdef TCP_NODELAY
+	flags = 1;
+	if (setsockopt(s, IPPROTO_TCP, TCP_NODELAY,
+			&flags, sizeof(flags)) == -1) {
+		fprintf(stderr,
+		    "failed to set TCP_NODELAY: %s\n", strerror(errno));
+		return -1;
+	}
+#endif
+
+	return 0;
+}
+
+int
+net_player_accept(int sock)
+{
+	return net_set_flags(sock);
 }

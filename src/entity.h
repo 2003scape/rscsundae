@@ -285,7 +285,7 @@ size_t mob_get_nearby_bounds(struct mob *, struct bound *, size_t);
 void mob_die(struct mob *);
 
 /* player.c */
-struct player *player_accept(struct server *, int);
+struct player *player_create(struct server *, int);
 void player_process_walk_queue(struct player *);
 void player_process_combat(struct player *);
 void player_die(struct player *, struct player *p);

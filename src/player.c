@@ -33,7 +33,7 @@ static bool player_consume_ammo(struct player *, struct projectile_config *);
 static void player_recalculate_bonus(struct player *);
 
 struct player *
-player_accept(struct server *s, int sock)
+player_create(struct server *s, int sock)
 {
 	int slot = -1;
 
