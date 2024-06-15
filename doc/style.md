@@ -21,6 +21,11 @@ Functions in `buffer.h` are all bounds-checked.  Only ignore their
 return value if truncation is known to be impossible or doesn't
 matter.
 
+Avoid the use of `sprintf`, `strcpy`, `strcat`, etc.  Use
+`snprintf` instead.
+
+Do not use `alloca`.
+
 Lua code
 --------
 
