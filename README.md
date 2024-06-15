@@ -1,6 +1,8 @@
 RSC Sundae
 ==========
 
+https://git.sr.ht/~stormy/rscsundae
+
 RSC Sundae is a simple, single-threaded RS Classic server emulator
 written in C99.  It is based on clean-room reverse engineering and
 contains no copyrighted source code.  For content scripting, it
