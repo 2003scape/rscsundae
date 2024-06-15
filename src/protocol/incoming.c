@@ -9,6 +9,7 @@
 #include "../netio.h"
 #include "../script.h"
 #include "../server.h"
+#include "../shop.h"
 #include "../trade.h"
 #include "../utility.h"
 #include "../zone.h"
@@ -580,6 +581,46 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			p->walk_queue_len = steps + 1;
 			p->walk_queue_pos = 0;
 			player_clear_actions(p);
+		}
+		break;
+	case OP_CLI_SHOP_SELL:
+		{
+			uint16_t id;
+
+			if (buf_getu16(data, offset, len, &id) == -1) {
+				return;
+			}
+			offset += 2;
+			/*
+			 * the client also sends the price but we don't trust it
+			 * and ignore it
+			 */
+			if (p->shop != NULL) {
+				shop_sell(p->shop, p, id);
+			}
+		}
+		break;
+	case OP_CLI_SHOP_BUY:
+		{
+			uint16_t id;
+
+			if (buf_getu16(data, offset, len, &id) == -1) {
+				return;
+			}
+			offset += 2;
+			/*
+			 * the client also sends the price but we don't trust it
+			 * and ignore it
+			 */
+			if (p->shop != NULL) {
+				shop_buy(p->shop, p, id);
+			}
+		}
+		break;
+	case OP_CLI_SHOP_CLOSE:
+		{
+			p->shop = NULL;
+			player_close_ui(p);
 		}
 		break;
 	case OP_CLI_TRADE_ACCEPT:

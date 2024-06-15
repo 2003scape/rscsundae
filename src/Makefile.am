@@ -15,6 +15,7 @@ rscsundae_SOURCES = \
 	npc.c \
 	script.c \
 	server.c \
+	shop.c \
 	stat.c \
 	trade.c \
 	utility.c \
