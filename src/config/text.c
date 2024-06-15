@@ -1346,14 +1346,14 @@ config_parse_shops(char *buffer, size_t len, size_t *num_shops,
 		if (tmp == -1 || tmpl > UINT8_MAX) {
 			goto err;
 		}
-		shops[i].type = tmpl;
+		shops[i].delta = tmpl;
 		offset = tmp;
 
 		tmp = next_token_int(buffer, offset, len, &tmpl);
 		if (tmp == -1 || tmpl > UINT16_MAX) {
 			goto err;
 		}
-		shops[i].removal_time = tmpl;
+		shops[i].pawn_limit = tmpl;
 		offset = tmp;
 
 		for (size_t j = 0; j < shops[i].item_count; ++j) {
@@ -1382,7 +1382,7 @@ config_parse_shops(char *buffer, size_t len, size_t *num_shops,
 			if (tmp == -1) {
 				goto err;
 			}
-			shops[i].items[j].price = tmpl;
+			shops[i].items[j].restock = tmpl;
 			offset = tmp;
 		}
 		*num_shops = *num_shops + 1;

@@ -1795,7 +1795,7 @@ player_send_shop(struct player *p, const char *shop_name)
 		        shop->item_count);
 
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
-		        shop->type == SHOP_TYPE_GENERAL);
+		        shop->pawn_limit != 0);
 
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 		        shop->sell_modifier);

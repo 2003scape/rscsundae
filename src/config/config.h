@@ -198,24 +198,18 @@ struct spell_config {
 struct shop_item {
 	uint16_t id;
 	uint16_t quantity;
-	uint16_t price;
+	uint16_t restock;
 };
 
 #define MAX_SHOP_ITEMS	(40)
-
-enum shop_type {
-	SHOP_TYPE_SPECIALTY_A	= 1,
-	SHOP_TYPE_SPECIALTY_B	= 2,
-	SHOP_TYPE_GENERAL	= 3,
-};
 
 struct shop_config {
 	uint16_t id;
 	char *name;
 	uint8_t sell_modifier;
 	uint8_t buy_modifier;
-	uint8_t type;
-	uint16_t removal_time;
+	uint8_t delta;
+	uint16_t pawn_limit;
 	uint8_t item_count;
 	struct shop_item items[MAX_SHOP_ITEMS];
 };
