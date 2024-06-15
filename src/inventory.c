@@ -85,6 +85,7 @@ player_inv_remove(struct player *p, struct item_config *item, uint32_t count)
 		}
 		removed++;
 		player_send_inv_remove(p, i);
+		player_recalculate_equip(p);
 	}
 }
 
