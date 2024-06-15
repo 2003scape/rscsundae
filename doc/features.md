@@ -35,7 +35,7 @@ Engine
 - [x] Stat restoration
 - [x] Lua scripting
 - [ ] Shops
-- [ ] Item banking
+- [x] Item banking
 - [ ] Player saving (SQLite)
 - [x] Protocol: 110
 - [ ] Protocol: RSA decryption (passwords are ignored)
@@ -114,7 +114,7 @@ These should all be implemented in Lua script:
 - [ ] Thrander NPC dialogue
 - [ ] Bareak NPC dialogue
 - [ ] Apothecary NPC dialogue
-- [ ] Banker NPC dialogue
+- [x] Banker NPC dialogue
 - [ ] Cook's Guild
 - [ ] Champions' Guild
 - [x] Alcohol (beers, wizards mind bomb)
