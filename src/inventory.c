@@ -77,6 +77,7 @@ player_inv_remove(struct player *p, struct item_config *item, uint32_t count)
 		if (p->inventory[i].id != item->id) {
 			continue;
 		}
+		bool was_worn = p->inventory[i].worn;
 		p->inv_count--;
 		for (int j = i; j < p->inv_count; ++j) {
 			p->inventory[j].id = p->inventory[j + 1].id;
@@ -85,7 +86,9 @@ player_inv_remove(struct player *p, struct item_config *item, uint32_t count)
 		}
 		removed++;
 		player_send_inv_remove(p, i);
-		player_recalculate_equip(p);
+		if (was_worn) {
+			player_recalculate_equip(p);
+		}
 	}
 }
 
