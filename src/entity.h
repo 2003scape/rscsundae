@@ -300,7 +300,7 @@ void player_process_combat(struct player *);
 void player_die(struct player *, struct player *p);
 void player_close_ui(struct player *);
 void player_destroy(struct player *);
-void player_recalculate_sprites(struct player *);
+void player_recalculate_equip(struct player *);
 void player_recalculate_combat_level(struct player *);
 bool player_has_ignore(struct player *, int64_t);
 bool player_has_friend(struct player *, int64_t);

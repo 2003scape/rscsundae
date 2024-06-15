@@ -30,7 +30,6 @@ static int player_pvm_ranged_roll(struct player *, struct npc *);
 static int player_magic_damage_roll(struct player *, int);
 static bool player_wilderness_check(struct player *, struct player *);
 static bool player_consume_ammo(struct player *, struct projectile_config *);
-static void player_recalculate_bonus(struct player *);
 
 struct player *
 player_create(struct server *s, int sock)
@@ -117,7 +116,6 @@ player_create(struct server *s, int sock)
 	p->last_packet = s->tick_counter;
 
 	player_recalculate_combat_level(p);
-	player_recalculate_sprites(p);
 
 	p->mob.server = s;
 	p->mob.x = s->start_tile_x;
@@ -947,11 +945,12 @@ player_retreat(struct player *p)
 	return 0;
 }
 
-static void
-player_recalculate_bonus(struct player *p)
+void
+player_recalculate_equip(struct player *p)
 {
 	struct item_config *item;
 	struct projectile_config *proj;
+	uint8_t sprites_orig[MAX_ENTITY_SPRITES];
 	int orig_armour = p->bonus_armour;
 	int orig_aim = p->bonus_weaponaim;
 	int orig_power = p->bonus_weaponpower;
@@ -965,21 +964,59 @@ player_recalculate_bonus(struct player *p)
 	p->bonus_prayer = 1;
 	p->projectile = NULL;
 
+	memcpy(sprites_orig, p->sprites, sizeof(sprites_orig));
+	memcpy(p->sprites, p->sprites_base, sizeof(p->sprites));
+
 	for (int i = 0; i < p->inv_count; ++i) {
 		if (!p->inventory[i].worn) {
 			continue;
 		}
 		item = server_item_config_by_id(p->inventory[i].id);
 		assert(item != NULL);
+
 		proj = server_find_projectile(item->projectile);
 		if (proj != NULL) {
 			p->projectile = proj;
 		}
+
 		p->bonus_armour += item->bonus_armour;
 		p->bonus_weaponaim += item->bonus_aim;
 		p->bonus_weaponpower += item->bonus_power;
 		p->bonus_magic += item->bonus_magic;
 		p->bonus_prayer += item->bonus_prayer;
+
+		if (item->equip_type == EQUIP_TYPE_WEAPON_OFF) {
+			/* funny special case, bows go in the shield slot */
+			p->sprites[ANIM_SLOT_OFFHAND] = item->entity_sprite + 1;
+		} else if ((item->equip_type & EQUIP_TYPE_WEAPON) != 0) {
+			p->sprites[ANIM_SLOT_HAND] = item->entity_sprite + 1;
+		} else if ((item->equip_type & EQUIP_TYPE_SHIELD) != 0) {
+			p->sprites[ANIM_SLOT_OFFHAND] = item->entity_sprite + 1;
+		} else if ((item->equip_type & EQUIP_TYPE_HEAD) != 0) {
+			p->sprites[ANIM_SLOT_HAT] = item->entity_sprite + 1;
+		} else if ((item->equip_type & EQUIP_TYPE_TORSO) != 0) {
+			p->sprites[ANIM_SLOT_SHIRT] = item->entity_sprite + 1;
+		} else if ((item->equip_type & EQUIP_TYPE_HANDS) != 0) {
+			p->sprites[ANIM_SLOT_GLOVES] = item->entity_sprite + 1;
+		} else if ((item->equip_type & EQUIP_TYPE_LEGS) != 0) {
+			p->sprites[ANIM_SLOT_TROUSERS] = item->entity_sprite + 1;
+		} else if ((item->equip_type & EQUIP_TYPE_SHOES) != 0) {
+			p->sprites[ANIM_SLOT_SHOES] = item->entity_sprite + 1;
+		} else if ((item->equip_type & EQUIP_TYPE_NECK) != 0) {
+			p->sprites[ANIM_SLOT_NECK] = item->entity_sprite + 1;
+		} else if ((item->equip_type & EQUIP_TYPE_BACK) != 0) {
+			p->sprites[ANIM_SLOT_BACK] = item->entity_sprite + 1;
+		}
+
+		if (item->equip_type == EQUIP_TYPE_HEAD_FULL) {
+			p->sprites[ANIM_SLOT_HEAD] = 0;
+		}
+		if (item->equip_type == EQUIP_TYPE_TORSO_FULL) {
+			p->sprites[ANIM_SLOT_BODY] = 0;
+		}
+		if (item->equip_type == EQUIP_TYPE_LEGS_FULL) {
+			p->sprites[ANIM_SLOT_LEGS] = 0;
+		}
 	}
 
 	if (p->bonus_weaponaim != orig_aim ||
@@ -988,6 +1025,10 @@ player_recalculate_bonus(struct player *p)
 	    p->bonus_magic != orig_magic ||
 	    p->bonus_prayer != orig_prayer) {
 		p->bonus_changed = true;
+	}
+
+	if (memcmp(sprites_orig, p->sprites, sizeof(sprites_orig)) != 0) {
+		p->appearance_changed = true;
 	}
 }
 
@@ -1018,8 +1059,7 @@ player_wear(struct player *p, int slot)
 		}
 	}
 	p->inventory[slot].worn = true;
-	player_recalculate_bonus(p);
-	player_recalculate_sprites(p);
+	player_recalculate_equip(p);
 	player_send_inv_slot(p, slot);
 	return 0;
 }
@@ -1038,8 +1078,7 @@ player_unwear(struct player *p, int slot)
 		return -1;
 	}
 	p->inventory[slot].worn = false;
-	player_recalculate_bonus(p);
-	player_recalculate_sprites(p);
+	player_recalculate_equip(p);
 	player_send_inv_slot(p, slot);
 	return 0;
 }
@@ -1100,63 +1139,6 @@ player_award_combat_xp(struct player *p, struct mob *target)
 
 	/* it's been verified that hits is given last */
 	stat_advance(p, SKILL_HITS, xp, 0);
-}
-
-void
-player_recalculate_sprites(struct player *p)
-{
-	uint8_t sprites_orig[MAX_ENTITY_SPRITES];
-
-	memcpy(sprites_orig, p->sprites, sizeof(sprites_orig));
-	memcpy(p->sprites, p->sprites_base, sizeof(p->sprites));
-
-	for (int i = 0; i < p->inv_count; ++i) {
-		if (!p->inventory[i].worn) {
-			continue;
-		}
-		struct item_config *item;
-
-		item = server_item_config_by_id(p->inventory[i].id);
-		if (item == NULL) {
-			continue;
-		}
-		if (item->equip_type == EQUIP_TYPE_WEAPON_OFF) {
-			/* funny special case, bows go in the shield slot */
-			p->sprites[ANIM_SLOT_OFFHAND] = item->entity_sprite + 1;
-		} else if ((item->equip_type & EQUIP_TYPE_WEAPON) != 0) {
-			p->sprites[ANIM_SLOT_HAND] = item->entity_sprite + 1;
-		} else if ((item->equip_type & EQUIP_TYPE_SHIELD) != 0) {
-			p->sprites[ANIM_SLOT_OFFHAND] = item->entity_sprite + 1;
-		} else if ((item->equip_type & EQUIP_TYPE_HEAD) != 0) {
-			p->sprites[ANIM_SLOT_HAT] = item->entity_sprite + 1;
-		} else if ((item->equip_type & EQUIP_TYPE_TORSO) != 0) {
-			p->sprites[ANIM_SLOT_SHIRT] = item->entity_sprite + 1;
-		} else if ((item->equip_type & EQUIP_TYPE_HANDS) != 0) {
-			p->sprites[ANIM_SLOT_GLOVES] = item->entity_sprite + 1;
-		} else if ((item->equip_type & EQUIP_TYPE_LEGS) != 0) {
-			p->sprites[ANIM_SLOT_TROUSERS] = item->entity_sprite + 1;
-		} else if ((item->equip_type & EQUIP_TYPE_SHOES) != 0) {
-			p->sprites[ANIM_SLOT_SHOES] = item->entity_sprite + 1;
-		} else if ((item->equip_type & EQUIP_TYPE_NECK) != 0) {
-			p->sprites[ANIM_SLOT_NECK] = item->entity_sprite + 1;
-		} else if ((item->equip_type & EQUIP_TYPE_BACK) != 0) {
-			p->sprites[ANIM_SLOT_BACK] = item->entity_sprite + 1;
-		}
-
-		if (item->equip_type == EQUIP_TYPE_HEAD_FULL) {
-			p->sprites[ANIM_SLOT_HEAD] = 0;
-		}
-		if (item->equip_type == EQUIP_TYPE_TORSO_FULL) {
-			p->sprites[ANIM_SLOT_BODY] = 0;
-		}
-		if (item->equip_type == EQUIP_TYPE_LEGS_FULL) {
-			p->sprites[ANIM_SLOT_LEGS] = 0;
-		}
-	}
-
-	if (memcmp(sprites_orig, p->sprites, sizeof(sprites_orig)) != 0) {
-		p->appearance_changed = true;
-	}
 }
 
 static void

@@ -727,7 +727,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 
 			(void)buf_getu8(data, offset++, len, &p->rpg_class);
 
-			player_recalculate_sprites(p);
+			player_recalculate_equip(p);
 			p->appearance_changed = true;
 			p->ui_design_open = false;
 		}
