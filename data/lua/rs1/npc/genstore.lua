@@ -48,3 +48,7 @@ end
 function talknpc_genstore8(player, npc)
 	do_dialogue(player, npc, "generalshop8")
 end
+
+function talknpc_dwarven_shopkeeper(player, npc)
+	do_dialogue(player, npc, "generaldwarf")
+end
