@@ -275,6 +275,9 @@ player_process_walk_queue(struct player *p)
 void
 player_close_ui(struct player *p)
 {
+	if (p->ui_bank_open) {
+		player_send_close_bank(p);
+	}
 	if (p->ui_trade_open) {
 		player_send_close_trade(p);
 	}

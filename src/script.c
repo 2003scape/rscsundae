@@ -17,6 +17,7 @@ static int script_npcattack(lua_State *);
 static int script_npcbusy(lua_State *);
 static int script_npcunbusy(lua_State *);
 static int script_npcsay(lua_State *);
+static int script_male(lua_State *);
 static int script_random(lua_State *);
 static int script_give(lua_State *);
 static int script_remove(lua_State *);
@@ -214,6 +215,25 @@ script_npcsay(lua_State *L)
 	npc->mob.chat_len = len;
 
 	return 0;
+}
+
+static int
+script_male(lua_State *L)
+{
+	lua_Integer player_id;
+	struct player *p;
+
+	player_id = luaL_checkinteger(L, 1);
+	p = id_to_player(player_id);
+	if (p == NULL) {
+		printf("script warning: player %ld is undefined\n", player_id);
+		script_cancel(L, player_id);
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	lua_pushboolean(L, p->gender == MOB_GENDER_MALE);
+	return 1;
 }
 
 static int
@@ -622,6 +642,25 @@ script_remove(lua_State *L)
 	}
 
 	player_inv_remove(p, item, amount);
+	return 0;
+}
+
+static int
+script_displaybalance(lua_State *L)
+{
+	lua_Integer player_id;
+	struct player *p;
+
+	player_id = luaL_checkinteger(L, 1);
+
+	p = id_to_player(player_id);
+	if (p == NULL) {
+		printf("script warning: player %ld is undefined\n", player_id);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	player_send_show_bank(p);
 	return 0;
 }
 
@@ -1106,6 +1145,12 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_changebound);
 	lua_setglobal(L, "changebound");
+
+	lua_pushcfunction(L, script_displaybalance);
+	lua_setglobal(L, "displaybalance");
+
+	lua_pushcfunction(L, script_male);
+	lua_setglobal(L, "male");
 
 	/* TODO: configurable path */
 	if (luaL_dofile(L, "./data/lua/script.lua") != LUA_OK) {

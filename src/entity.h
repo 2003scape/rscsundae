@@ -19,6 +19,7 @@
 #define MAX_OFFER_SIZE		(12)
 #define MAX_MULTI_SIZE		(5)
 #define MAX_KNOWN_ZONES		(64)
+#define MAX_BANK_SIZE		(48)
 
 /* signed to accomodate java client */
 #define MAX_STACK_SIZE		(INT32_MAX)
@@ -36,6 +37,11 @@ struct ranctx;
 struct bound;
 struct loc;
 struct ground_item;
+
+struct bank_item {
+	uint16_t id;
+	uint32_t amount;
+};
 
 enum action {
 	ACTION_NONE		= 0,
@@ -269,6 +275,8 @@ struct player {
 	uint16_t bubble_id;
 	uint8_t ranged_timer;
 	uint8_t spell_timer;
+	uint16_t bank_count;
+	struct bank_item bank[MAX_BANK_SIZE];
 };
 
 /* mob.c */
@@ -370,6 +378,8 @@ int player_send_trade_state_remote(struct player *);
 int player_send_trade_confirm(struct player *);
 int player_send_show_multi(struct player *, const char **, uint8_t);
 int player_send_hide_multi(struct player *);
+int player_send_show_bank(struct player *);
+int player_send_close_bank(struct player *);
 int player_notify_friend_online(struct player *, int64_t);
 int player_notify_friend_offline(struct player *, int64_t);
 

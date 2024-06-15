@@ -1713,3 +1713,49 @@ player_send_hide_multi(struct player *p)
 	p->ui_multi_open = false;
 	return player_write_packet(p, p->tmpbuf, offset);
 }
+
+int
+player_send_show_bank(struct player *p)
+{
+	size_t offset = 0;
+	ssize_t tmpofs;
+
+	assert(p != NULL);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_BANK_SHOW);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        p->bank_count);
+
+	for (int i = 0; i < p->bank_count; ++i) {
+		if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
+				p->bank[i].id) == -1) {
+			return -1;
+		}
+		offset += 2;
+		tmpofs = buf_putsmartu32(p->tmpbuf, offset,
+		    PLAYER_BUFSIZE, p->bank[i].amount);
+		if (tmpofs == -1) {
+			return -1;
+		}
+		offset = tmpofs;
+	}
+
+	p->ui_bank_open = true;
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
+player_send_close_bank(struct player *p)
+{
+	size_t offset = 0;
+
+	assert(p != NULL);
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_BANK_CLOSE);
+
+	p->ui_bank_open = false;
+	return player_write_packet(p, p->tmpbuf, offset);
+}
