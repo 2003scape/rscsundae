@@ -540,10 +540,10 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			if (opcode != OP_CLI_WALK_ENTITY) {
 				p->mob.target_npc = -1;
 				p->mob.target_player = -1;
+				script_cancel(p->mob.server->lua, p->mob.id);
 			}
 			p->walk_queue_len = steps + 1;
 			p->walk_queue_pos = 0;
-			script_cancel(p->mob.server->lua, p->mob.id);
 			player_clear_actions(p);
 		}
 		break;
