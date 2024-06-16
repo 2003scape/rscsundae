@@ -306,7 +306,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = subdir-objects
-AM_CPPFLAGS = -Iext/libjag/include $(LUA_INCLUDE)
+AM_CPPFLAGS = -Iext/libjag/include $(LUA_CFLAGS)
 rscsundae_SOURCES = bank.c buffer.c mob.c netio.c player.c inventory.c \
 	npc.c script.c server.c shop.c stat.c trade.c utility.c zone.c \
 	config/config.c config/text.c ext/flea.c \
