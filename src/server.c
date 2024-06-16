@@ -641,10 +641,20 @@ load_map_tile(struct jag_map *chunk,
 			}
 		}
 	} else if (object_type > JAG_MAP_DIAG_ITEM) {
+		struct loc *l;
+
+		l = server_find_loc(global_x, global_y - 1);
 		item.id = object_type - JAG_MAP_DIAG_ITEM - 1;
 		item.unique_id = s.ground_item_counter++;
 		item.x = global_x;
 		item.y = global_y;
+		if (l != NULL) {
+			loc_config = server_loc_config_by_id(l->id);
+			assert(loc_config != NULL);
+			if (loc_config->surface_height > 0) {
+				item.y = global_y - 1;
+			}
+		}
 		item.respawn = true;
 		item.stack = 1;
 		item.owner = UINT16_MAX;
