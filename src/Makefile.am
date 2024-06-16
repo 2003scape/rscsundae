@@ -3,7 +3,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 bin_PROGRAMS =	rscsundae
 
 AM_CPPFLAGS = -Iext/libjag/include
-AM_CPPFLAGS += $(LUA_INCLUDE)
+AM_CPPFLAGS += $(LUA_CFLAGS)
 
 rscsundae_SOURCES = \
 	bank.c \
