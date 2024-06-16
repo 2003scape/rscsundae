@@ -69,6 +69,15 @@ enum skill {
 	SKILL_RANGED		= 4,
 	SKILL_PRAYER		= 5,
 	SKILL_MAGIC		= 6,
+	SKILL_COOKING		= 7,
+	SKILL_WOODCUTTING	= 8,
+	SKILL_FLETCHING		= 9,
+	SKILL_FISHING		= 10,
+	SKILL_FIREMAKING	= 11,
+	SKILL_CRAFTING		= 12,
+	SKILL_SMITHING		= 13,
+	SKILL_MINING		= 14,
+	SKILL_HERBLAW		= 15
 };
 
 enum prayer {
@@ -175,6 +184,14 @@ struct npc {
 	uint16_t talk_target;
 	uint16_t respawn_time;
 	uint8_t busy;
+};
+
+enum rpg_class {
+	CLASS_ADVENTURER	= 0,
+	CLASS_WARRIOR		= 1,
+	CLASS_WIZARD		= 2,
+	CLASS_RANGER		= 3,
+	CLASS_MINER		= 4
 };
 
 struct player {
@@ -340,6 +357,7 @@ void player_shoot_pvp(struct player *, struct projectile_config *,
 void player_shoot_pvm(struct player *, struct projectile_config *,
     struct npc *);
 void player_skull(struct player *, struct player *);
+void player_init_class(struct player *);
 
 /* bank.c */
 void player_deposit(struct player *, uint16_t, uint32_t);

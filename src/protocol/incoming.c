@@ -132,7 +132,6 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 
 			player_send_privacy_settings(p);
 			player_send_design_ui(p);
-			player_send_message(p, "@que@Welcome to RSCSundae!");
 			player_send_client_settings(p);
 			player_send_init_friends(p);
 			player_send_init_ignore(p);
@@ -674,6 +673,8 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 		break;
 	case OP_CLI_ACCEPT_DESIGN:
 		{
+			uint8_t old_class = p->rpg_class;
+
 			if (!p->ui_design_open) {
 				return;
 			}
@@ -728,8 +729,13 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			(void)buf_getu8(data, offset++, len, &p->rpg_class);
 
 			player_recalculate_equip(p);
+			if (old_class == UINT8_MAX) {
+				player_init_class(p);
+			}
 			p->appearance_changed = true;
 			p->ui_design_open = false;
+
+			player_send_message(p, "@que@Welcome to RSCSundae!");
 		}
 		break;
 	case OP_CLI_ANSWER_MULTI:

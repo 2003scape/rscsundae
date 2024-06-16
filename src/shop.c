@@ -8,6 +8,8 @@
 
 #define MAX_SHOP_STACK UINT16_MAX
 
+/* TODO restock */
+
 static int shop_remove(struct shop_config *, struct player *, uint16_t);
 static uint32_t shop_price(struct shop_config *, struct shop_item *, bool);
 

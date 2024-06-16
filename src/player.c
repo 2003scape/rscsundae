@@ -99,10 +99,6 @@ player_create(struct server *s, int sock)
 	p->bonus_prayer = 1;
 	p->bonus_magic = 1;
 
-	/* add some test items */
-	p->inventory[p->inv_count].id = 10;
-	p->inventory[p->inv_count++].stack = 1000;
-
 	p->stats_changed = true;
 	p->bonus_changed = true;
 	p->plane_changed = true;
@@ -110,6 +106,7 @@ player_create(struct server *s, int sock)
 	p->ui_design_open = true;
 	p->following_player = -1;
 	p->trading_player = -1;
+	p->rpg_class = UINT8_MAX;
 	p->projectile_target_player = UINT16_MAX;
 	p->projectile_target_npc = UINT16_MAX;
 	p->bubble_id = UINT16_MAX;
@@ -1732,4 +1729,85 @@ player_can_cast(struct player *p, struct spell_config *spell)
 	}
 	p->spell_timer = 3;
 	return true;
+}
+
+void
+player_init_class(struct player *p)
+{
+	struct item_config *item;
+
+	/* XXX the experience rewards here are pretty much guessed */
+
+	switch (p->rpg_class) {
+	case CLASS_ADVENTURER:
+		item = server_find_item_config("bronze axe");
+		assert(item != NULL);
+		player_inv_give(p, item, 1);
+
+		item = server_find_item_config("tinderbox");
+		assert(item != NULL);
+		player_inv_give(p, item, 1);
+
+		item = server_find_item_config("jug");
+		assert(item != NULL);
+		player_inv_give(p, item, 1);
+
+		item = server_find_item_config("pot");
+		assert(item != NULL);
+		player_inv_give(p, item, 1);
+
+		stat_advance(p, SKILL_ATTACK, 500, 0);
+		stat_advance(p, SKILL_DEFENSE, 500, 0);
+		stat_advance(p, SKILL_STRENGTH, 500, 0);
+		stat_advance(p, SKILL_HITS, 1500, 0);
+		stat_advance(p, SKILL_RANGED, 500, 0);
+		stat_advance(p, SKILL_MAGIC, 500, 0);
+		stat_advance(p, SKILL_PRAYER, 500, 0);
+		break;
+	case CLASS_WARRIOR:
+		item = server_find_item_config("bronze short sword");
+		assert(item != NULL);
+		player_inv_give(p, item, 1);
+
+		item = server_find_item_config("wooden shield");
+		assert(item != NULL);
+		player_inv_give(p, item, 1);
+
+		stat_advance(p, SKILL_ATTACK, 700, 0);
+		stat_advance(p, SKILL_DEFENSE, 700, 0);
+		stat_advance(p, SKILL_STRENGTH, 700, 0);
+		stat_advance(p, SKILL_HITS, 3000, 0);
+		break;
+	case CLASS_WIZARD:
+		item = server_find_item_config("staff");
+		assert(item != NULL);
+		player_inv_give(p, item, 1);
+
+		item = server_find_item_config("bluewizhat");
+		assert(item != NULL);
+		player_inv_give(p, item, 1);
+
+		stat_advance(p, SKILL_MAGIC, 2600, 0);
+		break;
+	case CLASS_RANGER:
+		item = server_find_item_config("shortbow");
+		assert(item != NULL);
+		player_inv_give(p, item, 1);
+
+		item = server_find_item_config("arrows");
+		assert(item != NULL);
+		player_inv_give(p, item, 10);
+
+		stat_advance(p, SKILL_RANGED, 2100, 0);
+		stat_advance(p, SKILL_HITS, 3000, 0);
+		break;
+	case CLASS_MINER:
+		item = server_find_item_config("pickaxe");
+		assert(item != NULL);
+		player_inv_give(p, item, 1);
+		stat_advance(p, SKILL_MINING, 2600, 0);
+		break;
+	}
+
+	player_send_init_stats(p);
 }
