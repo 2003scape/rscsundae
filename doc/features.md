@@ -34,7 +34,7 @@ Engine
 - [x] Experience and levelling up
 - [x] Stat restoration
 - [x] Lua scripting
-- [ ] Shops
+- [x] Shops
 - [x] Item banking
 - [ ] Player saving (SQLite)
 - [x] Protocol: 110
