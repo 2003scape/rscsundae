@@ -1626,7 +1626,7 @@ player_process_action(struct player *p)
 			p->walk_queue_pos = 0;
 			return;
 		}
-		if (!mob_within_range(&p->mob, bound->x, bound->y, 2)) {
+		if (!mob_reached_bound(&p->mob, bound)) {
 			return;
 		}
 		p->walk_queue_len = 0;

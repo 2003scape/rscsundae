@@ -309,6 +309,7 @@ uint32_t mob_combat_xp(struct mob *);
 size_t mob_get_nearby_locs(struct mob *, struct loc *, size_t);
 size_t mob_get_nearby_bounds(struct mob *, struct bound *, size_t);
 bool mob_reached_item(struct mob *, struct ground_item *);
+bool mob_reached_bound(struct mob *, struct bound *);
 void mob_die(struct mob *);
 
 /* player.c */

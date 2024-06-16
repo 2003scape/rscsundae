@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <math.h>
 #include "entity.h"
 #include "server.h"
@@ -253,4 +254,30 @@ mob_reached_item(struct mob *mob, struct ground_item *item)
 		return mob->x == item->x && mob->y == item->y;
 	}
 	return mob_within_range(mob, item->x, item->y, 2);
+}
+
+bool
+mob_reached_bound(struct mob *mob, struct bound *bound)
+{
+	if (mob->x == bound->x && mob->y == bound->y) {
+		return true;
+	}
+	switch (bound->dir) {
+	case BOUND_DIR_HORIZ:
+		if (mob->x == (bound->x - 1) && mob->y == bound->y) {
+			return true;
+		}
+		return false;
+	case BOUND_DIR_VERT:
+		if (mob->x == bound->x && mob->y == (bound->y - 1)) {
+			return true;
+		}
+		return false;
+	case BOUND_DIR_DIAG_NW_SE:
+		return mob_within_range(mob, bound->x, bound->y, 2);
+	case BOUND_DIR_DIAG_NE_SW:
+		return mob_within_range(mob, bound->x, bound->y, 2);
+	}
+	assert(0);
+	return false;
 }
