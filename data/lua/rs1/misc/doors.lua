@@ -34,3 +34,28 @@ function oploc1_doubledoorsclosed(player, x, y)
 	changeloc(x, y, "doubledoorsopen")
 	delay(4)
 end
+
+-- ./RSC 2001/3/f2p (not 100% complete)/walkaround- falador- south- chicken farm
+function oploc2_woodengateopen(player, x, y)
+	mes(player, "@que@The gate creaks shut")
+	changeloc(x, y, "woodengateclosed")
+	delay(4)
+end
+
+function oploc1_woodengateclosed(player, x, y)
+	mes(player, "@que@The gate swings open")
+	changeloc(x, y, "woodengateopen")
+	delay(4)
+end
+
+function oploc2_metalgateopen(player, x, y)
+	mes(player, "@que@The gate creaks shut")
+	changeloc(x, y, "metalgateclosed")
+	delay(4)
+end
+
+function oploc1_metalgateclosed(player, x, y)
+	mes(player, "@que@The gate swings open")
+	changeloc(x, y, "metalgateopen")
+	delay(4)
+end
