@@ -8,8 +8,6 @@
 
 #define MAX_SHOP_STACK UINT16_MAX
 
-/* TODO restock */
-
 static int shop_remove(struct shop_config *, struct player *, uint16_t);
 static uint32_t shop_price(struct shop_config *, struct shop_item *, bool);
 
@@ -84,7 +82,7 @@ shop_sell(struct shop_config *shop, struct player *p, uint16_t id)
 				player_inv_give(p, coins, price);
 			}
 			shop->items[i].cur_quantity++;
-			player_send_shop(p, shop->name);
+			shop->changed = true;
 			return;
 		}
 	}
@@ -98,7 +96,7 @@ shop_sell(struct shop_config *shop, struct player *p, uint16_t id)
 		shop->items[shop->item_count].restock = 0;
 		shop->items[shop->item_count].quantity = 0;
 		shop->items[shop->item_count++].cur_quantity = 1;
-		player_send_shop(p, shop->name);
+		shop->changed = true;
 	}
 }
 
@@ -129,9 +127,13 @@ shop_remove(struct shop_config *shop, struct player *p, uint16_t id)
 				shop->items[j] = shop->items[j + 1];
 			}
 		} else {
+			if (shop->items[i].restock) {
+				p->shop->items[i].restock_timer =
+				    (p->shop->items[i].restock / 5);
+			}
 			p->shop->items[i].cur_quantity--;
 		}
-		player_send_shop(p, shop->name);
+		shop->changed = true;
 		return 0;
 	}
 	return -1;

@@ -200,6 +200,7 @@ struct shop_item {
 	uint16_t quantity;
 	uint16_t cur_quantity;
 	uint16_t restock;
+	uint16_t restock_timer;
 };
 
 #define MAX_SHOP_ITEMS	(40)
@@ -213,6 +214,7 @@ struct shop_config {
 	uint16_t pawn_limit;
 	uint8_t item_count;
 	struct shop_item items[MAX_SHOP_ITEMS];
+	uint8_t changed;
 };
 
 int config_find_entity(const char *, struct entity_config *, size_t);

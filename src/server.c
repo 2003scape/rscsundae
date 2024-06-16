@@ -232,6 +232,26 @@ server_tick(void)
 		}
 	}
 
+	/* restock shops */
+	for (size_t i = 0; i < s.shop_config_count; ++i) {
+		for (size_t j = 0; j < s.shop_config[i].item_count; ++j) {
+			struct shop_item *item;
+
+			item = &s.shop_config[i].items[j];
+			if (item->cur_quantity < item->quantity) {
+				if (item->restock_timer > 0) {
+					item->restock_timer--;
+					continue;
+				}
+				item->cur_quantity++;
+				s.shop_config[i].changed = true;
+				if (item->cur_quantity < item->quantity) {
+					item->restock_timer = item->restock / 5;
+				}
+			}
+		}
+	}
+
 	for (int i = 0; i < s.max_player_id; ++i) {
 		if (s.players[i] == NULL) {
 			continue;
@@ -293,6 +313,10 @@ server_tick(void)
 		if (s.players[i]->partner_offer_changed) {
 			player_send_partner_trade_offer(s.players[i]);
 		}
+		if (s.players[i]->shop != NULL && s.players[i]->shop->changed) {
+			player_send_shop(s.players[i],
+			    s.players[i]->shop->name);
+		}
 		player_send_movement(s.players[i]);
 		player_send_appearance_update(s.players[i]);
 		player_send_npc_movement(s.players[i]);
@@ -343,6 +367,10 @@ server_tick(void)
 		s.npcs[i]->mob.chat_len = 0;
 		s.npcs[i]->mob.damage = UINT8_MAX;
 		s.npcs[i]->mob.prev_dir = s.npcs[i]->mob.dir;
+	}
+
+	for (size_t i = 0; i < s.shop_config_count; ++i) {
+		s.shop_config[i].changed = false;
 	}
 
 	if (drain_tick) {
