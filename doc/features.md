@@ -106,7 +106,7 @@ These should all be implemented in Lua script:
 - [ ] Aggie NPC dialogue
 - [ ] Certing (Miles, Niles, Giles NPCs)
 - [x] Bartender NPC dialogue
-- [ ] Barmaid NPC dialogue
+- [x] Barmaid NPC dialogue
 - [ ] Monk NPC dialogue
 - [ ] Brother Jered NPC dialogue
 - [x] Barbarian NPC dialogue

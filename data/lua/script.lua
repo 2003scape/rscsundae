@@ -246,6 +246,7 @@ function multi(player, ...)
 	return active_script.answer
 end
 
+dofile("./data/lua/rs1/npc/asgarnia/barmaid.lua")
 dofile("./data/lua/rs1/npc/asgarnia/betty.lua")
 dofile("./data/lua/rs1/npc/asgarnia/brian.lua")
 dofile("./data/lua/rs1/npc/asgarnia/cassie.lua")
