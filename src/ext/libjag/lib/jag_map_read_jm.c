@@ -31,14 +31,14 @@ jag_map_read_jm(struct jag_map *out, void *b, size_t len) {
 		if (jag_getu8(b, offset++, len, &val) != 0) {
 			return -1;
 		}
-		out->tiles[i++].bound_vert = val;
+		out->tiles[i++].bound_horiz = val;
 	}
 
 	for (i = 0; i < JAG_MAP_CHUNK_AREA;) {
 		if (jag_getu8(b, offset++, len, &val) != 0) {
 			return -1;
 		}
-		out->tiles[i++].bound_horiz = val;
+		out->tiles[i++].bound_vert = val;
 	}
 
 	for (i = 0; i < JAG_MAP_CHUNK_AREA;) {

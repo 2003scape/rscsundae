@@ -24,8 +24,8 @@
 struct jag_tile {
 	uint8_t height;
 	uint8_t colour;
-	uint8_t bound_vert;
 	uint8_t bound_horiz;
+	uint8_t bound_vert;
 	uint16_t bound_diag;
 	uint8_t roof;
 	uint8_t overlay;

@@ -43,8 +43,8 @@ struct loc {
 };
 
 enum bound_dir {
-	BOUND_DIR_HORIZ		= 0,
-	BOUND_DIR_VERT		= 1,
+	BOUND_DIR_VERT		= 0,
+	BOUND_DIR_HORIZ		= 1,
 	BOUND_DIR_DIAG_NW_SE	= 2,
 	BOUND_DIR_DIAG_NE_SW	= 3,
 };
