@@ -87,6 +87,9 @@ shop_sell(struct shop_config *shop, struct player *p, uint16_t id)
 		}
 	}
 	if (shop->item_count < MAX_SHOP_ITEMS) {
+		if (shop->pawn_limit == 0) {
+			return;
+		}
 		price = (shop->buy_modifier * item->value) / 100;
 		player_inv_remove(p, item, 1);
 		if (price > 0) {
@@ -94,6 +97,8 @@ shop_sell(struct shop_config *shop, struct player *p, uint16_t id)
 		}
 		shop->items[shop->item_count].id = id;
 		shop->items[shop->item_count].restock = 0;
+		shop->items[shop->item_count].removal_timer =
+		    shop->pawn_limit / 5;
 		shop->items[shop->item_count].quantity = 0;
 		shop->items[shop->item_count++].cur_quantity = 1;
 		shop->changed = true;
@@ -116,12 +121,15 @@ shop_remove(struct shop_config *shop, struct player *p, uint16_t id)
 		if (shop->items[i].cur_quantity == 0) {
 			return -1;
 		}
-		price = shop_price(shop, &shop->items[i], true);
-		if (!player_inv_held(p, coins, price)) {
-			player_send_message(p, "You don't have enough money!");
-			return -1;
+		if (p != NULL) {
+			price = shop_price(shop, &shop->items[i], true);
+			if (!player_inv_held(p, coins, price)) {
+				player_send_message(p,
+				    "You don't have enough money!");
+				return -1;
+			}
+			player_inv_remove(p, coins, price);
 		}
-		player_inv_remove(p, coins, price);
 		if (shop->items[i].cur_quantity == 1 && !shop->items[i].restock) {
 			shop->item_count--;
 			for (size_t j = i; j < shop->item_count; ++j) {
@@ -188,6 +196,17 @@ shop_process(struct shop_config *shop)
 			if (item->cur_quantity < item->quantity) {
 				item->restock_timer = item->restock / 5;
 			}
+		}
+		if (item->quantity > 0 || item->cur_quantity == 0) {
+			continue;
+		}
+		if (item->removal_timer > 0) {
+			item->removal_timer--;
+			continue;
+		}
+		if (item->removal_timer == 0) {
+			shop_remove(shop, NULL, item->id);
+			item->removal_timer = shop->pawn_limit / 5;
 		}
 	}
 }

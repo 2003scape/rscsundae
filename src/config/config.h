@@ -201,6 +201,7 @@ struct shop_item {
 	uint16_t cur_quantity;
 	uint16_t restock;
 	uint16_t restock_timer;
+	uint16_t removal_timer;
 };
 
 #define MAX_SHOP_ITEMS	(40)
