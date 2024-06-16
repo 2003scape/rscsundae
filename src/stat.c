@@ -20,8 +20,8 @@
  */
 static const char *skill_names[] = {
 	"attack", "defence", "strength", "hitpoints", "ranged", "prayer",
-	"magic", "cooking", "woodcutting", "fishing", "firemaking",
-	"crafting", "smithing", "mining", "herblaw"
+	"magic", "cooking", "woodcutting", "fletching", "fishing",
+	"firemaking", "crafting", "smithing", "mining", "herblaw"
 };
 
 static uint32_t xp_table[MAX_SKILL_LEVEL];
