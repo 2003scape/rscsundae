@@ -118,6 +118,7 @@ shop_remove(struct shop_config *shop, struct player *p, uint16_t id)
 		}
 		price = shop_price(shop, &shop->items[i], true);
 		if (!player_inv_held(p, coins, price)) {
+			player_send_message(p, "You don't have enough money!");
 			return -1;
 		}
 		player_inv_remove(p, coins, price);
