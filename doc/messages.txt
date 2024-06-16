@@ -166,3 +166,10 @@ This object can't be sold in shops
 You buy a pint of Wizard's Mind Bomb
 You buy a pint of Dwarven Stout
 You buy an Asgarnian Ale
+@que@You fill the bucket from the fountain
+@que@You fill the bucket from the sink
+@que@You slide the cover back over the manhole
+@que@You slide open the manhole cover
+You try to destroy the web...
+You fail to cut through it
+You slice through the web

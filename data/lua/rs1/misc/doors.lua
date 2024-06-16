@@ -59,3 +59,16 @@ function oploc1_metalgateclosed(player, x, y)
 	changeloc(x, y, "metalgateopen")
 	delay(4)
 end
+
+-- Logg/Tylerbeg/08-01-2018 19.32.34 varrock pt2.pcap
+function oploc1_manholeclosed(player, x, y)
+	mes(player, "@que@You slide open the manhole cover")
+	changeloc(x, y, "manholeopen")
+	delay(4)
+end
+
+function oploc2_manholeopen(player, x, y)
+	mes(player, "@que@You slide the cover back over the manhole")
+	changeloc(x, y, "manholeclosed")
+	delay(4)
+end

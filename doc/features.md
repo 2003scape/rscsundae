@@ -132,7 +132,9 @@ These should all be implemented in Lua script:
 - [ ] Dying capes
 - [ ] Mixing dyes
 - [ ] Monk of Zamorak wine aggression
-- [ ] Picking plants
+- [x] Picking plants
+- [ ] Cutting webs
+- [ ] Water sources
 - [ ] Using the windmill
-- [ ] Using ladders
-- [ ] Using stairs
+- [x] Using ladders
+- [ ] Using stairs (broken)

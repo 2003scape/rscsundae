@@ -344,8 +344,10 @@ dofile("./data/lua/rs1/items/stew.lua")
 dofile("./data/lua/rs1/items/cake.lua")
 dofile("./data/lua/rs1/items/pizza.lua")
 dofile("./data/lua/rs1/items/pumpkin.lua")
+dofile("./data/lua/rs1/misc/clutter.lua")
 dofile("./data/lua/rs1/misc/doors.lua")
 dofile("./data/lua/rs1/misc/ladders.lua")
+dofile("./data/lua/rs1/misc/plants.lua")
 
 --
 -- automatically register triggers
