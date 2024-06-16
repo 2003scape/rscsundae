@@ -1420,8 +1420,8 @@ player_get_nearby_items(struct player *p,
 		}
 	}
 
-	for (int x = -3; x < 4; ++x) {
-		for (int y = -3; y < 4; ++y) {
+	for (int x = -2; x < 3; ++x) {
+		for (int y = -2; y < 3; ++y) {
 			if (x == 0 && y == 0) {
 				continue;
 			}
