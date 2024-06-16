@@ -1641,6 +1641,28 @@ player_process_action(struct player *p)
 		}
 		p->action = ACTION_NONE;
 		break;
+	case ACTION_LOC_USEWITH:
+		if (p->action_loc == NULL) {
+			p->action = ACTION_NONE;
+			p->walk_queue_len = 0;
+			p->walk_queue_pos = 0;
+			return;
+		}
+		loc = server_find_loc(p->action_loc->x, p->action_loc->y);
+		if (loc == NULL) {
+			p->action = ACTION_NONE;
+			p->walk_queue_len = 0;
+			p->walk_queue_pos = 0;
+			return;
+		}
+		if (!mob_reached_loc(&p->mob, loc)) {
+			return;
+		}
+		p->walk_queue_len = 0;
+		p->walk_queue_pos = 0;
+		p->action = ACTION_NONE;
+		printf("loc usewith, slot %d\n", p->action_slot);
+		break;
 	case ACTION_LOC_OP1:
 	case ACTION_LOC_OP2:
 		if (p->action_loc == NULL) {

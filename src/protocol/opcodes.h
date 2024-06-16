@@ -37,6 +37,7 @@
 #define OP_CLI_ACCEPT_DESIGN	(236)
 #define OP_CLI_ANSWER_MULTI	(237)
 #define OP_CLI_BOUND_OP1	(238)
+#define OP_CLI_LOC_USEWITH	(241)
 #define OP_CLI_LOC_OP1		(242)
 #define OP_CLI_NPC_TALK		(245)
 #define OP_CLI_INV_ACTION	(246)

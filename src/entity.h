@@ -61,8 +61,9 @@ enum action {
 	ACTION_PLAYER_CAST	= 6,
 	ACTION_BOUND_OP1	= 7,
 	ACTION_BOUND_OP2	= 8,
-	ACTION_LOC_OP1		= 9,
-	ACTION_LOC_OP2		= 10,
+	ACTION_LOC_USEWITH	= 9,
+	ACTION_LOC_OP1		= 10,
+	ACTION_LOC_OP2		= 11,
 };
 
 enum trade_state {
