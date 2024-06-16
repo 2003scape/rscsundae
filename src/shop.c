@@ -170,3 +170,24 @@ shop_buy(struct shop_config *shop, struct player *p, uint16_t id)
 	}
 	return;
 }
+
+void
+shop_process(struct shop_config *shop)
+{
+	struct shop_item *item;
+
+	for (size_t i = 0; i < shop->item_count; ++i) {
+		item = &shop->items[i];
+		if (item->cur_quantity < item->quantity) {
+			if (item->restock_timer > 0) {
+				item->restock_timer--;
+				continue;
+			}
+			item->cur_quantity++;
+			shop->changed = true;
+			if (item->cur_quantity < item->quantity) {
+				item->restock_timer = item->restock / 5;
+			}
+		}
+	}
+}

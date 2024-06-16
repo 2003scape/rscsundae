@@ -12,6 +12,7 @@
 #include "netio.h"
 #include "entity.h"
 #include "script.h"
+#include "shop.h"
 #include "stat.h"
 #include "utility.h"
 #include "zone.h"
@@ -234,22 +235,7 @@ server_tick(void)
 
 	/* restock shops */
 	for (size_t i = 0; i < s.shop_config_count; ++i) {
-		for (size_t j = 0; j < s.shop_config[i].item_count; ++j) {
-			struct shop_item *item;
-
-			item = &s.shop_config[i].items[j];
-			if (item->cur_quantity < item->quantity) {
-				if (item->restock_timer > 0) {
-					item->restock_timer--;
-					continue;
-				}
-				item->cur_quantity++;
-				s.shop_config[i].changed = true;
-				if (item->cur_quantity < item->quantity) {
-					item->restock_timer = item->restock / 5;
-				}
-			}
-		}
+		shop_process(&s.shop_config[i]);
 	}
 
 	for (int i = 0; i < s.max_player_id; ++i) {
