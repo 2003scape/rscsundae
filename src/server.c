@@ -634,11 +634,13 @@ load_map_tile(struct jag_map *chunk,
 		item.unique_id = s.ground_item_counter++;
 		item.x = global_x;
 		item.y = global_y;
+		item.on_surface = false;
 		if (l != NULL) {
 			loc_config = server_loc_config_by_id(l->id);
 			assert(loc_config != NULL);
 			if (loc_config->surface_height > 0) {
 				item.y = global_y - 1;
+				item.on_surface = true;
 			}
 		}
 		item.respawn = true;

@@ -64,6 +64,7 @@ struct ground_item {
 	uint16_t owner;
 	uint32_t stack;
 	uint8_t respawn;
+	uint8_t on_surface;
 	uint64_t creation_time;
 	uint64_t respawn_time;
 	uint64_t unique_id;

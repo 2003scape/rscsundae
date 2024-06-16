@@ -245,3 +245,12 @@ mob_die(struct mob *mob)
 
 	mob_combat_reset(mob);
 }
+
+bool
+mob_reached_item(struct mob *mob, struct ground_item *item)
+{
+	if (!item->on_surface) {
+		return mob->x == item->x && mob->y == item->y;
+	}
+	return mob_within_range(mob, item->x, item->y, 2);
+}

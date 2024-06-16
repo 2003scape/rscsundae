@@ -1543,8 +1543,7 @@ player_process_action(struct player *p)
 			p->action = ACTION_NONE;
 			return;
 		}
-		if (p->mob.x != item->x || p->mob.y != item->y) {
-			/* not reached it yet */
+		if (!mob_reached_item(&p->mob, item)) {
 			return;
 		}
 		player_inv_give(p, item_config, item->stack);
