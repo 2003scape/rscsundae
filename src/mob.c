@@ -281,3 +281,31 @@ mob_reached_bound(struct mob *mob, struct bound *bound)
 	assert(0);
 	return false;
 }
+
+bool
+mob_reached_loc(struct mob *mob, struct loc *loc)
+{
+	struct loc_config *config;
+	int max_x, max_y;
+
+	config = server_loc_config_by_id(loc->id);
+	assert(config != NULL);
+
+	if (loc->dir == 0 || loc->dir == 4) {
+		max_x = loc->x + config->width;
+		max_y = loc->y + config->height;
+	} else {
+		max_x = loc->x + config->height;
+		max_y = loc->y + config->width;
+	}
+
+	for (int x = loc->x; x < max_x; ++x) {
+		for (int y = loc->y; y < max_y; ++y) {
+			if (mob_within_range(mob, x, y, 2)) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}

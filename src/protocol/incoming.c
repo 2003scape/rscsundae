@@ -1,5 +1,4 @@
 #include <stdlib.h>
-
 #include <stdio.h>
 #include <string.h>
 #include "opcodes.h"
@@ -772,6 +771,24 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			p->action = (opcode == OP_CLI_BOUND_OP1) ?
 			    ACTION_BOUND_OP1 : ACTION_BOUND_OP2;
 			p->action_bound = server_find_bound(x, y, dir);
+		}
+		break;
+	case OP_CLI_LOC_OP1:
+	case OP_CLI_LOC_OP2:
+		{
+			uint16_t x, y;
+
+			if (buf_getu16(data, offset, len, &x) == -1) {
+				return;
+			}
+			offset += 2;
+			if (buf_getu16(data, offset, len, &y) == -1) {
+				return;
+			}
+			offset += 2;
+			p->action = (opcode == OP_CLI_LOC_OP1) ?
+			    ACTION_LOC_OP1 : ACTION_LOC_OP2;
+			p->action_loc = server_find_loc(x, y);
 		}
 		break;
 	}

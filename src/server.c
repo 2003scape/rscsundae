@@ -581,6 +581,7 @@ load_map_tile(struct jag_map *chunk,
 		loc.id = object_type - JAG_MAP_DIAG_LOC - 1;
 		loc.x = global_x;
 		loc.y = global_y;
+		loc.dir = object_dir;
 		loc_config = server_loc_config_by_id(loc.id);
 		if (loc_config == NULL) {
 			return;
@@ -804,6 +805,19 @@ server_find_bound_config(const char *name)
 		for (size_t j = 0; j < s.bound_config[i].name_count; ++j) {
 			if (strcasecmp(name, s.bound_config[i].names[j]) == 0) {
 				return &s.bound_config[i];
+			}
+		}
+	}
+	return NULL;
+}
+
+struct loc_config *
+server_find_loc_config(const char *name)
+{
+	for (size_t i = 0; i < s.loc_config_count; ++i) {
+		for (size_t j = 0; j < s.loc_config[i].name_count; ++j) {
+			if (strcasecmp(name, s.loc_config[i].names[j]) == 0) {
+				return &s.loc_config[i];
 			}
 		}
 	}

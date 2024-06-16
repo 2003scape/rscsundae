@@ -37,6 +37,7 @@ static int script_npcstatdown(lua_State *);
 static int script_thinkbubble(lua_State *);
 static int script_openshop(lua_State *);
 static int script_changebound(lua_State *);
+static int script_changeloc(lua_State *);
 static int script_shootplayer(lua_State *);
 static int script_shootnpc(lua_State *);
 static int script_multi(lua_State *);
@@ -782,13 +783,14 @@ script_thinkbubble(lua_State *L)
 static int
 script_changebound(lua_State *L)
 {
+	lua_Integer x, y, dir;
 	const char *name;
 	struct bound_config *config;
-	struct bound b = {0};
+	struct bound *b;
 
-	b.x = luaL_checkinteger(L, 1);
-	b.y = luaL_checkinteger(L, 2);
-	b.dir = luaL_checkinteger(L, 3);
+	x = luaL_checkinteger(L, 1);
+	y = luaL_checkinteger(L, 2);
+	dir = luaL_checkinteger(L, 3);
 	name = luaL_checkstring(L, 4);
 
 	config = server_find_bound_config(name);
@@ -797,9 +799,45 @@ script_changebound(lua_State *L)
 		return 0;
 	}
 
-	b.id = config->id;
+	b = server_find_bound(x, y, dir);
+	if (b == NULL) {
+		printf("script warning: couldn't find bound at %ld %ld\n", x, y);
+		return 0;
+	}
 
-	server_add_bound(&b);
+	b->id = config->id;
+
+	server_add_bound(b);
+	return 0;
+}
+
+static int
+script_changeloc(lua_State *L)
+{
+	lua_Integer x, y;
+	const char *name;
+	struct loc_config *config;
+	struct loc *loc;
+
+	x = luaL_checkinteger(L, 1);
+	y = luaL_checkinteger(L, 2);
+	name = luaL_checkstring(L, 3);
+
+	loc = server_find_loc(x, y);
+	if (loc == NULL) {
+		printf("script warning: couldn't find loc at %ld %ld\n", x, y);
+		return 0;
+	}
+
+	config = server_find_loc_config(name);
+	if (config == NULL) {
+		printf("script warning: loc %s is undefined\n", name);
+		return 0;
+	}
+
+	loc->id = config->id;
+
+	server_add_loc(loc);
 	return 0;
 }
 
@@ -1016,9 +1054,10 @@ script_onopbound1(lua_State *L, struct player *p, struct bound *bound)
 		lua_pcall(L, 5, 1, 0);
 		result = lua_toboolean(L, -1);
 		if (result != 0) {
-			break;
+			return;
 		}
 	}
+	player_send_message(p, "Nothing interesting happens");
 }
 
 void
@@ -1044,9 +1083,66 @@ script_onopbound2(lua_State *L, struct player *p, struct bound *bound)
 		lua_pcall(L, 5, 1, 0);
 		result = lua_toboolean(L, -1);
 		if (result != 0) {
-			break;
+			return;
 		}
 	}
+	player_send_message(p, "Nothing interesting happens");
+}
+
+void
+script_onoploc1(lua_State *L, struct player *p, struct loc *loc)
+{
+	bool result;
+	struct loc_config *config;
+
+	config = server_loc_config_by_id(loc->id);
+	assert(config != NULL);
+
+	for (size_t i = 0; i < config->name_count; ++i) {
+		lua_getglobal(L, "script_engine_onoploc1");
+		if (!lua_isfunction(L, -1)) {
+			puts("script error: can't find essential function script_engine_onoploc1");
+			return;
+		}
+		lua_pushnumber(L, p->mob.id);
+		lua_pushstring(L, config->names[i]);
+		lua_pushnumber(L, loc->x);
+		lua_pushnumber(L, loc->y);
+		lua_pcall(L, 4, 1, 0);
+		result = lua_toboolean(L, -1);
+		if (result != 0) {
+			return;
+		}
+	}
+	player_send_message(p, "Nothing interesting happens");
+}
+
+void
+script_onoploc2(lua_State *L, struct player *p, struct loc *loc)
+{
+	bool result;
+	struct loc_config *config;
+
+	config = server_loc_config_by_id(loc->id);
+	assert(config != NULL);
+
+	for (size_t i = 0; i < config->name_count; ++i) {
+		lua_getglobal(L, "script_engine_onoploc2");
+		if (!lua_isfunction(L, -1)) {
+			puts("script error: can't find essential function script_engine_onoploc2");
+			return;
+		}
+		lua_pushnumber(L, p->mob.id);
+		lua_pushstring(L, config->names[i]);
+		lua_pushnumber(L, loc->x);
+		lua_pushnumber(L, loc->y);
+		lua_pcall(L, 4, 1, 0);
+		result = lua_toboolean(L, -1);
+		if (result != 0) {
+			return;
+		}
+	}
+	player_send_message(p, "Nothing interesting happens");
 }
 
 void
@@ -1170,6 +1266,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_changebound);
 	lua_setglobal(L, "changebound");
+
+	lua_pushcfunction(L, script_changeloc);
+	lua_setglobal(L, "changeloc");
 
 	lua_pushcfunction(L, script_displaybalance);
 	lua_setglobal(L, "displaybalance");

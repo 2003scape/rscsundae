@@ -21,3 +21,16 @@ function opbound2_highdoorframe(player, x, y, dir)
 	changebound(x, y, dir, "highdoor")
 	delay(4)
 end
+
+-- ./RSC 2001/3/f2p (not 100% complete)/scenery- draynor manor- front- doors (double)
+function oploc2_doubledoorsopen(player, x, y)
+	mes(player, "@que@The doors creak shut")
+	changeloc(x, y, "doubledoorsclosed")
+	delay(4)
+end
+
+function oploc1_doubledoorsclosed(player, x, y)
+	mes(player, "@que@The doors swing open")
+	changeloc(x, y, "doubledoorsopen")
+	delay(4)
+end

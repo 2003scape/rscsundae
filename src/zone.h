@@ -40,6 +40,7 @@ struct loc {
 	uint16_t id;
 	uint16_t x;
 	uint16_t y;
+	uint8_t dir;
 };
 
 enum bound_dir {

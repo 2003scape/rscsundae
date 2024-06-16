@@ -52,7 +52,9 @@ enum action {
 	ACTION_ITEM_TAKE	= 5,
 	ACTION_PLAYER_CAST	= 6,
 	ACTION_BOUND_OP1	= 7,
-	ACTION_BOUND_OP2	= 8
+	ACTION_BOUND_OP2	= 8,
+	ACTION_LOC_OP1		= 9,
+	ACTION_LOC_OP2		= 10,
 };
 
 enum trade_state {
@@ -289,6 +291,7 @@ struct player {
 	uint16_t action_slot;
 	struct ground_item *action_item;
 	struct bound *action_bound;
+	struct loc *action_loc;
 	uint16_t bubble_id;
 	uint8_t ranged_timer;
 	uint8_t spell_timer;
@@ -310,6 +313,7 @@ size_t mob_get_nearby_locs(struct mob *, struct loc *, size_t);
 size_t mob_get_nearby_bounds(struct mob *, struct bound *, size_t);
 bool mob_reached_item(struct mob *, struct ground_item *);
 bool mob_reached_bound(struct mob *, struct bound *);
+bool mob_reached_loc(struct mob *, struct loc *);
 void mob_die(struct mob *);
 
 /* player.c */

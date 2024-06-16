@@ -1471,6 +1471,7 @@ player_process_action(struct player *p)
 	struct item_config *item_config;
 	struct ground_item *item;
 	struct bound *bound;
+	struct loc *loc;
 	uint16_t id;
 	uint32_t stack;
 
@@ -1635,6 +1636,33 @@ player_process_action(struct player *p)
 			script_onopbound1(p->mob.server->lua, p, bound);
 		} else {
 			script_onopbound2(p->mob.server->lua, p, bound);
+		}
+		p->action = ACTION_NONE;
+		break;
+	case ACTION_LOC_OP1:
+	case ACTION_LOC_OP2:
+		if (p->action_loc == NULL) {
+			p->action = ACTION_NONE;
+			p->walk_queue_len = 0;
+			p->walk_queue_pos = 0;
+			return;
+		}
+		loc = server_find_loc(p->action_loc->x, p->action_loc->y);
+		if (loc == NULL) {
+			p->action = ACTION_NONE;
+			p->walk_queue_len = 0;
+			p->walk_queue_pos = 0;
+			return;
+		}
+		if (!mob_reached_loc(&p->mob, loc)) {
+			return;
+		}
+		p->walk_queue_len = 0;
+		p->walk_queue_pos = 0;
+		if (p->action == ACTION_LOC_OP1) {
+			script_onoploc1(p->mob.server->lua, p, loc);
+		} else {
+			script_onoploc2(p->mob.server->lua, p, loc);
 		}
 		p->action = ACTION_NONE;
 		break;

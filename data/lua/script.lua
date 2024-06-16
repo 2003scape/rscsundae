@@ -4,6 +4,8 @@ onskillplayer_scripts = {}
 onskillnpc_scripts = {}
 onopbound1_scripts = {}
 onopbound2_scripts = {}
+onoploc1_scripts = {}
+onoploc2_scripts = {}
 player_scripts = {}
 active_script = nil
 
@@ -41,6 +43,14 @@ end
 
 function register_opbound2(name, callback)
 	onopbound2_scripts[name] = callback;
+end
+
+function register_oploc1(name, callback)
+	onoploc1_scripts[name] = callback;
+end
+
+function register_oploc2(name, callback)
+	onoploc2_scripts[name] = callback;
 end
 
 function register_skillnpc(name, spell, callback)
@@ -221,6 +231,44 @@ function script_engine_onopbound2(player, name, x, y, dir)
 	return false
 end
 
+function script_engine_onoploc1(player, name, x, y)
+	local script = player_scripts[player]
+	if script then
+		return true
+	end
+	name = string.lower(name)
+	script = onoploc1_scripts[name]
+	if script then
+		ps = new_player_script()
+		ps.co = coroutine.create(function()
+			script(player, x, y)
+			player_scripts[player] = nil
+		end)
+		player_scripts[player] = ps
+		return true
+	end
+	return false
+end
+
+function script_engine_onoploc2(player, name, x, y)
+	local script = player_scripts[player]
+	if script then
+		return true
+	end
+	name = string.lower(name)
+	script = onoploc2_scripts[name]
+	if script then
+		ps = new_player_script()
+		ps.co = coroutine.create(function()
+			script(player, x, y)
+			player_scripts[player] = nil
+		end)
+		player_scripts[player] = ps
+		return true
+	end
+	return false
+end
+
 function delay(length)
 	active_script.delay = length
 	coroutine.yield(active_script.co)
@@ -322,6 +370,12 @@ for k in pairs(_G) do
 		elseif string.match(k, "opbound2_.*") then
 			target = string.gsub(string.sub(k, 10), "_", " ")
 			register_opbound2(target, v)
+		elseif string.match(k, "oploc1_.*") then
+			target = string.gsub(string.sub(k, 8), "_", " ")
+			register_oploc1(target, v)
+		elseif string.match(k, "oploc2_.*") then
+			target = string.gsub(string.sub(k, 8), "_", " ")
+			register_oploc2(target, v)
 		end
 	end
 end
