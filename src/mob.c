@@ -173,10 +173,12 @@ mob_get_nearby_locs(struct mob *mob,
 	struct zone *zone;
 
 	orig = server_find_zone(mob->x, mob->y);
-	if (orig != NULL) {
-		for (int i = 0; i < orig->loc_count && count < max; ++i) {
-			list[count++] = orig->locs[i];
-		}
+	if (orig == NULL) {
+		return 0;
+	}
+
+	for (int i = 0; i < orig->loc_count && count < max; ++i) {
+		list[count++] = orig->locs[i];
 	}
 
 	for (int x = -2; x < 3; ++x) {
@@ -208,10 +210,12 @@ mob_get_nearby_bounds(struct mob *mob,
 	struct zone *zone;
 
 	orig = server_find_zone(mob->x, mob->y);
-	if (orig != NULL) {
-		for (int i = 0; i < orig->bound_count && count < max; ++i) {
-			list[count++] = orig->bounds[i];
-		}
+	if (orig == NULL) {
+		return 0;
+	}
+
+	for (int i = 0; i < orig->bound_count && count < max; ++i) {
+		list[count++] = orig->bounds[i];
 	}
 
 	for (int x = -2; x < 3; ++x) {
