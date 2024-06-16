@@ -288,6 +288,7 @@ player_send_movement(struct player *p)
 		known_player = p->mob.server->players[p->known_players[i]];
 		if (known_player == NULL ||
 		    known_player->logout_confirmed ||
+		    known_player->teleported ||
 		    !mob_within_range(&known_player->mob,
 			p->mob.x, p->mob.y, UPDATE_RADIUS)) {
 			if (buf_putbits(p->tmpbuf, bitpos,

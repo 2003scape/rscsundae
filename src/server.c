@@ -20,13 +20,6 @@
 /* XXX no idea what's authentic here */
 #define MAX_IDLE_TICKS		(20)
 
-#ifndef DEFAULT_START_X
-#define DEFAULT_START_X		(120)
-#endif
-#ifndef DEFAULT_START_Y
-#define DEFAULT_START_Y		(648)
-#endif
-
 struct server s = {0};
 
 static void on_signal_do_nothing(int);
@@ -330,6 +323,7 @@ server_tick(void)
 		s.players[i]->prayers_changed = false;
 		s.players[i]->partner_offer_changed = false;
 		s.players[i]->moved = false;
+		s.players[i]->teleported = false;
 		s.players[i]->projectile_target_npc = UINT16_MAX;
 		s.players[i]->projectile_target_player = UINT16_MAX;
 		s.players[i]->bubble_id = UINT16_MAX;

@@ -4,6 +4,14 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifndef DEFAULT_START_X
+#define DEFAULT_START_X		(120)
+#endif
+
+#ifndef DEFAULT_START_Y
+#define DEFAULT_START_Y		(648)
+#endif
+
 #define PLAYER_BUFSIZE		(5000)
 
 #define PLANE_WIDTH		(2304)
@@ -295,6 +303,7 @@ struct player {
 	uint16_t bubble_id;
 	uint8_t ranged_timer;
 	uint8_t spell_timer;
+	uint8_t teleported;
 	uint16_t bank_count;
 	struct bank_item bank[MAX_BANK_SIZE];
 	struct shop_config *shop;

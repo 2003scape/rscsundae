@@ -514,7 +514,9 @@ player_die(struct player *p, struct player *victor)
 
 	mob_die(&p->mob);
 
-	/* TODO teleportation */
+	p->mob.x = DEFAULT_START_X;
+	p->mob.y = DEFAULT_START_Y;
+	p->teleported = true;
 
 	p->walk_queue_len = 0;
 	p->walk_queue_pos = 0;
