@@ -14,5 +14,6 @@ void stat_heal(struct mob *, int, int, int);
 
 bool stat_up(struct mob *mob, int);
 bool stat_down(struct mob *mob, int);
+bool stat_random(struct mob *, int, double, double);
 
 #endif

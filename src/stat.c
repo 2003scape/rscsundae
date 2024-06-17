@@ -71,15 +71,27 @@ stat_is_combat(int stat)
 /* corresponds to runescript ifstatrandom */
 bool
 stat_random(struct mob *mob, int stat,
-    int base_probability, int top_probability)
+    double base_probability, double top_probability)
 {
-	(void)base_probability;
-	(void)top_probability;
+	double level;
+	int low, high, chance, random;
+
 	assert(mob != NULL);
 	assert(stat < MAX_SKILL_ID);
 
-	/* TODO implement */
-	return false;
+	level = mob->cur_stats[stat];
+
+	/*
+	 * interpolate
+	 * do not modify for increased level caps, since scripts expect
+	 * a 0-100 range
+	 */
+	low = (int)(base_probability * (99.0 - level) / 98.0);
+	high = (int)(top_probability * (level - 1.0) / 98.0);
+	chance = (low + high) + 1;
+
+	random = (ranval(&mob->server->ran) / (double)UINT32_MAX) * 256.0;
+	return random <= chance;
 }
 
 /* corresponds to runescript advancestat */
