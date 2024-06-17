@@ -1,7 +1,7 @@
 -- ./rscplus-replays-master/RSC 2001/3/f2p (not 100% complete)/cabbage- draynor manor- consume
 -- ./rscplus-replays-master/RSC 2001/replays master archive/Stat effects/Consumable Stat effects/Healing/cabbage- consume- no health restored shown
 
-function useobj_normalcabbage(player)
+function opinv_normalcabbage(player)
 	mes(player, "@que@You eat the cabbage. Yuck!")
 	remove(player, "cabbage", 1)
 	if statdown(player, STAT_HITS) then
@@ -10,7 +10,7 @@ function useobj_normalcabbage(player)
 	end
 end
 
-function useobj_magic_cabbage(player)
+function opinv_magic_cabbage(player)
 	mes(player, "@que@You eat the cabbage")
 	mes(player, "@que@It seems to taste nicer than normal")
 	remove(player, "magic cabbage", 1)

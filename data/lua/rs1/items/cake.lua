@@ -1,7 +1,7 @@
 -- https://web.archive.org/web/20020204224007/http://www.jagex.com/manual/cooking.html
 -- messages came from grepping pcaps
 
-function useobj_cake(player)
+function opinv_cake(player)
 	remove(player, "cake", 1)
 	give(player, "partial cake", 1)
 	mes(player, "@que@You eat part of the cake")
@@ -11,7 +11,7 @@ function useobj_cake(player)
 	end
 end
 
-function useobj_partial_cake(player)
+function opinv_partial_cake(player)
 	remove(player, "partial cake", 1)
 	give(player, "slice of cake", 1)
 	mes(player, "@que@You eat some more of the cake")
@@ -21,7 +21,7 @@ function useobj_partial_cake(player)
 	end
 end
 
-function useobj_slice_of_cake(player)
+function opinv_slice_of_cake(player)
 	remove(player, "slice of cake", 1)
 	mes(player, "@que@You eat the slice of cake")
 	if statdown(player, STAT_HITS) then
@@ -30,7 +30,7 @@ function useobj_slice_of_cake(player)
 	end
 end
 
-function useobj_chocolate_cake(player)
+function opinv_chocolate_cake(player)
 	remove(player, "chocolate cake", 1)
 	give(player, "partial chocolate cake", 1)
 	mes(player, "@que@You eat part of the chocolate cake")
@@ -40,7 +40,7 @@ function useobj_chocolate_cake(player)
 	end
 end
 
-function useobj_partial_chocolate_cake(player)
+function opinv_partial_chocolate_cake(player)
 	remove(player, "partial chocolate cake", 1)
 	give(player, "chocolate slice", 1)
 	mes(player, "@que@You eat some more of the chocolate cake")
@@ -50,7 +50,7 @@ function useobj_partial_chocolate_cake(player)
 	end
 end
 
-function useobj_chocolate_slice(player)
+function opinv_chocolate_slice(player)
 	remove(player, "chocolate slice", 1)
 	mes(player, "@que@You eat the chocolate slice")
 	if statdown(player, STAT_HITS) then

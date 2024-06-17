@@ -1082,14 +1082,14 @@ script_onnpctalk(lua_State *L, struct player *p, struct npc *npc)
 }
 
 void
-script_onuseobj(lua_State *L, struct player *p, struct item_config *item)
+script_onopinv(lua_State *L, struct player *p, struct item_config *item)
 {
 	int result = 0;
 
 	for (size_t i = 0; i < item->name_count; ++i) {
-		lua_getglobal(L, "script_engine_useobj");
+		lua_getglobal(L, "script_engine_opinv");
 		if (!lua_isfunction(L, -1)) {
-			puts("script error: can't find essential function script_engine_useobj");
+			puts("script error: can't find essential function script_engine_opinv");
 			return;
 		}
 		lua_pushnumber(L, p->mob.id);

@@ -40,7 +40,7 @@
 #define OP_CLI_LOC_USEWITH	(241)
 #define OP_CLI_LOC_OP1		(242)
 #define OP_CLI_NPC_TALK		(245)
-#define OP_CLI_INV_ACTION	(246)
+#define OP_CLI_INV_OP1		(246)
 #define OP_CLI_INV_UNWEAR	(248)
 #define OP_CLI_INV_WEAR		(249)
 #define OP_CLI_ITEM_DROP	(251)

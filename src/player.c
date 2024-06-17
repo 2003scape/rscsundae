@@ -1521,14 +1521,14 @@ player_process_action(struct player *p)
 		server_add_temp_item(p, p->mob.x, p->mob.y, id, stack);
 		p->action = ACTION_NONE;
 		break;
-	case ACTION_INV_USE:
+	case ACTION_INV_OP1:
 		if (p->action_slot >= p->inv_count) {
 			p->action = ACTION_NONE;
 			return;
 		}
 		id = p->inventory[p->action_slot].id;
 		item_config = server_item_config_by_id(id);
-		script_onuseobj(p->mob.server->lua, p, item_config);
+		script_onopinv(p->mob.server->lua, p, item_config);
 		p->action = ACTION_NONE;
 		break;
 	case ACTION_ITEM_TAKE:

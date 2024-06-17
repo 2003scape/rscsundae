@@ -1,6 +1,6 @@
 local restore_locs = {}
 local talknpc_scripts = {}
-local useobj_scripts = {}
+local opinv_scripts = {}
 local skillplayer_scripts = {}
 local skillnpc_scripts = {}
 local opbound1_scripts = {}
@@ -40,8 +40,8 @@ function register_talknpc(name, callback)
 	talknpc_scripts[name] = callback;
 end
 
-function register_useobj(name, callback)
-	useobj_scripts[name] = callback;
+function register_opinv(name, callback)
+	opinv_scripts[name] = callback;
 end
 
 function register_skillplayer(spell, callback)
@@ -185,13 +185,13 @@ function script_engine_skillnpc(player, name, npc, spell)
 	return false
 end
 
-function script_engine_useobj(player, name)
+function script_engine_opinv(player, name)
 	local script = player_scripts[player]
 	if script then
 		return true
 	end
 	name = string.lower(name)
-	script = useobj_scripts[name]
+	script = opinv_scripts[name]
 	if script then
 		ps = new_player_script()
 		ps.co = coroutine.create(function()
@@ -425,9 +425,9 @@ dofile("./data/lua/rs1/misc/water.lua")
 for k in pairs(_G) do
 	v = _G[k]
 	if type(v) == "function" then
-		if string.match(k, "useobj_.*") then
-			target = string.gsub(string.sub(k, 8), "_", " ")
-			register_useobj(target, v)
+		if string.match(k, "opinv_.*") then
+			target = string.gsub(string.sub(k, 7), "_", " ")
+			register_opinv(target, v)
 		elseif string.match(k, "talknpc_.*") then
 			target = string.gsub(string.sub(k, 9), "_", " ")
 			register_talknpc(target, v)

@@ -5,7 +5,7 @@
 -- https://classic.runescape.wiki/w/Dwarven_Stout
 -- https://classic.runescape.wiki/w/Asgarnian_Ale
 
-function useobj_wizards_mind_bomb(player)
+function opinv_wizards_mind_bomb(player)
 	thinkbubble(player, "wizard's mind bomb")
 	remove(player, "wizard's mind bomb", 1)
 	mes(player, "@que@you drink the Wizard's Mind Bomb")
@@ -17,7 +17,7 @@ function useobj_wizards_mind_bomb(player)
 	healstat(player, STAT_HITS, 1, 0)
 end
 
-function useobj_dwarven_stout(player)
+function opinv_dwarven_stout(player)
 	thinkbubble(player, "dwarven stout")
 	remove(player, "dwarven stout", 1)
 	mes(player, "@que@You drink the Dwarven Stout")
@@ -32,7 +32,7 @@ function useobj_dwarven_stout(player)
 	mes(player, "@que@It tastes pretty strong too")
 end
 
-function useobj_asgarnian_ale(player)
+function opinv_asgarnian_ale(player)
 	thinkbubble(player, "asgarnian ale")
 	remove(player, "asgarnian ale", 1)
 	mes(player, "@que@You drink the Ale")
@@ -43,4 +43,4 @@ function useobj_asgarnian_ale(player)
 	addstat(player, STAT_STRENGTH, 2, 0)
 end
 
-register_useobj("wizard's mind bomb", drink_mindbomb)
+register_opinv("wizard's mind bomb", drink_mindbomb)

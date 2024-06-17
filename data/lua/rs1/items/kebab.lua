@@ -1,6 +1,6 @@
 -- https://oldschool.runescape.wiki/w/Kebab
 
-function useobj_kebab(player)
+function opinv_kebab(player)
 	mes(player, "@que@You eat the Kebab")
 	remove(player, "kebab", 1)
 	if random(64) then

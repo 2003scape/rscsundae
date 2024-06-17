@@ -1,6 +1,6 @@
 -- ./rscplus-replays-master/Zephyr/zephyr (originals only)/08-05-2018 16.59.13 eating a pumpkin
 
-function useobj_pumpkin(player)
+function opinv_pumpkin(player)
 	mes(player, "@que@You eat the pumpkin")
 	remove(player, "pumpkin", 1)
 	if statdown(player, STAT_HITS) then

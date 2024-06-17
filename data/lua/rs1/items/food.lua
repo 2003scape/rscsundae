@@ -11,62 +11,62 @@ function eat_simple(player, type, amount)
 	end
 end
 
-function useobj_anchovies(player)
+function opinv_anchovies(player)
 	eat_simple(player, "anchovies", 1)
 end
 
-function useobj_shrimp(player)
+function opinv_shrimp(player)
 	eat_simple(player, "shrimp", 3)
 end
 
-function useobj_sardine(player)
+function opinv_sardine(player)
 	eat_simple(player, "sardine", 4)
 end
 
-function useobj_herring(player)
+function opinv_herring(player)
 	eat_simple(player, "herring", 5)
 end
 
-function useobj_trout(player)
+function opinv_trout(player)
 	eat_simple(player, "trout", 7)
 end
 
-function useobj_pike(player)
+function opinv_pike(player)
 	eat_simple(player, "pike", 8)
 end
 
-function useobj_salmon(player)
+function opinv_salmon(player)
 	eat_simple(player, "salmon", 9)
 end
 
-function useobj_tuna(player)
+function opinv_tuna(player)
 	eat_simple(player, "tuna", 10)
 end
 
-function useobj_lobster(player)
+function opinv_lobster(player)
 	eat_simple(player, "lobster", 12)
 end
 
-function useobj_swordfish(player)
+function opinv_swordfish(player)
 	eat_simple(player, "swordfish", 14)
 end
 
-function useobj_tomato(player)
+function opinv_tomato(player)
 	eat_simple(player, "tomato", 2)
 end
 
-function useobj_cheese(player)
+function opinv_cheese(player)
 	eat_simple(player, "cheese", 2)
 end
 
-function useobj_banana(player)
+function opinv_banana(player)
 	eat_simple(player, "banana", 2)
 end
 
-function useobj_chocolate_bar(player)
+function opinv_chocolate_bar(player)
 	eat_simple(player, "chocolate bar", 3)
 end
 
-function useobj_bread(player)
+function opinv_bread(player)
 	eat_simple(player, "bread", 4)
 end

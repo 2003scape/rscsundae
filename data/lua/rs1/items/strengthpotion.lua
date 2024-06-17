@@ -7,7 +7,7 @@ function drink_strength(player)
 end
 
 -- inconsistency in config46.jag, probably bugged at the time
-function useobj_strength4(player)
+function opinv_strength4(player)
 	drink_strength(player)
 	remove(player, "strength4", 1)
 	give(player, "3dose1strength", 1)
@@ -15,7 +15,7 @@ function useobj_strength4(player)
 	mes(player, "You have 3 doses of potion left")
 end
 
-function useobj_3dose1strength(player)
+function opinv_3dose1strength(player)
 	drink_strength(player)
 	remove(player, "3dose1strength", 1)
 	give(player, "2dose1strength", 1)
@@ -23,7 +23,7 @@ function useobj_3dose1strength(player)
 	mes(player, "You have 2 doses of potion left")
 end
 
-function useobj_2dose1strength(player)
+function opinv_2dose1strength(player)
 	drink_strength(player)
 	remove(player, "2dose1strength", 1)
 	give(player, "1dose1strength", 1)
@@ -31,7 +31,7 @@ function useobj_2dose1strength(player)
 	mes(player, "You have 1 doses of potion left")
 end
 
-function useobj_1dose1strength(player)
+function opinv_1dose1strength(player)
 	drink_strength(player)
 	remove(player, "1dose1strength", 1)
 	delay(1)
