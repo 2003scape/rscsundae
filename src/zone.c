@@ -92,6 +92,27 @@ server_find_loc(int x, int y)
 }
 
 void
+server_del_loc(int x, int y)
+{
+	struct zone *zone;
+
+	zone = server_find_zone(x, y);
+	if (zone == NULL) {
+		return;
+	}
+	/* TODO can optimize since one loc per tile */
+	for (int i = 0; i < zone->loc_count; ++i) {
+		if (zone->locs[i].x != x || zone->locs[i].y != y) {
+			continue;
+		}
+		zone->loc_count--;
+		for (int j = i; j < zone->loc_count; ++j) {
+			zone->locs[j] = zone->locs[j + 1];
+		}
+	}
+}
+
+void
 server_add_loc(struct loc *loc)
 {
 	struct zone *zone;

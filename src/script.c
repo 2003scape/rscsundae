@@ -120,8 +120,12 @@ script_addloc(lua_State *L)
 static int
 script_delloc(lua_State *L)
 {
-	/* TODO implement */
-	(void)L;
+	lua_Integer x, y;
+
+	x = luaL_checknumber(L, 1);
+	y = luaL_checknumber(L, 2);
+
+	server_del_loc(x, y);
 	return 0;
 }
 

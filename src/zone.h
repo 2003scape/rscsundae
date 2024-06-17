@@ -89,6 +89,7 @@ struct zone *server_find_zone(int, int);
 struct zone *server_get_zone(int, int, int);
 struct loc *server_find_loc(int, int);
 void server_add_loc(struct loc *);
+void server_del_loc(int, int);
 struct bound *server_find_bound(int, int, int);
 void server_add_bound(struct bound *);
 struct ground_item *server_find_ground_item(struct player *, int, int, int);
