@@ -8,6 +8,8 @@ local opbound2_scripts = {}
 local oploc1_scripts = {}
 local oploc2_scripts = {}
 local useloc_scripts = {}
+local useobj_scripts = {}
+local useinv_scripts = {}
 local player_scripts = {}
 local active_script = nil
 
@@ -76,6 +78,25 @@ function register_useloc(name, item, callback)
 		useloc_scripts[name] = {}
 	end
 	useloc_scripts[name][item] = callback
+end
+
+function register_useobj(item, invitem, callback)
+	if not useobj_scripts[item] then
+		useobj_scripts[item] = {}
+	end
+	useobj_scripts[item][invitem] = callback
+end
+
+function register_useinv(item1, item2, callback)
+	if not useinv_scripts[item1] then
+		useinv_scripts[item1] = {}
+	end
+	useinv_scripts[item1][item2] = callback
+
+	if not useinv_scripts[item2] then
+		useinv_scripts[item2] = {}
+	end
+	useinv_scripts[item2][item1] = callback
 end
 
 function script_engine_tick()
@@ -323,6 +344,59 @@ function script_engine_useloc(player, name, x, y, item)
 	return false
 end
 
+function script_engine_useobj(player, name, x, y, item)
+	local script = player_scripts[player]
+	if script then
+		return true
+	end
+	name = string.lower(name)
+	item = string.lower(item)
+	script = useobj_scripts[name]
+	if not script then
+		return false
+	end
+	script = useobj_scripts[name][item]
+	if script then
+		ps = new_player_script()
+		ps.co = coroutine.create(function()
+			script(player, x, y)
+			player_scripts[player] = nil
+		end)
+		player_scripts[player] = ps
+		return true
+	end
+	return false
+end
+
+function script_engine_useinv(player, name, item)
+	local script = player_scripts[player]
+	if script then
+		return true
+	end
+	name = string.lower(name)
+	item = string.lower(item)
+	script = useinv_scripts[name]
+	if script then
+		script = useinv_scripts[name][item]
+	else
+		script = useinv_scripts[item]
+		if not script then
+			return false
+		end
+		script = useinv_scripts[item][name]
+	end
+	if script then
+		ps = new_player_script()
+		ps.co = coroutine.create(function()
+			script(player)
+			player_scripts[player] = nil
+		end)
+		player_scripts[player] = ps
+		return true
+	end
+	return false
+end
+
 function delay(length)
 	active_script.delay = length
 	coroutine.yield(active_script.co)
@@ -390,6 +464,7 @@ dofile("./data/lua/rs1/npc/bob.lua")
 dofile("./data/lua/rs1/npc/man.lua")
 dofile("./data/lua/rs1/npc/kebabseller.lua")
 dofile("./data/lua/rs1/npc/silktrader.lua")
+dofile("./data/lua/rs1/skill_firemaking/fire.lua")
 dofile("./data/lua/rs1/skill_magic/curses.lua")
 dofile("./data/lua/rs1/skill_magic/missiles.lua")
 dofile("./data/lua/rs1/skill_prayer/altar.lua")

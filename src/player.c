@@ -1471,10 +1471,11 @@ player_process_action(struct player *p)
 	struct npc *npc;
 	struct player *target;
 	struct item_config *item_config;
+	struct item_config *item_config2;
 	struct ground_item *item;
 	struct bound *bound;
 	struct loc *loc;
-	uint16_t id;
+	uint16_t id, id2;
 	uint32_t stack;
 
 	switch (p->action) {
@@ -1537,8 +1538,16 @@ player_process_action(struct player *p)
 			p->action = ACTION_NONE;
 			return;
 		}
-		printf("inv usewith %d %d\n",
-		    p->action_slot, p->action_slot2);
+		id = p->inventory[p->action_slot].id;
+		id2 = p->inventory[p->action_slot2].id;
+		item_config = server_item_config_by_id(id);
+		item_config2 = server_item_config_by_id(id2);
+		if (item_config == NULL || item_config2 == NULL) {
+			p->action = ACTION_NONE;
+			return;
+		}
+		script_onuseinv(p->mob.server->lua, p,
+		    item_config, item_config2);
 		p->action = ACTION_NONE;
 		break;
 	case ACTION_ITEM_TAKE:
@@ -1576,7 +1585,16 @@ player_process_action(struct player *p)
 			p->action = ACTION_NONE;
 			return;
 		}
-		printf("item usewith %d\n", p->action_slot);
+		id = p->inventory[p->action_slot].id;
+		item_config = server_item_config_by_id(item->id);
+		item_config2 = server_item_config_by_id(id);
+		if (item_config == NULL || item_config2 == NULL) {
+			p->action = ACTION_NONE;
+			return;
+		}
+		script_onuseobj(p->mob.server->lua, p,
+		    item_config, p->action_item->x, p->action_item->y,
+		    item_config2);
 		p->action = ACTION_NONE;
 		break;
 	case ACTION_NPC_CAST:

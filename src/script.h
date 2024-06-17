@@ -20,5 +20,9 @@ void script_onopbound2(lua_State *, struct player *, struct bound *);
 void script_onoploc1(lua_State *, struct player *, struct loc *);
 void script_onoploc2(lua_State *, struct player *, struct loc *);
 void script_onuseloc(lua_State *, struct player *, struct loc *, struct item_config *);
+void script_onuseobj(lua_State *, struct player *,
+    struct item_config *, int, int, struct item_config *);
+void script_onuseinv(lua_State *, struct player *,
+    struct item_config *, struct item_config *);
 
 #endif

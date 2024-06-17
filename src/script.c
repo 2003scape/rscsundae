@@ -1120,6 +1120,62 @@ script_onskillplayer(lua_State *L, struct player *p,
 }
 
 void
+script_onuseobj(lua_State *L, struct player *p,
+    struct item_config *item, int x, int y, struct item_config *invitem)
+{
+	bool result;
+
+	for (size_t i = 0; i < invitem->name_count; ++i) {
+		for (size_t j = 0; j < item->name_count; ++j) {
+			lua_getglobal(L, "script_engine_useobj");
+			if (!lua_isfunction(L, -1)) {
+				puts("script error: can't find essential function script_engine_useobj");
+				return;
+			}
+			lua_pushnumber(L, p->mob.id);
+			lua_pushstring(L, item->names[j]);
+			lua_pushnumber(L, x);
+			lua_pushnumber(L, y);
+			lua_pushstring(L, invitem->names[i]);
+			lua_pcall(L, 5, 1, 0);
+			result = lua_toboolean(L, -1);
+			if (result != 0) {
+				return;
+			}
+		}
+	}
+
+	player_send_message(p, "Nothing interesting happens");
+}
+
+void
+script_onuseinv(lua_State *L, struct player *p,
+    struct item_config *item1, struct item_config *item2)
+{
+	bool result;
+
+	for (size_t i = 0; i < item1->name_count; ++i) {
+		for (size_t j = 0; j < item2->name_count; ++j) {
+			lua_getglobal(L, "script_engine_useinv");
+			if (!lua_isfunction(L, -1)) {
+				puts("script error: can't find essential function script_engine_useinv");
+				return;
+			}
+			lua_pushnumber(L, p->mob.id);
+			lua_pushstring(L, item1->names[i]);
+			lua_pushstring(L, item2->names[j]);
+			lua_pcall(L, 3, 1, 0);
+			result = lua_toboolean(L, -1);
+			if (result != 0) {
+				return;
+			}
+		}
+	}
+
+	player_send_message(p, "Nothing interesting happens");
+}
+
+void
 script_onuseloc(lua_State *L, struct player *p,
     struct loc *loc, struct item_config *item)
 {
