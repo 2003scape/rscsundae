@@ -1270,11 +1270,11 @@ player_send_locs(struct player *p)
 			}
 			offset += 2;
 			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
-			    (uint8_t)(loc->x - (int)p->mob.x)) == -1) {
+			    (uint8_t)(p->known_locs[i].x - (int)p->mob.x)) == -1) {
 				return -1;
 			}
 			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
-			    (uint8_t)(loc->y - (int)p->mob.y)) == -1) {
+			    (uint8_t)(p->known_locs[i].y - (int)p->mob.y)) == -1) {
 				return -1;
 			}
 			update_count++;
