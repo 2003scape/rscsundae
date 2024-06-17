@@ -50,7 +50,7 @@ static struct player *
 id_to_player(lua_Integer id)
 {
 	if (id < 0 || id >= MAXPLAYERS) {
-		printf("script warning: player id %ld out of range\n", id);
+		printf("script warning: player id %lld out of range\n", id);
 		return NULL;
 	}
 	return serv->players[id];
@@ -60,7 +60,7 @@ static struct npc *
 id_to_npc(lua_Integer id)
 {
 	if (id < 0 || id >= MAXNPCS) {
-		printf("script warning: npc id %ld out of range\n", id);
+		printf("script warning: npc id %lld out of range\n", id);
 		return NULL;
 	}
 	return serv->npcs[id];
@@ -76,7 +76,7 @@ script_say(lua_State *L)
 
 	p = id_to_player(id);
 	if (p == NULL) {
-		printf("script warning: player %ld is undefined\n", id);
+		printf("script warning: player %lld is undefined\n", id);
 		script_cancel(L, id);
 		return 0;
 	}
@@ -109,7 +109,7 @@ script_multi(lua_State *L)
 
 	p = id_to_player(id);
 	if (p == NULL) {
-		printf("script warning: player %ld is undefined\n", id);
+		printf("script warning: player %lld is undefined\n", id);
 		script_cancel(L, id);
 		return 0;
 	}
@@ -152,7 +152,7 @@ script_npcbusy(lua_State *L)
 
 	npc = id_to_npc(id);
 	if (npc == NULL) {
-		printf("script warning: npc %ld is undefined\n", id);
+		printf("script warning: npc %lld is undefined\n", id);
 		script_cancel(L, id);
 		return 0;
 	}
@@ -169,7 +169,7 @@ script_npcunbusy(lua_State *L)
 
 	npc = id_to_npc(id);
 	if (npc == NULL) {
-		printf("script warning: npc %ld is undefined\n", id);
+		printf("script warning: npc %lld is undefined\n", id);
 		script_cancel(L, id);
 		return 0;
 	}
@@ -189,7 +189,7 @@ script_npcsay(lua_State *L)
 
 	npc = id_to_npc(id);
 	if (npc == NULL) {
-		printf("script warning: npc %ld is undefined\n", id);
+		printf("script warning: npc %lld is undefined\n", id);
 		script_cancel(L, id);
 		return 0;
 	}
@@ -230,7 +230,7 @@ script_male(lua_State *L)
 	player_id = luaL_checkinteger(L, 1);
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		printf("script warning: player %ld is undefined\n", player_id);
+		printf("script warning: player %lld is undefined\n", player_id);
 		script_cancel(L, player_id);
 		lua_pushboolean(L, false);
 		return 1;
@@ -276,7 +276,7 @@ script_mes(lua_State *L)
 	mes = luaL_checkstring(L, 2);
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		printf("script warning: player %ld is undefined\n", player_id);
+		printf("script warning: player %lld is undefined\n", player_id);
 		script_cancel(L, player_id);
 		return 0;
 	}
@@ -302,12 +302,12 @@ script_advancestat(lua_State *L)
 	exp = luaL_checkinteger(L, 4);
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		printf("script warning: player %ld is undefined\n", player_id);
+		printf("script warning: player %lld is undefined\n", player_id);
 		script_cancel(L, player_id);
 		return 0;
 	}
 	if (stat < 0 || stat >= MAX_SKILL_ID) {
-		printf("script warning: invalid stat id %ld\n", stat);
+		printf("script warning: invalid stat id %lld\n", stat);
 		script_cancel(L, player_id);
 		return 0;
 	}
@@ -328,12 +328,12 @@ script_healstat(lua_State *L)
 	percent = luaL_checkinteger(L, 4);
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		printf("script warning: player %ld is undefined\n", player_id);
+		printf("script warning: player %lld is undefined\n", player_id);
 		script_cancel(L, player_id);
 		return 0;
 	}
 	if (stat < 0 || stat >= MAX_SKILL_ID) {
-		printf("script warning: invalid stat id %ld\n", stat);
+		printf("script warning: invalid stat id %lld\n", stat);
 		script_cancel(L, player_id);
 		return 0;
 	}
@@ -355,12 +355,12 @@ script_addstat(lua_State *L)
 	percent = luaL_checkinteger(L, 4);
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		printf("script warning: player %ld is undefined\n", player_id);
+		printf("script warning: player %lld is undefined\n", player_id);
 		script_cancel(L, player_id);
 		return 0;
 	}
 	if (stat < 0 || stat >= MAX_SKILL_ID) {
-		printf("script warning: invalid stat id %ld\n", stat);
+		printf("script warning: invalid stat id %lld\n", stat);
 		script_cancel(L, player_id);
 		return 0;
 	}
@@ -380,12 +380,12 @@ script_statup(lua_State *L)
 	stat = luaL_checkinteger(L, 2);
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		printf("script warning: player %ld is undefined\n", player_id);
+		printf("script warning: player %lld is undefined\n", player_id);
 		script_cancel(L, player_id);
 		return 0;
 	}
 	if (stat < 0 || stat >= MAX_SKILL_ID) {
-		printf("script warning: invalid stat id %ld\n", stat);
+		printf("script warning: invalid stat id %lld\n", stat);
 		script_cancel(L, player_id);
 		return 0;
 	}
@@ -405,12 +405,12 @@ script_statdown(lua_State *L)
 	stat = luaL_checkinteger(L, 2);
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		printf("script warning: player %ld is undefined\n", player_id);
+		printf("script warning: player %lld is undefined\n", player_id);
 		script_cancel(L, player_id);
 		return 0;
 	}
 	if (stat < 0 || stat >= MAX_SKILL_ID) {
-		printf("script warning: invalid stat id %ld\n", stat);
+		printf("script warning: invalid stat id %lld\n", stat);
 		script_cancel(L, player_id);
 		return 0;
 	}
@@ -430,12 +430,12 @@ script_npcstatup(lua_State *L)
 	stat = luaL_checkinteger(L, 2);
 	npc = id_to_npc(npc_id);
 	if (npc == NULL) {
-		printf("script warning: npc %ld is undefined\n", npc_id);
+		printf("script warning: npc %lld is undefined\n", npc_id);
 		lua_pushboolean(L, false);
 		return 1;
 	}
 	if (stat < 0 || stat >= MAX_SKILL_ID) {
-		printf("script warning: invalid stat id %ld\n", stat);
+		printf("script warning: invalid stat id %lld\n", stat);
 		lua_pushboolean(L, false);
 		return 1;
 	}
@@ -455,12 +455,12 @@ script_npcstatdown(lua_State *L)
 	stat = luaL_checkinteger(L, 2);
 	npc = id_to_npc(npc_id);
 	if (npc == NULL) {
-		printf("script warning: npc %ld is undefined\n", npc_id);
+		printf("script warning: npc %lld is undefined\n", npc_id);
 		lua_pushboolean(L, false);
 		return 1;
 	}
 	if (stat < 0 || stat >= MAX_SKILL_ID) {
-		printf("script warning: invalid stat id %ld\n", stat);
+		printf("script warning: invalid stat id %lld\n", stat);
 		lua_pushboolean(L, false);
 		return 1;
 	}
@@ -482,12 +482,12 @@ script_substat(lua_State *L)
 	percent = luaL_checkinteger(L, 4);
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		printf("script warning: player %ld is undefined\n", player_id);
+		printf("script warning: player %lld is undefined\n", player_id);
 		script_cancel(L, player_id);
 		return 0;
 	}
 	if (stat < 0 || stat >= MAX_SKILL_ID) {
-		printf("script warning: invalid stat id %ld\n", stat);
+		printf("script warning: invalid stat id %lld\n", stat);
 		script_cancel(L, player_id);
 		return 0;
 	}
@@ -518,11 +518,11 @@ script_npcaddstat(lua_State *L)
 
 	npc = id_to_npc(npc_id);
 	if (npc == NULL) {
-		printf("script warning: npc %ld is undefined\n", npc_id);
+		printf("script warning: npc %lld is undefined\n", npc_id);
 		return 0;
 	}
 	if (stat < 0 || stat >= MAX_SKILL_ID) {
-		printf("script warning: invalid stat id %ld\n", stat);
+		printf("script warning: invalid stat id %lld\n", stat);
 		return 0;
 	}
 	stat_add(&npc->mob, stat, constant, percent);
@@ -543,11 +543,11 @@ script_npchealstat(lua_State *L)
 
 	npc = id_to_npc(npc_id);
 	if (npc == NULL) {
-		printf("script warning: npc %ld is undefined\n", npc_id);
+		printf("script warning: npc %lld is undefined\n", npc_id);
 		return 0;
 	}
 	if (stat < 0 || stat >= MAX_SKILL_ID) {
-		printf("script warning: invalid stat id %ld\n", stat);
+		printf("script warning: invalid stat id %lld\n", stat);
 		return 0;
 	}
 	stat_heal(&npc->mob, stat, constant, percent);
@@ -568,11 +568,11 @@ script_npcsubstat(lua_State *L)
 
 	npc = id_to_npc(npc_id);
 	if (npc == NULL) {
-		printf("script warning: npc %ld is undefined\n", npc_id);
+		printf("script warning: npc %lld is undefined\n", npc_id);
 		return 0;
 	}
 	if (stat < 0 || stat >= MAX_SKILL_ID) {
-		printf("script warning: invalid stat id %ld\n", stat);
+		printf("script warning: invalid stat id %lld\n", stat);
 		return 0;
 	}
 	if (stat != SKILL_HITS) {
@@ -602,7 +602,7 @@ script_give(lua_State *L)
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		printf("script warning: player %ld is undefined\n", player_id);
+		printf("script warning: player %lld is undefined\n", player_id);
 		script_cancel(L, player_id);
 		return 0;
 	}
@@ -633,7 +633,7 @@ script_remove(lua_State *L)
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		printf("script warning: player %ld is undefined\n", player_id);
+		printf("script warning: player %lld is undefined\n", player_id);
 		script_cancel(L, player_id);
 		return 0;
 	}
@@ -659,7 +659,7 @@ script_displaybalance(lua_State *L)
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		printf("script warning: player %ld is undefined\n", player_id);
+		printf("script warning: player %lld is undefined\n", player_id);
 		script_cancel(L, player_id);
 		return 0;
 	}
@@ -684,7 +684,7 @@ script_held(lua_State *L)
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		printf("script warning: player %ld is undefined\n", player_id);
+		printf("script warning: player %lld is undefined\n", player_id);
 		script_cancel(L, player_id);
 		return 0;
 	}
@@ -715,7 +715,7 @@ script_worn(lua_State *L)
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		printf("script warning: player %ld is undefined\n", player_id);
+		printf("script warning: player %lld is undefined\n", player_id);
 		script_cancel(L, player_id);
 		return 0;
 	}
@@ -742,7 +742,7 @@ script_upstairs(lua_State *L)
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		printf("script warning: player %ld is undefined\n", player_id);
+		printf("script warning: player %lld is undefined\n", player_id);
 		script_cancel(L, player_id);
 		return 0;
 	}
@@ -770,7 +770,7 @@ script_downstairs(lua_State *L)
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		printf("script warning: player %ld is undefined\n", player_id);
+		printf("script warning: player %lld is undefined\n", player_id);
 		script_cancel(L, player_id);
 		return 0;
 	}
@@ -800,7 +800,7 @@ script_openshop(lua_State *L)
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		printf("script warning: player %ld is undefined\n", player_id);
+		printf("script warning: player %lld is undefined\n", player_id);
 		script_cancel(L, player_id);
 		return 0;
 	}
@@ -822,7 +822,7 @@ script_thinkbubble(lua_State *L)
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		printf("script warning: player %ld is undefined\n", player_id);
+		printf("script warning: player %lld is undefined\n", player_id);
 		script_cancel(L, player_id);
 		return 0;
 	}
@@ -859,7 +859,7 @@ script_changebound(lua_State *L)
 
 	b = server_find_bound(x, y, dir);
 	if (b == NULL) {
-		printf("script warning: couldn't find bound at %ld %ld\n", x, y);
+		printf("script warning: couldn't find bound at %lld %lld\n", x, y);
 		return 0;
 	}
 
@@ -883,7 +883,7 @@ script_changeloc(lua_State *L)
 
 	loc = server_find_loc(x, y);
 	if (loc == NULL) {
-		printf("script warning: couldn't find loc at %ld %ld\n", x, y);
+		printf("script warning: couldn't find loc at %lld %lld\n", x, y);
 		return 0;
 	}
 
@@ -913,14 +913,14 @@ script_shootplayer(lua_State *L)
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		printf("script warning: player %ld is undefined\n", player_id);
+		printf("script warning: player %lld is undefined\n", player_id);
 		script_cancel(L, player_id);
 		return 0;
 	}
 
 	target = id_to_player(target_id);
 	if (target == NULL) {
-		printf("script warning: player %ld is undefined\n", target_id);
+		printf("script warning: player %lld is undefined\n", target_id);
 		script_cancel(L, target_id);
 		return 0;
 	}
@@ -951,14 +951,14 @@ script_shootnpc(lua_State *L)
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
-		printf("script warning: player %ld is undefined\n", player_id);
+		printf("script warning: player %lld is undefined\n", player_id);
 		script_cancel(L, player_id);
 		return 0;
 	}
 
 	target = id_to_npc(target_id);
 	if (target == NULL) {
-		printf("script warning: npc %ld is undefined\n", target_id);
+		printf("script warning: npc %lld is undefined\n", target_id);
 		script_cancel(L, target_id);
 		return 0;
 	}
