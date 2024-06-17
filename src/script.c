@@ -45,6 +45,7 @@ static int script_restoreloc(lua_State *);
 static int script_shootplayer(lua_State *);
 static int script_shootnpc(lua_State *);
 static int script_multi(lua_State *);
+static int script_addobject(lua_State *);
 static int script_delobject(lua_State *);
 static struct player *id_to_player(lua_Integer);
 static struct npc *id_to_npc(lua_Integer);
@@ -121,6 +122,38 @@ script_delloc(lua_State *L)
 {
 	/* TODO implement */
 	(void)L;
+	return 0;
+}
+
+static int
+script_addobject(lua_State *L)
+{
+	lua_Integer id, amount, x, y;
+	const char *name;
+	struct item_config *config;
+	struct player *p;
+
+	id = luaL_checkinteger(L, 1);
+	name = luaL_checkstring(L, 2);
+	amount = luaL_checkinteger(L, 3);
+	x = luaL_checkinteger(L, 4);
+	y = luaL_checkinteger(L, 5);
+
+	p = id_to_player(id);
+	if (p == NULL) {
+		printf("script warning: player %lld is undefined\n", id);
+		script_cancel(L, id);
+		return 0;
+	}
+
+	config = server_find_item_config(name);
+	if (config == NULL) {
+		printf("script warning: item %s is undefined\n", name);
+		script_cancel(L, id);
+		return 0;
+	}
+
+	server_add_temp_item(p, x, y, config->id, amount);
 	return 0;
 }
 
@@ -1607,6 +1640,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_male);
 	lua_setglobal(L, "male");
+
+	lua_pushcfunction(L, script_addobject);
+	lua_setglobal(L, "addobject");
 
 	lua_pushcfunction(L, script_delobject);
 	lua_setglobal(L, "delobject");
