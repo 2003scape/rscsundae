@@ -50,7 +50,7 @@ These should all be implemented in Lua script:
 ### Skills
 
 - [x] Prayer (bone burying)
-- [ ] Prayer (altars)
+- [x] Prayer (altars)
 - [x] Magic (missiles vs. players)
 - [x] Magic (missiles vs. NPCs)
 - [x] Magic (curses)
