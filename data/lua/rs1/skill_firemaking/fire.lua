@@ -22,7 +22,6 @@ function useobj_tinderbox_logs(player, x, y)
 		advancestat(player, STAT_FIREMAKING, 100, 7)
 		delobject(player, "logs", x, y)
 		addloc("fire", x, y, 100)
-		-- TODO unimplemented
 		addobject(player, "ashes", 1, x, y)
 	else
 		mes(player, "@que@You fail to light a fire")
