@@ -1642,7 +1642,7 @@ player_process_action(struct player *p)
 		p->action = ACTION_NONE;
 		break;
 	case ACTION_LOC_USEWITH:
-		if (p->action_loc == NULL) {
+		if (p->action_loc == NULL || p->action_slot >= p->inv_count) {
 			p->action = ACTION_NONE;
 			p->walk_queue_len = 0;
 			p->walk_queue_pos = 0;
@@ -1658,10 +1658,12 @@ player_process_action(struct player *p)
 		if (!mob_reached_loc(&p->mob, loc)) {
 			return;
 		}
+		item_config = server_item_config_by_id(p->inventory[p->action_slot].id);
+		assert(item_config != NULL);
 		p->walk_queue_len = 0;
 		p->walk_queue_pos = 0;
 		p->action = ACTION_NONE;
-		printf("loc usewith, slot %d\n", p->action_slot);
+		script_onuseloc(p->mob.server->lua, p, loc, item_config);
 		break;
 	case ACTION_LOC_OP1:
 	case ACTION_LOC_OP2:

@@ -1054,6 +1054,39 @@ script_onskillplayer(lua_State *L, struct player *p,
 }
 
 void
+script_onuseloc(lua_State *L, struct player *p,
+    struct loc *loc, struct item_config *item)
+{
+	struct loc_config *config;
+	bool result;
+
+	config = server_loc_config_by_id(loc->id);
+	assert(config != NULL);
+
+	for (size_t i = 0; i < config->name_count; ++i) {
+		for (size_t j = 0; j < item->name_count; ++j) {
+			lua_getglobal(L, "script_engine_useloc");
+			if (!lua_isfunction(L, -1)) {
+				puts("script error: can't find essential function script_engine_useloc");
+				return;
+			}
+			lua_pushnumber(L, p->mob.id);
+			lua_pushstring(L, config->names[i]);
+			lua_pushnumber(L, loc->x);
+			lua_pushnumber(L, loc->y);
+			lua_pushstring(L, item->names[j]);
+			lua_pcall(L, 5, 1, 0);
+			result = lua_toboolean(L, -1);
+			if (result != 0) {
+				return;
+			}
+		}
+	}
+
+	player_send_message(p, "Nothing interesting happens");
+}
+
+void
 script_onskillnpc(lua_State *L, struct player *p,
     struct npc *npc, struct spell_config *spell)
 {
