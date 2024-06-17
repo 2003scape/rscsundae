@@ -57,13 +57,15 @@ enum action {
 	ACTION_NPC_CAST		= 2,
 	ACTION_INV_DROP		= 3,
 	ACTION_INV_OP1		= 4,
-	ACTION_ITEM_TAKE	= 5,
-	ACTION_PLAYER_CAST	= 6,
-	ACTION_BOUND_OP1	= 7,
-	ACTION_BOUND_OP2	= 8,
-	ACTION_LOC_USEWITH	= 9,
-	ACTION_LOC_OP1		= 10,
-	ACTION_LOC_OP2		= 11,
+	ACTION_INV_USEWITH	= 5,
+	ACTION_ITEM_TAKE	= 6,
+	ACTION_ITEM_USEWITH	= 7,
+	ACTION_PLAYER_CAST	= 8,
+	ACTION_BOUND_OP1	= 9,
+	ACTION_BOUND_OP2	= 10,
+	ACTION_LOC_USEWITH	= 11,
+	ACTION_LOC_OP1		= 12,
+	ACTION_LOC_OP2		= 13,
 };
 
 enum trade_state {
@@ -298,6 +300,7 @@ struct player {
 	uint16_t action_npc;
 	uint16_t action_player;
 	uint16_t action_slot;
+	uint16_t action_slot2;
 	struct ground_item *action_item;
 	struct bound *action_bound;
 	struct loc *action_loc;

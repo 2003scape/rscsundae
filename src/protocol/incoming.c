@@ -494,7 +494,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			player_unwear(p, slot);
 		}
 		break;
-	case OP_CLI_ITEM_DROP:
+	case OP_CLI_INV_DROP:
 		{
 			uint16_t slot;
 
@@ -503,6 +503,31 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			}
 			offset += 2;
 			p->action = ACTION_INV_DROP;
+			p->action_slot = slot;
+		}
+		break;
+	case OP_CLI_ITEM_USEWITH:
+		{
+			uint16_t x, y, id, slot;
+
+			if (buf_getu16(data, offset, len, &x) == -1) {
+				return;
+			}
+			offset += 2;
+			if (buf_getu16(data, offset, len, &y) == -1) {
+				return;
+			}
+			offset += 2;
+			if (buf_getu16(data, offset, len, &id) == -1) {
+				return;
+			}
+			offset += 2;
+			if (buf_getu16(data, offset, len, &slot) == -1) {
+				return;
+			}
+			offset += 2;
+			p->action = ACTION_ITEM_USEWITH;
+			p->action_item = server_find_ground_item(p, x, y, id);
 			p->action_slot = slot;
 		}
 		break;
@@ -771,6 +796,23 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			p->action = (opcode == OP_CLI_BOUND_OP1) ?
 			    ACTION_BOUND_OP1 : ACTION_BOUND_OP2;
 			p->action_bound = server_find_bound(x, y, dir);
+		}
+		break;
+	case OP_CLI_INV_USEWITH:
+		{
+			uint16_t slot1, slot2;
+
+			if (buf_getu16(data, offset, len, &slot1) == -1) {
+				return;
+			}
+			offset += 2;
+			if (buf_getu16(data, offset, len, &slot2) == -1) {
+				return;
+			}
+			offset += 2;
+			p->action = ACTION_INV_USEWITH;
+			p->action_slot = slot1;
+			p->action_slot2 = slot2;
 		}
 		break;
 	case OP_CLI_LOC_USEWITH:

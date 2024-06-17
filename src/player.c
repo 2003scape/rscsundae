@@ -1531,6 +1531,16 @@ player_process_action(struct player *p)
 		script_onopinv(p->mob.server->lua, p, item_config);
 		p->action = ACTION_NONE;
 		break;
+	case ACTION_INV_USEWITH:
+		if (p->action_slot >= p->inv_count ||
+		    p->action_slot2 >= p->inv_count) {
+			p->action = ACTION_NONE;
+			return;
+		}
+		printf("inv usewith %d %d\n",
+		    p->action_slot, p->action_slot2);
+		p->action = ACTION_NONE;
+		break;
 	case ACTION_ITEM_TAKE:
 		if (p->action_item == NULL) {
 			p->action = ACTION_NONE;
@@ -1556,6 +1566,17 @@ player_process_action(struct player *p)
 		} else {
 			server_remove_temp_item(item->unique_id);
 		}
+		p->action = ACTION_NONE;
+		break;
+	case ACTION_ITEM_USEWITH:
+		item = server_find_ground_item(p,
+		    p->action_item->x, p->action_item->y,
+		    p->action_item->id);
+		if (p->action_slot >= p->inv_count || item == NULL) {
+			p->action = ACTION_NONE;
+			return;
+		}
+		printf("item usewith %d\n", p->action_slot);
 		p->action = ACTION_NONE;
 		break;
 	case ACTION_NPC_CAST:
