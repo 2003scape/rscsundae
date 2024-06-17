@@ -1,11 +1,11 @@
-ontalknpc_scripts = {}
-onuseobj_scripts = {}
-onskillplayer_scripts = {}
-onskillnpc_scripts = {}
-onopbound1_scripts = {}
-onopbound2_scripts = {}
-onoploc1_scripts = {}
-onoploc2_scripts = {}
+talknpc_scripts = {}
+useobj_scripts = {}
+skillplayer_scripts = {}
+skillnpc_scripts = {}
+opbound1_scripts = {}
+opbound2_scripts = {}
+oploc1_scripts = {}
+oploc2_scripts = {}
 player_scripts = {}
 active_script = nil
 
@@ -26,38 +26,38 @@ function new_player_script()
 end
 
 function register_talknpc(name, callback)
-	ontalknpc_scripts[name] = callback;
+	talknpc_scripts[name] = callback;
 end
 
 function register_useobj(name, callback)
-	onuseobj_scripts[name] = callback;
+	useobj_scripts[name] = callback;
 end
 
 function register_skillplayer(spell, callback)
-	onskillplayer_scripts[spell] = callback;
+	skillplayer_scripts[spell] = callback;
 end
 
 function register_opbound1(name, callback)
-	onopbound1_scripts[name] = callback;
+	opbound1_scripts[name] = callback;
 end
 
 function register_opbound2(name, callback)
-	onopbound2_scripts[name] = callback;
+	opbound2_scripts[name] = callback;
 end
 
 function register_oploc1(name, callback)
-	onoploc1_scripts[name] = callback;
+	oploc1_scripts[name] = callback;
 end
 
 function register_oploc2(name, callback)
-	onoploc2_scripts[name] = callback;
+	oploc2_scripts[name] = callback;
 end
 
 function register_skillnpc(name, spell, callback)
-	if not onskillnpc_scripts[spell] then
-		onskillnpc_scripts[spell] = {}
+	if not skillnpc_scripts[spell] then
+		skillnpc_scripts[spell] = {}
 	end
-	onskillnpc_scripts[spell][name] = callback
+	skillnpc_scripts[spell][name] = callback
 end
 
 function script_engine_process(player)
@@ -107,13 +107,13 @@ function script_engine_answer(player, answer)
 	coroutine.resume(ps.co)
 end
 
-function script_engine_ontalknpc(player, name, npc)
+function script_engine_talknpc(player, name, npc)
 	local script = player_scripts[player]
 	if script then
 		return true
 	end
 	name = string.lower(name)
-	script = ontalknpc_scripts[name]
+	script = talknpc_scripts[name]
 	if script then
 		ps = new_player_script()
 		ps.npc = npc
@@ -129,19 +129,19 @@ function script_engine_ontalknpc(player, name, npc)
 	return false
 end
 
-function script_engine_onskillnpc(player, name, npc, spell)
+function script_engine_skillnpc(player, name, npc, spell)
 	local script = player_scripts[player]
 	if script then
 		return true
 	end
 	spell = string.lower(spell)
 	name = string.lower(name)
-	if not onskillnpc_scripts[spell] then
+	if not skillnpc_scripts[spell] then
 		return false
 	end
-	script = onskillnpc_scripts[spell][name]
+	script = skillnpc_scripts[spell][name]
 	if not script then
-		script = onskillnpc_scripts[spell]["_"]
+		script = skillnpc_scripts[spell]["_"]
 	end
 	if script then
 		ps = new_player_script()
@@ -155,13 +155,13 @@ function script_engine_onskillnpc(player, name, npc, spell)
 	return false
 end
 
-function script_engine_onuseobj(player, name)
+function script_engine_useobj(player, name)
 	local script = player_scripts[player]
 	if script then
 		return true
 	end
 	name = string.lower(name)
-	script = onuseobj_scripts[name]
+	script = useobj_scripts[name]
 	if script then
 		ps = new_player_script()
 		ps.co = coroutine.create(function()
@@ -174,13 +174,13 @@ function script_engine_onuseobj(player, name)
 	return false
 end
 
-function script_engine_onskillplayer(player, target, name)
+function script_engine_skillplayer(player, target, name)
 	local script = player_scripts[player]
 	if script then
 		return true
 	end
 	name = string.lower(name)
-	script = onskillplayer_scripts[name]
+	script = skillplayer_scripts[name]
 	if script then
 		ps = new_player_script()
 		ps.co = coroutine.create(function()
@@ -193,13 +193,13 @@ function script_engine_onskillplayer(player, target, name)
 	return false
 end
 
-function script_engine_onopbound1(player, name, x, y, dir)
+function script_engine_opbound1(player, name, x, y, dir)
 	local script = player_scripts[player]
 	if script then
 		return true
 	end
 	name = string.lower(name)
-	script = onopbound1_scripts[name]
+	script = opbound1_scripts[name]
 	if script then
 		ps = new_player_script()
 		ps.co = coroutine.create(function()
@@ -212,13 +212,13 @@ function script_engine_onopbound1(player, name, x, y, dir)
 	return false
 end
 
-function script_engine_onopbound2(player, name, x, y, dir)
+function script_engine_opbound2(player, name, x, y, dir)
 	local script = player_scripts[player]
 	if script then
 		return true
 	end
 	name = string.lower(name)
-	script = onopbound2_scripts[name]
+	script = opbound2_scripts[name]
 	if script then
 		ps = new_player_script()
 		ps.co = coroutine.create(function()
@@ -231,13 +231,13 @@ function script_engine_onopbound2(player, name, x, y, dir)
 	return false
 end
 
-function script_engine_onoploc1(player, name, x, y)
+function script_engine_oploc1(player, name, x, y)
 	local script = player_scripts[player]
 	if script then
 		return true
 	end
 	name = string.lower(name)
-	script = onoploc1_scripts[name]
+	script = oploc1_scripts[name]
 	if script then
 		ps = new_player_script()
 		ps.co = coroutine.create(function()
@@ -250,13 +250,13 @@ function script_engine_onoploc1(player, name, x, y)
 	return false
 end
 
-function script_engine_onoploc2(player, name, x, y)
+function script_engine_oploc2(player, name, x, y)
 	local script = player_scripts[player]
 	if script then
 		return true
 	end
 	name = string.lower(name)
-	script = onoploc2_scripts[name]
+	script = oploc2_scripts[name]
 	if script then
 		ps = new_player_script()
 		ps.co = coroutine.create(function()
