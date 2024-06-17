@@ -1,5 +1,5 @@
 local restore_locs = {}
-local remove_locs = {}
+local delete_locs = {}
 local talknpc_scripts = {}
 local opinv_scripts = {}
 local skillplayer_scripts = {}
@@ -31,8 +31,9 @@ STAT_SMITHING		= 13
 STAT_MINING		= 14
 STAT_HERBLAW		= 15
 
-function new_player_script()
+function new_player_script(player)
 	local ps = {}
+	ps.player = player
 	ps.delay = 0
 	ps.option_count = 0
 	ps.npc = nil
@@ -177,7 +178,7 @@ function script_engine_talknpc(player, name, npc)
 	name = string.lower(name)
 	script = talknpc_scripts[name]
 	if script then
-		ps = new_player_script()
+		ps = new_player_script(player)
 		ps.npc = npc
 		ps.co = coroutine.create(function()
 			script(player, npc)
@@ -206,7 +207,7 @@ function script_engine_skillnpc(player, name, npc, spell)
 		script = skillnpc_scripts[spell]["_"]
 	end
 	if script then
-		ps = new_player_script()
+		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, npc)
 			player_scripts[player] = nil
@@ -225,7 +226,7 @@ function script_engine_opinv(player, name)
 	name = string.lower(name)
 	script = opinv_scripts[name]
 	if script then
-		ps = new_player_script()
+		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player)
 			player_scripts[player] = nil
@@ -244,7 +245,7 @@ function script_engine_skillplayer(player, target, name)
 	name = string.lower(name)
 	script = skillplayer_scripts[name]
 	if script then
-		ps = new_player_script()
+		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, target)
 			player_scripts[player] = nil
@@ -263,7 +264,7 @@ function script_engine_opbound1(player, name, x, y, dir)
 	name = string.lower(name)
 	script = opbound1_scripts[name]
 	if script then
-		ps = new_player_script()
+		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, x, y, dir)
 			player_scripts[player] = nil
@@ -282,7 +283,7 @@ function script_engine_opbound2(player, name, x, y, dir)
 	name = string.lower(name)
 	script = opbound2_scripts[name]
 	if script then
-		ps = new_player_script()
+		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, x, y, dir)
 			player_scripts[player] = nil
@@ -301,7 +302,7 @@ function script_engine_oploc1(player, name, x, y)
 	name = string.lower(name)
 	script = oploc1_scripts[name]
 	if script then
-		ps = new_player_script()
+		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, x, y)
 			player_scripts[player] = nil
@@ -320,7 +321,7 @@ function script_engine_oploc2(player, name, x, y)
 	name = string.lower(name)
 	script = oploc2_scripts[name]
 	if script then
-		ps = new_player_script()
+		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, x, y)
 			player_scripts[player] = nil
@@ -344,7 +345,7 @@ function script_engine_useloc(player, name, x, y, item)
 	end
 	script = useloc_scripts[name][item]
 	if script then
-		ps = new_player_script()
+		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, x, y)
 			player_scripts[player] = nil
@@ -368,7 +369,7 @@ function script_engine_useobj(player, name, x, y, item)
 	end
 	script = useobj_scripts[name][item]
 	if script then
-		ps = new_player_script()
+		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, x, y)
 			player_scripts[player] = nil
@@ -397,7 +398,7 @@ function script_engine_useinv(player, name, item)
 		script = useinv_scripts[item][name]
 	end
 	if script then
-		ps = new_player_script()
+		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player)
 			player_scripts[player] = nil
@@ -422,7 +423,8 @@ function addloc(name, x, y, timer)
 	target.timer = timer
 	target.co = active_script.co
 
-	table.insert(remove_locs, target)
+	table.insert(delete_locs, target)
+	player_scripts[active_script.player] = nil
 	coroutine.yield(active_script.co)
 end
 
