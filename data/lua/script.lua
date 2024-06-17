@@ -1,13 +1,14 @@
-talknpc_scripts = {}
-useobj_scripts = {}
-skillplayer_scripts = {}
-skillnpc_scripts = {}
-opbound1_scripts = {}
-opbound2_scripts = {}
-oploc1_scripts = {}
-oploc2_scripts = {}
-player_scripts = {}
-active_script = nil
+local talknpc_scripts = {}
+local useobj_scripts = {}
+local skillplayer_scripts = {}
+local skillnpc_scripts = {}
+local opbound1_scripts = {}
+local opbound2_scripts = {}
+local oploc1_scripts = {}
+local oploc2_scripts = {}
+local useloc_scripts = {}
+local player_scripts = {}
+local active_script = nil
 
 STAT_ATTACK		= 0
 STAT_DEFENSE		= 1
@@ -58,6 +59,13 @@ function register_skillnpc(name, spell, callback)
 		skillnpc_scripts[spell] = {}
 	end
 	skillnpc_scripts[spell][name] = callback
+end
+
+function register_useloc(name, item, callback)
+	if not useloc_scripts[name] then
+		useloc_scripts[name] = {}
+	end
+	useloc_scripts[name][item] = callback
 end
 
 function script_engine_process(player)
@@ -269,6 +277,30 @@ function script_engine_oploc2(player, name, x, y)
 	return false
 end
 
+function script_engine_useloc(player, name, x, y, item)
+	local script = player_scripts[player]
+	if script then
+		return true
+	end
+	name = string.lower(name)
+	item = string.lower(item)
+	script = useloc_scripts[name]
+	if not script then
+		return false
+	end
+	script = useloc_scripts[name][item]
+	if script then
+		ps = new_player_script()
+		ps.co = coroutine.create(function()
+			script(player, x, y)
+			player_scripts[player] = nil
+		end)
+		player_scripts[player] = ps
+		return true
+	end
+	return false
+end
+
 function delay(length)
 	active_script.delay = length
 	coroutine.yield(active_script.co)
@@ -348,6 +380,7 @@ dofile("./data/lua/rs1/misc/clutter.lua")
 dofile("./data/lua/rs1/misc/doors.lua")
 dofile("./data/lua/rs1/misc/ladders.lua")
 dofile("./data/lua/rs1/misc/plants.lua")
+dofile("./data/lua/rs1/misc/water.lua")
 
 --
 -- automatically register triggers

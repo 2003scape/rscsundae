@@ -134,7 +134,7 @@ These should all be implemented in Lua script:
 - [ ] Monk of Zamorak wine aggression
 - [x] Picking plants
 - [ ] Cutting webs
-- [ ] Water sources
+- [x] Water sources
 - [ ] Using the windmill
 - [x] Using ladders
 - [ ] Using stairs (broken)
