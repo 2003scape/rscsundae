@@ -1,4 +1,5 @@
 local restore_locs = {}
+local remove_locs = {}
 local talknpc_scripts = {}
 local opinv_scripts = {}
 local skillplayer_scripts = {}
@@ -107,6 +108,15 @@ function script_engine_tick()
 		else
 			_restoreloc(event.x, event.y)
 			table.remove(restore_locs, i)
+		end
+	end
+	for i=1,#delete_locs do
+		local event = delete_locs[i]
+		if event.timer > 0 then
+			event.timer = event.timer - 1;
+		else
+			_delloc(event.x, event.y)
+			table.remove(delete_locs, i)
 		end
 	end
 end
@@ -400,6 +410,17 @@ end
 function delay(length)
 	active_script.delay = length
 	coroutine.yield(active_script.co)
+end
+
+function addloc(name, x, y, timer)
+	_addloc(name, x, y)
+
+	local target = {}
+	target.x = x
+	target.y = y
+	target.timer = timer
+
+	table.insert(remove_locs, target)
 end
 
 function restoreloc(x, y, timer)

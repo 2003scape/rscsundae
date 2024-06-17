@@ -5,6 +5,10 @@ end
 
 -- rsc-preservation.xyz/Skilling/some woodcutting and firemaking at low levels.pcap
 function useobj_tinderbox_logs(player, x, y)
+	if blocked(x, y) then
+		mes(player, "@que@You can't light a fire here")
+		return
+	end
 	thinkbubble(player, "tinderbox")
 	mes(player, "@que@You attempt to light the logs")
 	delay(3)
@@ -18,7 +22,7 @@ function useobj_tinderbox_logs(player, x, y)
 		advancestat(player, STAT_FIREMAKING, 100, 7)
 		-- TODO unimplemented
 		--delobject("logs", x, y)
-		--addloc("fire", x, y, 100)
+		addloc("fire", x, y, 100)
 		--addobject(player, "ashes", 1, x, y)
 	else
 		mes(player, "@que@You fail to light a fire")

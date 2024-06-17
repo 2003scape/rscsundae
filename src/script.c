@@ -69,6 +69,61 @@ id_to_npc(lua_Integer id)
 }
 
 static int
+script_blocked(lua_State *L)
+{
+	lua_Integer x, y;
+
+	x = luaL_checknumber(L, 1);
+	y = luaL_checknumber(L, 2);
+
+	if (server_find_loc(x, y) != NULL) {
+		lua_pushboolean(L, true);
+		return 1;
+	}
+
+	lua_pushboolean(L, false);
+	return 1;
+}
+
+static int
+script_addloc(lua_State *L)
+{
+	const char *name;
+	struct loc_config *config;
+	struct loc loc = {0};
+
+	name = luaL_checkstring(L, 1);
+	loc.x = luaL_checknumber(L, 2);
+	loc.y = luaL_checknumber(L, 3);
+
+	config = server_find_loc_config(name);
+	if (config == NULL) {
+		printf("script warning: loc %s is undefined\n", name);
+		return 0;
+	}
+
+	loc.id = config->id;
+	loc.orig_id = loc.id;
+
+	if (server_find_loc(loc.x, loc.y) != NULL) {
+		printf("script warning: tried to spawn loc at %d %d but it's blocked\n",
+			loc.x, loc.y);
+		return 0;
+	}
+
+	server_add_loc(&loc);
+	return 0;
+}
+
+static int
+script_delloc(lua_State *L)
+{
+	/* TODO implement */
+	(void)L;
+	return 0;
+}
+
+static int
 script_say(lua_State *L)
 {
 	lua_Integer id = luaL_checkinteger(L, 1);
@@ -923,9 +978,6 @@ script_changeloc(lua_State *L)
 		return 0;
 	}
 
-	if (loc->orig_id == UINT16_MAX) {
-		loc->orig_id = loc->id;
-	}
 	loc->id = config->id;
 
 	server_add_loc(loc);
@@ -1396,11 +1448,20 @@ script_init(struct server *s)
 	lua_pushcfunction(L, script_say);
 	lua_setglobal(L, "_say");
 
+	lua_pushcfunction(L, script_addloc);
+	lua_setglobal(L, "_addloc");
+
+	lua_pushcfunction(L, script_delloc);
+	lua_setglobal(L, "_delloc");
+
 	lua_pushcfunction(L, script_npcsay);
 	lua_setglobal(L, "_npcsay");
 
 	lua_pushcfunction(L, script_multi);
 	lua_setglobal(L, "_multi");
+
+	lua_pushcfunction(L, script_blocked);
+	lua_setglobal(L, "blocked");
 
 	lua_pushcfunction(L, script_npcattack);
 	lua_setglobal(L, "npcattack");
