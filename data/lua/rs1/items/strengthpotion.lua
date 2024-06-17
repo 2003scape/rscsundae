@@ -34,7 +34,6 @@ end
 function useobj_1dose1strength(player)
 	drink_strength(player)
 	remove(player, "1dose1strength", 1)
-	give(player, "emptyvial", 1)
 	delay(1)
 	mes(player, "You have finished your potion")
 end
