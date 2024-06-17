@@ -38,6 +38,7 @@
 /* 3d object in 2-dimensional space */
 struct loc {
 	uint16_t id;
+	uint16_t orig_id;
 	uint16_t x;
 	uint16_t y;
 	uint8_t dir;

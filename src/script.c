@@ -32,6 +32,7 @@ static int script_npcaddstat(lua_State *);
 static int script_npcsubstat(lua_State *);
 static int script_statup(lua_State *);
 static int script_statdown(lua_State *);
+static int script_statrandom(lua_State *);
 static int script_npcstatup(lua_State *);
 static int script_npcstatdown(lua_State *);
 static int script_thinkbubble(lua_State *);
@@ -40,6 +41,7 @@ static int script_downstairs(lua_State *);
 static int script_openshop(lua_State *);
 static int script_changebound(lua_State *);
 static int script_changeloc(lua_State *);
+static int script_restoreloc(lua_State *);
 static int script_shootplayer(lua_State *);
 static int script_shootnpc(lua_State *);
 static int script_multi(lua_State *);
@@ -415,6 +417,34 @@ script_statdown(lua_State *L)
 		return 0;
 	}
 	b = stat_down(&p->mob, stat);
+	lua_pushboolean(L, b);
+	return 1;
+}
+
+static int
+script_statrandom(lua_State *L)
+{
+	lua_Integer player_id, stat;
+	lua_Integer base, top;
+	struct player *p;
+	int b;
+
+	player_id = luaL_checkinteger(L, 1);
+	stat = luaL_checkinteger(L, 2);
+	base = luaL_checkinteger(L, 3);
+	top = luaL_checkinteger(L, 4);
+	p = id_to_player(player_id);
+	if (p == NULL) {
+		printf("script warning: player %lld is undefined\n", player_id);
+		script_cancel(L, player_id);
+		return 0;
+	}
+	if (stat < 0 || stat >= MAX_SKILL_ID) {
+		printf("script warning: invalid stat id %lld\n", stat);
+		script_cancel(L, player_id);
+		return 0;
+	}
+	b = stat_random(&p->mob, stat, base, top);
 	lua_pushboolean(L, b);
 	return 1;
 }
@@ -893,7 +923,31 @@ script_changeloc(lua_State *L)
 		return 0;
 	}
 
+	if (loc->orig_id == UINT16_MAX) {
+		loc->orig_id = loc->id;
+	}
 	loc->id = config->id;
+
+	server_add_loc(loc);
+	return 0;
+}
+
+static int
+script_restoreloc(lua_State *L)
+{
+	lua_Integer x, y;
+	struct loc *loc;
+
+	x = luaL_checkinteger(L, 1);
+	y = luaL_checkinteger(L, 2);
+
+	loc = server_find_loc(x, y);
+	if (loc == NULL) {
+		printf("script warning: couldn't find loc at %lld %lld\n", x, y);
+		return 0;
+	}
+
+	loc->id = loc->orig_id;
 
 	server_add_loc(loc);
 	return 0;
@@ -972,6 +1026,18 @@ script_shootnpc(lua_State *L)
 
 	player_shoot_pvm(p, proj, target);
 	return 0;
+}
+
+void
+script_tick(lua_State *L)
+{
+	assert(L != NULL);
+	lua_getglobal(L, "script_engine_tick");
+	if (!lua_isfunction(L, -1)) {
+		puts("script error: can't find essential function script_engine_tick");
+		return;
+	}
+	lua_pcall(L, 0, 0, 0);
 }
 
 void
@@ -1322,6 +1388,9 @@ script_init(struct server *s)
 	lua_pushcfunction(L, script_statdown);
 	lua_setglobal(L, "statdown");
 
+	lua_pushcfunction(L, script_statrandom);
+	lua_setglobal(L, "statrandom");
+
 	lua_pushcfunction(L, script_npcstatup);
 	lua_setglobal(L, "npcstatup");
 
@@ -1366,6 +1435,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_changeloc);
 	lua_setglobal(L, "changeloc");
+
+	lua_pushcfunction(L, script_restoreloc);
+	lua_setglobal(L, "_restoreloc");
 
 	lua_pushcfunction(L, script_displaybalance);
 	lua_setglobal(L, "displaybalance");

@@ -231,6 +231,8 @@ server_tick(void)
 		shop_process(&s.shop_config[i]);
 	}
 
+	script_tick(s.lua);
+
 	for (int i = 0; i < s.max_player_id; ++i) {
 		if (s.players[i] == NULL) {
 			continue;
@@ -573,6 +575,7 @@ load_map_tile(struct jag_map *chunk,
 		int max_x, max_y;
 
 		loc.id = object_type - JAG_MAP_DIAG_LOC - 1;
+		loc.orig_id = loc.id;
 		loc.x = global_x;
 		loc.y = global_y;
 		loc.dir = object_dir;

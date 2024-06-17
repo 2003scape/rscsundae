@@ -1,3 +1,4 @@
+local restore_locs = {}
 local talknpc_scripts = {}
 local useobj_scripts = {}
 local skillplayer_scripts = {}
@@ -17,6 +18,15 @@ STAT_HITS		= 3
 STAT_RANGED		= 4
 STAT_PRAYER		= 5
 STAT_MAGIC		= 6
+STAT_COOKING		= 7
+STAT_WOODCUTTING	= 8
+STAT_FLETCHING		= 9
+STAT_FISHING		= 10
+STAT_FIREMAKING		= 11
+STAT_CRAFTING		= 12
+STAT_SMITHING		= 13
+STAT_MINING		= 14
+STAT_HERBLAW		= 15
 
 function new_player_script()
 	local ps = {}
@@ -66,6 +76,18 @@ function register_useloc(name, item, callback)
 		useloc_scripts[name] = {}
 	end
 	useloc_scripts[name][item] = callback
+end
+
+function script_engine_tick()
+	for i=1,#restore_locs do
+		local event = restore_locs[i]
+		if event.timer > 0 then
+			event.timer = event.timer - 1;
+		else
+			_restoreloc(event.x, event.y)
+			table.remove(restore_locs, i)
+		end
+	end
 end
 
 function script_engine_process(player)
@@ -306,6 +328,15 @@ function delay(length)
 	coroutine.yield(active_script.co)
 end
 
+function restoreloc(x, y, timer)
+	local target = {}
+	target.x = x
+	target.y = y
+	target.timer = timer
+
+	table.insert(restore_locs, target)
+end
+
 function say(player, mes)
 	_say(player, mes)
 	delay(3)
@@ -362,6 +393,7 @@ dofile("./data/lua/rs1/npc/silktrader.lua")
 dofile("./data/lua/rs1/skill_magic/curses.lua")
 dofile("./data/lua/rs1/skill_magic/missiles.lua")
 dofile("./data/lua/rs1/skill_prayer/bones.lua")
+dofile("./data/lua/rs1/skill_woodcutting/tree.lua")
 dofile("./data/lua/rs1/items/asgarnia/alcohol.lua")
 dofile("./data/lua/rs1/items/food.lua")
 dofile("./data/lua/rs1/items/cabbage.lua")
