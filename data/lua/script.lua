@@ -115,6 +115,7 @@ function script_engine_tick()
 		if event.timer > 0 then
 			event.timer = event.timer - 1;
 		else
+			coroutine.resume(event.co)
 			_delloc(event.x, event.y)
 			table.remove(delete_locs, i)
 		end
@@ -419,8 +420,10 @@ function addloc(name, x, y, timer)
 	target.x = x
 	target.y = y
 	target.timer = timer
+	target.co = active_script.co
 
 	table.insert(remove_locs, target)
+	coroutine.yield(active_script.co)
 end
 
 function restoreloc(x, y, timer)
