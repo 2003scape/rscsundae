@@ -175,3 +175,5 @@ You buy an Asgarnian Ale
 You try to destroy the web...
 You fail to cut through it
 You slice through the web
+@que@You recharge your prayer points
+@que@You already have full prayer points
