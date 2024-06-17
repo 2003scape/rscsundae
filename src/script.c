@@ -45,6 +45,7 @@ static int script_restoreloc(lua_State *);
 static int script_shootplayer(lua_State *);
 static int script_shootnpc(lua_State *);
 static int script_multi(lua_State *);
+static int script_delobject(lua_State *);
 static struct player *id_to_player(lua_Integer);
 static struct npc *id_to_npc(lua_Integer);
 
@@ -120,6 +121,51 @@ script_delloc(lua_State *L)
 {
 	/* TODO implement */
 	(void)L;
+	return 0;
+}
+
+static int
+script_delobject(lua_State *L)
+{
+	lua_Integer id, x, y;
+	const char *name;
+	struct item_config *config;
+	struct ground_item *item;
+	struct player *p;
+
+	id = luaL_checkinteger(L, 1);
+	name = luaL_checkstring(L, 2);
+	x = luaL_checkinteger(L, 3);
+	y = luaL_checkinteger(L, 4);
+
+	p = id_to_player(id);
+	if (p == NULL) {
+		printf("script warning: player %lld is undefined\n", id);
+		script_cancel(L, id);
+		return 0;
+	}
+
+	config = server_find_item_config(name);
+	if (config == NULL) {
+		printf("script warning: item %s is undefined\n", name);
+		script_cancel(L, id);
+		return 0;
+	}
+
+	item = server_find_ground_item(p, x, y, config->id);
+	if (item == NULL) {
+		printf("script warning: item %s at %lld %lld is undefined\n",
+			name, x, y);
+		script_cancel(L, id);
+		return 0;
+	}
+
+	if (item->respawn) {
+		item->respawn_time = p->mob.server->tick_counter +
+		    (config->respawn_rate / 5);
+	} else {
+		server_remove_temp_item(item->unique_id);
+	}
 	return 0;
 }
 
@@ -1561,6 +1607,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_male);
 	lua_setglobal(L, "male");
+
+	lua_pushcfunction(L, script_delobject);
+	lua_setglobal(L, "delobject");
 
 	/* TODO: configurable path */
 	if (luaL_dofile(L, "./data/lua/script.lua") != LUA_OK) {

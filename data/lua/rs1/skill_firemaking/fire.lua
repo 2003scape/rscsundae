@@ -20,9 +20,10 @@ function useobj_tinderbox_logs(player, x, y)
 	if statrandom(player, STAT_FIREMAKING, 64, 512) then
 		mes(player, "@que@The fire catches and the logs begin to burn")
 		advancestat(player, STAT_FIREMAKING, 100, 7)
-		-- TODO unimplemented
-		--delobject("logs", x, y)
+		delobject(player, "logs", x, y)
 		addloc("fire", x, y, 100)
+		-- TODO unimplemented
+		-- coroutine needs to be resumed once loc is deleted
 		--addobject(player, "ashes", 1, x, y)
 	else
 		mes(player, "@que@You fail to light a fire")
