@@ -66,7 +66,7 @@ loop_set_delay(int delay)
 }
 
 int
-loop_start(struct server *s, int port)
+loop_start(struct server *s)
 {
 	int sockets[8];
 	struct pollfd pfds[8];
@@ -76,7 +76,7 @@ loop_start(struct server *s, int port)
 
 	serv = s;
 
-	numsockets = net_establish_listener(sockets, port);
+	numsockets = net_establish_listener(s, sockets);
 	if (numsockets == 0) {
 		fprintf(stderr, "failed to open sockets: %s\n", strerror(errno));
 		goto err;

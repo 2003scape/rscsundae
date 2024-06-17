@@ -100,7 +100,7 @@ loop_add_player(struct player *p)
 }
 
 int
-loop_start(struct server *s, int port)
+loop_start(struct server *s)
 {
 	int sockets[8];
 	ev_io sock_events[8];
@@ -111,7 +111,7 @@ loop_start(struct server *s, int port)
 
 	serv = s;
 
-	numsockets = net_establish_listener(sockets, port);
+	numsockets = net_establish_listener(s, sockets);
 	if (numsockets == 0) {
 		fprintf(stderr, "failed to open sockets: %s\n", strerror(errno));
 		return -1;

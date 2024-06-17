@@ -4,6 +4,7 @@ bin_PROGRAMS =	rscsundae
 
 AM_CPPFLAGS = -Iext/libjag/include
 AM_CPPFLAGS += $(LUA_CFLAGS)
+AM_CPPFLAGS += $(INIH_CFLAGS)
 
 rscsundae_SOURCES = \
 	bank.c \
@@ -15,6 +16,7 @@ rscsundae_SOURCES = \
 	npc.c \
 	script.c \
 	server.c \
+	settings.c \
 	shop.c \
 	stat.c \
 	trade.c \
@@ -35,6 +37,11 @@ rscsundae_SOURCES = \
 	protocol/incoming.c \
 	protocol/outgoing.c
 
+if ! HAVE_SYSTEM_INIH
+AM_CPPFLAGS += -Iext/inih
+rscsundae_SOURCES += ext/inih/ini.c
+endif
+
 if KQUEUE
 rscsundae_SOURCES += loop-kqueue.c
 else
@@ -45,4 +52,4 @@ rscsundae_SOURCES += loop-poll.c
 endif
 endif
 
-rscsundae_LDADD = $(libev_LIBS) $(LUA_LIBS) -lm
+rscsundae_LDADD = $(libev_LIBS) $(LUA_LIBS) $(INIH_LIBS) -lm

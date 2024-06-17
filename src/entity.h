@@ -4,14 +4,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#ifndef DEFAULT_START_X
-#define DEFAULT_START_X		(120)
-#endif
-
-#ifndef DEFAULT_START_Y
-#define DEFAULT_START_Y		(648)
-#endif
-
 #define PLAYER_BUFSIZE		(5000)
 
 #define PLANE_WIDTH		(2304)

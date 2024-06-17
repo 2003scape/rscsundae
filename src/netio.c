@@ -5,25 +5,26 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
+#include "server.h"
 #include "netio.h"
 
 static int net_set_flags(int);
 
 int
-net_establish_listener(int *sockets, int port)
+net_establish_listener(struct server *s, int *sockets)
 {
 	int numsocks = 0;
 	struct addrinfo hints = {0};
 	struct addrinfo *ai = NULL, *ai0 = NULL;
 	char portstr[32];
 
-	(void)snprintf(portstr, sizeof(portstr), "%d", port);
+	(void)snprintf(portstr, sizeof(portstr), "%d", s->port);
 
 	hints.ai_family = PF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
-	if (getaddrinfo("127.0.0.1", portstr, &hints, &ai0) == -1) {
+	if (getaddrinfo(s->bind_addr, portstr, &hints, &ai0) == -1) {
 		fprintf(stderr, "failed to getaddrinfo: %s\n", strerror(errno));
 		goto err;
 	}

@@ -3,7 +3,7 @@
 
 #include "entity.h"
 
-int net_establish_listener(int *, int);
+int net_establish_listener(struct server *s, int *);
 int net_player_accept(int);
 int net_player_send(struct player *);
 int net_player_recv(struct player *);

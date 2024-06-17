@@ -20,6 +20,13 @@ AC_CHECK_HEADERS([sys/timerfd.h])
 AC_CHECK_HEADERS([bzlib.h])
 AC_SEARCH_LIBS([BZ2_bzDecompressInit], [bz2])
 PKG_CHECK_MODULES([LUA], [lua-5.4])
+
+AM_CONDITIONAL(HAVE_SYSTEM_INIH, true)
+PKG_CHECK_MODULES([INIH], [inih], [
+	], [
+		AM_CONDITIONAL(HAVE_SYSTEM_INIH, false)
+	])
+
 AM_SILENT_RULES([yes])
 
 AC_ARG_WITH([kqueue], 

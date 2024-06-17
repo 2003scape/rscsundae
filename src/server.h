@@ -10,6 +10,9 @@
 
 struct server {
 	void *loop_ctx;
+	char *name;
+	char *bind_addr;
+	int port;
 	uint16_t player_count;
 	uint16_t max_player_id;
 	uint16_t max_npc_id;
@@ -75,5 +78,6 @@ struct shop_config *server_find_shop(const char *);
 int server_add_npc(int, int, int);
 int server_add_temp_item(struct player *, int, int, int, uint32_t);
 void server_remove_temp_item(uint64_t);
+int server_parse_settings(void *, const char *, const char *, const char *);
 
 #endif

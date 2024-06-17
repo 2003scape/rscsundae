@@ -697,6 +697,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 		break;
 	case OP_CLI_ACCEPT_DESIGN:
 		{
+			char mes[32];
 			uint8_t old_class = p->rpg_class;
 
 			if (!p->ui_design_open) {
@@ -759,7 +760,9 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			p->appearance_changed = true;
 			p->ui_design_open = false;
 
-			player_send_message(p, "@que@Welcome to RSCSundae!");
+			(void)snprintf(mes, sizeof(mes),
+			    "Welcome to %s!", p->mob.server->name);
+			player_send_message(p, mes);
 		}
 		break;
 	case OP_CLI_ANSWER_MULTI:

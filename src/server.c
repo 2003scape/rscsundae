@@ -1,5 +1,6 @@
 #include <jag.h>
 #include <map.h>
+#include <ini.h>
 #include <sys/types.h>
 #include <assert.h>
 #include <signal.h>
@@ -7,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 #include "server.h"
 #include "loop.h"
 #include "netio.h"
@@ -27,21 +29,56 @@ static int load_config_jag(void);
 static void load_map_chunk(struct jag_map *, int, int, int);
 static void load_map_tile(struct jag_map *, int, int, int, int);
 static int load_maps_jag(void);
+static void usage(void);
+
+static void
+usage(void)
+{
+	fputs("rscsundae [-b basedir] [-d] [-f conffile]\n", stderr);
+}
 
 int
 main(int argc, char **argv)
 {
-	(void)argc;
-	(void)argv;
+	extern char *optarg;
+	extern int optind;
+	char ch;
+	char *basedir = "./data";
+	char *conffile = "./data/settings.ini";
 
-	s.start_tile_x = DEFAULT_START_X;
-	s.start_tile_y = DEFAULT_START_Y;
+	while ((ch = getopt(argc, argv, "b:df:")) != -1) {
+		switch (ch) {
+		case 'b':
+			basedir = strdup(optarg);
+			assert(basedir != NULL);
+			break;
+		case 'd':
+			daemon(1, 0);
+			break;
+		case 'f':
+			conffile = strdup(optarg);
+			assert(conffile != NULL);
+			break;
+		case '?':
+		default:
+			usage();
+			exit(EXIT_FAILURE);
+			break;
+		}
+	}
+
+	printf("base directory is %s\n", basedir);
+	printf("configuration file is %s\n", conffile);
+
+	argc -= optind;
+	argv += optind;
+
+	s.name = "RSC Sundae";
+	s.bind_addr = "127.0.0.1";
+	s.port = 43594;
 	s.next_restore = 0;
 	s.next_rapid_restore = 0;
 	s.next_prayer_drain = 0;
-	/* TODO: should be configurable somehow */
-	s.xp_multiplier = 1;
-	s.spell_timer = true;
 
 	(void)signal(SIGPIPE, on_signal_do_nothing);
 
@@ -49,6 +86,16 @@ main(int argc, char **argv)
 	raninit(&s.ran, time(NULL));
 
 	stat_calculate_table();
+
+	if (ini_parse(conffile, server_parse_settings, &s) < 0) {
+		fprintf(stderr, "error parsing ./data/settings.ini\n");
+		return EXIT_FAILURE;
+	}
+
+	(void)chdir(basedir);
+
+	printf("starting server on address %s port %d\n",
+	    s.bind_addr, s.port);
 
 	s.lua = script_init(&s);
 	if (s.lua == NULL) {
@@ -68,8 +115,7 @@ main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
-	/* TODO: port should be configurable */
-	if (loop_start(&s, 43594) == -1) {
+	if (loop_start(&s) == -1) {
 		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;
@@ -384,8 +430,7 @@ load_config_jag(void)
 	struct jag_entry entry = {0};
 	FILE *f = NULL;
 
-	/* TODO: support configurable & system-wide paths */
-	f = fopen("./data/config46.jag", "rb");
+	f = fopen("./config46.jag", "rb");
 	if (f == NULL) {
 		goto err;
 	}
@@ -699,8 +744,7 @@ load_maps_jag(void)
 	struct jag_entry entry = {0};
 	FILE *f = NULL;
 
-	/* TODO: support configurable & system-wide paths */
-	f = fopen("./data/maps27.jag", "rb");
+	f = fopen("./maps27.jag", "rb");
 	if (f == NULL) {
 		goto err;
 	}

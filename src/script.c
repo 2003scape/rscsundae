@@ -1651,8 +1651,7 @@ script_init(struct server *s)
 	lua_pushcfunction(L, script_delobject);
 	lua_setglobal(L, "delobject");
 
-	/* TODO: configurable path */
-	if (luaL_dofile(L, "./data/lua/script.lua") != LUA_OK) {
+	if (luaL_dofile(L, "./lua/script.lua") != LUA_OK) {
 		printf("script error %s:\n",  lua_tostring(L, -1));
 	}
 

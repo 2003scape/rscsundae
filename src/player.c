@@ -514,8 +514,8 @@ player_die(struct player *p, struct player *victor)
 
 	mob_die(&p->mob);
 
-	p->mob.x = DEFAULT_START_X;
-	p->mob.y = DEFAULT_START_Y;
+	p->mob.x = p->mob.server->start_tile_x;
+	p->mob.y = p->mob.server->start_tile_y;
 	p->teleported = true;
 
 	p->walk_queue_len = 0;
