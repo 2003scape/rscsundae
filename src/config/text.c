@@ -80,8 +80,7 @@ next_token_int(char *buffer, size_t offset, size_t len, long *out)
 	errno = 0;
 	result = strtol(buffer + n, NULL, 10);
 	if (errno != 0) {
-		assert(0);
-		return -1;
+		result = 0;
 	}
 	*out = result;
 	return n + strlen(buffer + n) + 1;
