@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -102,6 +103,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 	case OP_CLI_RECONNECT:
 		{
 			char namestr[64];
+			char password[32];
 			uint16_t ver;
 			int64_t name;
 
@@ -126,6 +128,44 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				net_login_response(p->sock, RESP_ACCOUNT_USED);
 				return;
 			}
+
+			for (int i = 0; i < 3; ++i) {
+				uint8_t block_len;
+				uint8_t encrypted[128];
+				uint8_t decrypted[128];
+				int decrypted_len;
+
+				if (buf_getu8(data, offset++, len,
+						&block_len) == -1) {
+					return;
+				}
+				if (block_len > sizeof(encrypted)) {
+					return;
+				}
+				for (size_t j = 0; j < block_len; ++j) {
+					if (buf_getu8(data, offset++, len,
+							&encrypted[j]) == -1) {
+						return;
+					}
+				}
+				decrypted_len = rsa_decrypt(&p->mob.server->rsa,
+				    encrypted, block_len,
+				    decrypted, sizeof(decrypted));
+				if (decrypted_len == -1) {
+					return;
+				}
+				memcpy(password + (i * 7), decrypted + 8, 7);
+			}
+
+			for (size_t i = 0; i < sizeof(password); ++i) {
+				if (isspace((unsigned char)password[i])) {
+					password[i] = '\0';
+					break;
+				}
+			}
+			password[sizeof(password) - 1] = '\0';
+
+			printf("got password %s\n", password);
 
 			p->name = name;
 

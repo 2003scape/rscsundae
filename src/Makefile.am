@@ -5,6 +5,13 @@ bin_PROGRAMS =	rscsundae
 AM_CPPFLAGS = -Iext/libjag/include
 AM_CPPFLAGS += $(LUA_CFLAGS)
 AM_CPPFLAGS += $(INIH_CFLAGS)
+AM_CPPFLAGS += $(LIBCRYPTO_CFLAGS)
+
+# only for testing, so slow it's unusable
+#AM_CPPFLAGS += -Iext/tiny-bignum-c
+#AM_CPPFLAGS += -DWITH_RSA_TINY
+
+AM_CPPFLAGS += -DWITH_RSA_OPENSSL
 
 rscsundae_SOURCES = \
 	bank.c \
@@ -37,6 +44,9 @@ rscsundae_SOURCES = \
 	protocol/incoming.c \
 	protocol/outgoing.c
 
+#rscsundae_SOURCES += protocol/rsa-tiny.c
+rscsundae_SOURCES += protocol/rsa-openssl.c
+
 if ! HAVE_SYSTEM_INIH
 AM_CPPFLAGS += -Iext/inih
 rscsundae_SOURCES += ext/inih/ini.c
@@ -52,4 +62,8 @@ rscsundae_SOURCES += loop-poll.c
 endif
 endif
 
-rscsundae_LDADD = $(libev_LIBS) $(LUA_LIBS) $(INIH_LIBS) -lm
+rscsundae_LDADD = -lm
+rscsundae_LDADD += $(libev_LIBS)
+rscsundae_LDADD += $(LUA_LIBS)
+rscsundae_LDADD += $(INIH_LIBS)
+rscsundae_LDADD += $(LIBCRYPTO_LIBS)

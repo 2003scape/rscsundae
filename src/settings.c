@@ -15,6 +15,10 @@ server_parse_settings(void *user, const char *section,
 			s->bind_addr = strdup(value);
 		} else if (strcmp(name, "port") == 0) {
 			s->port = strtol(value, NULL, 10);
+		} else if (strcmp(name, "rsa_exponent") == 0) {
+			s->rsa_exponent = strdup(value);
+		} else if (strcmp(name, "rsa_modulus") == 0) {
+			s->rsa_modulus = strdup(value);
 		} else {
 			return 0;
 		}

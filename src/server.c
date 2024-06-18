@@ -92,6 +92,11 @@ main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
+	if (rsa_init(&s.rsa, s.rsa_exponent, s.rsa_modulus) == -1) {
+		fprintf(stderr, "failed to initialize with rsa private key\n");
+		return EXIT_FAILURE;
+	}
+
 	(void)chdir(basedir);
 
 	printf("starting server on address %s port %d\n",

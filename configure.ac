@@ -27,6 +27,8 @@ PKG_CHECK_MODULES([INIH], [inih], [
 		AM_CONDITIONAL(HAVE_SYSTEM_INIH, false)
 	])
 
+PKG_CHECK_MODULES([LIBCRYPTO], [libcrypto])
+
 AM_SILENT_RULES([yes])
 
 AC_ARG_WITH([kqueue], 

@@ -2,6 +2,7 @@
 #define SERVER_H
 #include <lua.h>
 #include "config/config.h"
+#include "protocol/rsa.h"
 #include "ext/flea.h"
 #include "entity.h"
 
@@ -54,6 +55,9 @@ struct server {
 	bool spell_timer;
 	int xp_multiplier;
 	lua_State *lua;
+	struct rsa rsa;
+	char *rsa_exponent;
+	char *rsa_modulus;
 };
 
 void server_tick(void);

@@ -38,7 +38,7 @@ Engine
 - [x] Item banking
 - [ ] Player saving (SQLite)
 - [x] Protocol: 110
-- [ ] Protocol: RSA decryption (passwords are ignored)
+- [x] Protocol: RSA decryption
 - [ ] Protocol: 201
 - [ ] Protocol: 204
 
