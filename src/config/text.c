@@ -101,7 +101,7 @@ next_token_hex(char *buffer, size_t offset, size_t len, unsigned long *out)
 	errno = 0;
 	result = strtoul(buffer + n, NULL, 16);
 	if (errno != 0) {
-		return -1;
+		result = 0;
 	}
 	*out = result;
 	return n + strlen(buffer + n) + 1;
@@ -906,6 +906,12 @@ config_parse_npcs(char *buffer, size_t len, size_t *num_npcs,
 		offset = tmp + strlen(buffer + tmp) + 1;
 
 		/* second line: stats */
+
+		tmp = next_line(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
 
 		tmpl = 0;
 		tmp = next_token_int(buffer, offset, len, &tmpl);
