@@ -115,8 +115,8 @@ am__rscsundae_SOURCES_DIST = bank.c buffer.c mob.c netio.c player.c \
 	ext/libjag/lib/jag_read_header.c \
 	ext/libjag/lib/jag_unpack_entry.c \
 	ext/libjag/lib/jag_unpack_file.c ext/reallocarr.c \
-	protocol/incoming.c protocol/outgoing.c ext/inih/ini.c \
-	loop-kqueue.c loop-ev.c loop-poll.c
+	protocol/incoming.c protocol/outgoing.c protocol/rsa-openssl.c \
+	ext/inih/ini.c loop-kqueue.c loop-ev.c loop-poll.c
 am__dirstamp = $(am__leading_dot)dirstamp
 @HAVE_SYSTEM_INIH_FALSE@am__objects_1 = ext/inih/ini.$(OBJEXT)
 @KQUEUE_TRUE@am__objects_2 = loop-kqueue.$(OBJEXT)
@@ -138,11 +138,13 @@ am_rscsundae_OBJECTS = bank.$(OBJEXT) buffer.$(OBJEXT) mob.$(OBJEXT) \
 	ext/libjag/lib/jag_unpack_entry.$(OBJEXT) \
 	ext/libjag/lib/jag_unpack_file.$(OBJEXT) \
 	ext/reallocarr.$(OBJEXT) protocol/incoming.$(OBJEXT) \
-	protocol/outgoing.$(OBJEXT) $(am__objects_1) $(am__objects_2) \
-	$(am__objects_3) $(am__objects_4)
+	protocol/outgoing.$(OBJEXT) protocol/rsa-openssl.$(OBJEXT) \
+	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
+	$(am__objects_4)
 rscsundae_OBJECTS = $(am_rscsundae_OBJECTS)
 am__DEPENDENCIES_1 =
-rscsundae_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+rscsundae_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -177,7 +179,8 @@ am__depfiles_remade = ./$(DEPDIR)/bank.Po ./$(DEPDIR)/buffer.Po \
 	ext/libjag/lib/$(DEPDIR)/jag_read_header.Po \
 	ext/libjag/lib/$(DEPDIR)/jag_unpack_entry.Po \
 	ext/libjag/lib/$(DEPDIR)/jag_unpack_file.Po \
-	protocol/$(DEPDIR)/incoming.Po protocol/$(DEPDIR)/outgoing.Po
+	protocol/$(DEPDIR)/incoming.Po protocol/$(DEPDIR)/outgoing.Po \
+	protocol/$(DEPDIR)/rsa-openssl.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -246,6 +249,8 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
+LIBCRYPTO_CFLAGS = @LIBCRYPTO_CFLAGS@
+LIBCRYPTO_LIBS = @LIBCRYPTO_LIBS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LTLIBOBJS = @LTLIBOBJS@
@@ -313,8 +318,14 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = subdir-objects
+
+# only for testing, so slow it's unusable
+#AM_CPPFLAGS += -Iext/tiny-bignum-c
+#AM_CPPFLAGS += -DWITH_RSA_TINY
 AM_CPPFLAGS = -Iext/libjag/include $(LUA_CFLAGS) $(INIH_CFLAGS) \
-	$(am__append_1)
+	$(LIBCRYPTO_CFLAGS) -DWITH_RSA_OPENSSL $(am__append_1)
+
+#rscsundae_SOURCES += protocol/rsa-tiny.c
 rscsundae_SOURCES = bank.c buffer.c mob.c netio.c player.c inventory.c \
 	npc.c script.c server.c settings.c shop.c stat.c trade.c \
 	utility.c zone.c config/config.c config/text.c ext/flea.c \
@@ -326,9 +337,11 @@ rscsundae_SOURCES = bank.c buffer.c mob.c netio.c player.c inventory.c \
 	ext/libjag/lib/jag_read_header.c \
 	ext/libjag/lib/jag_unpack_entry.c \
 	ext/libjag/lib/jag_unpack_file.c ext/reallocarr.c \
-	protocol/incoming.c protocol/outgoing.c $(am__append_2) \
-	$(am__append_3) $(am__append_4) $(am__append_5)
-rscsundae_LDADD = $(libev_LIBS) $(LUA_LIBS) $(INIH_LIBS) -lm
+	protocol/incoming.c protocol/outgoing.c protocol/rsa-openssl.c \
+	$(am__append_2) $(am__append_3) $(am__append_4) \
+	$(am__append_5)
+rscsundae_LDADD = -lm $(libev_LIBS) $(LUA_LIBS) $(INIH_LIBS) \
+	$(LIBCRYPTO_LIBS)
 all: all-am
 
 .SUFFIXES:
@@ -463,6 +476,8 @@ protocol/incoming.$(OBJEXT): protocol/$(am__dirstamp) \
 	protocol/$(DEPDIR)/$(am__dirstamp)
 protocol/outgoing.$(OBJEXT): protocol/$(am__dirstamp) \
 	protocol/$(DEPDIR)/$(am__dirstamp)
+protocol/rsa-openssl.$(OBJEXT): protocol/$(am__dirstamp) \
+	protocol/$(DEPDIR)/$(am__dirstamp)
 ext/inih/$(am__dirstamp):
 	@$(MKDIR_P) ext/inih
 	@: > ext/inih/$(am__dirstamp)
@@ -520,6 +535,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@ext/libjag/lib/$(DEPDIR)/jag_unpack_file.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@protocol/$(DEPDIR)/incoming.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@protocol/$(DEPDIR)/outgoing.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@protocol/$(DEPDIR)/rsa-openssl.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -712,6 +728,7 @@ distclean: distclean-am
 	-rm -f ext/libjag/lib/$(DEPDIR)/jag_unpack_file.Po
 	-rm -f protocol/$(DEPDIR)/incoming.Po
 	-rm -f protocol/$(DEPDIR)/outgoing.Po
+	-rm -f protocol/$(DEPDIR)/rsa-openssl.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -790,6 +807,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ext/libjag/lib/$(DEPDIR)/jag_unpack_file.Po
 	-rm -f protocol/$(DEPDIR)/incoming.Po
 	-rm -f protocol/$(DEPDIR)/outgoing.Po
+	-rm -f protocol/$(DEPDIR)/rsa-openssl.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
