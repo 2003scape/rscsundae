@@ -38,8 +38,8 @@ static int encode_char_legacy(char);
 static int
 encode_char_legacy(char ch)
 {
-	if (isalpha(ch)) {
-		ch = toupper(ch);
+	if (isalpha((unsigned char)ch)) {
+		ch = toupper((unsigned char)ch);
 	}
 	for (int i = 0; legacy_chartab[i] != '\0'; ++i) {
 		if (legacy_chartab[i] == ch) {
