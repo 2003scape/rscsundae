@@ -422,6 +422,12 @@ server_tick(void)
 	}
 
 	s.last_tick = get_time_ms();
+	if ((s.last_tick - start_time) > 50) {
+		printf("warning: server running slowly,");
+		printf(" processing took %llu milliseconds\n",
+		    (unsigned long long)(s.last_tick - start_time));
+	}
+
 	time_delay += s.last_tick - start_time;
 
 	if (time_delay > 640) {
