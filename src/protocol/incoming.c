@@ -105,13 +105,11 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 
 	if (p->login_stage == LOGIN_STAGE_ZERO) {
 		if ((opcode == OP_CLI_LOGIN || opcode == OP_CLI_RECONNECT)) {
-			puts("using 110");
 			p->protocol_rev = 110;
 			p->last_packet = p->mob.server->tick_counter;
 		} else if (opcode == 32) {
 			uint8_t zero[4] = {0};
 
-			puts("using 203");
 			p->protocol_rev = 203;
 			p->login_stage = LOGIN_STAGE_SESSION;
 			p->last_packet = p->mob.server->tick_counter;
@@ -359,7 +357,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			if (buf_getu8(data, offset++, len, &value) == -1) {
 				return;
 			}
-			if (id <= MAX_CLIENT_SETTINGS) {
+			if (id < MAX_CLIENT_SETTINGS) {
 				p->client_settings[id] = value;
 			}
 		}
