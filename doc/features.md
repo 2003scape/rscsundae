@@ -12,7 +12,7 @@ Engine
 - [ ] Ranged PvM combat
 - [x] Prayer
 - [x] Player design
-- [ ] Player classes
+- [x] Player classes
 - [x] Player movement
 - [x] Player following
 - [x] Player trading
@@ -38,6 +38,8 @@ Engine
 - [x] Item banking
 - [ ] Player saving (SQLite)
 - [x] Protocol: 110
+- [ ] Protocol: 110 (new player)
+- [ ] Protocol: 110 (password change)
 - [x] Protocol: RSA decryption
 - [ ] Protocol: 201
 - [x] Protocol: 204
