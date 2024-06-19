@@ -16,6 +16,8 @@ static int script_say(lua_State *);
 static int script_npcattack(lua_State *);
 static int script_npcbusy(lua_State *);
 static int script_npcunbusy(lua_State *);
+static int script_playerbusy(lua_State *);
+static int script_playerunbusy(lua_State *);
 static int script_npcsay(lua_State *);
 static int script_male(lua_State *);
 static int script_random(lua_State *);
@@ -317,6 +319,40 @@ script_npcunbusy(lua_State *L)
 	}
 
 	npc->busy = false;
+	return 0;
+}
+
+static int
+script_playerbusy(lua_State *L)
+{
+	lua_Integer id = luaL_checkinteger(L, 1);
+	struct player *p;
+
+	p = id_to_player(id);
+	if (p == NULL) {
+		printf("script warning: player %lld is undefined\n", id);
+		script_cancel(L, id);
+		return 0;
+	}
+
+	p->script_active = true;
+	return 0;
+}
+
+static int
+script_playerunbusy(lua_State *L)
+{
+	lua_Integer id = luaL_checkinteger(L, 1);
+	struct player *p;
+
+	p = id_to_player(id);
+	if (p == NULL) {
+		printf("script warning: player %lld is undefined\n", id);
+		script_cancel(L, id);
+		return 0;
+	}
+
+	p->script_active = false;
 	return 0;
 }
 
@@ -1558,6 +1594,12 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_npcunbusy);
 	lua_setglobal(L, "npcunbusy");
+
+	lua_pushcfunction(L, script_playerbusy);
+	lua_setglobal(L, "playerbusy");
+
+	lua_pushcfunction(L, script_playerunbusy);
+	lua_setglobal(L, "playerunbusy");
 
 	lua_pushcfunction(L, script_mes);
 	lua_setglobal(L, "mes");

@@ -589,7 +589,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			size_t steps;
 			int start_x, start_y;
 
-			if (len < 5) {
+			if (len < 5 || p->script_active) {
 				return;
 			}
 			if (p->mob.in_combat) {
@@ -629,9 +629,9 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				p->walk_queue_y[i + 1] = (uint16_t)new_y;
 			}
 			if (opcode != OP_CLI_WALK_ENTITY) {
+				p->action = ACTION_NONE;
 				p->mob.target_npc = -1;
 				p->mob.target_player = -1;
-				script_cancel(p->mob.server->lua, p->mob.id);
 			}
 			p->walk_queue_len = steps + 1;
 			p->walk_queue_pos = 0;

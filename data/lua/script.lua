@@ -150,6 +150,7 @@ function script_engine_cancel(player)
 	if ps.npc ~= nil then
 		npcunbusy(ps.npc)
 	end
+	playerunbusy(player)
 	player_scripts[player] = nil
 	coroutine.close(co)
 end
@@ -184,9 +185,11 @@ function script_engine_talknpc(player, name, npc)
 			script(player, npc)
 			player_scripts[player] = nil
 			npcunbusy(npc)
+			playerunbusy(player)
 		end)
 		player_scripts[player] = ps
 		npcbusy(npc)
+		playerbusy(player)
 		return true
 	end
 	return false
@@ -211,8 +214,10 @@ function script_engine_skillnpc(player, name, npc, spell)
 		ps.co = coroutine.create(function()
 			script(player, npc)
 			player_scripts[player] = nil
+			playerunbusy(player)
 		end)
 		player_scripts[player] = ps
+		playerbusy(player)
 		return true
 	end
 	return false
@@ -230,8 +235,10 @@ function script_engine_opinv(player, name)
 		ps.co = coroutine.create(function()
 			script(player)
 			player_scripts[player] = nil
+			playerunbusy(player)
 		end)
 		player_scripts[player] = ps
+		playerbusy(player)
 		return true
 	end
 	return false
@@ -249,8 +256,10 @@ function script_engine_skillplayer(player, target, name)
 		ps.co = coroutine.create(function()
 			script(player, target)
 			player_scripts[player] = nil
+			playerunbusy(player)
 		end)
 		player_scripts[player] = ps
+		playerbusy(player)
 		return true
 	end
 	return false
@@ -268,8 +277,10 @@ function script_engine_opbound1(player, name, x, y, dir)
 		ps.co = coroutine.create(function()
 			script(player, x, y, dir)
 			player_scripts[player] = nil
+			playerunbusy(player)
 		end)
 		player_scripts[player] = ps
+		playerbusy(player)
 		return true
 	end
 	return false
@@ -287,8 +298,10 @@ function script_engine_opbound2(player, name, x, y, dir)
 		ps.co = coroutine.create(function()
 			script(player, x, y, dir)
 			player_scripts[player] = nil
+			playerunbusy(player)
 		end)
 		player_scripts[player] = ps
+		playerbusy(player)
 		return true
 	end
 	return false
@@ -306,8 +319,10 @@ function script_engine_oploc1(player, name, x, y)
 		ps.co = coroutine.create(function()
 			script(player, x, y)
 			player_scripts[player] = nil
+			playerunbusy(player)
 		end)
 		player_scripts[player] = ps
+		playerbusy(player)
 		return true
 	end
 	return false
@@ -325,8 +340,10 @@ function script_engine_oploc2(player, name, x, y)
 		ps.co = coroutine.create(function()
 			script(player, x, y)
 			player_scripts[player] = nil
+			playerunbusy(player)
 		end)
 		player_scripts[player] = ps
+		playerbusy(player)
 		return true
 	end
 	return false
@@ -349,8 +366,10 @@ function script_engine_useloc(player, name, x, y, item)
 		ps.co = coroutine.create(function()
 			script(player, x, y)
 			player_scripts[player] = nil
+			playerunbusy(player)
 		end)
 		player_scripts[player] = ps
+		playerbusy(player)
 		return true
 	end
 	return false
@@ -373,8 +392,10 @@ function script_engine_useobj(player, name, x, y, item)
 		ps.co = coroutine.create(function()
 			script(player, x, y)
 			player_scripts[player] = nil
+			playerunbusy(player)
 		end)
 		player_scripts[player] = ps
+		playerbusy(player)
 		return true
 	end
 	return false
@@ -402,8 +423,10 @@ function script_engine_useinv(player, name, item)
 		ps.co = coroutine.create(function()
 			script(player)
 			player_scripts[player] = nil
+			playerunbusy(player)
 		end)
 		player_scripts[player] = ps
+		playerbusy(player)
 		return true
 	end
 	return false
@@ -425,6 +448,7 @@ function addloc(name, x, y, timer)
 
 	table.insert(delete_locs, target)
 	player_scripts[active_script.player] = nil
+	playerunbusy(player)
 	coroutine.yield(active_script.co)
 end
 
@@ -451,9 +475,11 @@ function multi(player, ...)
 	local arg = { ... }
 	active_script.option_count = #arg
 	active_script.last_active = os.time()
+	playerunbusy(player)
 	_multi(player, arg)
 	coroutine.yield(active_script.co)
 	active_script.option_count = 0
+	playerbusy(player)
 	return active_script.answer
 end
 

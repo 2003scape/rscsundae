@@ -320,6 +320,7 @@ struct player {
 	struct isaac isaac_in;
 	struct isaac isaac_out;
 	uint8_t isaac_ready;
+	uint8_t script_active;
 };
 
 /* mob.c */
