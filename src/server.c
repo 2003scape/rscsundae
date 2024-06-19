@@ -1,6 +1,9 @@
 #include <jag.h>
 #include <map.h>
 #include <ini.h>
+#ifdef PROFILE
+#include <gperftools/profiler.h>
+#endif
 #include <sys/types.h>
 #include <assert.h>
 #include <signal.h>
@@ -121,6 +124,10 @@ main(int argc, char **argv)
 		fprintf(stderr, "did you run the fetch-jag-files script from the data directory?\n");
 		return EXIT_FAILURE;
 	}
+
+#ifdef PROFILE
+	ProfilerStart("./sundae.prof");
+#endif
 
 	if (loop_start(&s) == -1) {
 		return EXIT_FAILURE;
@@ -427,6 +434,10 @@ server_tick(void)
 		printf(" processing took %llu milliseconds\n",
 		    (unsigned long long)(s.last_tick - start_time));
 	}
+
+#ifdef PROFILE
+	ProfilerFlush();
+#endif
 
 	time_delay += s.last_tick - start_time;
 

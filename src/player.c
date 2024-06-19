@@ -1313,6 +1313,7 @@ player_prayer_drain(struct player *p)
 bool
 player_has_known_loc(struct player *p, int x, int y)
 {
+	/* XXX: slow, known_loc_count gets huge */
 	for (size_t i = 0; i < p->known_loc_count; ++i) {
 		if (p->known_locs[i].x == x && p->known_locs[i].y == y) {
 			return true;
