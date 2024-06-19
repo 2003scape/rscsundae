@@ -233,6 +233,8 @@ script_say(lua_State *L)
 	}
 
 	encode_chat_legacy(mes, (uint8_t *)p->mob.chat_enc, len);
+	p->mob.chat_compressed_len =
+	    chat_compress(mes, p->mob.chat_compressed);
 	p->mob.chat_len = len;
 	p->chat_type = CHAT_TYPE_QUEST;
 
@@ -356,6 +358,8 @@ script_npcsay(lua_State *L)
 	}
 
 	encode_chat_legacy(mes, (uint8_t *)npc->mob.chat_enc, len);
+	npc->mob.chat_compressed_len =
+	    chat_compress(mes, npc->mob.chat_compressed);
 	npc->mob.chat_len = len;
 
 	return 0;

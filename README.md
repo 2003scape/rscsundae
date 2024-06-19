@@ -20,8 +20,10 @@ original game's unmodified free data files. By using the same API and
 data sources as the original game, the hope is that it becomes
 more difficult to implement content inaccurately.
 
-Currently RSC Sundae requires a copy of mudclient110. 204 protocol
-support for RSC-C is a TODO item.
+For clients, RSC Sundae supports the 110 protocol (the original
+Java mudclient110 from December 2001), and the 204 protocol
+(the final version of RSC before "Retro Revival" in 2009, used
+by RSC-C, and STS).
 
 RSC Sundae will never support:
 

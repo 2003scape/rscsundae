@@ -3,18 +3,34 @@
 #include <sys/time.h>
 #endif
 #include <ctype.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 #include <time.h>
 #include "utility.h"
 
-const char legacy_chartab[] = {
-	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-	'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-	'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3',
-	'4', '5', '6', '7', '8', '9', ' ', '!', '?', '.',
-	',', ':', ';', '(', ')', '-', '&', '*', '\\', '\'',
-	'\0'
+#ifndef MAX_CHAT_LEN
+#define MAX_CHAT_LEN	(80)
+#endif
+
+static const char legacy_chartab[] = {
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+    'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+    'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3',
+    '4', '5', '6', '7', '8', '9', ' ', '!', '?', '.',
+    ',', ':', ';', '(', ')', '-', '&', '*', '\\', '\'',
+    '\0'
+};
+
+
+static const char compression_tab[] = {
+    ' ', 'e', 't', 'a', 'o', 'i', 'h', 'n', 's', 'r',
+    'd', 'l', 'u', 'm', 'w', 'c', 'y', 'f', 'g', 'p',
+    'b', 'v', 'k', 'x', 'j', 'q', 'z', '0', '1', '2',
+    '3', '4', '5', '6', '7', '8', '9', ' ', '!', '?',
+    '.', ',', ':', ';', '(', ')', '-', '&', '*', '\\',
+    '\'', '@', '#', '+', '=', '\243', '$', '%', '"', '[',
+    ']'
 };
 
 static int encode_char_legacy(char);
@@ -46,6 +62,48 @@ encode_chat_legacy(const char *mes, uint8_t *out, size_t outlen)
 	for (size_t i = 0; i < inlen && i < outlen; ++i) {
 		out[i] = (uint8_t)encode_char_legacy(mes[i]);
 	}
+}
+
+void
+username_sanitize(const char *name, char *out, size_t len)
+{
+	for (size_t i = 0; i < len; ++i) {
+		if (isupper((unsigned char)name[i])) {
+			out[i] = tolower((unsigned char)name[i]);
+		} else if (isalnum((unsigned char)name[i])) {
+			out[i] = name[i];
+		} else {
+			out[i] = ' ';
+		}
+	}
+}
+
+int64_t
+mod37_nameenc(const char *name)
+{
+	int64_t encoded = 0;
+	char sanitized[21];
+	size_t len;
+
+	len = strlen(name);
+	if (len > 20) {
+		return encoded;
+	}
+
+	username_sanitize(name, sanitized, len);
+	sanitized[len + 1] = '\0';
+
+	for (size_t i = 0; i < len; i++) {
+		encoded *= 37;
+
+		if (isalpha((unsigned char)sanitized[i])) {
+		    encoded += 1 + sanitized[i] - 97;
+		} else if (isdigit((unsigned char)sanitized[i])) {
+		    encoded += 27 + sanitized[i] - 48;
+		}
+	}
+
+	return encoded;
 }
 
 char *
@@ -111,4 +169,130 @@ get_time_ms(void)
 	milliseconds += tv.tv_usec / 1000LL;
 #endif
 	return milliseconds;
+}
+
+int
+chat_decompress(uint8_t *buffer, size_t offset, size_t len, char *out)
+{
+	bool new_sentence = true;
+	size_t new_length = 0;
+	int left_shift = -1;
+
+	for (size_t i = 0; i < len; i++) {
+		int cur = buffer[offset++] & 0xff;
+		int tab_index = cur >> 4 & 0xf;
+
+		if (new_length >= MAX_CHAT_LEN) {
+			break;
+		}
+
+		if (left_shift == -1) {
+			if (tab_index < 13) {
+				out[new_length++] = compression_tab[tab_index];
+			} else {
+				left_shift = tab_index;
+			}
+		} else {
+			out[new_length++] =
+			    compression_tab[((left_shift << 4) + tab_index) - 195];
+
+			left_shift = -1;
+		}
+
+		tab_index = cur & 0xf;
+
+		if (new_length >= MAX_CHAT_LEN) {
+			break;
+		}
+
+		if (left_shift == -1) {
+			if (tab_index < 13) {
+				out[new_length++] = compression_tab[tab_index];
+			} else {
+				left_shift = tab_index;
+			}
+		} else {
+			out[new_length++] =
+			    compression_tab[((left_shift << 4) + tab_index) - 195];
+
+			left_shift = -1;
+		}
+	}
+
+	for (size_t i = 0; i < new_length; i++) {
+		char ch = out[i];
+
+		if (i > 4 && ch == '@') {
+			out[i] = ' ';
+		}
+
+		if (ch == '%') {
+			out[i] = ' ';
+		}
+
+		if (new_sentence && ch >= 'a' && ch <= 'z') {
+			out[i] = toupper((unsigned char)out[i]);
+
+			new_sentence = false;
+		}
+
+		if (ch == '.' || ch == '!') {
+			new_sentence = true;
+		}
+	}
+
+	out[new_length] = '\0';
+
+	return new_length;
+}
+
+int
+chat_compress(const char *input, char *output)
+{
+	size_t len = strlen(input);
+	size_t offset = 0;
+	int left_shift = -1;
+
+	if (len > MAX_CHAT_LEN) {
+		len = MAX_CHAT_LEN;
+	}
+
+	for (size_t i = 0; i < len; i++) {
+		char ch = tolower((unsigned char)input[i]);
+		size_t tab_index = 0;
+
+		for (size_t j = 0; j < sizeof(compression_tab); j++) {
+			if (ch == compression_tab[j]) {
+				tab_index = j;
+				break;
+			}
+		}
+
+		if (tab_index > 12) {
+			tab_index += 195;
+		}
+
+		if (left_shift == -1) {
+			if (tab_index < 13) {
+				left_shift = tab_index;
+			} else {
+				output[offset++] = tab_index & 0xff;
+			}
+		} else if (tab_index < 13) {
+			output[offset++] = ((left_shift << 4) + tab_index) & 0xff;
+
+			left_shift = -1;
+		} else {
+			output[offset++] =
+				((left_shift << 4) + (tab_index >> 4)) & 0xff;
+
+			left_shift = tab_index & 0xf;
+		}
+	}
+
+	if (left_shift != -1) {
+		output[offset++] = (left_shift << 4) & 0xff;
+	}
+
+	return offset;
 }

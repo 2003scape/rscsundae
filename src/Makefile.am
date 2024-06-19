@@ -32,6 +32,7 @@ rscsundae_SOURCES = \
 	config/config.c \
 	config/text.c \
 	ext/flea.c \
+	ext/isaac.c \
 	ext/libjag/lib/jag_bzip2_decompress.c \
 	ext/libjag/lib/jag_find_entry.c \
 	ext/libjag/lib/jag_hash_entry_name.c  \
@@ -42,6 +43,7 @@ rscsundae_SOURCES = \
 	ext/libjag/lib/jag_unpack_file.c \
 	ext/reallocarr.c \
 	protocol/incoming.c \
+	protocol/opcodes203.c \
 	protocol/outgoing.c
 
 #rscsundae_SOURCES += protocol/rsa-tiny.c

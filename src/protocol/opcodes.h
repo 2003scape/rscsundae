@@ -1,10 +1,12 @@
 #ifndef OPCODES_H
 #define OPCODES_H
+#include <stdint.h>
 
 #define OP_CLI_LOGIN		(0)
 #define OP_CLI_PUBLIC_CHAT	(3)
 #define OP_CLI_PING		(5)
 #define OP_CLI_LOGOUT		(6)
+#define OP_CLI_ADMIN_COMMAND	(7)
 #define OP_CLI_RECONNECT	(19)
 #define OP_CLI_ADD_FRIEND	(26)
 #define OP_CLI_REMOVE_FRIEND	(27)
@@ -24,8 +26,14 @@
 #define OP_CLI_SHOP_SELL	(216)
 #define OP_CLI_SHOP_BUY		(217)
 #define OP_CLI_SHOP_CLOSE	(218)
+#define OP_CLI_PLAYER_USEWITH	(219)
+#define OP_CLI_INV_CAST		(220)
+#define OP_CLI_LOC_CAST		(222)
+#define OP_CLI_BOUND_CAST	(223)
+#define OP_CLI_ITEM_CAST	(224)
 #define OP_CLI_NPC_CAST		(225)
 #define OP_CLI_PLAYER_CAST	(226)
+#define OP_CLI_SELF_CAST	(227)
 #define OP_CLI_ATTACK_PLAYER	(228)
 #define OP_CLI_BOUND_OP2	(229)
 #define OP_CLI_LOC_OP2		(230)
@@ -37,9 +45,12 @@
 #define OP_CLI_ACCEPT_DESIGN	(236)
 #define OP_CLI_ANSWER_MULTI	(237)
 #define OP_CLI_BOUND_OP1	(238)
+#define OP_CLI_BOUND_USEWITH	(239)
 #define OP_CLI_INV_USEWITH	(240)
 #define OP_CLI_LOC_USEWITH	(241)
 #define OP_CLI_LOC_OP1		(242)
+#define OP_CLI_NPC_USEWITH	(243)
+#define OP_CLI_NPC_ATTACK	(244)
 #define OP_CLI_NPC_TALK		(245)
 #define OP_CLI_INV_OP1		(246)
 #define OP_CLI_INV_UNWEAR	(248)
@@ -64,6 +75,7 @@
 #define OP_SRV_STAT_XP			(220)
 #define OP_SRV_BANK_CLOSE		(221)
 #define OP_SRV_BANK_SHOW		(222)
+#define OP_SRV_QUESTS			(226)
 #define OP_SRV_PRAYERS			(227)
 #define OP_SRV_CLIENT_SETTINGS		(228)
 #define OP_SRV_TRADE_STATE_LOCAL	(229)
@@ -92,4 +104,9 @@
 #define RESP_LOGIN_OK		(0)
 #define RESP_ACCOUNT_USED	(4)
 #define RESP_FULL		(14)
+
+extern uint8_t opcodes_in_203[256];
+extern uint8_t opcodes_out_203[256];
+
+void init_opcodes_203(void);
 #endif

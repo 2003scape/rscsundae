@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "ext/isaac.h"
 
 #define PLAYER_BUFSIZE		(5000)
 
@@ -28,6 +29,9 @@
 #define MAX_FRIENDS		(200)
 #define MAX_IGNORE		(100)
 
+/* restriction of 204 protocol */
+#define MAX_USERNAME_LEN	(20)
+
 #define MAX_ENTITY_SPRITES	(12)
 
 #define WALK_QUEUE_LEN		(16)
@@ -37,6 +41,12 @@ struct ranctx;
 struct bound;
 struct loc;
 struct ground_item;
+
+enum login_stage {
+	LOGIN_STAGE_ZERO	= 0,
+	LOGIN_STAGE_SESSION	= 1,
+	LOGIN_STAGE_GOT_LOGIN	= 2,
+};
 
 struct bank_item {
 	uint16_t id;
@@ -157,7 +167,9 @@ struct mob {
 	uint8_t base_stats[MAX_SKILL_ID];
 	uint8_t combat_level;
 	uint8_t chat_len;
+	uint8_t chat_compressed_len;
 	char chat_enc[MAX_CHAT_LEN];
+	char chat_compressed[MAX_CHAT_LEN];
 	int16_t target_player;
 	int16_t target_npc;
 };
@@ -218,6 +230,8 @@ struct player {
 	int64_t name;
 	int16_t following_player;
 	int16_t trading_player;
+	uint8_t protocol_rev;
+	uint8_t login_stage;
 	uint8_t stats_changed;
 	uint8_t bonus_changed;
 	uint8_t appearance_changed;
@@ -303,6 +317,9 @@ struct player {
 	uint16_t bank_count;
 	struct bank_item bank[MAX_BANK_SIZE];
 	struct shop_config *shop;
+	struct isaac isaac_in;
+	struct isaac isaac_out;
+	uint8_t isaac_ready;
 };
 
 /* mob.c */
@@ -323,6 +340,7 @@ void mob_die(struct mob *);
 
 /* player.c */
 struct player *player_create(struct server *, int);
+int player_load(struct player *);
 void player_process_walk_queue(struct player *);
 void player_process_combat(struct player *);
 void player_die(struct player *, struct player *p);
@@ -369,6 +387,7 @@ void player_shoot_pvm(struct player *, struct projectile_config *,
     struct npc *);
 void player_skull(struct player *, struct player *);
 void player_init_class(struct player *);
+void player_init_adventurer(struct player *);
 
 /* bank.c */
 void player_deposit(struct player *, uint16_t, uint32_t);

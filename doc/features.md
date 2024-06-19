@@ -40,7 +40,7 @@ Engine
 - [x] Protocol: 110
 - [x] Protocol: RSA decryption
 - [ ] Protocol: 201
-- [ ] Protocol: 204
+- [x] Protocol: 204
 
 Content
 -------

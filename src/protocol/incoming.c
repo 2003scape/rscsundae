@@ -1,3 +1,4 @@
+#include <sys/socket.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -23,6 +24,12 @@
 
 static void
 process_packet(struct player *, uint8_t *, size_t);
+
+static int
+process_login(struct player *, uint8_t *, size_t, size_t);
+
+static int
+process_login_isaac(struct player *, uint8_t *, size_t, size_t);
 
 int
 player_parse_incoming(struct player *p)
@@ -92,9 +99,37 @@ void
 process_packet(struct player *p, uint8_t *data, size_t len)
 {
 	size_t offset = 0;
-	uint8_t opcode = data[offset++] & 0xff;
+	uint32_t opcode = data[offset++] & 0xff;
 
 	printf("process packet opcode %d len %zu\n", opcode, len);
+
+	if (p->login_stage == LOGIN_STAGE_ZERO) {
+		if ((opcode == OP_CLI_LOGIN || opcode == OP_CLI_RECONNECT)) {
+			puts("using 110");
+			p->protocol_rev = 110;
+			p->last_packet = p->mob.server->tick_counter;
+		} else if (opcode == 32) {
+			uint8_t zero[4] = {0};
+
+			puts("using 203");
+			p->protocol_rev = 203;
+			p->login_stage = LOGIN_STAGE_SESSION;
+			p->last_packet = p->mob.server->tick_counter;
+
+			/* extra bytes for session id */
+			(void)send(p->sock, &zero, sizeof(zero), 0);
+			return;
+		} else {
+			return;
+		}
+	}
+
+	if (p->protocol_rev == 203) {
+		if (p->isaac_ready) {
+			opcode = (opcode - isaac_next(&p->isaac_in)) & 0xff;
+		}
+		opcode = opcodes_in_203[opcode];
+	}
 
 	p->last_packet = p->mob.server->tick_counter;
 
@@ -102,73 +137,29 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 	case OP_CLI_LOGIN:
 	case OP_CLI_RECONNECT:
 		{
-			char namestr[64];
-			char password[32];
-			uint16_t ver;
-			int64_t name;
-
-			if (p->name != -1) {
-				return;
-			}
-			if (buf_getu16(data, offset, len, &ver) == -1) {
-				return;
-			}
-			offset += 2;
-			printf("got version number: %d\n", ver);
-
-			if (buf_gets64(data, offset, len, &name) == -1) {
-				return;
-			}
-			offset += 8;
-			printf("got username: %s\n",
-			    mod37_namedec(name, namestr));
-
-			if (server_has_player(name)) {
-				p->logout_confirmed = true;
-				net_login_response(p->sock, RESP_ACCOUNT_USED);
+			if (p->login_stage == LOGIN_STAGE_GOT_LOGIN) {
 				return;
 			}
 
-			for (int i = 0; i < 3; ++i) {
-				uint8_t block_len;
-				uint8_t encrypted[128];
-				uint8_t decrypted[128];
-				int decrypted_len;
-
-				if (buf_getu8(data, offset++, len,
-						&block_len) == -1) {
+			switch (p->protocol_rev) {
+			case 110:
+				if (process_login(p, data, offset, len) == -1) {
+					p->logout_confirmed = true;
 					return;
 				}
-				if (block_len > sizeof(encrypted)) {
+				break;
+			case 203:
+				if (process_login_isaac(p,
+				    data, offset, len) == -1) {
+					p->logout_confirmed = true;
 					return;
 				}
-				for (size_t j = 0; j < block_len; ++j) {
-					if (buf_getu8(data, offset++, len,
-							&encrypted[j]) == -1) {
-						return;
-					}
-				}
-				decrypted_len = rsa_decrypt(&p->mob.server->rsa,
-				    encrypted, block_len,
-				    decrypted, sizeof(decrypted));
-				if (decrypted_len == -1) {
-					return;
-				}
-				memcpy(password + (i * 7), decrypted + 8, 7);
+				break;
 			}
 
-			for (size_t i = 0; i < sizeof(password); ++i) {
-				if (isspace((unsigned char)password[i])) {
-					password[i] = '\0';
-					break;
-				}
-			}
-			password[sizeof(password) - 1] = '\0';
+			p->login_stage = LOGIN_STAGE_GOT_LOGIN;
 
-			printf("got password %s\n", password);
-
-			p->name = name;
-
+			player_load(p);
 			player_send_privacy_settings(p);
 			player_send_design_ui(p);
 			player_send_client_settings(p);
@@ -176,7 +167,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			player_send_init_ignore(p);
 
 			server_register_login(p->name);
-			net_login_response(p->sock, RESP_LOGIN_OK);
+			net_login_response(p, RESP_LOGIN_OK);
 		}
 		break;
 	case OP_CLI_LOGOUT:
@@ -193,6 +184,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 	case OP_CLI_PUBLIC_CHAT:
 		{
 			/* want to eventually decode this to moderate */
+			/* FIXME: need to decode for inter-client compat */
 			size_t msglen = len - 1;
 			if (msglen > MAX_CHAT_LEN) {
 				msglen = MAX_CHAT_LEN;
@@ -791,12 +783,19 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				p->skin_colour = 0;
 			}
 
-			(void)buf_getu8(data, offset++, len, &p->rpg_class);
+			if (p->protocol_rev < 154) {
+				(void)buf_getu8(data, offset++, len, &p->rpg_class);
+				if (old_class == UINT8_MAX) {
+					player_init_class(p);
+				}
+			} else {
+				p->rpg_class = CLASS_ADVENTURER;
+				if (old_class == UINT8_MAX) {
+					player_init_adventurer(p);
+				}
+			}
 
 			player_recalculate_equip(p);
-			if (old_class == UINT8_MAX) {
-				player_init_class(p);
-			}
 			p->appearance_changed = true;
 			p->ui_design_open = false;
 
@@ -898,4 +897,203 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 		}
 		break;
 	}
+}
+
+static int
+process_login(struct player *p, uint8_t *data, size_t offset, size_t len)
+{
+	char namestr[64];
+	char password[32];
+	uint16_t ver;
+	int64_t name;
+
+	if (p->name != -1) {
+		return -1;
+	}
+	if (buf_getu16(data, offset, len, &ver) == -1) {
+		return -1;
+	}
+	offset += 2;
+	printf("got version number: %d\n", ver);
+
+	if (buf_gets64(data, offset, len, &name) == -1) {
+		return -1;
+	}
+	offset += 8;
+	printf("got username: %s\n",
+	    mod37_namedec(name, namestr));
+
+	if (server_has_player(name)) {
+		net_login_response(p, RESP_ACCOUNT_USED);
+		return -1;
+	}
+
+	for (int i = 0; i < 3; ++i) {
+		uint8_t block_len;
+		uint8_t encrypted[128];
+		uint8_t decrypted[128];
+		int decrypted_len;
+
+		if (buf_getu8(data, offset++, len,
+				&block_len) == -1) {
+			return -1;
+		}
+		if (block_len > sizeof(encrypted)) {
+			return -1;
+		}
+		for (size_t j = 0; j < block_len; ++j) {
+			if (buf_getu8(data, offset++, len,
+					&encrypted[j]) == -1) {
+				return -1;
+			}
+		}
+		decrypted_len = rsa_decrypt(&p->mob.server->rsa,
+		    encrypted, block_len,
+		    decrypted, sizeof(decrypted));
+		if (decrypted_len == -1) {
+			return -1;
+		}
+		memcpy(password + (i * 7), decrypted + 8, 7);
+	}
+
+	for (size_t i = 0; i < sizeof(password); ++i) {
+		if (isspace((unsigned char)password[i])) {
+			password[i] = '\0';
+			break;
+		}
+	}
+	password[sizeof(password) - 1] = '\0';
+
+	printf("got password %s\n", password);
+
+	p->name = name;
+
+	return 0;
+}
+
+
+static int
+process_login_isaac(struct player *p, uint8_t *data, size_t offset, size_t len)
+{
+	uint8_t reconnecting;
+	uint8_t limit30;
+	uint8_t magic;
+	uint16_t revision;
+	uint32_t uid;
+	uint8_t encrypted[128];
+	uint8_t encrypted_len;
+	uint8_t decrypted[128];
+	char username[21];
+	char password[21];
+	int64_t name;
+	int decrypted_len;
+
+	if (buf_getu8(data, offset++, len, &reconnecting) == -1) {
+		return -1;
+	}
+	if (buf_getu16(data, offset, len, &revision) == -1) {
+		return -1;
+	}
+	offset += 2;
+
+	if (buf_getu8(data, offset++, len, &limit30) == -1) {
+		return -1;
+	}
+
+	p->protocol_rev = revision;
+	printf("got protocol rev %d\n", revision);
+
+	if (buf_getu8(data, offset++, len, &encrypted_len) == -1) {
+		return -1;
+	}
+	if (encrypted_len > sizeof(encrypted)) {
+		return -1;
+	}
+	for (size_t i = 0; i < encrypted_len; ++i) {
+		if (buf_getu8(data, offset++, len, &encrypted[i]) == -1) {
+			return -1;
+		}
+	}
+	decrypted_len = rsa_decrypt(&p->mob.server->rsa,
+	    encrypted, encrypted_len,
+	    decrypted, sizeof(decrypted));
+	if (decrypted_len == -1) {
+		return -1;
+	}
+
+	offset = 0;
+
+	if (buf_getu8(decrypted, offset++, decrypted_len, &magic) == -1) {
+		return -1;
+	}
+
+	/* this is used to verify that RSA decryption succeeded */
+	if (magic != 10) {
+		net_login_response(p, RESP_FULL);
+		return -1;
+	}
+
+	for (int i = 0; i < 4; ++i) {
+		uint32_t val;
+
+		if (buf_getu32(decrypted, offset, decrypted_len, &val) == -1) {
+			return -1;
+		}
+		offset += 4;
+
+		p->isaac_in.randrsl[i] = val;
+		p->isaac_out.randrsl[i] = val;
+	}
+
+	isaac_init(&p->isaac_in, 1);
+	isaac_init(&p->isaac_out, 1);
+
+	p->isaac_ready = true;
+
+	if (buf_getu32(decrypted, offset, decrypted_len, &uid) == -1) {
+		return -1;
+	}
+	offset += 4;
+
+	for (size_t i = 0; i < (sizeof(username) - 1); ++i) {
+		if (buf_getu8(decrypted, offset + i, decrypted_len,
+				(uint8_t *)&username[i]) == -1) {
+			return -1;
+		}
+		if (isspace((unsigned char)username[i])) {
+			username[i] = '\0';
+			break;
+		}
+	}
+
+	username[sizeof(username) - 1] = '\0';
+	offset += sizeof(username);
+
+	name = mod37_nameenc(username);
+
+	if (server_has_player(name)) {
+		net_login_response(p, RESP_ACCOUNT_USED);
+		return -1;
+	}
+
+	p->name = name;
+
+	for (size_t i = 0; i < (sizeof(password) - 1); ++i) {
+		if (buf_getu8(decrypted, offset + i, decrypted_len,
+				(uint8_t *)&password[i]) == -1) {
+			return -1;
+		}
+		if (isspace((unsigned char)password[i])) {
+			password[i] = '\0';
+			break;
+		}
+	}
+
+	password[sizeof(password) - 1] = '\0';
+	offset += sizeof(password);
+
+	printf("got username %s\n", username);
+	printf("got password %s\n", password);
+
+	return 0;
 }

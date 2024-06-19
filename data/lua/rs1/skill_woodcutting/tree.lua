@@ -64,6 +64,31 @@ function useloc_tree_rune_axe(player, x, y)
 		statrandom(STAT_WOODCUTTING, 224, 700))
 end
 
+-- later client versions (after 2002 or so) have one-click woodcutting
+function oploc1_tree(player, x, y)
+	-- more powerful axes seem to be preferred when the player has
+	-- multiple types held, see
+	-- ./RSC 2001/replays master archive/Skilling/Woodcutting/Regular trees/woodcutting- skilling- regular trees, steel axe- 36 wc.pcap
+	if held(player, "rune axe", 1) then
+		useloc_tree_rune_axe(player, x, y)
+	elseif held(player, "adamantite axe", 1) then
+		useloc_tree_adamantite_axe(player, x, y)
+	elseif held(player, "mithril axe", 1) then
+		useloc_tree_mithril_axe(player, x, y)
+	elseif held(player, "black axe", 1) then
+		useloc_tree_black_axe(player, x, y)
+	elseif held(player, "steel axe", 1) then
+		useloc_tree_steel_axe(player, x, y)
+	elseif held(player, "iron axe", 1) then
+		useloc_tree_iron_axe(player, x, y)
+	elseif held(player, "bronze axe", 1) then
+		useloc_tree_bronze_axe(player, x, y)
+	else
+		-- pcaps/Logg/Loggykins/08-03-2018 21.58.13 lumbridge with tylerbeg.pcap
+		mes(player, "@que@You need an axe to chop this tree down")
+	end
+end
+
 register_useloc("tree", "bronze axe", useloc_tree_bronze_axe)
 register_useloc("tree", "iron axe", useloc_tree_iron_axe)
 register_useloc("tree", "steel axe", useloc_tree_steel_axe)

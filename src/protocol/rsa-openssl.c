@@ -45,5 +45,8 @@ rsa_decrypt(struct rsa *rsa, void *buffer, size_t len,
 	r = BN_bn2bin(result, out);
 	BN_free(result);
 
-	return r != 0;
+	if (r == 0) {
+		return -1;
+	}
+	return r;
 }

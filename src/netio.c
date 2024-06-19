@@ -103,14 +103,20 @@ net_player_send(struct player *p)
 }
 
 void
-net_login_response(int sock, int response)
+net_login_response(struct player *p, int response)
 {
-	uint8_t b[2];
+	if (p->protocol_rev < 196) {
+		uint8_t b[2];
 
-	b[0] = 0;
-	b[1] = response;
+		b[0] = 0;
+		b[1] = response;
 
-	(void)send(sock, &b, sizeof(b), 0);
+		(void)send(p->sock, &b, sizeof(b), 0);
+	} else {
+		uint8_t b = response;
+
+		(void)send(p->sock, &b, sizeof(b), 0);
+	}
 }
 
 static int

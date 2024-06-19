@@ -56,23 +56,42 @@ player_create(struct server *s, int sock)
 		printf("set max player id %d\n", s->max_player_id);
 	}
 
-	if (slot == -1) {
-		/* server is full */
-		net_login_response(sock, RESP_FULL);
+	struct player *p = calloc(1, sizeof(struct player));
+	if (p == NULL) {
 		return NULL;
 	}
 
-	struct player *p = calloc(1, sizeof(struct player));
-	if (p == NULL) {
-		net_login_response(sock, RESP_FULL);
+	p->sock = sock;
+
+	if (slot == -1) {
+		/* server is full */
+		net_login_response(p, RESP_FULL);
 		return NULL;
 	}
 
 	p->name = -1;
-	p->mob.id = (uint16_t)slot;
 	p->session_id = session_id;
-	p->sock = sock;
+	p->mob.id = (uint16_t)slot;
+	p->mob.server = s;
 
+	p->following_player = -1;
+	p->trading_player = -1;
+	p->projectile_target_player = UINT16_MAX;
+	p->projectile_target_npc = UINT16_MAX;
+	p->bubble_id = UINT16_MAX;
+	p->mob.damage = UINT8_MAX;
+	p->last_packet = s->tick_counter;
+
+	mob_combat_reset(&p->mob);
+
+	s->players[slot] = p;
+	loop_add_player(p);
+	return p;
+}
+
+int
+player_load(struct player *p)
+{
 	for (int i = 0; i < MAX_SKILL_ID; ++i) {
 		p->mob.cur_stats[i] = 1;
 		p->mob.base_stats[i] = 1;
@@ -104,26 +123,14 @@ player_create(struct server *s, int sock)
 	p->plane_changed = true;
 	p->inv_changed = true;
 	p->ui_design_open = true;
-	p->following_player = -1;
-	p->trading_player = -1;
+
 	p->rpg_class = UINT8_MAX;
-	p->projectile_target_player = UINT16_MAX;
-	p->projectile_target_npc = UINT16_MAX;
-	p->bubble_id = UINT16_MAX;
-	p->last_packet = s->tick_counter;
 
 	player_recalculate_combat_level(p);
 
-	p->mob.server = s;
-	p->mob.x = s->start_tile_x;
-	p->mob.y = s->start_tile_y;
-	p->mob.damage = UINT8_MAX;
-
-	mob_combat_reset(&p->mob);
-	s->players[slot] = p;
-
-	loop_add_player(p);
-	return p;
+	p->mob.x = p->mob.server->start_tile_x;
+	p->mob.y = p->mob.server->start_tile_y;
+	return 0;
 }
 
 void
@@ -1902,4 +1909,24 @@ player_init_class(struct player *p)
 	}
 
 	player_send_init_stats(p);
+}
+
+void
+player_init_adventurer(struct player *p)
+{
+	struct item_config *item;
+
+	/* post-tutorial island starter pack */
+
+	item = server_find_item_config("bronze axe");
+	assert(item != NULL);
+	player_inv_give(p, item, 1);
+
+	item = server_find_item_config("tinderbox");
+	assert(item != NULL);
+	player_inv_give(p, item, 1);
+
+	item = server_find_item_config("cookedmeat");
+	assert(item != NULL);
+	player_inv_give(p, item, 1);
 }

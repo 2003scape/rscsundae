@@ -32,6 +32,7 @@ static ssize_t player_send_appearance(struct player *, void *, size_t);
 static ssize_t player_send_damage(struct mob *, void *, size_t);
 static ssize_t player_send_projectile_pvp(struct player *, void *, size_t);
 static ssize_t player_send_projectile_pvm(struct player *, void *, size_t);
+static ssize_t player_send_chat(struct player *, struct mob *, size_t);
 static int player_write_packet(struct player *, void *, size_t);
 
 static int
@@ -40,6 +41,22 @@ player_write_packet(struct player *p, void *b, size_t len)
 	uint8_t *payload = b;
 	size_t off = p->outbuf_len;
 	size_t orig_off = off;
+	uint32_t opcode;
+
+	if (p->protocol_rev == 203) {
+		opcode = opcodes_out_203[payload[0]];
+		if (opcode == 0) {
+			return -1;
+		}
+		payload[0] = opcode;
+		printf("write packet opcode %d, len %zu\n", opcode, len);
+	}
+
+	if (p->isaac_ready) {
+		opcode = payload[0];
+
+		payload[0] = (opcode + isaac_next(&p->isaac_out)) & 0xff;
+	}
 
 	if (len >= 160) {
 		if (buf_putu8(p->outbuf, off++, PLAYER_BUFSIZE,
@@ -202,11 +219,19 @@ player_send_npc_movement(struct player *p)
 			continue;
 		}
 
-		if (buf_putbits(p->tmpbuf, bitpos,
-				PLAYER_BUFSIZE, 11, nearby[i]->mob.id) == -1) {
-			return -1;
+		if (p->protocol_rev < 155) {
+			if (buf_putbits(p->tmpbuf, bitpos, PLAYER_BUFSIZE, 11,
+					nearby[i]->mob.id) == -1) {
+				return -1;
+			}
+			bitpos += 11;
+		} else {
+			if (buf_putbits(p->tmpbuf, bitpos, PLAYER_BUFSIZE, 12,
+					nearby[i]->mob.id) == -1) {
+				return -1;
+			}
+			bitpos += 12;
 		}
-		bitpos += 11;
 
 		if (buf_putbits(p->tmpbuf, bitpos, PLAYER_BUFSIZE, 5,
 				(int)nearby[i]->mob.x - (int)p->mob.x) == -1) {
@@ -226,11 +251,19 @@ player_send_npc_movement(struct player *p)
 		}
 		bitpos += 4;
 
-		if (buf_putbits(p->tmpbuf, bitpos, PLAYER_BUFSIZE, 8,
-				nearby[i]->config->id) == -1) {
-			return -1;
+		if (p->protocol_rev < 159) {
+			if (buf_putbits(p->tmpbuf, bitpos, PLAYER_BUFSIZE, 8,
+					nearby[i]->config->id) == -1) {
+				return -1;
+			}
+			bitpos += 8;
+		} else {
+			if (buf_putbits(p->tmpbuf, bitpos, PLAYER_BUFSIZE, 10,
+					nearby[i]->config->id) == -1) {
+				return -1;
+			}
+			bitpos += 10;
 		}
-		bitpos += 8;
 
 		new_known[new_known_count++] = nearby[i]->mob.id;
 	}
@@ -262,13 +295,23 @@ player_send_movement(struct player *p)
 
 	bitpos = offset * 8;
 
-	buf_putbits(p->tmpbuf, bitpos,
-		    PLAYER_BUFSIZE, 10, p->mob.x);
-	bitpos += 10;
+	if (p->protocol_rev < 149) {
+		buf_putbits(p->tmpbuf, bitpos,
+			    PLAYER_BUFSIZE, 10, p->mob.x);
+		bitpos += 10;
 
-	buf_putbits(p->tmpbuf, bitpos,
-		    PLAYER_BUFSIZE, 12, p->mob.y);
-	bitpos += 12;
+		buf_putbits(p->tmpbuf, bitpos,
+			    PLAYER_BUFSIZE, 12, p->mob.y);
+		bitpos += 12;
+	} else {
+		buf_putbits(p->tmpbuf, bitpos,
+			    PLAYER_BUFSIZE, 11, p->mob.x);
+		bitpos += 11;
+
+		buf_putbits(p->tmpbuf, bitpos,
+			    PLAYER_BUFSIZE, 13, p->mob.y);
+		bitpos += 13;
+	}
 
 	buf_putbits(p->tmpbuf, bitpos,
 	            PLAYER_BUFSIZE, 4, p->mob.dir);
@@ -575,6 +618,34 @@ player_send_projectile_pvm(struct player *p, void *tmpbuf, size_t offset)
 	return offset;
 }
 
+static ssize_t
+player_send_chat(struct player *p, struct mob *mob, size_t offset)
+{
+	if (p->protocol_rev > 163) {
+		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+			      mob->chat_compressed_len) == -1) {
+			return -1;
+		}
+		if (buf_putdata(p->tmpbuf, offset, PLAYER_BUFSIZE,
+		    mob->chat_compressed,
+		    mob->chat_compressed_len) == -1) {
+			return -1;
+		}
+		offset += mob->chat_compressed_len;
+	} else {
+		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+			      mob->chat_len) == -1) {
+			return -1;
+		}
+		if (buf_putdata(p->tmpbuf, offset, PLAYER_BUFSIZE,
+		      mob->chat_enc, mob->chat_len) == -1) {
+			return -1;
+		}
+		offset += mob->chat_len;
+	}
+	return offset;
+}
+
 int
 player_send_design_ui(struct player *p)
 {
@@ -722,26 +793,45 @@ int
 player_send_init_stats(struct player *p)
 {
 	size_t offset = 0;
+	int skill_count = MAX_SKILL_ID;
+
+	if (p->protocol_rev >= 134) {
+		skill_count = 18;
+	}
 
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, OP_SRV_INIT_STATS);
 
-	for (int i = 0; i < MAX_SKILL_ID; ++i) {
+	for (int i = 0; i < skill_count; ++i) {
+		uint8_t cur_stat = 1;
+
+		if (i < MAX_SKILL_ID) {
+			cur_stat = p->mob.cur_stats[i];
+		}
 		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
-				p->mob.cur_stats[i]) == -1) {
+				cur_stat) == -1) {
 			return -1;
 		}
 	}
 
-	for (int i = 0; i < MAX_SKILL_ID; ++i) {
+	for (int i = 0; i < skill_count; ++i) {
+		uint8_t base_stat = 1;
+
+		if (i < MAX_SKILL_ID) {
+			base_stat = p->mob.base_stats[i];
+		}
 		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
-				p->mob.base_stats[i]) == -1) {
+				base_stat) == -1) {
 			return -1;
 		}
 	}
 
-	for (int i = 0; i < MAX_SKILL_ID; ++i) {
-		if (buf_putu32(p->tmpbuf, offset, PLAYER_BUFSIZE,
-				p->experience[i]) == -1) {
+	for (int i = 0; i < skill_count; ++i) {
+		uint32_t xp = 0;
+
+		if (i < MAX_SKILL_ID) {
+			xp = p->experience[i];
+		}
+		if (buf_putu32(p->tmpbuf, offset, PLAYER_BUFSIZE, xp) == -1) {
 			return -1;
 		}
 		offset += 4;
@@ -793,15 +883,11 @@ player_send_npc_appearance_update(struct player *p)
 				return -1;
 			}
 			offset += 2;
-			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
-				      npc->mob.chat_len) == -1) {
+			tmpofs = player_send_chat(p, &npc->mob, offset);
+			if (tmpofs == -1) {
 				return -1;
 			}
-			if (buf_putdata(p->tmpbuf, offset, PLAYER_BUFSIZE,
-			      npc->mob.chat_enc, npc->mob.chat_len) == -1) {
-				return -1;
-			}
-			offset += npc->mob.chat_len;
+			offset = tmpofs;
 			update_count++;
 		}
 		if (npc->mob.damage != UINT8_MAX) {
@@ -886,15 +972,11 @@ player_send_appearance_update(struct player *p)
 				PLAYER_UPDATE_CHAT_QUEST) == -1) {
 			return -1;
 		}
-		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
-			      p->mob.chat_len) == -1) {
+		tmpofs = player_send_chat(p, &p->mob, offset);
+		if (tmpofs == -1) {
 			return -1;
 		}
-		if (buf_putdata(p->tmpbuf, offset, PLAYER_BUFSIZE,
-		      p->mob.chat_enc, p->mob.chat_len) == -1) {
-			return -1;
-		}
-		offset += p->mob.chat_len;
+		offset = tmpofs;
 		update_count++;
 	}
 
@@ -929,15 +1011,11 @@ player_send_appearance_update(struct player *p)
 					PLAYER_UPDATE_CHAT_QUEST) == -1) {
 				return -1;
 			}
-			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
-				      p2->mob.chat_len) == -1) {
+			tmpofs = player_send_chat(p, &p2->mob, offset);
+			if (tmpofs == -1) {
 				return -1;
 			}
-			if (buf_putdata(p->tmpbuf, offset, PLAYER_BUFSIZE,
-			      p2->mob.chat_enc, p2->mob.chat_len) == -1) {
-				return -1;
-			}
-			offset += p2->mob.chat_len;
+			offset = tmpofs;
 			update_count++;
 		}
 		if (p2->mob.damage != UINT8_MAX) {
@@ -1007,8 +1085,12 @@ player_send_init_friends(struct player *p)
 				return -1;
 			}
 		} else {
-			if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, 1) == -1) {
-				return -1;
+			if (p->protocol_rev > 202) {
+				(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, 255);
+			} else if (p->protocol_rev > 132) {
+				(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, 99);
+			} else {
+				(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, 10);
 			}
 		}
 	}
@@ -1054,7 +1136,14 @@ player_notify_friend_online(struct player *p, int64_t friend)
 		        OP_SRV_FRIEND_UPDATE);
 	(void)buf_putu64(p->tmpbuf, offset, PLAYER_BUFSIZE, friend);
 	offset += 8;
-	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, 1);
+
+	if (p->protocol_rev > 202) {
+		(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, 255);
+	} else if (p->protocol_rev > 132) {
+		(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, 99);
+	} else {
+		(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE, 10);
+	}
 
 	return player_write_packet(p, p->tmpbuf, offset);
 }
@@ -1503,8 +1592,10 @@ player_send_ground_items(struct player *p)
 	    p->known_item_count, new_known_count, nearby_count, update_count);
 #endif
 
-	memcpy(p->known_items, new_known,
-	    new_known_count * sizeof(struct ground_item));
+	if (new_known_count > 0) {
+		memcpy(p->known_items, new_known,
+		    new_known_count * sizeof(struct ground_item));
+	}
 	p->known_item_count = new_known_count;
 
 	if (update_count == 0) {
