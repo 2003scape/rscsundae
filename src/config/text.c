@@ -1402,3 +1402,72 @@ err:
 	shops = NULL;
 	return NULL;
 }
+
+struct floor_config *
+config_parse_floors(char *buffer, size_t len, size_t *num_floors)
+{
+	struct floor_config *floors = NULL;
+	size_t max_floors;
+	size_t offset;
+	ssize_t tmp;
+	long tmpl;
+
+	offset = 0;
+	tmp = next_token_int(buffer, offset, len, &tmpl);
+	if (tmp == -1) {
+		return NULL;
+	}
+	offset = tmp;
+	max_floors = tmpl;
+
+	floors = calloc(max_floors, sizeof(struct floor_config));
+	if (floors == NULL) {
+		return NULL;
+	}
+
+	for (size_t i = 0; i < max_floors; ++i) {
+		floors[i].id = i;
+
+		tmp = next_line(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		offset = tmp;
+
+		tmp = next_token(buffer, offset, len);
+		if (tmp == -1) {
+			goto err;
+		}
+		floors[i].name = buffer + tmp;
+		offset = tmp + strlen(buffer + tmp) + 1;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		floors[i].fill = tmpl;
+		offset = tmp;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		floors[i].type = tmpl;
+		offset = tmp;
+
+		tmp = next_token_int(buffer, offset, len, &tmpl);
+		if (tmp == -1) {
+			goto err;
+		}
+		floors[i].blocked = tmpl;
+		offset = tmp;
+	}
+
+	*num_floors = max_floors;
+	return floors;
+err:
+	assert(0);
+	free(floors);
+	floors = NULL;
+	return NULL;
+}

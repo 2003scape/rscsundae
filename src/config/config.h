@@ -218,6 +218,23 @@ struct shop_config {
 	uint8_t changed;
 };
 
+enum floor_type {
+	FLOOR_NONE		= 0,
+	FLOOR_OUTDOOR_SURFACE	= 1,
+	FLOOR_INDOOR_SURFACE	= 2,
+	FLOOR_WATER		= 3,
+	FLOOR_BRIDGE		= 4,
+	FLOOR_EMPTY		= 5,
+};
+
+struct floor_config {
+	uint16_t id;
+	char *name;
+	int32_t fill;
+	uint8_t type;
+	uint8_t blocked;
+};
+
 int config_find_entity(const char *, struct entity_config *, size_t);
 int config_find_item(const char *, struct item_config *, size_t);
 struct item_config *config_parse_items(char *, size_t, size_t *,
@@ -233,6 +250,7 @@ struct spell_config *config_parse_spells(char *, size_t, size_t *,
     struct item_config *, size_t);
 struct shop_config *config_parse_shops(char *, size_t, size_t *,
     struct item_config *, size_t);
+struct floor_config *config_parse_floors(char *, size_t, size_t *);
 bool item_equip_clear(struct item_config *, int);
 
 #endif

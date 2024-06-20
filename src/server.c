@@ -586,6 +586,18 @@ load_config_jag(void)
 	printf("read configuration for %zu shops\n",
 	    s.shop_config_count);
 
+	if (jag_find_entry(&archive, "floor.txt", &entry) == -1 ||
+	    jag_unpack_entry(&entry) == -1) {
+		goto err;
+	}
+	s.floor_config = config_parse_floors((char *)entry.data,
+	    entry.unpacked_len, &s.floor_config_count);
+	if (s.floor_config == NULL) {
+		goto err;
+	}
+	printf("read configuration for %zu floors\n",
+	    s.floor_config_count);
+
 	return 0;
 err:
 	if (entry.must_free) {

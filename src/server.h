@@ -47,6 +47,8 @@ struct server {
 	size_t spell_config_count;
 	struct shop_config *shop_config;
 	size_t shop_config_count;
+	struct floor_config *floor_config;
+	size_t floor_config_count;
 	uint16_t start_tile_x;
 	uint16_t start_tile_y;
 	/* emulate bug in original server where checks were clientside */
