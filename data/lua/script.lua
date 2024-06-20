@@ -9,6 +9,7 @@ local opbound2_scripts = {}
 local oploc1_scripts = {}
 local oploc2_scripts = {}
 local useloc_scripts = {}
+local usenpc_scripts = {}
 local useobj_scripts = {}
 local useinv_scripts = {}
 local player_scripts = {}
@@ -73,6 +74,14 @@ function register_skillnpc(name, spell, callback)
 		skillnpc_scripts[spell] = {}
 	end
 	skillnpc_scripts[spell][name] = callback
+end
+
+function register_usenpc(name, item, callback)
+	print(string.format("register %s %s", name, item))
+	if not usenpc_scripts[name] then
+		usenpc_scripts[name] = {}
+	end
+	usenpc_scripts[name][item] = callback
 end
 
 function register_useloc(name, item, callback)
@@ -375,6 +384,32 @@ function script_engine_useloc(player, name, x, y, item)
 	return false
 end
 
+function script_engine_usenpc(player, npc, name, item)
+	local script = player_scripts[player]
+	if script then
+		return true
+	end
+	name = string.lower(name)
+	item = string.lower(item)
+	script = usenpc_scripts[name]
+	if not script then
+		return false
+	end
+	script = usenpc_scripts[name][item]
+	if script then
+		ps = new_player_script(player)
+		ps.co = coroutine.create(function()
+			script(player, npc)
+			player_scripts[player] = nil
+			playerunbusy(player)
+		end)
+		player_scripts[player] = ps
+		playerbusy(player)
+		return true
+	end
+	return false
+end
+
 function script_engine_useobj(player, name, x, y, item)
 	local script = player_scripts[player]
 	if script then
@@ -539,6 +574,7 @@ dofile("./lua/rs1/items/stew.lua")
 dofile("./lua/rs1/items/cake.lua")
 dofile("./lua/rs1/items/pizza.lua")
 dofile("./lua/rs1/items/pumpkin.lua")
+dofile("./lua/rs1/misc/animals.lua")
 dofile("./lua/rs1/misc/clutter.lua")
 dofile("./lua/rs1/misc/doors.lua")
 dofile("./lua/rs1/misc/ladders.lua")

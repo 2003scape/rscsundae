@@ -1491,14 +1491,24 @@ player_process_action(struct player *p)
 		npc = p->mob.server->npcs[p->action_npc];
 		if (npc == NULL) {
 			p->action = ACTION_NONE;
+			assert(0);
+			return;
+		}
+		if (p->action_slot >= p->inv_count) {
+			p->action = ACTION_NONE;
+			assert(0);
 			return;
 		}
 		if (!mob_within_range(&p->mob, npc->mob.x, npc->mob.y, 2)) {
+			puts("waiting for move closer");
 			return;
 		}
 		p->walk_queue_len = 0;
 		p->walk_queue_pos = 0;
-		printf("use with npc %d\n", p->action_slot);
+		id = p->inventory[p->action_slot].id;
+		item_config = server_item_config_by_id(id);
+		assert(item_config != NULL);
+		script_onusenpc(p->mob.server->lua, p, npc, item_config);
 		p->action = ACTION_NONE;
 		break;
 	case ACTION_NPC_TALK:

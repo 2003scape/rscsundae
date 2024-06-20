@@ -1378,6 +1378,34 @@ script_onuseinv(lua_State *L, struct player *p,
 }
 
 void
+script_onusenpc(lua_State *L, struct player *p,
+    struct npc *npc, struct item_config *item)
+{
+	bool result;
+
+	for (size_t i = 0; i < npc->config->name_count; ++i) {
+		for (size_t j = 0; j < item->name_count; ++j) {
+			lua_getglobal(L, "script_engine_usenpc");
+			if (!lua_isfunction(L, -1)) {
+				puts("script error: can't find essential function script_engine_usenpc");
+				return;
+			}
+			lua_pushnumber(L, p->mob.id);
+			lua_pushnumber(L, npc->mob.id);
+			lua_pushstring(L, npc->config->names[i]);
+			lua_pushstring(L, item->names[j]);
+			lua_pcall(L, 4, 1, 0);
+			result = lua_toboolean(L, -1);
+			if (result != 0) {
+				return;
+			}
+		}
+	}
+
+	player_send_message(p, "Nothing interesting happens");
+}
+
+void
 script_onuseloc(lua_State *L, struct player *p,
     struct loc *loc, struct item_config *item)
 {
