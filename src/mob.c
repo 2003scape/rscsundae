@@ -305,6 +305,7 @@ mob_reached_loc(struct mob *mob, struct loc *loc)
 
 	for (int x = loc->x; x < max_x; ++x) {
 		for (int y = loc->y; y < max_y; ++y) {
+			/* FIXME: this is wrong, real server didn't allow diagonals */
 			if (mob_within_range(mob, x, y, 2)) {
 				return true;
 			}

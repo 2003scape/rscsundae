@@ -76,6 +76,10 @@ Your opponent already has weakend strength
 @que@You examine the rock for ores...
 @que@This rock contains clay
 @que@This rock contains coal
+@que@You just found a sapphire!
+@que@You just found an emerald!
+@que@You just found a ruby!
+@que@You just found a diamond!
 @que@You place the mithril and 4 heaps of coal into the furnace
 @que@You retrieve a bar of mithril
 @que@What would you like to make?
