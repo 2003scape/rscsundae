@@ -484,6 +484,30 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			}
 		}
 		break;
+	case OP_CLI_NPC_USEWITH:
+		{
+			uint16_t id, slot;
+			struct npc *npc;
+
+			if (buf_getu16(data, offset, len, &id) == -1) {
+				return;
+			}
+			offset += 2;
+			if (buf_getu16(data, offset, len, &slot) == -1) {
+				return;
+			}
+			offset += 2;
+			if (id >= MAXNPCS) {
+				return;
+			}
+			npc = p->mob.server->npcs[id];
+			if (npc != NULL) {
+				p->action = ACTION_NPC_USEWITH;
+				p->action_npc = npc->mob.id;
+				p->action_slot = slot;
+			}
+		}
+		break;
 	case OP_CLI_NPC_TALK:
 		{
 			uint16_t id;

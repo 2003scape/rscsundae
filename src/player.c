@@ -1487,6 +1487,20 @@ player_process_action(struct player *p)
 	uint32_t stack;
 
 	switch (p->action) {
+	case ACTION_NPC_USEWITH:
+		npc = p->mob.server->npcs[p->action_npc];
+		if (npc == NULL) {
+			p->action = ACTION_NONE;
+			return;
+		}
+		if (!mob_within_range(&p->mob, npc->mob.x, npc->mob.y, 2)) {
+			return;
+		}
+		p->walk_queue_len = 0;
+		p->walk_queue_pos = 0;
+		printf("use with npc %d\n", p->action_slot);
+		p->action = ACTION_NONE;
+		break;
 	case ACTION_NPC_TALK:
 		npc = p->mob.server->npcs[p->action_npc];
 		if (npc == NULL) {
