@@ -293,6 +293,13 @@ server_tick(void)
 
 	script_tick(s.lua);
 
+	for (int i = 0; i < s.max_npc_id; ++i) {
+		if (s.npcs[i] == NULL) {
+			continue;
+		}
+		npc_process_movement(s.npcs[i]);
+	}
+
 	for (int i = 0; i < s.max_player_id; ++i) {
 		if (s.players[i] == NULL) {
 			continue;
@@ -412,6 +419,7 @@ server_tick(void)
 		}
 		s.npcs[i]->mob.chat_len = 0;
 		s.npcs[i]->mob.damage = UINT8_MAX;
+		s.npcs[i]->mob.moved = false;
 		s.npcs[i]->mob.prev_dir = s.npcs[i]->mob.dir;
 	}
 
@@ -634,6 +642,7 @@ load_map_tile(struct jag_map *chunk,
 	world_y = global_y - (plane * PLANE_LEVEL_INC);
 
 	ind = tile_x * JAG_MAP_CHUNK_SIZE + tile_y;
+
 	if (chunk->tiles[ind].overlay) {
 		object_type = chunk->tiles[ind].overlay - 1;
 		floor_config = server_floor_config_by_id(object_type);
@@ -643,6 +652,10 @@ load_map_tile(struct jag_map *chunk,
 			    ADJ_BLOCK_NORTH | ADJ_BLOCK_SOUTH |
 			    ADJ_BLOCK_EAST | ADJ_BLOCK_WEST;
 		}
+	}
+
+	if (chunk->tiles[ind].roof && plane == 0) {
+		s.roofs[world_x][world_y] = chunk->tiles[ind].roof;
 	}
 
 	object_type = chunk->tiles[ind].bound_diag;
@@ -1047,11 +1060,14 @@ server_add_npc(int id, int x, int y)
 		}
 		npc->config = server_npc_config_by_id(id);
 		assert(npc->config != NULL);
+		npc->spawn_x = x;
+		npc->spawn_y = y;
 		npc->mob.id = (uint16_t)i;
 		npc->mob.x = x;
 		npc->mob.y = y;
 		npc->mob.server = &s;
 		npc->mob.damage = UINT8_MAX;
+		npc->mob.following_player = -1;
 		npc->mob.cur_stats[SKILL_ATTACK] =
 		    npc->mob.base_stats[SKILL_ATTACK] = npc->config->attack;
 		npc->mob.cur_stats[SKILL_DEFENSE] =

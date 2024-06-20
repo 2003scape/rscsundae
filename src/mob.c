@@ -412,7 +412,6 @@ mob_process_walk_queue(struct mob *mob)
 		    (s->adjacency[plane][x][y] & ADJ_BLOCK_SOUTH) != 0 &&
 		    (s->adjacency[plane][x][y] & ADJ_BLOCK_EAST) != 0 &&
 		    (s->adjacency[plane][x][y] & ADJ_BLOCK_WEST) != 0) {
-			puts("not reachable");
 			return;
 		}
 		switch (dir) {
@@ -420,7 +419,6 @@ mob_process_walk_queue(struct mob *mob)
 		case MOB_DIR_NORTHWEST:
 		case MOB_DIR_NORTHEAST:
 			if ((s->adjacency[plane][cur_x][cur_y] & ADJ_BLOCK_NORTH) != 0) {
-				puts("not passable from north");
 				return;
 			}
 			break;
@@ -428,7 +426,6 @@ mob_process_walk_queue(struct mob *mob)
 		case MOB_DIR_SOUTHWEST:
 		case MOB_DIR_SOUTHEAST:
 			if ((s->adjacency[plane][cur_x][cur_y] & ADJ_BLOCK_SOUTH) != 0) {
-				puts("not passable from south");
 				return;
 			}
 			break;
@@ -438,7 +435,6 @@ mob_process_walk_queue(struct mob *mob)
 		case MOB_DIR_NORTHEAST:
 		case MOB_DIR_SOUTHEAST:
 			if ((s->adjacency[plane][cur_x][cur_y] & ADJ_BLOCK_EAST) != 0) {
-				puts("not passable from east");
 				return;
 			}
 			break;
@@ -446,7 +442,6 @@ mob_process_walk_queue(struct mob *mob)
 		case MOB_DIR_NORTHWEST:
 		case MOB_DIR_SOUTHWEST:
 			if ((s->adjacency[plane][cur_x][cur_y] & ADJ_BLOCK_WEST) != 0) {
-				puts("not passable from west");
 				return;
 			}
 			break;

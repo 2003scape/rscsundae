@@ -20,7 +20,7 @@ Engine
 - [x] Player client settings
 - [x] Player privacy settings
 - [x] NPC spawn loading
-- [ ] NPC movement
+- [x] NPC movement
 - [ ] NPC aggression
 - [ ] Line of sight checks
 - [x] Friends list

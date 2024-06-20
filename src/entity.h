@@ -206,6 +206,9 @@ struct npc {
 	struct npc_config *config;
 	uint16_t talk_target;
 	uint16_t respawn_time;
+	uint16_t random_walk_timer;
+	uint16_t spawn_x;
+	uint16_t spawn_y;
 	uint8_t busy;
 };
 
@@ -445,5 +448,6 @@ int player_notify_friend_offline(struct player *, int64_t);
 /* npc.c */
 void npc_damage(struct npc *, struct player * , int);
 void npc_die(struct npc *, struct player *);
+void npc_process_movement(struct npc *);
 
 #endif

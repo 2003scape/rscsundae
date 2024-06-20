@@ -33,6 +33,7 @@ struct server {
 	uint64_t next_rapid_restore;
 	uint64_t last_tick;
 	uint8_t adjacency[ZONE_MAX_PLANE][ZONE_MAX_X][ZONE_MAX_Y];
+	uint8_t roofs[ZONE_MAX_X][ZONE_MAX_Y];
 	struct player *players[MAXPLAYERS];
 	struct npc *npcs[MAXNPCS];
 	struct ground_item *temp_items;
