@@ -46,6 +46,23 @@ player_parse_admin_command(struct player *p, char *str)
 			return;
 		}
 		player_inv_give(p, item_config, amount);
+	} else if (strcmp(cmd, "tele") == 0) {
+		char *x_str;
+		char *y_str;
+
+		x_str = strtok(NULL, " ");
+		y_str = strtok(NULL, " ");
+
+		if (x_str == NULL || y_str == NULL) {
+			player_send_message(p,
+			    "Usage: tele relative_x relative_y");
+			return;
+		}
+
+		/* jagex coordinate syntax not yet supported */
+		p->mob.x += strtol(x_str, NULL, 10);
+		p->mob.y += strtol(y_str, NULL, 10);
+		p->teleported = true;
 	} else if (strcmp(cmd, "ftele") == 0) {
 		char *x_str;
 		char *y_str;
