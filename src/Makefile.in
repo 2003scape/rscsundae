@@ -104,9 +104,9 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am__rscsundae_SOURCES_DIST = bank.c buffer.c mob.c netio.c player.c \
-	inventory.c npc.c script.c server.c settings.c shop.c stat.c \
-	trade.c utility.c zone.c config/config.c config/text.c \
+am__rscsundae_SOURCES_DIST = admin.c bank.c buffer.c mob.c netio.c \
+	player.c inventory.c npc.c script.c server.c settings.c shop.c \
+	stat.c trade.c utility.c zone.c config/config.c config/text.c \
 	ext/flea.c ext/isaac.c ext/libjag/lib/jag_bzip2_decompress.c \
 	ext/libjag/lib/jag_find_entry.c \
 	ext/libjag/lib/jag_hash_entry_name.c \
@@ -123,12 +123,12 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @KQUEUE_TRUE@am__objects_2 = loop-kqueue.$(OBJEXT)
 @KQUEUE_FALSE@@LIBEV_TRUE@am__objects_3 = loop-ev.$(OBJEXT)
 @KQUEUE_FALSE@@LIBEV_FALSE@am__objects_4 = loop-poll.$(OBJEXT)
-am_rscsundae_OBJECTS = bank.$(OBJEXT) buffer.$(OBJEXT) mob.$(OBJEXT) \
-	netio.$(OBJEXT) player.$(OBJEXT) inventory.$(OBJEXT) \
-	npc.$(OBJEXT) script.$(OBJEXT) server.$(OBJEXT) \
-	settings.$(OBJEXT) shop.$(OBJEXT) stat.$(OBJEXT) \
-	trade.$(OBJEXT) utility.$(OBJEXT) zone.$(OBJEXT) \
-	config/config.$(OBJEXT) config/text.$(OBJEXT) \
+am_rscsundae_OBJECTS = admin.$(OBJEXT) bank.$(OBJEXT) buffer.$(OBJEXT) \
+	mob.$(OBJEXT) netio.$(OBJEXT) player.$(OBJEXT) \
+	inventory.$(OBJEXT) npc.$(OBJEXT) script.$(OBJEXT) \
+	server.$(OBJEXT) settings.$(OBJEXT) shop.$(OBJEXT) \
+	stat.$(OBJEXT) trade.$(OBJEXT) utility.$(OBJEXT) \
+	zone.$(OBJEXT) config/config.$(OBJEXT) config/text.$(OBJEXT) \
 	ext/flea.$(OBJEXT) ext/isaac.$(OBJEXT) \
 	ext/libjag/lib/jag_bzip2_decompress.$(OBJEXT) \
 	ext/libjag/lib/jag_find_entry.$(OBJEXT) \
@@ -161,13 +161,14 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/bank.Po ./$(DEPDIR)/buffer.Po \
-	./$(DEPDIR)/inventory.Po ./$(DEPDIR)/loop-ev.Po \
-	./$(DEPDIR)/loop-kqueue.Po ./$(DEPDIR)/loop-poll.Po \
-	./$(DEPDIR)/mob.Po ./$(DEPDIR)/netio.Po ./$(DEPDIR)/npc.Po \
-	./$(DEPDIR)/player.Po ./$(DEPDIR)/script.Po \
-	./$(DEPDIR)/server.Po ./$(DEPDIR)/settings.Po \
-	./$(DEPDIR)/shop.Po ./$(DEPDIR)/stat.Po ./$(DEPDIR)/trade.Po \
+am__depfiles_remade = ./$(DEPDIR)/admin.Po ./$(DEPDIR)/bank.Po \
+	./$(DEPDIR)/buffer.Po ./$(DEPDIR)/inventory.Po \
+	./$(DEPDIR)/loop-ev.Po ./$(DEPDIR)/loop-kqueue.Po \
+	./$(DEPDIR)/loop-poll.Po ./$(DEPDIR)/mob.Po \
+	./$(DEPDIR)/netio.Po ./$(DEPDIR)/npc.Po ./$(DEPDIR)/player.Po \
+	./$(DEPDIR)/script.Po ./$(DEPDIR)/server.Po \
+	./$(DEPDIR)/settings.Po ./$(DEPDIR)/shop.Po \
+	./$(DEPDIR)/stat.Po ./$(DEPDIR)/trade.Po \
 	./$(DEPDIR)/utility.Po ./$(DEPDIR)/zone.Po \
 	config/$(DEPDIR)/config.Po config/$(DEPDIR)/text.Po \
 	ext/$(DEPDIR)/flea.Po ext/$(DEPDIR)/isaac.Po \
@@ -329,10 +330,10 @@ AM_CPPFLAGS = -Iext/libjag/include $(LUA_CFLAGS) $(INIH_CFLAGS) \
 	$(LIBCRYPTO_CFLAGS) -DWITH_RSA_OPENSSL $(am__append_1)
 
 #rscsundae_SOURCES += protocol/rsa-tiny.c
-rscsundae_SOURCES = bank.c buffer.c mob.c netio.c player.c inventory.c \
-	npc.c script.c server.c settings.c shop.c stat.c trade.c \
-	utility.c zone.c config/config.c config/text.c ext/flea.c \
-	ext/isaac.c ext/libjag/lib/jag_bzip2_decompress.c \
+rscsundae_SOURCES = admin.c bank.c buffer.c mob.c netio.c player.c \
+	inventory.c npc.c script.c server.c settings.c shop.c stat.c \
+	trade.c utility.c zone.c config/config.c config/text.c \
+	ext/flea.c ext/isaac.c ext/libjag/lib/jag_bzip2_decompress.c \
 	ext/libjag/lib/jag_find_entry.c \
 	ext/libjag/lib/jag_hash_entry_name.c \
 	ext/libjag/lib/jag_map_read_jm.c \
@@ -508,6 +509,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/admin.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bank.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/buffer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inventory.Po@am__quote@ # am--include-marker
@@ -703,7 +705,8 @@ clean: clean-am
 clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/bank.Po
+		-rm -f ./$(DEPDIR)/admin.Po
+	-rm -f ./$(DEPDIR)/bank.Po
 	-rm -f ./$(DEPDIR)/buffer.Po
 	-rm -f ./$(DEPDIR)/inventory.Po
 	-rm -f ./$(DEPDIR)/loop-ev.Po
@@ -784,7 +787,8 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/bank.Po
+		-rm -f ./$(DEPDIR)/admin.Po
+	-rm -f ./$(DEPDIR)/bank.Po
 	-rm -f ./$(DEPDIR)/buffer.Po
 	-rm -f ./$(DEPDIR)/inventory.Po
 	-rm -f ./$(DEPDIR)/loop-ev.Po

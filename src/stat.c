@@ -18,7 +18,7 @@
  * the spelling here is not the same as the client,
  * since original RSC had some inconsistencies there
  */
-static const char *skill_names[] = {
+const char *skill_names[] = {
 	"attack", "defence", "strength", "hitpoints", "ranged", "prayer",
 	"magic", "cooking", "woodcutting", "fletching", "fishing",
 	"firemaking", "crafting", "smithing", "mining", "herblaw"

@@ -179,6 +179,20 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			player_send_logout(p);
 		}
 		break;
+	case OP_CLI_ADMIN_COMMAND:
+		{
+			char cmd[128];
+
+			len--;
+			if (len > (sizeof(cmd) - 1)) {
+				len = (sizeof(cmd) - 1);
+			}
+			memcpy(cmd, data + offset, len);
+			cmd[len] = '\0';
+
+			player_parse_admin_command(p, cmd);
+		}
+		break;
 	case OP_CLI_PUBLIC_CHAT:
 		{
 			/* want to eventually decode this to moderate */

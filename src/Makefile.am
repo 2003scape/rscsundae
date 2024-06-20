@@ -14,6 +14,7 @@ AM_CPPFLAGS += $(LIBCRYPTO_CFLAGS)
 AM_CPPFLAGS += -DWITH_RSA_OPENSSL
 
 rscsundae_SOURCES = \
+	admin.c \
 	bank.c \
 	buffer.c \
 	mob.c \

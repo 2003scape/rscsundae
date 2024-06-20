@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include "entity.h"
 
+extern const char *skill_names[MAX_SKILL_ID];
+
 void stat_calculate_table(void);
 bool stat_is_combat(int);
 

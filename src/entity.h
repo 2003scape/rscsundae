@@ -390,6 +390,9 @@ void player_skull(struct player *, struct player *);
 void player_init_class(struct player *);
 void player_init_adventurer(struct player *);
 
+/* admin.c */
+void player_parse_admin_command(struct player *, char *);
+
 /* bank.c */
 void player_deposit(struct player *, uint16_t, uint32_t);
 void player_withdraw(struct player *, uint16_t, uint32_t);
