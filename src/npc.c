@@ -98,6 +98,9 @@ npc_random_walk(struct npc *npc)
 void
 npc_process_movement(struct npc *npc)
 {
+	if (npc->busy || npc->mob.in_combat) {
+		return;
+	}
 	if (npc->random_walk_timer == 0) {
 		if (npc->mob.following_player == -1) {
 			double r = ranval(&npc->mob.server->ran) /
@@ -108,7 +111,7 @@ npc_process_movement(struct npc *npc)
 			npc_random_walk(npc);
 		}
 	} else {
-		npc->random_walk_timer --;
+		npc->random_walk_timer--;
 	}
 	mob_process_walk_queue(&npc->mob);
 }
