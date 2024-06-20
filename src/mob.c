@@ -408,7 +408,10 @@ mob_process_walk_queue(struct mob *mob)
 	if (x < ZONE_MAX_X && y < ZONE_MAX_Y && plane < ZONE_MAX_PLANE) {
 		struct server *s = mob->server;
 
-		if (s->adjacency[plane][x][y] == 0xff) {
+		if ((s->adjacency[plane][x][y] & ADJ_BLOCK_NORTH) != 0 &&
+		    (s->adjacency[plane][x][y] & ADJ_BLOCK_SOUTH) != 0 &&
+		    (s->adjacency[plane][x][y] & ADJ_BLOCK_EAST) != 0 &&
+		    (s->adjacency[plane][x][y] & ADJ_BLOCK_WEST) != 0) {
 			puts("not reachable");
 			return;
 		}

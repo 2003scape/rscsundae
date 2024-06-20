@@ -10,10 +10,14 @@
 #define MAXPLAYERS	(1000)
 #define MAXNPCS		(1000)
 
-#define ADJ_BLOCK_NORTH	(1 << 0)
-#define ADJ_BLOCK_SOUTH	(1 << 1)
-#define ADJ_BLOCK_EAST	(1 << 2)
-#define ADJ_BLOCK_WEST	(1 << 3)
+#define ADJ_BLOCK_NORTH		(1 << 0)
+#define ADJ_BLOCK_SOUTH		(1 << 1)
+#define ADJ_BLOCK_EAST		(1 << 2)
+#define ADJ_BLOCK_WEST		(1 << 3)
+#define ADJ_BLOCK_SIGHT_NORTH	(1 << 4)
+#define ADJ_BLOCK_SIGHT_SOUTH	(1 << 5)
+#define ADJ_BLOCK_SIGHT_EAST	(1 << 6)
+#define ADJ_BLOCK_SIGHT_WEST	(1 << 7)
 
 struct server {
 	void *loop_ctx;
