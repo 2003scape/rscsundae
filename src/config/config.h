@@ -75,6 +75,13 @@ struct prayer_config {
 	uint8_t drain;
 };
 
+enum loc_type {
+	LOC_TYPE_PASSTHRU	= 0, /* everything can pass thru */
+	LOC_TYPE_BLOCKING	= 1, /* nothing can pass thru */
+	LOC_TYPE_HAS_HOLE	= 2, /* projectiles can pass thru */
+	LOC_TYPE_PASSTHRU_GATE	= 3, /* unclear difference from 0 */
+};
+
 /* "location.txt" - definitions for 3d objects */
 struct loc_config {
 	uint16_t id;
