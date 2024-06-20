@@ -1593,6 +1593,9 @@ player_process_action(struct player *p)
 			p->action = ACTION_NONE;
 			return;
 		}
+		if (!mob_reached_item(&p->mob, item)) {
+			return;
+		}
 		id = p->inventory[p->action_slot].id;
 		item_config = server_item_config_by_id(item->id);
 		item_config2 = server_item_config_by_id(id);
@@ -1702,13 +1705,12 @@ player_process_action(struct player *p)
 			p->walk_queue_pos = 0;
 			return;
 		}
-		if (!mob_reached_loc(&p->mob, loc)) {
+		if (!mob_reached_loc(&p->mob, loc) ||
+		    (p->walk_queue_len - p->walk_queue_pos) > 0) {
 			return;
 		}
 		item_config = server_item_config_by_id(p->inventory[p->action_slot].id);
 		assert(item_config != NULL);
-		p->walk_queue_len = 0;
-		p->walk_queue_pos = 0;
 		p->action = ACTION_NONE;
 		script_onuseloc(p->mob.server->lua, p, loc, item_config);
 		break;
@@ -1727,11 +1729,10 @@ player_process_action(struct player *p)
 			p->walk_queue_pos = 0;
 			return;
 		}
-		if (!mob_reached_loc(&p->mob, loc)) {
+		if (!mob_reached_loc(&p->mob, loc) ||
+		    (p->walk_queue_len - p->walk_queue_pos) > 0) {
 			return;
 		}
-		p->walk_queue_len = 0;
-		p->walk_queue_pos = 0;
 		if (p->action == ACTION_LOC_OP1) {
 			script_onoploc1(p->mob.server->lua, p, loc);
 		} else {
