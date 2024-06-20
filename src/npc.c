@@ -117,6 +117,7 @@ npc_process_movement(struct npc *npc)
 	if ((npc->mob.walk_queue_len - pos) <= 0) {
 		return;
 	}
+	/* TODO: also need to stop them walking on same tiles as other NPCs */
 	int x = npc->mob.walk_queue_x[pos];
 	int y = npc->mob.walk_queue_y[pos];
 	switch (npc->config->move_restrict) {

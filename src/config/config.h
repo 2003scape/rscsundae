@@ -79,7 +79,7 @@ enum loc_type {
 	LOC_TYPE_PASSTHRU	= 0, /* everything can pass thru */
 	LOC_TYPE_BLOCKING	= 1, /* nothing can pass thru */
 	LOC_TYPE_HAS_HOLE	= 2, /* projectiles can pass thru */
-	LOC_TYPE_PASSTHRU_GATE	= 3, /* unclear difference from 0 */
+	LOC_TYPE_GATE		= 3, /* passthru from certain dirs */
 };
 
 /* "location.txt" - definitions for 3d objects */

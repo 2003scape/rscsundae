@@ -648,9 +648,9 @@ load_map_tile(struct jag_map *chunk,
 		floor_config = server_floor_config_by_id(object_type);
 		assert(floor_config != NULL);
 		if (floor_config->blocked) {
-			s.adjacency[plane][world_x][world_y] =
-			    ADJ_BLOCK_NORTH | ADJ_BLOCK_SOUTH |
-			    ADJ_BLOCK_EAST | ADJ_BLOCK_WEST;
+			s.adjacency[plane][world_x][world_y] |=
+			    (ADJ_BLOCK_NORTH | ADJ_BLOCK_SOUTH |
+			    ADJ_BLOCK_EAST | ADJ_BLOCK_WEST);
 		}
 	}
 
@@ -746,18 +746,19 @@ load_map_tile(struct jag_map *chunk,
 				world_y = (global_y + (y - tile_y)) -
 				    (plane * PLANE_LEVEL_INC);
 
-				if (loc_config->type >= LOC_TYPE_BLOCKING) {
-					s.adjacency[plane][world_x][world_y] =
-					    ADJ_BLOCK_NORTH | ADJ_BLOCK_SOUTH |
-					    ADJ_BLOCK_EAST | ADJ_BLOCK_WEST;
+				if (loc_config->type == LOC_TYPE_BLOCKING) {
+					/* TODO LOC_TYPE_GATE */
+					s.adjacency[plane][world_x][world_y] |=
+					    (ADJ_BLOCK_NORTH | ADJ_BLOCK_SOUTH |
+					    ADJ_BLOCK_EAST | ADJ_BLOCK_WEST);
+				}
 
-					if (loc_config->type < LOC_TYPE_HAS_HOLE) {
-						s.adjacency[plane][world_x][world_y] =
-						    ADJ_BLOCK_SIGHT_NORTH |
-						    ADJ_BLOCK_SIGHT_SOUTH |
-						    ADJ_BLOCK_SIGHT_EAST |
-						    ADJ_BLOCK_SIGHT_WEST;
-					}
+				if (loc_config->type < LOC_TYPE_HAS_HOLE) {
+					s.adjacency[plane][world_x][world_y] |=
+					    (ADJ_BLOCK_SIGHT_NORTH |
+					    ADJ_BLOCK_SIGHT_SOUTH |
+					    ADJ_BLOCK_SIGHT_EAST |
+					    ADJ_BLOCK_SIGHT_WEST);
 				}
 
 				if (x == tile_x && y == tile_y) {
@@ -812,11 +813,11 @@ load_map_tile(struct jag_map *chunk,
 		bound_config = server_bound_config_by_id(bound.id);
 		if (bound_config != NULL) {
 			if (bound_config->block_projectile) {
-				s.adjacency[plane][world_x][world_y] =
-				    ADJ_BLOCK_SIGHT_NORTH |
+				s.adjacency[plane][world_x][world_y] |=
+				    (ADJ_BLOCK_SIGHT_NORTH |
 				    ADJ_BLOCK_SIGHT_SOUTH |
 				    ADJ_BLOCK_SIGHT_EAST |
-				    ADJ_BLOCK_SIGHT_WEST;
+				    ADJ_BLOCK_SIGHT_WEST);
 			}
 			if (bound_config->block) {
 				s.adjacency[plane][world_x][world_y] = 0xff;
@@ -833,11 +834,11 @@ load_map_tile(struct jag_map *chunk,
 		bound_config = server_bound_config_by_id(bound.id);
 		if (bound_config != NULL) {
 			if (bound_config->block_projectile) {
-				s.adjacency[plane][world_x][world_y] =
-				    ADJ_BLOCK_SIGHT_NORTH |
+				s.adjacency[plane][world_x][world_y] |=
+				    (ADJ_BLOCK_SIGHT_NORTH |
 				    ADJ_BLOCK_SIGHT_SOUTH |
 				    ADJ_BLOCK_SIGHT_EAST |
-				    ADJ_BLOCK_SIGHT_WEST;
+				    ADJ_BLOCK_SIGHT_WEST);
 			}
 			if (bound_config->block) {
 				s.adjacency[plane][world_x][world_y] = 0xff;
