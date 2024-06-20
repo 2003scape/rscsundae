@@ -121,10 +121,23 @@ The ship is sailing
 You feel a crunch
 @que@You cook the dough in the oven...
 @que@You remove the bread from the oven
-@que@You place a lump of gold in the furnace
-@que@You retrieve a bar of gold
 @que@You smelt the copper and tin together in the furnace
 @que@You retrieve a bar of bronze
+@que@You smelt the iron in the furnace
+@que@You retrieve a bar of iron
+@que@The ore is too impure and you fail to refine it
+@que@You place the iron and 2 heaps of coal into the furnace
+@que@You retrieve a bar of steel
+@que@You place a lump of silver in the furnace
+@que@You retrieve a bar of silver
+@que@You place a lump of gold in the furnace
+@que@You retrieve a bar of gold
+@que@You place the mithril and 4 heaps of coal into the furnace
+@que@You retrieve a bar of mithril
+@que@You place the adamantite and 6 heaps of coal into the furnace
+@que@You retrieve a bar of adamantite
+@que@You place the runite and 8 heaps of coal into the furnace
+@que@You retrieve a bar of runite
 @que@I should add the tomato first
 @que@You need to cook the anchovies
 @que@You add the tomato to the pizza

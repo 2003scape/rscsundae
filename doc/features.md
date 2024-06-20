@@ -75,7 +75,8 @@ These should all be implemented in Lua script:
 - [ ] Cooking (cake)
 - [ ] Cooking (stew)
 - [x] Mining
-- [ ] Smithing
+- [ ] Smithing (forging)
+- [x] Smithing (smelting)
 
 ### Quests
 
