@@ -723,7 +723,7 @@ load_map_tile(struct jag_map *chunk,
 		if (loc_config == NULL) {
 			return;
 		}
-		server_add_loc(&loc);
+		server_add_loc(&s, &loc);
 		if (object_dir == 0 || object_dir == 4) {
 			width = loc_config->width;
 			height = loc_config->height;
@@ -743,25 +743,6 @@ load_map_tile(struct jag_map *chunk,
 			for (int y = tile_y; y < max_y; ++y) {
 				int ind2;
 				uint32_t n;
-
-				world_x = global_x + (x - tile_x);
-				world_y = (global_y + (y - tile_y)) -
-				    (plane * PLANE_LEVEL_INC);
-
-				if (loc_config->type == LOC_TYPE_BLOCKING) {
-					/* TODO LOC_TYPE_GATE */
-					s.adjacency[plane][world_x][world_y] |=
-					    (ADJ_BLOCK_NORTH | ADJ_BLOCK_SOUTH |
-					    ADJ_BLOCK_EAST | ADJ_BLOCK_WEST);
-				}
-
-				if (loc_config->type < LOC_TYPE_HAS_HOLE) {
-					s.adjacency[plane][world_x][world_y] |=
-					    (ADJ_BLOCK_SIGHT_NORTH |
-					    ADJ_BLOCK_SIGHT_SOUTH |
-					    ADJ_BLOCK_SIGHT_EAST |
-					    ADJ_BLOCK_SIGHT_WEST);
-				}
 
 				if (x == tile_x && y == tile_y) {
 					continue;

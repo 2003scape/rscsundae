@@ -113,14 +113,64 @@ server_del_loc(int x, int y)
 }
 
 void
-server_add_loc(struct loc *loc)
+server_add_loc(struct server *s, struct loc *loc)
 {
 	struct zone *zone;
-	struct loc *loc2;
+	struct loc *old;
+	struct loc_config *config;
+	int x, y;
+	int max_x, max_y;
+	int y_dec;
+	int plane;
 
-	loc2 = server_find_loc(loc->x, loc->y);
-	if (loc2 != NULL) {
-		loc2->id = loc->id;
+	plane = 0;
+	y = loc->y;
+	while (y > PLANE_LEVEL_INC) {
+		y -= PLANE_LEVEL_INC;
+		plane++;
+	}
+	y_dec = PLANE_LEVEL_INC * plane;
+
+	config = server_loc_config_by_id(loc->id);
+	assert(config != NULL);
+
+	if (loc->dir == 0 || loc->dir == 4) {
+		max_x = loc->x + config->width;
+		max_y = loc->y + config->height;
+	} else {
+		max_x = loc->x + config->height;
+		max_y = loc->y + config->width;
+	}
+
+	old = server_find_loc(loc->x, loc->y);
+	if (old != NULL) {
+		for (x = loc->x; x < max_x; ++x) {
+			for (y = loc->y; y < max_y; ++y) {
+				s->adjacency[plane][x][y - y_dec] = 0;
+			}
+		}
+	}
+
+	for (x = loc->x; x < max_x; ++x) {
+		for (y = loc->y; y < max_y; ++y) {
+			if (config->type == LOC_TYPE_BLOCKING) {
+				/* TODO LOC_TYPE_GATE */
+				s->adjacency[plane][x][y - y_dec] |=
+				    (ADJ_BLOCK_NORTH | ADJ_BLOCK_SOUTH |
+				    ADJ_BLOCK_EAST | ADJ_BLOCK_WEST);
+			}
+			if (config->type < LOC_TYPE_HAS_HOLE) {
+				s->adjacency[plane][x][y - y_dec] |=
+				    (ADJ_BLOCK_SIGHT_NORTH |
+				    ADJ_BLOCK_SIGHT_SOUTH |
+				    ADJ_BLOCK_SIGHT_EAST |
+				    ADJ_BLOCK_SIGHT_WEST);
+			}
+		}
+	}
+
+	if (old != NULL) {
+		old->id = loc->id;
 		return;
 	}
 	zone = server_find_zone(loc->x, loc->y);

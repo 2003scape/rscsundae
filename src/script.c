@@ -77,11 +77,22 @@ static int
 script_blocked(lua_State *L)
 {
 	lua_Integer x, y;
+	int plane = 0;
 
 	x = luaL_checknumber(L, 1);
 	y = luaL_checknumber(L, 2);
 
 	if (server_find_loc(x, y) != NULL) {
+		lua_pushboolean(L, true);
+		return 1;
+	}
+
+	while (y > PLANE_LEVEL_INC) {
+		y -= PLANE_LEVEL_INC;
+		plane++;
+	}
+
+	if (serv->adjacency[plane][x][y] != 0) {
 		lua_pushboolean(L, true);
 		return 1;
 	}
@@ -116,7 +127,7 @@ script_addloc(lua_State *L)
 		return 0;
 	}
 
-	server_add_loc(&loc);
+	server_add_loc(serv, &loc);
 	return 0;
 }
 
@@ -1130,9 +1141,7 @@ script_changeloc(lua_State *L)
 
 	loc->id = config->id;
 
-	server_add_loc(loc);
-
-	/* TODO: should adjust adjacency! */
+	server_add_loc(serv, loc);
 	return 0;
 }
 
@@ -1153,7 +1162,7 @@ script_restoreloc(lua_State *L)
 
 	loc->id = loc->orig_id;
 
-	server_add_loc(loc);
+	server_add_loc(serv, loc);
 	return 0;
 }
 
