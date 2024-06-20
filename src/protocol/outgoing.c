@@ -49,7 +49,6 @@ player_write_packet(struct player *p, void *b, size_t len)
 			return -1;
 		}
 		payload[0] = opcode;
-		printf("write packet opcode %d, len %zu\n", opcode, len);
 	}
 
 	if (p->isaac_ready) {
