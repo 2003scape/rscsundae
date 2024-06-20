@@ -101,7 +101,9 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 	size_t offset = 0;
 	uint32_t opcode = data[offset++] & 0xff;
 
+#if 0
 	printf("process packet opcode %d len %zu\n", opcode, len);
+#endif
 
 	if (p->login_stage == LOGIN_STAGE_ZERO) {
 		if ((opcode == OP_CLI_LOGIN || opcode == OP_CLI_RECONNECT)) {
