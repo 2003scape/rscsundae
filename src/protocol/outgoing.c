@@ -1820,6 +1820,11 @@ player_send_show_bank(struct player *p)
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 		        p->bank_count);
 
+	if (p->protocol_rev > 124) {
+		(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+				MAX_BANK_SIZE);
+	}
+
 	for (int i = 0; i < p->bank_count; ++i) {
 		if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
 				p->bank[i].id) == -1) {
