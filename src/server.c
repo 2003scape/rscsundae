@@ -654,7 +654,7 @@ load_map_tile(struct jag_map *chunk,
 		}
 	}
 
-	if (chunk->tiles[ind].roof && plane == 0) {
+	if (chunk->tiles[ind].roof) {
 		s.roofs[world_x][world_y] = chunk->tiles[ind].roof;
 	}
 
