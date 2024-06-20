@@ -1439,6 +1439,7 @@ player_process_action(struct player *p)
 			p->action = ACTION_NONE;
 			return;
 		}
+		/* TODO: check sight */
 		npc->talk_target = p->mob.id;
 		p->mob.walk_queue_len = 0;
 		p->mob.walk_queue_pos = 0;
