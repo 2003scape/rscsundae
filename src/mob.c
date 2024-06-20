@@ -313,3 +313,91 @@ mob_reached_loc(struct mob *mob, struct loc *loc)
 
 	return false;
 }
+
+void
+mob_process_walk_queue(struct mob *mob)
+{
+	if (mob->in_combat) {
+		if (mob->dir == MOB_DIR_COMBAT_LEFT ||
+		    mob->dir == MOB_DIR_COMBAT_RIGHT) {
+			mob->walk_queue_len = 0;
+			mob->walk_queue_pos = 0;
+			return;
+		}
+	}
+	if (mob->following_player != -1) {
+		struct player *p;
+
+		p = mob->server->players[mob->following_player];
+		if (p != NULL) {
+			if (mob_within_range(mob, p->mob.x, p->mob.y, 2)) {
+				return;
+			}
+			if (!mob_within_range(mob, p->mob.x, p->mob.y, 3)) {
+				mob->walk_queue_x[0] = p->mob.x;
+				mob->walk_queue_y[0] = p->mob.y;
+				mob->walk_queue_pos = 0;
+				mob->walk_queue_len = 1;
+			}
+		} else {
+			mob->following_player = -1;
+		}
+	}
+	int pos = mob->walk_queue_pos;
+	int remaining = mob->walk_queue_len - pos;
+	if (remaining == 0) {
+		mob->walk_queue_pos = 0;
+		mob->walk_queue_len = 0;
+		return;
+	}
+	int cur_x = mob->x;
+	int cur_y = mob->y;
+	int dif_x = cur_x - (int)mob->walk_queue_x[pos];
+	int dif_y = cur_y - (int)mob->walk_queue_y[pos];
+
+	if (dif_x == 0) {
+		if (dif_y > 0) {
+			mob->dir = MOB_DIR_NORTH;
+			mob->y = cur_y - 1;
+		} else if (dif_y < 0) {
+			mob->dir = MOB_DIR_SOUTH;
+			mob->y = cur_y + 1;
+		}
+	} else if (dif_x < 0) {
+		if (dif_y == 0) {
+			mob->dir = MOB_DIR_WEST;
+			mob->x = cur_x + 1;
+		} else if (dif_y < 0) {
+			mob->dir = MOB_DIR_SOUTHWEST;
+			mob->x = cur_x + 1;
+			mob->y = cur_y + 1;
+		} else if (dif_y > 0) {
+			mob->dir = MOB_DIR_NORTHWEST;
+			mob->x = cur_x + 1;
+			mob->y = cur_y - 1;
+		}
+	} else if (dif_x > 0) {
+		if (dif_y == 0) {
+			mob->dir = MOB_DIR_EAST;
+			mob->x = cur_x - 1;
+		} else if (dif_y < 0) {
+			mob->dir = MOB_DIR_SOUTHEAST;
+			mob->x = cur_x - 1;
+			mob->y = cur_y + 1;
+		} else if (dif_y > 0) {
+			mob->dir = MOB_DIR_NORTHEAST;
+			mob->x = cur_x - 1;
+			mob->y = cur_y - 1;
+		}
+	}
+
+	if (mob->x == mob->walk_queue_x[pos] &&
+	    mob->y == mob->walk_queue_y[pos]) {
+		mob->walk_queue_pos++;
+	}
+
+	if (mob->x != cur_x || mob->y != cur_y) {
+		mob->moved = true;
+	}
+
+}

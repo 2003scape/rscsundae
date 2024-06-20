@@ -397,7 +397,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			(void)snprintf(message, sizeof(message),
 					"Following %s", name);
 			player_send_message(p, message);
-			p->following_player = (int16_t)target;
+			p->mob.following_player = (int16_t)target;
 		}
 		break;
 	case OP_CLI_NPC_CAST:
@@ -636,16 +636,18 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				}
 			}
 			steps = (len - 5) / 2;
-			if (buf_getu16(data, offset, len, &p->walk_queue_x[0]) == -1) {
+			if (buf_getu16(data, offset, len,
+			    &p->mob.walk_queue_x[0]) == -1) {
 				return;
 			}
 			offset += 2;
-			if (buf_getu16(data, offset, len, &p->walk_queue_y[0]) == -1) {
+			if (buf_getu16(data, offset, len,
+			    &p->mob.walk_queue_y[0]) == -1) {
 				return;
 			}
 			offset += 2;
-			start_x = p->walk_queue_x[0];
-			start_y = p->walk_queue_y[0];
+			start_x = p->mob.walk_queue_x[0];
+			start_y = p->mob.walk_queue_y[0];
 			if (steps > (WALK_QUEUE_LEN - 1)) {
 				steps = WALK_QUEUE_LEN - 1;
 			}
@@ -661,16 +663,16 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				}
 				new_x = start_x + (int8_t)off_x;
 				new_y = start_y + (int8_t)off_y;
-				p->walk_queue_x[i + 1] = (uint16_t)new_x;
-				p->walk_queue_y[i + 1] = (uint16_t)new_y;
+				p->mob.walk_queue_x[i + 1] = (uint16_t)new_x;
+				p->mob.walk_queue_y[i + 1] = (uint16_t)new_y;
 			}
 			if (opcode != OP_CLI_WALK_ENTITY) {
 				p->action = ACTION_NONE;
 				p->mob.target_npc = -1;
 				p->mob.target_player = -1;
 			}
-			p->walk_queue_len = steps + 1;
-			p->walk_queue_pos = 0;
+			p->mob.walk_queue_len = steps + 1;
+			p->mob.walk_queue_pos = 0;
 			player_clear_actions(p);
 		}
 		break;

@@ -74,7 +74,7 @@ player_create(struct server *s, int sock)
 	p->mob.id = (uint16_t)slot;
 	p->mob.server = s;
 
-	p->following_player = -1;
+	p->mob.following_player = -1;
 	p->trading_player = -1;
 	p->projectile_target_player = UINT16_MAX;
 	p->projectile_target_npc = UINT16_MAX;
@@ -131,95 +131,6 @@ player_load(struct player *p)
 	p->mob.x = p->mob.server->start_tile_x;
 	p->mob.y = p->mob.server->start_tile_y;
 	return 0;
-}
-
-void
-player_process_walk_queue(struct player *p)
-{
-	if (p->mob.in_combat) {
-		if (p->mob.dir == MOB_DIR_COMBAT_LEFT ||
-		    p->mob.dir == MOB_DIR_COMBAT_RIGHT) {
-			p->walk_queue_len = 0;
-			p->walk_queue_pos = 0;
-			return;
-		}
-	}
-	if (p->following_player != -1) {
-		struct player *p2;
-
-		p2 = p->mob.server->players[p->following_player];
-		if (p2 != NULL) {
-			if (mob_within_range(&p->mob, p2->mob.x, p2->mob.y, 2)) {
-				return;
-			}
-			if (!mob_within_range(&p->mob, p2->mob.x, p2->mob.y, 3)) {
-				p->walk_queue_x[0] = p2->mob.x;
-				p->walk_queue_y[0] = p2->mob.y;
-				p->walk_queue_pos = 0;
-				p->walk_queue_len = 1;
-			}
-		} else {
-			p->following_player = -1;
-		}
-	}
-	int pos = p->walk_queue_pos;
-	int remaining = p->walk_queue_len - pos;
-	if (remaining == 0) {
-		p->walk_queue_pos = 0;
-		p->walk_queue_len = 0;
-		return;
-	}
-	int cur_x = p->mob.x;
-	int cur_y = p->mob.y;
-	int dif_x = cur_x - (int)p->walk_queue_x[pos];
-	int dif_y = cur_y - (int)p->walk_queue_y[pos];
-
-	if (dif_x == 0) {
-		if (dif_y > 0) {
-			p->mob.dir = MOB_DIR_NORTH;
-			p->mob.y = cur_y - 1;
-		} else if (dif_y < 0) {
-			p->mob.dir = MOB_DIR_SOUTH;
-			p->mob.y = cur_y + 1;
-		}
-	} else if (dif_x < 0) {
-		if (dif_y == 0) {
-			p->mob.dir = MOB_DIR_WEST;
-			p->mob.x = cur_x + 1;
-		} else if (dif_y < 0) {
-			p->mob.dir = MOB_DIR_SOUTHWEST;
-			p->mob.x = cur_x + 1;
-			p->mob.y = cur_y + 1;
-		} else if (dif_y > 0) {
-			p->mob.dir = MOB_DIR_NORTHWEST;
-			p->mob.x = cur_x + 1;
-			p->mob.y = cur_y - 1;
-		}
-	} else if (dif_x > 0) {
-		if (dif_y == 0) {
-			p->mob.dir = MOB_DIR_EAST;
-			p->mob.x = cur_x - 1;
-		} else if (dif_y < 0) {
-			p->mob.dir = MOB_DIR_SOUTHEAST;
-			p->mob.x = cur_x - 1;
-			p->mob.y = cur_y + 1;
-		} else if (dif_y > 0) {
-			p->mob.dir = MOB_DIR_NORTHEAST;
-			p->mob.x = cur_x - 1;
-			p->mob.y = cur_y - 1;
-		}
-	}
-
-	if (p->mob.x == p->walk_queue_x[pos] &&
-	    p->mob.y == p->walk_queue_y[pos]) {
-		p->walk_queue_pos++;
-	}
-
-	if (p->mob.x != cur_x || p->mob.y != cur_y) {
-		player_close_ui(p);
-		p->moved = true;
-	}
-
 }
 
 void
@@ -525,8 +436,8 @@ player_die(struct player *p, struct player *victor)
 	p->mob.y = p->mob.server->start_tile_y;
 	p->teleported = true;
 
-	p->walk_queue_len = 0;
-	p->walk_queue_pos = 0;
+	p->mob.walk_queue_len = 0;
+	p->mob.walk_queue_pos = 0;
 	player_clear_actions(p);
 
 	mob_combat_reset(&p->mob);
@@ -652,9 +563,9 @@ player_shoot_pvm(struct player *p, struct projectile_config *projectile,
 {
 	int roll = 0;
 
-	p->walk_queue_len = 0;
-	p->walk_queue_pos = 0;
-	p->following_player = -1;
+	p->mob.walk_queue_len = 0;
+	p->mob.walk_queue_pos = 0;
+	p->mob.following_player = -1;
 
 	/* TODO: verify reachability */
 
@@ -702,15 +613,15 @@ player_shoot_pvp(struct player *p, struct projectile_config *projectile,
 	assert(target != NULL);
 	assert(projectile != NULL);
 
-	p->walk_queue_len = 0;
-	p->walk_queue_pos = 0;
-	p->following_player = -1;
+	p->mob.walk_queue_len = 0;
+	p->mob.walk_queue_pos = 0;
+	p->mob.following_player = -1;
 
 	if (projectile->type != PROJECTILE_TYPE_MAGIC) {
 		range = projectile->range;
 		if ((abs(p->mob.x - (int)target->mob.x) > range) ||
 		    (abs(p->mob.y - (int)target->mob.y) > range)) {
-			p->following_player = target->mob.id;
+			p->mob.following_player = target->mob.id;
 			return;
 		}
 
@@ -823,8 +734,8 @@ player_process_combat(struct player *p)
 				 * hp bar in client takes roughly 4 seconds
 				 * to be gone
 				 */
-				p->walk_queue_pos = 0;
-				p->walk_queue_len = 0;
+				p->mob.walk_queue_pos = 0;
+				p->mob.walk_queue_len = 0;
 				mob_combat_reset(&p->mob);
 				return;
 			}
@@ -832,8 +743,8 @@ player_process_combat(struct player *p)
 			if (target->mob.in_combat) {
 				/* XXX needs verifying */
 				player_send_message(p, "I can't get close enough");
-				p->walk_queue_pos = 0;
-				p->walk_queue_len = 0;
+				p->mob.walk_queue_pos = 0;
+				p->mob.walk_queue_len = 0;
 				mob_combat_reset(&p->mob);
 				return;
 			}
@@ -846,19 +757,19 @@ player_process_combat(struct player *p)
 			if (p->mob.x == target->mob.x &&
 			    p->mob.y == target->mob.y) {
 				p->mob.dir = MOB_DIR_COMBAT_RIGHT;
-				p->walk_queue_len = 0;
-				p->walk_queue_pos = 0;
+				p->mob.walk_queue_len = 0;
+				p->mob.walk_queue_pos = 0;
 			} else {
 				/* TODO reachability */
-				p->walk_queue_x[0] = target->mob.x;
-				p->walk_queue_y[0] = target->mob.y;
-				p->walk_queue_len = 1;
-				p->walk_queue_pos = 0;
+				p->mob.walk_queue_x[0] = target->mob.x;
+				p->mob.walk_queue_y[0] = target->mob.y;
+				p->mob.walk_queue_len = 1;
+				p->mob.walk_queue_pos = 0;
 			}
 
 			/* successful catch, combat lock the target */
-			target->walk_queue_len = 0;
-			target->walk_queue_pos = 0;
+			target->mob.walk_queue_len = 0;
+			target->mob.walk_queue_pos = 0;
 
 			player_skull(p, target);
 
@@ -872,8 +783,8 @@ player_process_combat(struct player *p)
 
 			player_close_ui(target);
 			player_clear_actions(target);
-			target->walk_queue_len = 0;
-			target->walk_queue_pos = 0;
+			target->mob.walk_queue_len = 0;
+			target->mob.walk_queue_pos = 0;
 			target->mob.target_player = p->mob.id;
 			target->mob.target_npc = -1;
 			target->mob.in_combat = true;
@@ -941,8 +852,8 @@ player_retreat(struct player *p)
 		if (p2 != NULL) {
 			player_send_message(p2,
 			    "Your opponent is retreating!");
-			p2->walk_queue_len = 0;
-			p2->walk_queue_pos = 0;
+			p2->mob.walk_queue_len = 0;
+			p2->mob.walk_queue_pos = 0;
 			mob_combat_reset(&p2->mob);
 		}
 	}
@@ -1382,7 +1293,7 @@ void
 player_clear_actions(struct player *p)
 {
 	p->action = ACTION_NONE;
-	p->following_player = -1;
+	p->mob.following_player = -1;
 	p->trading_player = -1;
 	p->ui_design_open = false;
 }
@@ -1503,8 +1414,8 @@ player_process_action(struct player *p)
 			puts("waiting for move closer");
 			return;
 		}
-		p->walk_queue_len = 0;
-		p->walk_queue_pos = 0;
+		p->mob.walk_queue_len = 0;
+		p->mob.walk_queue_pos = 0;
 		id = p->inventory[p->action_slot].id;
 		item_config = server_item_config_by_id(id);
 		assert(item_config != NULL);
@@ -1530,8 +1441,8 @@ player_process_action(struct player *p)
 			return;
 		}
 		npc->talk_target = p->mob.id;
-		p->walk_queue_len = 0;
-		p->walk_queue_pos = 0;
+		p->mob.walk_queue_len = 0;
+		p->mob.walk_queue_pos = 0;
 		mob_face(&p->mob, npc->mob.x, npc->mob.y);
 		script_onnpctalk(p->mob.server->lua, p, npc);
 		p->action = ACTION_NONE;
@@ -1542,7 +1453,7 @@ player_process_action(struct player *p)
 			return;
 		}
 
-		if (p->walk_queue_len > 0 || p->ui_trade_open) {
+		if (p->mob.walk_queue_len > 0 || p->ui_trade_open) {
 			return;
 		}
 
@@ -1636,8 +1547,8 @@ player_process_action(struct player *p)
 		npc = p->mob.server->npcs[p->action_npc];
 		if (npc == NULL) {
 			p->action = ACTION_NONE;
-			p->walk_queue_len = 0;
-			p->walk_queue_pos = 0;
+			p->mob.walk_queue_len = 0;
+			p->mob.walk_queue_pos = 0;
 			return;
 		}
 		/* should be able to shoot within 4 tiles */
@@ -1645,8 +1556,8 @@ player_process_action(struct player *p)
 		    npc->mob.x, npc->mob.y, 4)) {
 			return;
 		}
-		p->walk_queue_len = 0;
-		p->walk_queue_pos = 0;
+		p->mob.walk_queue_len = 0;
+		p->mob.walk_queue_pos = 0;
 		p->action = ACTION_NONE;
 		if (npc->config->aggression == 0) {
 			player_send_message(p, "I can't attack that");
@@ -1665,8 +1576,8 @@ player_process_action(struct player *p)
 		target = p->mob.server->players[p->action_player];
 		if (target == NULL) {
 			p->action = ACTION_NONE;
-			p->walk_queue_len = 0;
-			p->walk_queue_pos = 0;
+			p->mob.walk_queue_len = 0;
+			p->mob.walk_queue_pos = 0;
 			return;
 		}
 		/* should be able to shoot within 4 tiles */
@@ -1674,8 +1585,8 @@ player_process_action(struct player *p)
 		    target->mob.x, target->mob.y, 4)) {
 			return;
 		}
-		p->walk_queue_len = 0;
-		p->walk_queue_pos = 0;
+		p->mob.walk_queue_len = 0;
+		p->mob.walk_queue_pos = 0;
 		p->action = ACTION_NONE;
 		if (!player_wilderness_check(p, target) ||
 		    !player_can_cast(p, p->spell)) {
@@ -1691,23 +1602,23 @@ player_process_action(struct player *p)
 	case ACTION_BOUND_OP2:
 		if (p->action_bound == NULL) {
 			p->action = ACTION_NONE;
-			p->walk_queue_len = 0;
-			p->walk_queue_pos = 0;
+			p->mob.walk_queue_len = 0;
+			p->mob.walk_queue_pos = 0;
 			return;
 		}
 		bound = server_find_bound(p->action_bound->x, p->action_bound->y,
 		    p->action_bound->dir);
 		if (bound == NULL) {
 			p->action = ACTION_NONE;
-			p->walk_queue_len = 0;
-			p->walk_queue_pos = 0;
+			p->mob.walk_queue_len = 0;
+			p->mob.walk_queue_pos = 0;
 			return;
 		}
 		if (!mob_reached_bound(&p->mob, bound)) {
 			return;
 		}
-		p->walk_queue_len = 0;
-		p->walk_queue_pos = 0;
+		p->mob.walk_queue_len = 0;
+		p->mob.walk_queue_pos = 0;
 		if (p->action == ACTION_BOUND_OP1) {
 			script_onopbound1(p->mob.server->lua, p, bound);
 		} else {
@@ -1718,19 +1629,19 @@ player_process_action(struct player *p)
 	case ACTION_LOC_USEWITH:
 		if (p->action_loc == NULL || p->action_slot >= p->inv_count) {
 			p->action = ACTION_NONE;
-			p->walk_queue_len = 0;
-			p->walk_queue_pos = 0;
+			p->mob.walk_queue_len = 0;
+			p->mob.walk_queue_pos = 0;
 			return;
 		}
 		loc = server_find_loc(p->action_loc->x, p->action_loc->y);
 		if (loc == NULL) {
 			p->action = ACTION_NONE;
-			p->walk_queue_len = 0;
-			p->walk_queue_pos = 0;
+			p->mob.walk_queue_len = 0;
+			p->mob.walk_queue_pos = 0;
 			return;
 		}
 		if (!mob_reached_loc(&p->mob, loc) ||
-		    (p->walk_queue_len - p->walk_queue_pos) > 0) {
+		    (p->mob.walk_queue_len - p->mob.walk_queue_pos) > 0) {
 			return;
 		}
 		item_config = server_item_config_by_id(p->inventory[p->action_slot].id);
@@ -1742,19 +1653,19 @@ player_process_action(struct player *p)
 	case ACTION_LOC_OP2:
 		if (p->action_loc == NULL) {
 			p->action = ACTION_NONE;
-			p->walk_queue_len = 0;
-			p->walk_queue_pos = 0;
+			p->mob.walk_queue_len = 0;
+			p->mob.walk_queue_pos = 0;
 			return;
 		}
 		loc = server_find_loc(p->action_loc->x, p->action_loc->y);
 		if (loc == NULL) {
 			p->action = ACTION_NONE;
-			p->walk_queue_len = 0;
-			p->walk_queue_pos = 0;
+			p->mob.walk_queue_len = 0;
+			p->mob.walk_queue_pos = 0;
 			return;
 		}
 		if (!mob_reached_loc(&p->mob, loc) ||
-		    (p->walk_queue_len - p->walk_queue_pos) > 0) {
+		    (p->mob.walk_queue_len - p->mob.walk_queue_pos) > 0) {
 			return;
 		}
 		if (p->action == ACTION_LOC_OP1) {

@@ -155,6 +155,10 @@ struct mob {
 	struct server *server;
 	uint16_t x, y;
 	uint16_t id;
+	uint16_t walk_queue_x[WALK_QUEUE_LEN];
+	uint16_t walk_queue_y[WALK_QUEUE_LEN];
+	uint16_t walk_queue_pos;
+	uint16_t walk_queue_len;
 	uint8_t dir;
 	uint8_t prev_dir;
 	uint8_t moved;
@@ -173,6 +177,7 @@ struct mob {
 	char chat_compressed[MAX_CHAT_LEN];
 	int16_t target_player;
 	int16_t target_npc;
+	int16_t following_player;
 };
 
 enum animslot {
@@ -229,7 +234,6 @@ struct player {
 	uint16_t outbuf_written;
 	int64_t session_id;
 	int64_t name;
-	int16_t following_player;
 	int16_t trading_player;
 	uint8_t protocol_rev;
 	uint8_t login_stage;
@@ -254,10 +258,6 @@ struct player {
 	uint64_t drain_counter;
 	uint64_t next_drain;
 	uint8_t chat_type;
-	uint16_t walk_queue_x[WALK_QUEUE_LEN];
-	uint16_t walk_queue_y[WALK_QUEUE_LEN];
-	uint16_t walk_queue_pos;
-	uint16_t walk_queue_len;
 	uint8_t ui_multi_open;
 	uint8_t ui_bank_open;
 	uint8_t ui_design_open;
@@ -339,11 +339,11 @@ bool mob_reached_item(struct mob *, struct ground_item *);
 bool mob_reached_bound(struct mob *, struct bound *);
 bool mob_reached_loc(struct mob *, struct loc *);
 void mob_die(struct mob *);
+void mob_process_walk_queue(struct mob *);
 
 /* player.c */
 struct player *player_create(struct server *, int);
 int player_load(struct player *);
-void player_process_walk_queue(struct player *);
 void player_process_combat(struct player *);
 void player_die(struct player *, struct player *p);
 void player_close_ui(struct player *);
