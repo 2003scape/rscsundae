@@ -317,6 +317,12 @@ mob_reached_loc(struct mob *mob, struct loc *loc)
 void
 mob_process_walk_queue(struct mob *mob)
 {
+	int plane = 0;
+	int dir;
+	int x, y;
+	int dif_x, dif_y;
+	int cur_x, cur_y;
+
 	if (mob->in_combat) {
 		if (mob->dir == MOB_DIR_COMBAT_LEFT ||
 		    mob->dir == MOB_DIR_COMBAT_RIGHT) {
@@ -343,6 +349,11 @@ mob_process_walk_queue(struct mob *mob)
 			mob->following_player = -1;
 		}
 	}
+
+	for (int tmp_y = mob->y; tmp_y >= PLANE_LEVEL_INC; plane++) {
+		tmp_y -= PLANE_LEVEL_INC;
+	}
+
 	int pos = mob->walk_queue_pos;
 	int remaining = mob->walk_queue_len - pos;
 	if (remaining == 0) {
@@ -350,54 +361,105 @@ mob_process_walk_queue(struct mob *mob)
 		mob->walk_queue_len = 0;
 		return;
 	}
-	int cur_x = mob->x;
-	int cur_y = mob->y;
-	int dif_x = cur_x - (int)mob->walk_queue_x[pos];
-	int dif_y = cur_y - (int)mob->walk_queue_y[pos];
+
+	dir = mob->dir;
+	x = cur_x = mob->x;
+	y = cur_y = mob->y;
+	dif_x = cur_x - (int)mob->walk_queue_x[pos];
+	dif_y = cur_y - (int)mob->walk_queue_y[pos];
 
 	if (dif_x == 0) {
 		if (dif_y > 0) {
-			mob->dir = MOB_DIR_NORTH;
-			mob->y = cur_y - 1;
+			dir = MOB_DIR_NORTH;
+			y = cur_y - 1;
 		} else if (dif_y < 0) {
-			mob->dir = MOB_DIR_SOUTH;
-			mob->y = cur_y + 1;
+			dir = MOB_DIR_SOUTH;
+			y = cur_y + 1;
 		}
 	} else if (dif_x < 0) {
 		if (dif_y == 0) {
-			mob->dir = MOB_DIR_WEST;
-			mob->x = cur_x + 1;
+			dir = MOB_DIR_WEST;
+			x = cur_x + 1;
 		} else if (dif_y < 0) {
-			mob->dir = MOB_DIR_SOUTHWEST;
-			mob->x = cur_x + 1;
-			mob->y = cur_y + 1;
+			dir = MOB_DIR_SOUTHWEST;
+			x = cur_x + 1;
+			y = cur_y + 1;
 		} else if (dif_y > 0) {
-			mob->dir = MOB_DIR_NORTHWEST;
-			mob->x = cur_x + 1;
-			mob->y = cur_y - 1;
+			dir = MOB_DIR_NORTHWEST;
+			x = cur_x + 1;
+			y = cur_y - 1;
 		}
 	} else if (dif_x > 0) {
 		if (dif_y == 0) {
-			mob->dir = MOB_DIR_EAST;
-			mob->x = cur_x - 1;
+			dir = MOB_DIR_EAST;
+			x = cur_x - 1;
 		} else if (dif_y < 0) {
-			mob->dir = MOB_DIR_SOUTHEAST;
-			mob->x = cur_x - 1;
-			mob->y = cur_y + 1;
+			dir = MOB_DIR_SOUTHEAST;
+			x = cur_x - 1;
+			y = cur_y + 1;
 		} else if (dif_y > 0) {
-			mob->dir = MOB_DIR_NORTHEAST;
-			mob->x = cur_x - 1;
-			mob->y = cur_y - 1;
+			dir = MOB_DIR_NORTHEAST;
+			x = cur_x - 1;
+			y = cur_y - 1;
 		}
 	}
 
-	if (mob->x == mob->walk_queue_x[pos] &&
-	    mob->y == mob->walk_queue_y[pos]) {
+	/* verify reachability */
+	/* TODO: this is very basic, need to verify orientation too */
+	if (x < ZONE_MAX_X && y < ZONE_MAX_Y && plane < ZONE_MAX_PLANE) {
+		struct server *s = mob->server;
+
+		if (s->adjacency[plane][x][y] == 0xff) {
+			puts("not reachable");
+			return;
+		}
+		switch (dir) {
+		case MOB_DIR_NORTH:
+		case MOB_DIR_NORTHWEST:
+		case MOB_DIR_NORTHEAST:
+			if ((s->adjacency[plane][cur_x][cur_y] & ADJ_BLOCK_NORTH) != 0) {
+				puts("not passable from north");
+				return;
+			}
+			break;
+		case MOB_DIR_SOUTH:
+		case MOB_DIR_SOUTHWEST:
+		case MOB_DIR_SOUTHEAST:
+			if ((s->adjacency[plane][cur_x][cur_y] & ADJ_BLOCK_SOUTH) != 0) {
+				puts("not passable from south");
+				return;
+			}
+			break;
+		}
+		switch (dir) {
+		case MOB_DIR_EAST:
+		case MOB_DIR_NORTHEAST:
+		case MOB_DIR_SOUTHEAST:
+			if ((s->adjacency[plane][cur_x][cur_y] & ADJ_BLOCK_EAST) != 0) {
+				puts("not passable from east");
+				return;
+			}
+			break;
+		case MOB_DIR_WEST:
+		case MOB_DIR_NORTHWEST:
+		case MOB_DIR_SOUTHWEST:
+			if ((s->adjacency[plane][cur_x][cur_y] & ADJ_BLOCK_WEST) != 0) {
+				puts("not passable from west");
+				return;
+			}
+			break;
+		}
+	}
+
+	if (x == mob->walk_queue_x[pos] &&
+	    y == mob->walk_queue_y[pos]) {
 		mob->walk_queue_pos++;
 	}
 
-	if (mob->x != cur_x || mob->y != cur_y) {
+	if (x != cur_x || y != cur_y) {
+		mob->x = x;
+		mob->y = y;
+		mob->dir = dir;
 		mob->moved = true;
 	}
-
 }

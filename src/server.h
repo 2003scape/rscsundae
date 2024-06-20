@@ -5,9 +5,15 @@
 #include "protocol/rsa.h"
 #include "ext/flea.h"
 #include "entity.h"
+#include "zone.h"
 
 #define MAXPLAYERS	(1000)
 #define MAXNPCS		(1000)
+
+#define ADJ_BLOCK_NORTH	(1 << 0)
+#define ADJ_BLOCK_SOUTH	(1 << 1)
+#define ADJ_BLOCK_EAST	(1 << 2)
+#define ADJ_BLOCK_WEST	(1 << 3)
 
 struct server {
 	void *loop_ctx;
@@ -22,6 +28,7 @@ struct server {
 	uint64_t next_restore;
 	uint64_t next_rapid_restore;
 	uint64_t last_tick;
+	uint8_t adjacency[ZONE_MAX_PLANE][ZONE_MAX_X][ZONE_MAX_Y];
 	struct player *players[MAXPLAYERS];
 	struct npc *npcs[MAXNPCS];
 	struct ground_item *temp_items;
@@ -70,6 +77,7 @@ void server_register_logout(int64_t);
 void server_register_hide_status(struct player *);
 void server_register_unhide_status(struct player *);
 void server_send_pm(struct player *, int64_t, uint8_t *, size_t);
+struct floor_config *server_floor_config_by_id(int);
 struct item_config *server_item_config_by_id(int);
 struct item_config *server_find_item_config(const char *);
 struct prayer_config *server_prayer_config_by_id(int);

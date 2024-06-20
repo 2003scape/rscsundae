@@ -31,7 +31,7 @@ struct server s = {0};
 static void on_signal_do_nothing(int);
 static int load_config_jag(void);
 static void load_map_chunk(struct jag_map *, int, int, int);
-static void load_map_tile(struct jag_map *, int, int, int, int);
+static void load_map_tile(struct jag_map *, int, int, int, int, int);
 static int load_maps_jag(void);
 static void usage(void);
 
@@ -617,18 +617,32 @@ err:
 
 static void
 load_map_tile(struct jag_map *chunk,
-    int tile_x, int tile_y, int global_x, int global_y)
+    int tile_x, int tile_y, int global_x, int global_y, int plane)
 {
 	struct loc loc;
 	struct loc_config *loc_config;
 	struct bound bound;
 	struct bound_config *bound_config;
+	struct floor_config *floor_config;
 	struct ground_item item;
 	uint32_t object_type;
 	uint16_t object_dir;
+	int world_x, world_y;
 	int ind;
 
+	world_x = global_x;
+	world_y = global_y - (plane * PLANE_LEVEL_INC);
+
 	ind = tile_x * JAG_MAP_CHUNK_SIZE + tile_y;
+	if (chunk->tiles[ind].overlay) {
+		object_type = chunk->tiles[ind].overlay - 1;
+		floor_config = server_floor_config_by_id(object_type);
+		assert(floor_config != NULL);
+		if (floor_config->blocked) {
+			s.adjacency[plane][world_x][world_y] = 0xff;
+		}
+	}
+
 	object_type = chunk->tiles[ind].bound_diag;
 	object_dir = chunk->tiles[ind].loc_direction;
 	if (chunk->tiles[ind].bound_vert) {
@@ -638,6 +652,12 @@ load_map_tile(struct jag_map *chunk,
 		bound.dir = BOUND_DIR_VERT;
 		bound_config = server_bound_config_by_id(bound.id);
 		if (bound_config != NULL) {
+			if (bound_config->block) {
+				s.adjacency[plane][world_x][world_y]
+				    |= ADJ_BLOCK_NORTH;
+				s.adjacency[plane][world_x][world_y - 1]
+				    |= ADJ_BLOCK_SOUTH;
+			}
 			if (bound_config->interactive) {
 				server_add_bound(&bound);
 			}
@@ -650,6 +670,12 @@ load_map_tile(struct jag_map *chunk,
 		bound.dir = BOUND_DIR_HORIZ;
 		bound_config = server_bound_config_by_id(bound.id);
 		if (bound_config != NULL) {
+			if (bound_config->block) {
+				s.adjacency[plane][world_x][world_y]
+				    |= ADJ_BLOCK_EAST;
+				s.adjacency[plane][world_x - 1][world_y]
+				    |= ADJ_BLOCK_WEST;
+			}
 			if (bound_config->interactive) {
 				server_add_bound(&bound);
 			}
@@ -676,15 +702,6 @@ load_map_tile(struct jag_map *chunk,
 			width = loc_config->height;
 			height = loc_config->width;
 		}
-		if (width <= 1 && height <= 1) {
-			return;
-		}
-		/*
-		 * have to clear up adjacent tiles as apparently the
-		 * original map editor puts objects on every tile
-		 * their width and height occupy, and we don't want
-		 * duplicates
-		 */
 		max_x = tile_x + width;
 		if (max_x >= JAG_MAP_CHUNK_SIZE) {
 			max_x = JAG_MAP_CHUNK_SIZE;
@@ -698,10 +715,23 @@ load_map_tile(struct jag_map *chunk,
 				int ind2;
 				uint32_t n;
 
+				if (loc_config->type == LOC_TYPE_BLOCKING) {
+					world_x = global_x + (x - tile_x);
+					world_y = (global_y + (y - tile_y)) -
+					    (plane * PLANE_LEVEL_INC);
+					s.adjacency[plane][world_x][world_y] = 0xff;
+				}
+
 				if (x == tile_x && y == tile_y) {
 					continue;
 				}
 
+				/*
+				 * have to clear up adjacent tiles - apparently
+				 * the original map editor puts locs on
+				 * every tile their width and height occupy,
+				 * and we don't want duplicates
+				 */
 				ind2 = x * JAG_MAP_CHUNK_SIZE + y;
 				n = chunk->tiles[ind2].bound_diag;
 				if (n == object_type) {
@@ -743,6 +773,9 @@ load_map_tile(struct jag_map *chunk,
 		bound.dir = BOUND_DIR_DIAG_NW_SE;
 		bound_config = server_bound_config_by_id(bound.id);
 		if (bound_config != NULL) {
+			if (bound_config->block) {
+				s.adjacency[plane][world_x][world_y] = 0xff;
+			}
 			if (bound_config->interactive) {
 				server_add_bound(&bound);
 			}
@@ -754,6 +787,9 @@ load_map_tile(struct jag_map *chunk,
 		bound.dir = BOUND_DIR_DIAG_NE_SW;
 		bound_config = server_bound_config_by_id(bound.id);
 		if (bound_config != NULL) {
+			if (bound_config->block) {
+				s.adjacency[plane][world_x][world_y] = 0xff;
+			}
 			if (bound_config->interactive) {
 				server_add_bound(&bound);
 			}
@@ -772,7 +808,7 @@ load_map_chunk(struct jag_map *chunk, int chunk_x, int chunk_y, int plane)
 			    JAG_MAP_CHUNK_SIZE) + x;
 			global_y = (plane * PLANE_LEVEL_INC) +
 			    ((chunk_y - 37) * JAG_MAP_CHUNK_SIZE) + y;
-			load_map_tile(chunk, x, y, global_x, global_y);
+			load_map_tile(chunk, x, y, global_x, global_y, plane);
 		}
 	}
 }
@@ -868,6 +904,15 @@ server_loc_config_by_id(int id)
 		return NULL;
 	}
 	return &s.loc_config[id];
+}
+
+struct floor_config *
+server_floor_config_by_id(int id)
+{
+	if (id < 0 || id >= (int)s.floor_config_count) {
+		return NULL;
+	}
+	return &s.floor_config[id];
 }
 
 struct bound_config *

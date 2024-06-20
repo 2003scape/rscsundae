@@ -760,7 +760,6 @@ player_process_combat(struct player *p)
 				p->mob.walk_queue_len = 0;
 				p->mob.walk_queue_pos = 0;
 			} else {
-				/* TODO reachability */
 				p->mob.walk_queue_x[0] = target->mob.x;
 				p->mob.walk_queue_y[0] = target->mob.y;
 				p->mob.walk_queue_len = 1;

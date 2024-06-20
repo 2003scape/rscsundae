@@ -1100,6 +1100,7 @@ script_changebound(lua_State *L)
 
 	b->id = config->id;
 
+	/* TODO: should adjust adjacency! */
 	server_add_bound(b);
 	return 0;
 }
@@ -1131,6 +1132,8 @@ script_changeloc(lua_State *L)
 	loc->id = config->id;
 
 	server_add_loc(loc);
+
+	/* TODO: should adjust adjacency! */
 	return 0;
 }
 
