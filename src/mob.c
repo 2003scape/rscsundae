@@ -405,7 +405,6 @@ mob_process_walk_queue(struct mob *mob)
 	}
 
 	/* verify reachability */
-	/* TODO: this is very basic, need to verify orientation too */
 	if (x < ZONE_MAX_X && y < ZONE_MAX_Y && plane < ZONE_MAX_PLANE) {
 		struct server *s = mob->server;
 
