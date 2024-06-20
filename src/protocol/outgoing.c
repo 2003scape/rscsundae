@@ -340,7 +340,7 @@ player_send_movement(struct player *p)
 			}
 			p->known_players[i] = -1;
 			bitpos += 4;
-		} else if (known_player->moved) {
+		} else if (known_player->mob.moved) {
 			/*
 			 * TODO: this assertion can be fired!!! it's fatal
 			 * because there isn't room in the next bits

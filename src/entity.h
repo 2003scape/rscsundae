@@ -243,7 +243,6 @@ struct player {
 	uint8_t plane_changed;
 	uint8_t prayers_changed;
 	uint8_t inv_changed;
-	uint8_t moved;
 	uint8_t sprites_base[MAX_ENTITY_SPRITES];
 	uint8_t sprites[MAX_ENTITY_SPRITES];
 	uint8_t client_settings[MAX_CLIENT_SETTINGS];

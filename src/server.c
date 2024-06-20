@@ -316,7 +316,7 @@ server_tick(void)
 		player_process_action(s.players[i]);
 		script_process(s.lua, s.players[i]);
 		mob_process_walk_queue(&s.players[i]->mob);
-		if (s.players[i]->moved) {
+		if (s.players[i]->mob.moved) {
 			player_close_ui(s.players[i]);
 		}
 		if (drain_tick) {
@@ -388,11 +388,11 @@ server_tick(void)
 		s.players[i]->bonus_changed = false;
 		s.players[i]->prayers_changed = false;
 		s.players[i]->partner_offer_changed = false;
-		s.players[i]->moved = false;
 		s.players[i]->teleported = false;
 		s.players[i]->projectile_target_npc = UINT16_MAX;
 		s.players[i]->projectile_target_player = UINT16_MAX;
 		s.players[i]->bubble_id = UINT16_MAX;
+		s.players[i]->mob.moved = false;
 		s.players[i]->mob.damage = UINT8_MAX;
 		s.players[i]->mob.prev_dir = s.players[i]->mob.dir;
 		s.players[i]->last_update = s.tick_counter;
