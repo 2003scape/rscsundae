@@ -667,20 +667,21 @@ load_map_tile(struct jag_map *chunk,
 		bound.dir = BOUND_DIR_VERT;
 		bound_config = server_bound_config_by_id(bound.id);
 		if (bound_config != NULL) {
-			if (bound_config->block) {
-				s.adjacency[plane][world_x][world_y]
-				    |= ADJ_BLOCK_NORTH;
-				s.adjacency[plane][world_x][world_y - 1]
-				    |= ADJ_BLOCK_SOUTH;
-			}
-			if (bound_config->block_projectile) {
-				s.adjacency[plane][world_x][world_y]
-				    |= ADJ_BLOCK_SIGHT_NORTH;
-				s.adjacency[plane][world_x][world_y - 1]
-				    |= ADJ_BLOCK_SIGHT_SOUTH;
-			}
 			if (bound_config->interactive) {
-				server_add_bound(&bound);
+				server_add_bound(&s, &bound);
+			} else {
+				if (bound_config->block) {
+					s.adjacency[plane][world_x][world_y]
+					    |= ADJ_BLOCK_NORTH;
+					s.adjacency[plane][world_x][world_y - 1]
+					    |= ADJ_BLOCK_SOUTH;
+				}
+				if (bound_config->block_projectile) {
+					s.adjacency[plane][world_x][world_y]
+					    |= ADJ_BLOCK_SIGHT_NORTH;
+					s.adjacency[plane][world_x][world_y - 1]
+					    |= ADJ_BLOCK_SIGHT_SOUTH;
+				}
 			}
 		}
 	}
@@ -691,20 +692,21 @@ load_map_tile(struct jag_map *chunk,
 		bound.dir = BOUND_DIR_HORIZ;
 		bound_config = server_bound_config_by_id(bound.id);
 		if (bound_config != NULL) {
-			if (bound_config->block) {
-				s.adjacency[plane][world_x][world_y]
-				    |= ADJ_BLOCK_EAST;
-				s.adjacency[plane][world_x - 1][world_y]
-				    |= ADJ_BLOCK_WEST;
-			}
-			if (bound_config->block_projectile) {
-				s.adjacency[plane][world_x][world_y]
-				    |= ADJ_BLOCK_SIGHT_EAST;
-				s.adjacency[plane][world_x - 1][world_y]
-				    |= ADJ_BLOCK_SIGHT_WEST;
-			}
 			if (bound_config->interactive) {
-				server_add_bound(&bound);
+				server_add_bound(&s, &bound);
+			} else {
+				if (bound_config->block) {
+					s.adjacency[plane][world_x][world_y]
+					    |= ADJ_BLOCK_EAST;
+					s.adjacency[plane][world_x - 1][world_y]
+					    |= ADJ_BLOCK_WEST;
+				}
+				if (bound_config->block_projectile) {
+					s.adjacency[plane][world_x][world_y]
+					    |= ADJ_BLOCK_SIGHT_EAST;
+					s.adjacency[plane][world_x - 1][world_y]
+					    |= ADJ_BLOCK_SIGHT_WEST;
+				}
 			}
 		}
 	}
@@ -812,18 +814,19 @@ load_map_tile(struct jag_map *chunk,
 		bound.dir = BOUND_DIR_DIAG_NW_SE;
 		bound_config = server_bound_config_by_id(bound.id);
 		if (bound_config != NULL) {
-			if (bound_config->block_projectile) {
-				s.adjacency[plane][world_x][world_y] |=
-				    (ADJ_BLOCK_SIGHT_NORTH |
-				    ADJ_BLOCK_SIGHT_SOUTH |
-				    ADJ_BLOCK_SIGHT_EAST |
-				    ADJ_BLOCK_SIGHT_WEST);
-			}
-			if (bound_config->block) {
-				s.adjacency[plane][world_x][world_y] = 0xff;
-			}
 			if (bound_config->interactive) {
-				server_add_bound(&bound);
+				server_add_bound(&s, &bound);
+			} else {
+				if (bound_config->block_projectile) {
+					s.adjacency[plane][world_x][world_y] |=
+					    (ADJ_BLOCK_SIGHT_NORTH |
+					    ADJ_BLOCK_SIGHT_SOUTH |
+					    ADJ_BLOCK_SIGHT_EAST |
+					    ADJ_BLOCK_SIGHT_WEST);
+				}
+				if (bound_config->block) {
+					s.adjacency[plane][world_x][world_y] = 0xff;
+				}
 			}
 		}
 	} else {
@@ -833,18 +836,19 @@ load_map_tile(struct jag_map *chunk,
 		bound.dir = BOUND_DIR_DIAG_NE_SW;
 		bound_config = server_bound_config_by_id(bound.id);
 		if (bound_config != NULL) {
-			if (bound_config->block_projectile) {
-				s.adjacency[plane][world_x][world_y] |=
-				    (ADJ_BLOCK_SIGHT_NORTH |
-				    ADJ_BLOCK_SIGHT_SOUTH |
-				    ADJ_BLOCK_SIGHT_EAST |
-				    ADJ_BLOCK_SIGHT_WEST);
-			}
-			if (bound_config->block) {
-				s.adjacency[plane][world_x][world_y] = 0xff;
-			}
 			if (bound_config->interactive) {
-				server_add_bound(&bound);
+				server_add_bound(&s, &bound);
+			} else {
+				if (bound_config->block_projectile) {
+					s.adjacency[plane][world_x][world_y] |=
+					    (ADJ_BLOCK_SIGHT_NORTH |
+					    ADJ_BLOCK_SIGHT_SOUTH |
+					    ADJ_BLOCK_SIGHT_EAST |
+					    ADJ_BLOCK_SIGHT_WEST);
+				}
+				if (bound_config->block) {
+					s.adjacency[plane][world_x][world_y] = 0xff;
+				}
 			}
 		}
 	}

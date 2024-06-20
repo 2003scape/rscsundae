@@ -1100,8 +1100,7 @@ script_changebound(lua_State *L)
 
 	b->id = config->id;
 
-	/* TODO: should adjust adjacency! */
-	server_add_bound(b);
+	server_add_bound(serv, b);
 	return 0;
 }
 

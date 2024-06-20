@@ -152,14 +152,99 @@ server_find_bound(int x, int y, int dir)
 }
 
 void
-server_add_bound(struct bound *bound)
+server_add_bound(struct server *s, struct bound *bound)
 {
 	struct zone *zone;
-	struct bound *bound2;
+	struct bound *old;
+	struct bound_config *config;
+	int plane = 0;
+	int y;
 
-	bound2 = server_find_bound(bound->x, bound->y, bound->dir);
-	if (bound2 != NULL) {
-		bound2->id = bound->id;
+	config = server_bound_config_by_id(bound->id);
+	assert(config != NULL);
+
+	y = bound->y;
+	while (y > PLANE_LEVEL_INC) {
+		y -= PLANE_LEVEL_INC;
+		plane++;
+	}
+
+	old = server_find_bound(bound->x, bound->y, bound->dir);
+	if (old != NULL) {
+		switch (old->dir) {
+		case BOUND_DIR_VERT:
+			s->adjacency[plane][bound->x][y] &=
+			    ~ADJ_BLOCK_NORTH;
+				s->adjacency[plane][bound->x][y - 1] &=
+			    ~ADJ_BLOCK_SOUTH;
+			s->adjacency[plane][bound->x][y] &=
+			    ~ADJ_BLOCK_SIGHT_NORTH;
+			s->adjacency[plane][bound->x][y - 1] &=
+			    ~ADJ_BLOCK_SIGHT_SOUTH;
+			break;
+		case BOUND_DIR_HORIZ:
+			s->adjacency[plane][bound->x][y] &=
+			    ~ADJ_BLOCK_EAST;
+			s->adjacency[plane][bound->x - 1][y] &=
+			    ~ADJ_BLOCK_WEST;
+			s->adjacency[plane][bound->x][y] &=
+			    ~ADJ_BLOCK_SIGHT_EAST;
+			s->adjacency[plane][bound->x - 1][y] &=
+			    ~ADJ_BLOCK_SIGHT_WEST;
+			break;
+		case BOUND_DIR_DIAG_NW_SE:
+		case BOUND_DIR_DIAG_NE_SW:
+			s->adjacency[plane][bound->x][y] = 0;
+			break;
+		}
+	}
+
+	switch (bound->dir) {
+	case BOUND_DIR_VERT:
+		if (config->block) {
+			s->adjacency[plane][bound->x][y] |=
+			    ADJ_BLOCK_NORTH;
+			s->adjacency[plane][bound->x][y - 1] |=
+			    ADJ_BLOCK_SOUTH;
+		}
+		if (config->block_projectile) {
+			s->adjacency[plane][bound->x][y] |=
+			    ADJ_BLOCK_SIGHT_NORTH;
+			s->adjacency[plane][bound->x][y - 1] |=
+			    ADJ_BLOCK_SIGHT_SOUTH;
+		}
+		break;
+	case BOUND_DIR_HORIZ:
+		if (config->block) {
+			s->adjacency[plane][bound->x][y] |=
+			    ADJ_BLOCK_EAST;
+			s->adjacency[plane][bound->x - 1][y] |=
+			    ADJ_BLOCK_WEST;
+		}
+		if (config->block_projectile) {
+			s->adjacency[plane][bound->x][y] |=
+			    ADJ_BLOCK_SIGHT_EAST;
+			s->adjacency[plane][bound->x - 1][y] |=
+			    ADJ_BLOCK_SIGHT_WEST;
+		}
+		break;
+	case BOUND_DIR_DIAG_NW_SE:
+	case BOUND_DIR_DIAG_NE_SW:
+		if (config->block_projectile) {
+			s->adjacency[plane][bound->x][y] |=
+			    (ADJ_BLOCK_SIGHT_NORTH |
+			    ADJ_BLOCK_SIGHT_SOUTH |
+			    ADJ_BLOCK_SIGHT_EAST |
+			    ADJ_BLOCK_SIGHT_WEST);
+		}
+		if (config->block) {
+			s->adjacency[plane][bound->x][y] = 0xff;
+		}
+		break;
+	}
+
+	if (old != NULL) {
+		old->id = bound->id;
 		return;
 	}
 	zone = server_find_zone(bound->x, bound->y);
