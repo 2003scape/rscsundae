@@ -77,7 +77,6 @@ function register_skillnpc(name, spell, callback)
 end
 
 function register_usenpc(name, item, callback)
-	print(string.format("register %s %s", name, item))
 	if not usenpc_scripts[name] then
 		usenpc_scripts[name] = {}
 	end
