@@ -107,11 +107,31 @@ npc_process_movement(struct npc *npc)
 			    (double)UINT32_MAX;
 
 			/* XXX: needs verifying */
-			npc->random_walk_timer = 1 + (int)(r * 40);
+			npc->random_walk_timer = 1 + (int)(r * 30);
 			npc_random_walk(npc);
 		}
 	} else {
 		npc->random_walk_timer--;
+	}
+	int pos = npc->mob.walk_queue_pos;
+	if ((npc->mob.walk_queue_len - pos) <= 0) {
+		return;
+	}
+	int x = npc->mob.walk_queue_x[pos];
+	int y = npc->mob.walk_queue_y[pos];
+	switch (npc->config->move_restrict) {
+	case MOVE_RESTRICT_OUTDOORS:
+		if (y < PLANE_LEVEL_INC && npc->mob.server->roofs[x][y] != 0) {
+			npc->mob.walk_queue_len = 0;
+			npc->mob.walk_queue_pos = 0;
+		}
+		break;
+	case MOVE_RESTRICT_INDOORS:
+		if (y < PLANE_LEVEL_INC && npc->mob.server->roofs[x][y] == 0) {
+			npc->mob.walk_queue_len = 0;
+			npc->mob.walk_queue_pos = 0;
+		}
+		break;
 	}
 	mob_process_walk_queue(&npc->mob);
 }
