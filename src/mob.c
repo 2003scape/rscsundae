@@ -404,28 +404,34 @@ mob_process_walk_queue(struct mob *mob)
 		}
 	}
 
+	int ty = y;
+	ty -= (plane * PLANE_LEVEL_INC);
+
+	int cy = cur_y;
+	cy -= (plane * PLANE_LEVEL_INC);
+
 	/* verify reachability */
-	if (x < ZONE_MAX_X && y < ZONE_MAX_Y && plane < ZONE_MAX_PLANE) {
+	if (x < ZONE_MAX_X && ty < ZONE_MAX_Y && plane < ZONE_MAX_PLANE) {
 		struct server *s = mob->server;
 
-		if ((s->adjacency[plane][x][y] & ADJ_BLOCK_NORTH) != 0 &&
-		    (s->adjacency[plane][x][y] & ADJ_BLOCK_SOUTH) != 0 &&
-		    (s->adjacency[plane][x][y] & ADJ_BLOCK_EAST) != 0 &&
-		    (s->adjacency[plane][x][y] & ADJ_BLOCK_WEST) != 0) {
+		if ((s->adjacency[plane][x][ty] & ADJ_BLOCK_NORTH) != 0 &&
+		    (s->adjacency[plane][x][ty] & ADJ_BLOCK_SOUTH) != 0 &&
+		    (s->adjacency[plane][x][ty] & ADJ_BLOCK_EAST) != 0 &&
+		    (s->adjacency[plane][x][ty] & ADJ_BLOCK_WEST) != 0) {
 			return;
 		}
 		switch (dir) {
 		case MOB_DIR_NORTH:
 		case MOB_DIR_NORTHWEST:
 		case MOB_DIR_NORTHEAST:
-			if ((s->adjacency[plane][cur_x][cur_y] & ADJ_BLOCK_NORTH) != 0) {
+			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_NORTH) != 0) {
 				return;
 			}
 			break;
 		case MOB_DIR_SOUTH:
 		case MOB_DIR_SOUTHWEST:
 		case MOB_DIR_SOUTHEAST:
-			if ((s->adjacency[plane][cur_x][cur_y] & ADJ_BLOCK_SOUTH) != 0) {
+			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_SOUTH) != 0) {
 				return;
 			}
 			break;
@@ -434,14 +440,14 @@ mob_process_walk_queue(struct mob *mob)
 		case MOB_DIR_EAST:
 		case MOB_DIR_NORTHEAST:
 		case MOB_DIR_SOUTHEAST:
-			if ((s->adjacency[plane][cur_x][cur_y] & ADJ_BLOCK_EAST) != 0) {
+			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_EAST) != 0) {
 				return;
 			}
 			break;
 		case MOB_DIR_WEST:
 		case MOB_DIR_NORTHWEST:
 		case MOB_DIR_SOUTHWEST:
-			if ((s->adjacency[plane][cur_x][cur_y] & ADJ_BLOCK_WEST) != 0) {
+			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_WEST) != 0) {
 				return;
 			}
 			break;
