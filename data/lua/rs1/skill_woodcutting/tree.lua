@@ -89,6 +89,10 @@ function oploc1_tree(player, x, y)
 	end
 end
 
+function oploc2_deadtree1(player, x, y)
+	oploc1_tree(player, x, y)
+end
+
 register_useloc("tree", "bronze axe", useloc_tree_bronze_axe)
 register_useloc("tree", "iron axe", useloc_tree_iron_axe)
 register_useloc("tree", "steel axe", useloc_tree_steel_axe)
