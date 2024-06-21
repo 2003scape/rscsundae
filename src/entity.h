@@ -363,7 +363,6 @@ int player_add_ignore(struct player *, int64_t);
 int player_add_friend(struct player *, int64_t);
 int player_remove_ignore(struct player *, int64_t);
 int player_remove_friend(struct player *, int64_t);
-void player_pvp_attack(struct player *, struct player *);
 int player_wear(struct player *, int);
 int player_unwear(struct player *, int);
 void player_award_combat_xp(struct player *, struct mob *);
