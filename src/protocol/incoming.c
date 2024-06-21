@@ -838,6 +838,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			player_recalculate_equip(p);
 			p->appearance_changed = true;
 			p->ui_design_open = false;
+			p->script_active = false;
 
 			(void)snprintf(mes, sizeof(mes),
 			    "Welcome to %s!", p->mob.server->name);

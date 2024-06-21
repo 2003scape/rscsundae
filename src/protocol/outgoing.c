@@ -653,6 +653,7 @@ player_send_design_ui(struct player *p)
 		        OP_SRV_SHOW_DESIGN);
 
 	p->ui_design_open = true;
+	p->script_active = true;
 	return player_write_packet(p, p->tmpbuf, offset);
 }
 
