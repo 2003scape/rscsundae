@@ -81,6 +81,10 @@ player_create(struct server *s, int sock)
 	p->mob.damage = UINT8_MAX;
 	p->last_packet = s->tick_counter;
 
+	p->variables = NULL;
+	p->variable_count = 0;
+	p->variable_max = 0;
+
 	mob_combat_reset(&p->mob);
 
 	s->players[slot] = p;
@@ -1960,4 +1964,67 @@ player_init_adventurer(struct player *p)
 	item = server_find_item_config("cookedmeat");
 	assert(item != NULL);
 	player_inv_give(p, item, 1);
+}
+
+int32_t
+player_variable_get(struct player *p, const char *varname)
+{
+	for (size_t i = 0; i < p->variable_count; i++)
+	{
+		if (strcasecmp(varname, p->variables[i].name) == 0)
+		{
+			return p->variables[i].value;
+		}
+	}
+	return 0;
+}
+
+void
+player_variable_set(struct player *p, const char *varname, int32_t value)
+{
+	// check for an existing variable and update/delete it
+	for (size_t i = 0; i < p->variable_count; i++)
+	{
+		if (strcasecmp(varname, p->variables[i].name) == 0)
+		{
+			// remove the variable if value is 0
+			if (value == 0)
+			{
+				free(p->variables[i].name);
+
+				// shift all elements to the left
+				for (size_t j = i + 1; j < p->variable_count; j++)
+				{
+					p->variables[j - 1] = p->variables[j];
+				}
+
+				p->variable_count -= 1;
+			}
+			else
+			{
+				p->variables[i].value = value;
+			}
+			return;
+		}
+	}
+
+	// create a new variable
+	if (p->variable_count >= p->variable_max)
+	{
+		size_t next_size = p->variable_max + PLAYER_VAR_INC_SIZE;
+
+		if (reallocarr(&p->variables, next_size,
+			sizeof(struct playervar)) == -1)
+		{
+			printf("failed to realloc player var array of size %zu\n",
+				next_size);
+			return;
+		}
+
+		p->variable_max = next_size;
+	}
+
+	p->variables[p->variable_count].name = strdup(varname);
+	p->variables[p->variable_count].value = value;
+	p->variable_count += 1;
 }

@@ -115,5 +115,51 @@ player_parse_admin_command(struct player *p, char *str)
 		xp = strtol(xp_str, NULL, 10);
 
 		stat_advance(p, stat, xp, 0);
+	} else if (strcmp(cmd, "getvar") == 0) {
+		char *varname;
+		int32_t value;
+		char msg[64];
+
+		varname = strtok(NULL, " ");
+
+		if (varname == NULL) {
+			player_send_message(p, "Usage: getvar varname");
+			return;
+		}
+
+		value = player_variable_get(p, varname);
+
+		(void)snprintf(msg, sizeof(msg), "%s=%d", varname, value);
+		player_send_message(p, msg);
+	} else if (strcmp(cmd, "setvar") == 0) {
+		char *varname;
+		char *value_str;
+		int32_t value;
+
+		varname = strtok(NULL, " ");
+		value_str = strtok(NULL, " ");
+
+		if (varname == NULL || value_str == NULL) {
+			player_send_message(p, "Usage: setvar varname value");
+			return;
+		}
+
+		value = strtol(value_str, NULL, 10);
+
+		player_variable_set(p, varname, value);
+	} else if (strcmp(cmd, "listvar") == 0) {
+		if (p->variable_count == 0)
+		{
+			player_send_message(p, "You have no custom variables");
+			return;
+		}
+		for (size_t i = 0; i < p->variable_count; i++)
+		{
+			char msg[64];
+
+			(void)snprintf(msg, sizeof(msg), "%s=%d", p->variables[i].name,
+				p->variables[i].value);
+			player_send_message(p, msg);
+		}
 	}
 }

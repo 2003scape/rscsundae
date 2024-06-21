@@ -36,6 +36,8 @@
 
 #define WALK_QUEUE_LEN		(16)
 
+#define PLAYER_VAR_INC_SIZE	(16)
+
 struct server;
 struct ranctx;
 struct bound;
@@ -203,6 +205,11 @@ struct invitem {
 	uint8_t worn;
 };
 
+struct playervar {
+	char *name;
+	uint32_t value;
+};
+
 struct npc {
 	struct mob mob;
 	struct npc_config *config;
@@ -326,6 +333,9 @@ struct player {
 	struct isaac isaac_out;
 	uint8_t isaac_ready;
 	uint8_t script_active;
+	struct playervar *variables;
+	size_t variable_count;
+	size_t variable_max;
 };
 
 /* mob.c */
@@ -448,6 +458,8 @@ int player_send_shop(struct player *, const char *);
 int player_send_close_shop(struct player *);
 int player_notify_friend_online(struct player *, int64_t);
 int player_notify_friend_offline(struct player *, int64_t);
+int32_t player_variable_get(struct player *, const char *);
+void player_variable_set(struct player *, const char *, int32_t);
 
 /* npc.c */
 void npc_damage(struct npc *, struct player * , int);

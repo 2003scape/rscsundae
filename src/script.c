@@ -50,6 +50,8 @@ static int script_shootnpc(lua_State *);
 static int script_multi(lua_State *);
 static int script_addobject(lua_State *);
 static int script_delobject(lua_State *);
+static int script_getvar(lua_State *);
+static int script_setvar(lua_State *);
 static struct player *id_to_player(lua_Integer);
 static struct npc *id_to_npc(lua_Integer);
 static void safe_call(lua_State *, int, int, int);
@@ -849,6 +851,53 @@ script_npcsubstat(lua_State *L)
 		    (double)percent) / 100.0);
 		npc_damage(npc, NULL, constant + extra);
 	}
+	return 0;
+}
+
+
+static int
+script_getvar(lua_State *L)
+{
+	lua_Integer player_id;
+	const char *varname;
+	struct player *p;
+	uint32_t value;
+
+	player_id = luaL_checkinteger(L, 1);
+	varname = luaL_checkstring(L, 2);
+
+	p = id_to_player(player_id);
+	if (p == NULL) {
+		printf("script warning: player %lld is undefined\n", player_id);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	value = player_variable_get(p, varname);
+	lua_pushinteger(L, value);
+	return 1;
+}
+
+static int
+script_setvar(lua_State *L)
+{
+	lua_Integer player_id;
+	lua_Integer varvalue;
+	const char *varname;
+	struct player *p;
+
+	player_id = luaL_checkinteger(L, 1);
+	varname = luaL_checkstring(L, 2);
+	varvalue = luaL_checkinteger(L, 3);
+
+	p = id_to_player(player_id);
+	if (p == NULL) {
+		printf("script warning: player %lld is undefined\n", player_id);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	player_variable_set(p, varname, varvalue);
 	return 0;
 }
 
@@ -1786,6 +1835,12 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_delobject);
 	lua_setglobal(L, "delobject");
+
+	lua_pushcfunction(L, script_getvar);
+	lua_setglobal(L, "getvar");
+
+	lua_pushcfunction(L, script_setvar);
+	lua_setglobal(L, "setvar");
 
 	if (luaL_dofile(L, "./lua/script.lua") != LUA_OK) {
 		printf("script error %s:\n",  lua_tostring(L, -1));
