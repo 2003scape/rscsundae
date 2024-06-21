@@ -245,6 +245,20 @@ mob_die(struct mob *mob)
 		mob->cur_stats[i] = mob->base_stats[i];
 	}
 
+	if (mob->target_player != -1) {
+		struct player *target = mob->server->players[mob->target_player];
+		if (target != NULL) {
+			mob_combat_reset(&target->mob);
+		}
+	}
+
+	if (mob->target_npc != -1) {
+		struct npc *target = mob->server->npcs[mob->target_npc];
+		if (target != NULL) {
+			mob_combat_reset(&target->mob);
+		}
+	}
+
 	mob->combat_timer = 0;
 	mob->damage_timer = 0;
 

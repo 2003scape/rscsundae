@@ -433,15 +433,10 @@ player_die(struct player *p, struct player *victor)
 
 	mob_die(&p->mob);
 
-	p->mob.x = p->mob.server->start_tile_x;
-	p->mob.y = p->mob.server->start_tile_y;
-	p->teleported = true;
-
 	p->mob.walk_queue_len = 0;
 	p->mob.walk_queue_pos = 0;
 	player_clear_actions(p);
 
-	mob_combat_reset(&p->mob);
 	if (victor != NULL && victor->mob.target_player == p->mob.id) {
 		mob_combat_reset(&victor->mob);
 	}
@@ -509,6 +504,10 @@ player_die(struct player *p, struct player *victor)
 		    "You have defeated %s!", name);
 		player_send_message(victor, msg);
 	}
+
+	p->mob.x = p->mob.server->start_tile_x;
+	p->mob.y = p->mob.server->start_tile_y;
+	p->teleported = true;
 }
 
 void
