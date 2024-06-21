@@ -10,8 +10,11 @@ player_parse_admin_command(struct player *p, char *str)
 {
 	const char *cmd;
 
-	printf("admin command: %s\n", str);
 	cmd = strtok(str, " ");
+	if (cmd == NULL) {
+		return;
+	}
+	printf("admin command: %s\n", str);
 	if (strcmp(cmd, "give") == 0) {
 		struct item_config *item_config;
 		char *item_str;
