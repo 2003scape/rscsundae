@@ -194,3 +194,20 @@ You fail to cut through it
 You slice through the web
 @que@You recharge your prayer points
 @que@You already have full prayer points
+@que@What would you like to make?
+@que@You make the clay into a bowl
+@que@you make the clay into a pot
+@que@you make the clay into a pie dish
+@que@you need to have a crafting of level 4 or higher to make pie dishes
+@que@You need to have a crafting of level 7 or higher to make a bowl
+@que@You need to have a crafting of level 7 or higher to make boots
+@que@You need to have a crafting of level 14 or higher to make Leather Armour
+@que@You put the bowl in the oven
+@que@the bowl hardens in the oven
+@que@You remove a bowl from the oven
+@que@You put the pot in the oven
+@que@the pot hardens in the oven
+@que@You remove a pot from the oven
+@que@You put the pie dish in the oven
+@que@the dish hardens in the oven
+@que@You remove a dish from the oven

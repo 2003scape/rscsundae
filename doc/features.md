@@ -63,7 +63,7 @@ These should all be implemented in Lua script:
 - [ ] Magic (enchantment)
 - [x] Woodcutting
 - [x] Firemaking
-- [ ] Crafting (pottery)
+- [x] Crafting (pottery)
 - [ ] Crafting (jewelry)
 - [ ] Crafting (leatherworking)
 - [ ] Crafting (wool)
