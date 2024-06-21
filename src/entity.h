@@ -55,20 +55,22 @@ struct bank_item {
 
 enum action {
 	ACTION_NONE		= 0,
-	ACTION_NPC_USEWITH	= 1,
-	ACTION_NPC_TALK		= 2,
-	ACTION_NPC_CAST		= 3,
-	ACTION_INV_DROP		= 4,
-	ACTION_INV_OP1		= 5,
-	ACTION_INV_USEWITH	= 6,
-	ACTION_ITEM_TAKE	= 7,
-	ACTION_ITEM_USEWITH	= 8,
-	ACTION_PLAYER_CAST	= 9,
-	ACTION_BOUND_OP1	= 10,
-	ACTION_BOUND_OP2	= 11,
-	ACTION_LOC_USEWITH	= 12,
-	ACTION_LOC_OP1		= 13,
-	ACTION_LOC_OP2		= 14,
+	ACTION_NPC_ATTACK	= 1,
+	ACTION_NPC_USEWITH	= 2,
+	ACTION_NPC_TALK		= 3,
+	ACTION_NPC_CAST		= 4,
+	ACTION_INV_DROP		= 5,
+	ACTION_INV_OP1		= 6,
+	ACTION_INV_USEWITH	= 7,
+	ACTION_ITEM_TAKE	= 8,
+	ACTION_ITEM_USEWITH	= 9,
+	ACTION_PLAYER_ATTACK	= 10,
+	ACTION_PLAYER_CAST	= 11,
+	ACTION_BOUND_OP1	= 12,
+	ACTION_BOUND_OP2	= 13,
+	ACTION_LOC_USEWITH	= 14,
+	ACTION_LOC_OP1		= 15,
+	ACTION_LOC_OP2		= 16,
 };
 
 enum trade_state {
@@ -392,6 +394,9 @@ void player_shoot_pvm(struct player *, struct projectile_config *,
 void player_skull(struct player *, struct player *);
 void player_init_class(struct player *);
 void player_init_adventurer(struct player *);
+int player_get_attack_boosted(struct player *);
+int player_get_defense_boosted(struct player *);
+int player_get_strength_boosted(struct player *);
 
 /* admin.c */
 void player_parse_admin_command(struct player *, char *);
@@ -449,5 +454,6 @@ int player_notify_friend_offline(struct player *, int64_t);
 void npc_damage(struct npc *, struct player * , int);
 void npc_die(struct npc *, struct player *);
 void npc_process_movement(struct npc *);
+void npc_process_combat(struct npc *);
 
 #endif

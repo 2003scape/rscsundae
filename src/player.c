@@ -21,9 +21,6 @@
 
 static void player_restore_stat(struct player *, int);
 static void player_restore_stats(struct player *);
-static int player_get_attack_boosted(struct player *);
-static int player_get_defense_boosted(struct player *);
-static int player_get_strength_boosted(struct player *);
 static int player_pvp_roll(struct player *, struct player *);
 static int player_pvm_roll(struct player *, struct npc *);
 static int player_pvp_ranged_roll(struct player *, struct player *);
@@ -288,7 +285,7 @@ player_is_blocked(struct player *p, int64_t speaker, bool flag)
 	return flag;
 }
 
-static int
+int
 player_get_attack_boosted(struct player *p)
 {
 	int stat = 8;
@@ -314,7 +311,7 @@ player_get_attack_boosted(struct player *p)
 	return stat;
 }
 
-static int
+int
 player_get_defense_boosted(struct player *p)
 {
 	int stat = 8;
@@ -340,7 +337,7 @@ player_get_defense_boosted(struct player *p)
 	return stat;
 }
 
-static int
+int
 player_get_strength_boosted(struct player *p)
 {
 	int stat = 8;
@@ -426,16 +423,6 @@ player_magic_damage_roll(struct player *p, int power)
 	double dmg = (power + 5.0) * rand;
 
 	return dmg / 10;
-}
-void
-player_pvp_attack(struct player *attacker, struct player *target)
-{
-	if (attacker->mob.in_combat) {
-		player_send_message(attacker,
-		    "You are already busy fighting!");
-		return;
-	}
-	attacker->mob.target_player = target->mob.id;
 }
 
 void
@@ -722,6 +709,11 @@ player_wilderness_check(struct player *p, struct player *target)
 static bool
 player_init_combat(struct player *p, struct mob *target)
 {
+	if (p->mob.in_combat) {
+		player_send_message(p,
+		    "You are already busy fighting!");
+		return false;
+	}
 
 	if (target->in_combat) {
 		/* XXX message needs verifying */
@@ -732,8 +724,7 @@ player_init_combat(struct player *p, struct mob *target)
 		return false;
 	}
 
-	if (!mob_within_range(&p->mob,
-	    target->x, target->y, 3)) {
+	if (!mob_within_range(&p->mob, target->x, target->y, 3)) {
 		return false;
 	}
 
@@ -765,7 +756,6 @@ player_init_combat(struct player *p, struct mob *target)
 	target->target_player = p->mob.id;
 	target->target_npc = -1;
 	target->in_combat = true;
-	target->combat_next_hit = 4;
 	target->combat_rounds = 0;
 	target->dir = MOB_DIR_COMBAT_LEFT;
 
@@ -818,8 +808,24 @@ player_process_combat(struct player *p)
 
 			player_close_ui(target);
 			player_clear_actions(target);
+			target->mob.combat_next_hit = 4;
 
 			player_send_message(target, "You are under attack!");
+		} else if (p->mob.target_npc != -1) {
+			struct npc *target;
+
+			target = p->mob.server->npcs[p->mob.target_npc];
+			if (target == NULL) {
+				mob_combat_reset(&p->mob);
+				return;
+			}
+
+			if (!player_init_combat(p, &target->mob)) {
+				return;
+			}
+
+			target->mob.combat_next_hit = 3;
+			p->mob.target_player = -1;
 		}
 		return;
 	}
@@ -860,6 +866,37 @@ player_process_combat(struct player *p)
 		target->mob.combat_rounds++;
 		target->mob.combat_timer = p->mob.server->tick_counter;
 		p->mob.combat_next_hit = 3;
+	} else if (p->mob.target_npc != -1) {
+		struct npc *target;
+		int roll;
+
+		target = p->mob.server->npcs[p->mob.target_npc];
+		if (target == NULL) {
+			mob_combat_reset(&p->mob);
+			return;
+		}
+
+		if (p->mob.x != target->mob.x ||
+		    p->mob.y != target->mob.y) {
+			return;
+		}
+
+		if (p->mob.dir != MOB_DIR_COMBAT_RIGHT &&
+		    p->mob.dir != MOB_DIR_COMBAT_LEFT) {
+			p->mob.dir = MOB_DIR_COMBAT_RIGHT;
+			target->mob.dir = MOB_DIR_COMBAT_LEFT;
+		}
+
+		if (p->mob.combat_next_hit > 0) {
+			p->mob.combat_next_hit--;
+			return;
+		}
+
+		roll = player_pvm_roll(p, target);
+		npc_damage(target, p, roll);
+		target->mob.combat_rounds++;
+		target->mob.combat_timer = p->mob.server->tick_counter;
+		p->mob.combat_next_hit = 3;
 	}
 }
 
@@ -867,6 +904,7 @@ int
 player_retreat(struct player *p)
 {
 	struct player *p2;
+	struct npc *npc;
 
 	if (p->mob.combat_rounds < 3) {
 		player_send_message(p,
@@ -882,6 +920,15 @@ player_retreat(struct player *p)
 			p2->mob.walk_queue_len = 0;
 			p2->mob.walk_queue_pos = 0;
 			mob_combat_reset(&p2->mob);
+		}
+	}
+
+	if (p->mob.target_npc != -1) {
+		npc = p->mob.server->npcs[p->mob.target_npc];
+		if (npc != NULL) {
+			npc->mob.walk_queue_len = 0;
+			npc->mob.walk_queue_pos = 0;
+			mob_combat_reset(&npc->mob);
 		}
 	}
 
@@ -1425,20 +1472,29 @@ player_process_action(struct player *p)
 	uint32_t stack;
 
 	switch (p->action) {
+	case ACTION_NPC_ATTACK:
+		npc = p->mob.server->npcs[p->action_npc];
+		if (npc == NULL) {
+			p->action = ACTION_NONE;
+			return;
+		}
+		if (!mob_within_range(&p->mob, npc->mob.x, npc->mob.y, 3)) {
+			return;
+		}
+		p->mob.target_npc = p->action_npc;
+		p->action = ACTION_NONE;
+		break;
 	case ACTION_NPC_USEWITH:
 		npc = p->mob.server->npcs[p->action_npc];
 		if (npc == NULL) {
 			p->action = ACTION_NONE;
-			assert(0);
 			return;
 		}
 		if (p->action_slot >= p->inv_count) {
 			p->action = ACTION_NONE;
-			assert(0);
 			return;
 		}
 		if (!mob_within_range(&p->mob, npc->mob.x, npc->mob.y, 2)) {
-			puts("waiting for move closer");
 			return;
 		}
 		p->mob.walk_queue_len = 0;
@@ -1599,6 +1655,18 @@ player_process_action(struct player *p)
 		 * see Logg/Tylerbeg/08-05-2018 20.12.26 for some reason, I go to the wizards tower, cast fire blast on the demon for a little while, forget what Im doing and leave
 		 */
 		script_onskillnpc(p->mob.server->lua, p, npc, p->spell);
+		break;
+	case ACTION_PLAYER_ATTACK:
+		target = p->mob.server->players[p->action_player];
+		if (target == NULL) {
+			p->action = ACTION_NONE;
+			return;
+		}
+		if (!mob_within_range(&p->mob, target->mob.x, target->mob.y, 3)) {
+			return;
+		}
+		p->mob.target_player = target->mob.id;
+		p->action = ACTION_NONE;
 		break;
 	case ACTION_PLAYER_CAST:
 		target = p->mob.server->players[p->action_player];

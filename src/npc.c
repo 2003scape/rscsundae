@@ -4,6 +4,7 @@
 #include "server.h"
 
 static void npc_random_walk(struct npc *);
+static int npc_combat_roll(struct npc *, struct player *);
 
 void
 npc_die(struct npc *npc, struct player *p)
@@ -138,4 +139,45 @@ npc_process_movement(struct npc *npc)
 		break;
 	}
 	mob_process_walk_queue(&npc->mob);
+}
+
+static int
+npc_combat_roll(struct npc *npc, struct player *defender)
+{
+	int def = player_get_defense_boosted(defender);
+
+	return mob_combat_roll(&npc->mob.server->ran,
+	    npc->mob.cur_stats[SKILL_ATTACK], 0,
+	    def, defender->bonus_armour,
+	    npc->mob.cur_stats[SKILL_STRENGTH], 0);
+}
+
+void
+npc_process_combat(struct npc *npc)
+{
+	if (!npc->mob.in_combat) {
+		return;
+	}
+	/* TODO: bravery (or lack thereof) */
+	if (npc->mob.target_player != -1) {
+		struct player *target;
+		int roll;
+
+		target = npc->mob.server->players[npc->mob.target_player];
+		if (target == NULL) {
+			mob_combat_reset(&npc->mob);
+			return;
+		}
+
+		if (npc->mob.combat_next_hit > 0) {
+			npc->mob.combat_next_hit--;
+			return;
+		}
+
+		roll = npc_combat_roll(npc, target);
+		player_damage(target, NULL, roll);
+		target->mob.combat_rounds++;
+		target->mob.combat_timer = npc->mob.server->tick_counter;
+		npc->mob.combat_next_hit = 3;
+	}
 }

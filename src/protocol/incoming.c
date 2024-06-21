@@ -459,7 +459,6 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 		break;
 	case OP_CLI_ATTACK_PLAYER:
 		{
-			struct player *t;
 			uint16_t id;
 
 			if (buf_getu16(data, offset, len, &id) == -1) {
@@ -467,10 +466,8 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			}
 			offset += 2;
 			if (id < MAXPLAYERS) {
-				t = p->mob.server->players[id];
-				if (t != NULL) {
-					player_pvp_attack(p, t);
-				}
+				p->action = ACTION_PLAYER_ATTACK;
+				p->action_player = id;
 			}
 		}
 		break;
@@ -483,6 +480,20 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			}
 			if (style <= COMBAT_STYLE_DEFENSIVE) {
 				p->combat_style = style;
+			}
+		}
+		break;
+	case OP_CLI_NPC_ATTACK:
+		{
+			uint16_t id;
+
+			if (buf_getu16(data, offset, len, &id) == -1) {
+				return;
+			}
+			offset += 2;
+			if (id < MAXNPCS) {
+				p->action = ACTION_NPC_ATTACK;
+				p->action_npc = id;
 			}
 		}
 		break;

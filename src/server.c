@@ -297,6 +297,7 @@ server_tick(void)
 		if (s.npcs[i] == NULL) {
 			continue;
 		}
+		npc_process_combat(s.npcs[i]);
 		npc_process_movement(s.npcs[i]);
 	}
 
