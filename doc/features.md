@@ -106,7 +106,7 @@ These should all be implemented in Lua script:
 - [ ] Muddy key and chest
 - [x] Hans NPC dialogue
 - [x] Silk trader NPC dialogue
-- [ ] Tanner NPC dialogue
+- [x] Tanner NPC dialogue
 - [x] Kebab Seller NPC dialogue
 - [ ] Aggie NPC dialogue
 - [ ] Certing (Miles, Niles, Giles NPCs)

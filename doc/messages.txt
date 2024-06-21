@@ -211,3 +211,4 @@ You slice through the web
 @que@You put the pie dish in the oven
 @que@the dish hardens in the oven
 @que@You remove a dish from the oven
+You swap a cow hide for a piece of leather
