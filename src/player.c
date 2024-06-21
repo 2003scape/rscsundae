@@ -820,6 +820,11 @@ player_process_combat(struct player *p)
 				return;
 			}
 
+			if (p->projectile != NULL) {
+				player_shoot_pvm(p, p->projectile, target);
+				return;
+			}
+
 			if (!player_init_combat(p, &target->mob)) {
 				return;
 			}
@@ -1478,9 +1483,6 @@ player_process_action(struct player *p)
 			p->action = ACTION_NONE;
 			return;
 		}
-		if (!mob_within_range(&p->mob, npc->mob.x, npc->mob.y, 3)) {
-			return;
-		}
 		p->mob.target_npc = p->action_npc;
 		p->action = ACTION_NONE;
 		break;
@@ -1660,9 +1662,6 @@ player_process_action(struct player *p)
 		target = p->mob.server->players[p->action_player];
 		if (target == NULL) {
 			p->action = ACTION_NONE;
-			return;
-		}
-		if (!mob_within_range(&p->mob, target->mob.x, target->mob.y, 3)) {
 			return;
 		}
 		p->mob.target_player = target->mob.id;
