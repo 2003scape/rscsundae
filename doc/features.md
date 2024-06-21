@@ -114,7 +114,7 @@ These should all be implemented in Lua script:
 - [ ] Monk NPC dialogue
 - [ ] Brother Jered NPC dialogue
 - [x] Barbarian NPC dialogue
-- [ ] Pirate NPC dialogue
+- [x] Pirate NPC dialogue
 - [x] Man NPC dialogue
 - [ ] Thrander NPC dialogue
 - [ ] Bareak NPC dialogue
