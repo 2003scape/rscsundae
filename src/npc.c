@@ -14,9 +14,6 @@ npc_die(struct npc *npc, struct player *p)
 
 	mob_die(&npc->mob);
 
-	npc->mob.x = npc->spawn_x;
-	npc->mob.y = npc->spawn_y;
-
 	if (p->mob.target_npc == npc->mob.id) {
 		mob_combat_reset(&p->mob);
         }
@@ -28,6 +25,9 @@ npc_die(struct npc *npc, struct player *p)
 		    item_config->id,
 		    npc->config->drops[i].amount);
 	}
+
+	npc->mob.x = npc->spawn_x;
+	npc->mob.y = npc->spawn_y;
 }
 
 void
