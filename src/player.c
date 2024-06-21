@@ -25,11 +25,13 @@ static int player_get_attack_boosted(struct player *);
 static int player_get_defense_boosted(struct player *);
 static int player_get_strength_boosted(struct player *);
 static int player_pvp_roll(struct player *, struct player *);
+static int player_pvm_roll(struct player *, struct npc *);
 static int player_pvp_ranged_roll(struct player *, struct player *);
 static int player_pvm_ranged_roll(struct player *, struct npc *);
 static int player_magic_damage_roll(struct player *, int);
 static bool player_wilderness_check(struct player *, struct player *);
 static bool player_consume_ammo(struct player *, struct projectile_config *);
+static bool player_init_combat(struct player *, struct mob *);
 
 struct player *
 player_create(struct server *s, int sock)
@@ -393,6 +395,18 @@ player_pvm_ranged_roll(struct player *attacker, struct npc *npc)
 }
 
 static int
+player_pvm_roll(struct player *p, struct npc *npc)
+{
+	int att = player_get_attack_boosted(p);
+	int str = player_get_strength_boosted(p);
+
+	return mob_combat_roll(&p->mob.server->ran,
+	    att, p->bonus_weaponaim,
+	    npc->mob.cur_stats[SKILL_DEFENSE], 0,
+	    str, p->bonus_weaponpower);
+}
+
+static int
 player_pvp_roll(struct player *attacker, struct player *defender)
 {
 	int att = player_get_attack_boosted(attacker);
@@ -705,6 +719,59 @@ player_wilderness_check(struct player *p, struct player *target)
 	return true;
 }
 
+static bool
+player_init_combat(struct player *p, struct mob *target)
+{
+
+	if (target->in_combat) {
+		/* XXX message needs verifying */
+		player_send_message(p, "I can't get close enough");
+		p->mob.walk_queue_pos = 0;
+		p->mob.walk_queue_len = 0;
+		mob_combat_reset(&p->mob);
+		return false;
+	}
+
+	if (!mob_within_range(&p->mob,
+	    target->x, target->y, 3)) {
+		return false;
+	}
+
+	if (p->mob.x == target->x &&
+	    p->mob.y == target->y) {
+		p->mob.dir = MOB_DIR_COMBAT_RIGHT;
+		p->mob.walk_queue_len = 0;
+		p->mob.walk_queue_pos = 0;
+	} else {
+		p->mob.walk_queue_x[0] = target->x;
+		p->mob.walk_queue_y[0] = target->y;
+		p->mob.walk_queue_len = 1;
+		p->mob.walk_queue_pos = 0;
+	}
+
+	/* successful catch, combat lock the target */
+	target->walk_queue_len = 0;
+	target->walk_queue_pos = 0;
+
+	player_close_ui(p);
+	player_clear_actions(p);
+
+	p->mob.in_combat = true;
+	p->mob.combat_next_hit = 0;
+	p->mob.combat_rounds = 0;
+
+	target->walk_queue_len = 0;
+	target->walk_queue_pos = 0;
+	target->target_player = p->mob.id;
+	target->target_npc = -1;
+	target->in_combat = true;
+	target->combat_next_hit = 4;
+	target->combat_rounds = 0;
+	target->dir = MOB_DIR_COMBAT_LEFT;
+
+	return true;
+}
+
 void
 player_process_combat(struct player *p)
 {
@@ -740,56 +807,17 @@ player_process_combat(struct player *p)
 				return;
 			}
 
-			if (target->mob.in_combat) {
-				/* XXX needs verifying */
-				player_send_message(p, "I can't get close enough");
-				p->mob.walk_queue_pos = 0;
-				p->mob.walk_queue_len = 0;
-				mob_combat_reset(&p->mob);
+			if (!player_init_combat(p, &target->mob)) {
 				return;
 			}
-
-			if (!mob_within_range(&p->mob,
-			    target->mob.x, target->mob.y, 3)) {
-				return;
-			}
-
-			if (p->mob.x == target->mob.x &&
-			    p->mob.y == target->mob.y) {
-				p->mob.dir = MOB_DIR_COMBAT_RIGHT;
-				p->mob.walk_queue_len = 0;
-				p->mob.walk_queue_pos = 0;
-			} else {
-				p->mob.walk_queue_x[0] = target->mob.x;
-				p->mob.walk_queue_y[0] = target->mob.y;
-				p->mob.walk_queue_len = 1;
-				p->mob.walk_queue_pos = 0;
-			}
-
-			/* successful catch, combat lock the target */
-			target->mob.walk_queue_len = 0;
-			target->mob.walk_queue_pos = 0;
 
 			player_skull(p, target);
 
-			player_close_ui(p);
-			player_clear_actions(p);
 			p->mob.target_player = target->mob.id;
 			p->mob.target_npc = -1;
-			p->mob.in_combat = true;
-			p->mob.combat_next_hit = 0;
-			p->mob.combat_rounds = 0;
 
 			player_close_ui(target);
 			player_clear_actions(target);
-			target->mob.walk_queue_len = 0;
-			target->mob.walk_queue_pos = 0;
-			target->mob.target_player = p->mob.id;
-			target->mob.target_npc = -1;
-			target->mob.in_combat = true;
-			target->mob.combat_next_hit = 4;
-			target->mob.combat_rounds = 0;
-			target->mob.dir = MOB_DIR_COMBAT_LEFT;
 
 			player_send_message(target, "You are under attack!");
 		}
