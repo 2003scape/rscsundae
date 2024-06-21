@@ -91,8 +91,9 @@ Your opponent already has weakend strength
 @que@You hammer the metal and make a large helmet
 @que@You hammer the metal and make some nails
 @que@What would you like to make?
-@que@You make some leather armour
-@que@You make some boots
+You make some leather gloves
+You make some leather armour
+You make some boots
 @que@You use up one of your reels of thread
 You pay 30 gold
 You board the ship
@@ -202,6 +203,10 @@ You slice through the web
 @que@You need to have a crafting of level 7 or higher to make a bowl
 @que@You need to have a crafting of level 7 or higher to make boots
 @que@You need to have a crafting of level 14 or higher to make Leather Armour
+@que@you need a crafting level of 20 to cut sapphires
+@que@you need a crafting level of 27 to cut emeralds
+@que@you need a crafting level of 34 to cut rubies
+@que@you need a crafting level of 43 to cut diamonds
 @que@You put the bowl in the oven
 @que@the bowl hardens in the oven
 @que@You remove a bowl from the oven
@@ -212,3 +217,27 @@ You slice through the web
 @que@the dish hardens in the oven
 @que@You remove a dish from the oven
 You swap a cow hide for a piece of leather
+You cut the sapphire
+You cut the emerald
+You cut the ruby
+You cut the diamond
+@que@You are not a high enough level to use this item
+@que@You need to have a attack level of 5
+@que@You need to have a attack level of 10
+@que@You need to have a attack level of 20
+@que@You need to have a attack level of 30
+@que@You need to have a attack level of 40
+@que@You need to have a defense level of 5
+@que@You need to have a defense level of 10
+@que@You need to have a defense level of 40
+@que@what would you like to make
+@que@Would you like to put a gem in the amulet?
+@que@Would you like to put a gem in the necklace?
+@que@Would you like to put a gem in the ring?
+@que@what sort of gem do you want to put in the amulet?
+@que@what sort of gem do you want to put in the necklace?
+@que@what sort of gem do you want to put in the ring?
+@que@You need a crafting skill of level 24 to make this
+@que@You need a crafting skill of level 30 to make this
+@que@You need a crafting skill of level 40 to make this
+@que@You need a crafting skill of level 50 to make this
