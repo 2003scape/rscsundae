@@ -52,6 +52,25 @@ static int script_addobject(lua_State *);
 static int script_delobject(lua_State *);
 static struct player *id_to_player(lua_Integer);
 static struct npc *id_to_npc(lua_Integer);
+static void safe_call(lua_State *, int, int, int);
+static int script_panic(lua_State *);
+
+static int
+script_panic(lua_State *L) {
+	printf("Error in Lua script: %s\n", lua_tostring(L, -1));
+	fflush(stdout);
+	return 0;
+}
+
+static void
+safe_call(lua_State *L, int nargs, int nresults, int player_id)
+{
+	int ret = lua_pcall(L, nargs, nresults, 0);
+	if (ret != 0) {
+		printf("Error in Lua script: %s\n", lua_tostring(L, -1));
+		script_cancel(L, player_id);
+	}
+}
 
 static struct player *
 id_to_player(lua_Integer id)
@@ -1250,7 +1269,7 @@ script_tick(lua_State *L)
 		puts("script error: can't find essential function script_engine_tick");
 		return;
 	}
-	lua_pcall(L, 0, 0, 0);
+	safe_call(L, 0, 0, -1);
 }
 
 void
@@ -1264,7 +1283,7 @@ script_process(lua_State *L, struct player *p)
 		return;
 	}
 	lua_pushnumber(L, p->mob.id);
-	lua_pcall(L, 1, 0, 0);
+	safe_call(L, 1, 0, p->mob.id);
 }
 
 void
@@ -1282,7 +1301,7 @@ script_onnpctalk(lua_State *L, struct player *p, struct npc *npc)
 		lua_pushnumber(L, p->mob.id);
 		lua_pushstring(L, npc->config->names[i]);
 		lua_pushnumber(L, npc->mob.id);
-		lua_pcall(L, 3, 1, 0);
+		safe_call(L, 3, 1, p->mob.id);
 		result = lua_toboolean(L, -1);
 		if (result != 0) {
 			return;
@@ -1307,7 +1326,7 @@ script_onopinv(lua_State *L, struct player *p, struct item_config *item)
 		}
 		lua_pushnumber(L, p->mob.id);
 		lua_pushstring(L, item->names[i]);
-		lua_pcall(L, 2, 1, 0);
+		safe_call(L, 2, 1, p->mob.id);
 		result = lua_toboolean(L, -1);
 		if (result != 0) {
 			return;
@@ -1329,7 +1348,7 @@ script_onskillplayer(lua_State *L, struct player *p,
 	lua_pushnumber(L, p->mob.id);
 	lua_pushnumber(L, target->mob.id);
 	lua_pushstring(L, spell->name);
-	lua_pcall(L, 3, 0, 0);
+	safe_call(L, 3, 0, p->mob.id);
 }
 
 void
@@ -1350,7 +1369,7 @@ script_onuseobj(lua_State *L, struct player *p,
 			lua_pushnumber(L, x);
 			lua_pushnumber(L, y);
 			lua_pushstring(L, invitem->names[i]);
-			lua_pcall(L, 5, 1, 0);
+			safe_call(L, 5, 1, p->mob.id);
 			result = lua_toboolean(L, -1);
 			if (result != 0) {
 				return;
@@ -1377,7 +1396,7 @@ script_onuseinv(lua_State *L, struct player *p,
 			lua_pushnumber(L, p->mob.id);
 			lua_pushstring(L, item1->names[i]);
 			lua_pushstring(L, item2->names[j]);
-			lua_pcall(L, 3, 1, 0);
+			safe_call(L, 3, 1, p->mob.id);
 			result = lua_toboolean(L, -1);
 			if (result != 0) {
 				return;
@@ -1405,7 +1424,7 @@ script_onusenpc(lua_State *L, struct player *p,
 			lua_pushnumber(L, npc->mob.id);
 			lua_pushstring(L, npc->config->names[i]);
 			lua_pushstring(L, item->names[j]);
-			lua_pcall(L, 4, 1, 0);
+			safe_call(L, 4, 1, p->mob.id);
 			result = lua_toboolean(L, -1);
 			if (result != 0) {
 				return;
@@ -1438,7 +1457,7 @@ script_onuseloc(lua_State *L, struct player *p,
 			lua_pushnumber(L, loc->x);
 			lua_pushnumber(L, loc->y);
 			lua_pushstring(L, item->names[j]);
-			lua_pcall(L, 5, 1, 0);
+			safe_call(L, 5, 1, p->mob.id);
 			result = lua_toboolean(L, -1);
 			if (result != 0) {
 				return;
@@ -1465,7 +1484,7 @@ script_onskillnpc(lua_State *L, struct player *p,
 		lua_pushstring(L, npc->config->names[i]);
 		lua_pushnumber(L, npc->mob.id);
 		lua_pushstring(L, spell->name);
-		lua_pcall(L, 4, 1, 0);
+		safe_call(L, 4, 1, p->mob.id);
 		result = lua_toboolean(L, -1);
 		if (result != 0) {
 			return;
@@ -1481,7 +1500,7 @@ script_onskillnpc(lua_State *L, struct player *p,
 	lua_pushstring(L, "_");
 	lua_pushnumber(L, npc->mob.id);
 	lua_pushstring(L, spell->name);
-	lua_pcall(L, 4, 1, 0);
+	safe_call(L, 4, 1, p->mob.id);
 	lua_pop(L, -1);
 }
 
@@ -1505,7 +1524,7 @@ script_onopbound1(lua_State *L, struct player *p, struct bound *bound)
 		lua_pushnumber(L, bound->x);
 		lua_pushnumber(L, bound->y);
 		lua_pushnumber(L, bound->dir);
-		lua_pcall(L, 5, 1, 0);
+		safe_call(L, 5, 1, p->mob.id);
 		result = lua_toboolean(L, -1);
 		if (result != 0) {
 			return;
@@ -1534,7 +1553,7 @@ script_onopbound2(lua_State *L, struct player *p, struct bound *bound)
 		lua_pushnumber(L, bound->x);
 		lua_pushnumber(L, bound->y);
 		lua_pushnumber(L, bound->dir);
-		lua_pcall(L, 5, 1, 0);
+		safe_call(L, 5, 1, p->mob.id);
 		result = lua_toboolean(L, -1);
 		if (result != 0) {
 			return;
@@ -1562,7 +1581,7 @@ script_onoploc1(lua_State *L, struct player *p, struct loc *loc)
 		lua_pushstring(L, config->names[i]);
 		lua_pushnumber(L, loc->x);
 		lua_pushnumber(L, loc->y);
-		lua_pcall(L, 4, 1, 0);
+		safe_call(L, 4, 1, p->mob.id);
 		result = lua_toboolean(L, -1);
 		if (result != 0) {
 			return;
@@ -1590,7 +1609,7 @@ script_onoploc2(lua_State *L, struct player *p, struct loc *loc)
 		lua_pushstring(L, config->names[i]);
 		lua_pushnumber(L, loc->x);
 		lua_pushnumber(L, loc->y);
-		lua_pcall(L, 4, 1, 0);
+		safe_call(L, 4, 1, p->mob.id);
 		result = lua_toboolean(L, -1);
 		if (result != 0) {
 			return;
@@ -1621,7 +1640,7 @@ script_multi_answer(lua_State *L, struct player *p, int option)
 	}
 	lua_pushnumber(L, p->mob.id);
 	lua_pushnumber(L, option + 1);
-	lua_pcall(L, 2, 0, 0);
+	safe_call(L, 2, 0, p->mob.id);
 }
 
 lua_State *
@@ -1633,6 +1652,8 @@ script_init(struct server *s)
 
 	L = luaL_newstate();
 	luaL_openlibs(L);
+
+	lua_atpanic(L, script_panic);
 
 	lua_pushcfunction(L, script_say);
 	lua_setglobal(L, "_say");
