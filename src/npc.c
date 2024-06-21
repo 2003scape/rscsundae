@@ -13,6 +13,11 @@ npc_die(struct npc *npc, struct player *p)
 
 	npc->respawn_time = npc->config->respawn / 5;
 
+	if (p != NULL && p->mob.in_combat &&
+	    p->mob.target_npc == npc->mob.id) {
+		player_award_combat_xp(p, &npc->mob);
+	}
+
 	mob_die(&npc->mob);
 
 	if (p->mob.target_npc == npc->mob.id) {
