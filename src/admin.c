@@ -148,13 +148,11 @@ player_parse_admin_command(struct player *p, char *str)
 
 		player_variable_set(p, varname, value);
 	} else if (strcmp(cmd, "listvar") == 0) {
-		if (p->variable_count == 0)
-		{
+		if (p->variable_count == 0) {
 			player_send_message(p, "You have no custom variables");
 			return;
 		}
-		for (size_t i = 0; i < p->variable_count; i++)
-		{
+		for (size_t i = 0; i < p->variable_count; i++) {
 			char msg[64];
 
 			(void)snprintf(msg, sizeof(msg), "%s=%d", p->variables[i].name,
