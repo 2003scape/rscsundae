@@ -7,9 +7,9 @@ Engine
 ------
 
 - [x] Melee PvP combat
-- [ ] Melee PvM combat
+- [x] Melee PvM combat
 - [x] Ranged PvP combat
-- [ ] Ranged PvM combat
+- [x] Ranged PvM combat
 - [x] Prayer
 - [x] Player design
 - [x] Player classes
@@ -22,6 +22,7 @@ Engine
 - [x] NPC spawn loading
 - [x] NPC movement
 - [ ] NPC aggression
+- [ ] NPC "bravery" (retreating)
 - [ ] Line of sight checks
 - [x] Friends list
 - [x] Ignore list
