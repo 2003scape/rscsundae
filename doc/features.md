@@ -133,8 +133,8 @@ These should all be implemented in Lua script:
 - [x] Food (kebab)
 - [x] Food (spinach roll)
 - [x] Strength Potions
-- [ ] Dying capes
-- [ ] Mixing dyes
+- [x] Dying capes
+- [x] Mixing dyes
 - [ ] Monk of Zamorak wine aggression
 - [x] Picking plants
 - [ ] Cutting webs
