@@ -550,6 +550,7 @@ dofile("./lua/rs1/npc/bob.lua")
 dofile("./lua/rs1/npc/man.lua")
 dofile("./lua/rs1/npc/kebabseller.lua")
 dofile("./lua/rs1/npc/silktrader.lua")
+dofile("./lua/rs1/skill_crafting/dyes.lua")
 dofile("./lua/rs1/skill_firemaking/fire.lua")
 dofile("./lua/rs1/skill_magic/curses.lua")
 dofile("./lua/rs1/skill_magic/missiles.lua")
@@ -587,8 +588,7 @@ dofile("./lua/rs1/misc/water.lua")
 --
 -- it will also not work for operations that involve two entities as the key
 --
-for k in pairs(_G) do
-	v = _G[k]
+for k, v in pairs(_G) do
 	if type(v) == "function" then
 		if string.match(k, "opinv_.*") then
 			target = string.gsub(string.sub(k, 7), "_", " ")
