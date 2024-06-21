@@ -111,8 +111,7 @@ These should all be implemented in Lua script:
 - [ ] Certing (Miles, Niles, Giles NPCs)
 - [x] Bartender NPC dialogue
 - [x] Barmaid NPC dialogue
-- [ ] Monk NPC dialogue
-- [ ] Brother Jered NPC dialogue
+- [x] Monk NPC dialogue
 - [x] Barbarian NPC dialogue
 - [x] Pirate NPC dialogue
 - [x] Man NPC dialogue
@@ -122,6 +121,7 @@ These should all be implemented in Lua script:
 - [x] Banker NPC dialogue
 - [ ] Cook's Guild
 - [ ] Champions' Guild
+- [ ] Monastery (Prayer Guild)
 - [x] Alcohol (beers, wizards mind bomb)
 - [x] Food (fish/meat)
 - [x] Food (cabbage)
