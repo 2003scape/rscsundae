@@ -270,8 +270,8 @@ server_tick(void)
 
 	if (s.last_tick != 0) {
 		int64_t difference = start_time - s.last_tick;
-		if (difference > 640) {
-			time_delay = difference - 640;
+		if (difference > TICK_RATE) {
+			time_delay = difference - TICK_RATE;
 		}
 	}
 
@@ -453,10 +453,10 @@ server_tick(void)
 
 	time_delay += s.last_tick - start_time;
 
-	if (time_delay > 640) {
+	if (time_delay > TICK_RATE) {
 		loop_set_delay(0);
 	} else {
-		loop_set_delay(640 - time_delay);
+		loop_set_delay(TICK_RATE - time_delay);
 	}
 }
 

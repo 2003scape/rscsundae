@@ -20,7 +20,7 @@
 struct server *serv;
 
 static void server_sock_cb(int fd);
-static int loop_delay = 640;
+static int loop_delay = TICK_RATE;
 static int timerfd = -1;
 
 static void
@@ -86,7 +86,7 @@ loop_start(struct server *s)
 	timerfd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
 	if (timerfd != -1) {
 		struct itimerspec its = {0};
-		its.it_interval.tv_nsec = 640 * 1000000;
+		its.it_interval.tv_nsec = TICK_RATE * 1000000;
 		its.it_value = its.it_interval;
 
 		(void)timerfd_settime(timerfd, 0, &its, NULL);

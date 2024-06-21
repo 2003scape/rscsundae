@@ -118,7 +118,7 @@ loop_start(struct server *s)
 	}
 
 	ev_init(&tick_timer, tick_cb);
-	tick_timer.repeat = 0.64;
+	tick_timer.repeat = TICK_RATE / 1000.0;
 	ev_timer_again(loop, &tick_timer);
 
 	printf("got %d sockets\n", numsockets);

@@ -72,7 +72,7 @@ loop_start(struct server *s)
 	}
 
 	EV_SET(&events[0], 0, EVFILT_TIMER,
-	    EV_ADD | EV_ENABLE, NOTE_MSECONDS, 640, 0);
+	    EV_ADD | EV_ENABLE, NOTE_MSECONDS, TICK_RATE, 0);
 
 	printf("got %d sockets\n", numsockets);
 	for (int i = 0; i < numsockets; ++i) {
