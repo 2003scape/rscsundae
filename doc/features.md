@@ -143,3 +143,4 @@ These should all be implemented in Lua script:
 - [x] Using ladders
 - [ ] Using stairs (broken)
 - [ ] Al Kharid general store should reject silk
+- [ ] Equipment level requirements
