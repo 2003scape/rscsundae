@@ -1512,7 +1512,9 @@ player_send_ground_items(struct player *p)
 		        OP_SRV_GROUND_ITEMS);
 
 	origin = server_find_zone(p->mob.x, p->mob.y);
-	assert(origin != NULL);
+	if (origin == NULL) {
+		return -1;
+	}
 
 	for (size_t i = 0; i < p->known_item_count; ++i) {
 		bool out_of_range = false;
