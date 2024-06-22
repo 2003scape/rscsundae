@@ -129,7 +129,10 @@ function script_engine_tick()
 		if event.timer > 0 then
 			event.timer = event.timer - 1;
 		else
-			coroutine.resume(event.co)
+			local result, err = coroutine.resume(event.co)
+			if not result then
+				print("Script error inside coroutine :" .. err)
+			end
 			_delloc(event.x, event.y)
 			table.remove(delete_locs, i)
 		end
@@ -152,7 +155,11 @@ function script_engine_process(player)
 		end
 	else
 		if ps.delay == 0 then
-			coroutine.resume(ps.co)
+			local result, err = coroutine.resume(ps.co)
+			if not result then
+				print("Script error inside coroutine: " .. err)
+				script_engine_cancel(player)
+			end
 		end
 	end
 end
@@ -181,7 +188,11 @@ function script_engine_answer(player, answer)
 		return
 	end
 	ps.answer = answer
-	coroutine.resume(ps.co)
+	local result, err = coroutine.resume(ps.co)
+	if not result then
+		print("Script error inside coroutine: " .. err)
+		script_engine_cancel(player)
+	end
 end
 
 function script_engine_killnpc(player, npc, name, x, y)
