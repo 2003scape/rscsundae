@@ -56,9 +56,42 @@ static struct player *id_to_player(lua_Integer);
 static struct npc *id_to_npc(lua_Integer);
 static void safe_call(lua_State *, int, int, int);
 static int script_panic(lua_State *);
+static lua_Integer script_checkinteger(lua_State *, int);
+static const char *script_checkstring(lua_State *, int);
+
+static lua_Integer
+script_checkinteger(lua_State *L, int index)
+{
+	/* replacement for script_checkinteger with error handling */
+	int isnum = false;
+	lua_Integer result;
+
+	isnum = false;
+	result = lua_tointegerx(L, index, &isnum);
+	if (!isnum) {
+		printf("Error in Lua script: argument %d is not an integer!\n", index);
+		return 0;
+	}
+	return result;
+}
+
+static const char *
+script_checkstring(lua_State *L, int index)
+{
+	/* replacement for script_checkstring with error handling */
+	const char *result;
+
+	if (!lua_isstring(L, index)) {
+		printf("Error in Lua script: argument %d is not an integer!\n", index);
+		return "";
+	}
+	result = lua_tostring(L, index);
+	return result;
+}
 
 static int
-script_panic(lua_State *L) {
+script_panic(lua_State *L)
+{
 	printf("Error in Lua script: %s\n", lua_tostring(L, -1));
 	fflush(stdout);
 	return 0;
@@ -100,8 +133,8 @@ script_blocked(lua_State *L)
 	lua_Integer x, y;
 	int plane = 0;
 
-	x = luaL_checknumber(L, 1);
-	y = luaL_checknumber(L, 2);
+	x = script_checkinteger(L, 1);
+	y = script_checkinteger(L, 2);
 
 	if (server_find_loc(x, y) != NULL) {
 		lua_pushboolean(L, true);
@@ -129,9 +162,9 @@ script_addloc(lua_State *L)
 	struct loc_config *config;
 	struct loc loc = {0};
 
-	name = luaL_checkstring(L, 1);
-	loc.x = luaL_checknumber(L, 2);
-	loc.y = luaL_checknumber(L, 3);
+	name = script_checkstring(L, 1);
+	loc.x = script_checkinteger(L, 2);
+	loc.y = script_checkinteger(L, 3);
 
 	config = server_find_loc_config(name);
 	if (config == NULL) {
@@ -157,8 +190,8 @@ script_delloc(lua_State *L)
 {
 	lua_Integer x, y;
 
-	x = luaL_checknumber(L, 1);
-	y = luaL_checknumber(L, 2);
+	x = script_checkinteger(L, 1);
+	y = script_checkinteger(L, 2);
 
 	server_del_loc(x, y);
 	return 0;
@@ -172,11 +205,11 @@ script_addobject(lua_State *L)
 	struct item_config *config;
 	struct player *p;
 
-	id = luaL_checkinteger(L, 1);
-	name = luaL_checkstring(L, 2);
-	amount = luaL_checkinteger(L, 3);
-	x = luaL_checkinteger(L, 4);
-	y = luaL_checkinteger(L, 5);
+	id = script_checkinteger(L, 1);
+	name = script_checkstring(L, 2);
+	amount = script_checkinteger(L, 3);
+	x = script_checkinteger(L, 4);
+	y = script_checkinteger(L, 5);
 
 	p = id_to_player(id);
 	if (p == NULL) {
@@ -205,10 +238,10 @@ script_delobject(lua_State *L)
 	struct ground_item *item;
 	struct player *p;
 
-	id = luaL_checkinteger(L, 1);
-	name = luaL_checkstring(L, 2);
-	x = luaL_checkinteger(L, 3);
-	y = luaL_checkinteger(L, 4);
+	id = script_checkinteger(L, 1);
+	name = script_checkstring(L, 2);
+	x = script_checkinteger(L, 3);
+	y = script_checkinteger(L, 4);
 
 	p = id_to_player(id);
 	if (p == NULL) {
@@ -244,8 +277,8 @@ script_delobject(lua_State *L)
 static int
 script_say(lua_State *L)
 {
-	lua_Integer id = luaL_checkinteger(L, 1);
-	const char *mes = luaL_checkstring(L, 2);
+	lua_Integer id = script_checkinteger(L, 1);
+	const char *mes = script_checkstring(L, 2);
 	size_t len;
 	struct player *p;
 
@@ -279,7 +312,7 @@ script_say(lua_State *L)
 static int
 script_multi(lua_State *L)
 {
-	lua_Integer id = luaL_checkinteger(L, 1);
+	lua_Integer id = script_checkinteger(L, 1);
 	const char *options[MAX_MULTI_SIZE];
 	struct player *p;
 	uint8_t option_count = 0;
@@ -297,7 +330,7 @@ script_multi(lua_State *L)
 			lua_pop(L, 1);
 			break;
 		}
-		options[i - 1] = luaL_checkstring(L, -1);
+		options[i - 1] = script_checkstring(L, -1);
 		if (options[i - 1] == NULL) {
 			printf("script warning: multi option is undefined\n");
 			return 0;
@@ -313,7 +346,7 @@ script_multi(lua_State *L)
 static int
 script_npcattack(lua_State *L)
 {
-	lua_Integer npc_id = luaL_checkinteger(L, 1);
+	lua_Integer npc_id = script_checkinteger(L, 1);
 
 	(void)npc_id;
 	printf("npcattack\n");
@@ -324,7 +357,7 @@ script_npcattack(lua_State *L)
 static int
 script_npcbusy(lua_State *L)
 {
-	lua_Integer id = luaL_checkinteger(L, 1);
+	lua_Integer id = script_checkinteger(L, 1);
 	struct npc *npc;
 
 	npc = id_to_npc(id);
@@ -341,7 +374,7 @@ script_npcbusy(lua_State *L)
 static int
 script_npcunbusy(lua_State *L)
 {
-	lua_Integer id = luaL_checkinteger(L, 1);
+	lua_Integer id = script_checkinteger(L, 1);
 	struct npc *npc;
 
 	npc = id_to_npc(id);
@@ -358,7 +391,7 @@ script_npcunbusy(lua_State *L)
 static int
 script_playerbusy(lua_State *L)
 {
-	lua_Integer id = luaL_checkinteger(L, 1);
+	lua_Integer id = script_checkinteger(L, 1);
 	struct player *p;
 
 	p = id_to_player(id);
@@ -375,7 +408,7 @@ script_playerbusy(lua_State *L)
 static int
 script_playerunbusy(lua_State *L)
 {
-	lua_Integer id = luaL_checkinteger(L, 1);
+	lua_Integer id = script_checkinteger(L, 1);
 	struct player *p;
 
 	p = id_to_player(id);
@@ -392,8 +425,8 @@ script_playerunbusy(lua_State *L)
 static int
 script_npcsay(lua_State *L)
 {
-	lua_Integer id = luaL_checkinteger(L, 1);
-	const char *mes = luaL_checkstring(L, 2);
+	lua_Integer id = script_checkinteger(L, 1);
+	const char *mes = script_checkstring(L, 2);
 	size_t len;
 	struct npc *npc;
 	struct player *player;
@@ -440,7 +473,7 @@ script_male(lua_State *L)
 	lua_Integer player_id;
 	struct player *p;
 
-	player_id = luaL_checkinteger(L, 1);
+	player_id = script_checkinteger(L, 1);
 	p = id_to_player(player_id);
 	if (p == NULL) {
 		printf("script warning: player %lld is undefined\n", player_id);
@@ -459,7 +492,7 @@ script_random(lua_State *L)
 	lua_Integer probability;
 	lua_Integer result;
 
-	probability = luaL_checkinteger(L, 1);
+	probability = script_checkinteger(L, 1);
 	result = (int)((ranval(&serv->ran) / (double)UINT32_MAX) * 255.0);
 	lua_pushboolean(L, result < probability);
 	return 1;
@@ -471,7 +504,7 @@ script_randomvar(lua_State *L)
 	lua_Integer probability;
 	double d, result;
 
-	probability = luaL_checkinteger(L, 1);
+	probability = script_checkinteger(L, 1);
 	d = ranval(&serv->ran) / (double)UINT32_MAX;
 	result = d * probability;
 	lua_pushinteger(L, (lua_Integer)result);
@@ -485,8 +518,8 @@ script_mes(lua_State *L)
 	const char *mes;
 	struct player *p;
 
-	player_id = luaL_checkinteger(L, 1);
-	mes = luaL_checkstring(L, 2);
+	player_id = script_checkinteger(L, 1);
+	mes = script_checkstring(L, 2);
 	p = id_to_player(player_id);
 	if (p == NULL) {
 		printf("script warning: player %lld is undefined\n", player_id);
@@ -509,10 +542,10 @@ script_advancestat(lua_State *L)
 	lua_Integer stat, base, exp;
 	struct player *p;
 
-	player_id = luaL_checkinteger(L, 1);
-	stat = luaL_checkinteger(L, 2);
-	base = luaL_checkinteger(L, 3);
-	exp = luaL_checkinteger(L, 4);
+	player_id = script_checkinteger(L, 1);
+	stat = script_checkinteger(L, 2);
+	base = script_checkinteger(L, 3);
+	exp = script_checkinteger(L, 4);
 	p = id_to_player(player_id);
 	if (p == NULL) {
 		printf("script warning: player %lld is undefined\n", player_id);
@@ -535,10 +568,10 @@ script_healstat(lua_State *L)
 	lua_Integer stat, constant, percent;
 	struct player *p;
 
-	player_id = luaL_checkinteger(L, 1);
-	stat = luaL_checkinteger(L, 2);
-	constant = luaL_checkinteger(L, 3);
-	percent = luaL_checkinteger(L, 4);
+	player_id = script_checkinteger(L, 1);
+	stat = script_checkinteger(L, 2);
+	constant = script_checkinteger(L, 3);
+	percent = script_checkinteger(L, 4);
 	p = id_to_player(player_id);
 	if (p == NULL) {
 		printf("script warning: player %lld is undefined\n", player_id);
@@ -562,10 +595,10 @@ script_addstat(lua_State *L)
 	lua_Integer stat, constant, percent;
 	struct player *p;
 
-	player_id = luaL_checkinteger(L, 1);
-	stat = luaL_checkinteger(L, 2);
-	constant = luaL_checkinteger(L, 3);
-	percent = luaL_checkinteger(L, 4);
+	player_id = script_checkinteger(L, 1);
+	stat = script_checkinteger(L, 2);
+	constant = script_checkinteger(L, 3);
+	percent = script_checkinteger(L, 4);
 	p = id_to_player(player_id);
 	if (p == NULL) {
 		printf("script warning: player %lld is undefined\n", player_id);
@@ -589,9 +622,9 @@ script_statatleast(lua_State *L)
 	struct player *p;
 	int b;
 
-	player_id = luaL_checkinteger(L, 1);
-	stat = luaL_checkinteger(L, 2);
-	low = luaL_checkinteger(L, 3);
+	player_id = script_checkinteger(L, 1);
+	stat = script_checkinteger(L, 2);
+	low = script_checkinteger(L, 3);
 	p = id_to_player(player_id);
 	if (p == NULL) {
 		printf("script warning: player %lld is undefined\n", player_id);
@@ -615,8 +648,8 @@ script_statup(lua_State *L)
 	struct player *p;
 	int b;
 
-	player_id = luaL_checkinteger(L, 1);
-	stat = luaL_checkinteger(L, 2);
+	player_id = script_checkinteger(L, 1);
+	stat = script_checkinteger(L, 2);
 	p = id_to_player(player_id);
 	if (p == NULL) {
 		printf("script warning: player %lld is undefined\n", player_id);
@@ -640,8 +673,8 @@ script_statdown(lua_State *L)
 	struct player *p;
 	int b;
 
-	player_id = luaL_checkinteger(L, 1);
-	stat = luaL_checkinteger(L, 2);
+	player_id = script_checkinteger(L, 1);
+	stat = script_checkinteger(L, 2);
 	p = id_to_player(player_id);
 	if (p == NULL) {
 		printf("script warning: player %lld is undefined\n", player_id);
@@ -666,10 +699,10 @@ script_statrandom(lua_State *L)
 	struct player *p;
 	int b;
 
-	player_id = luaL_checkinteger(L, 1);
-	stat = luaL_checkinteger(L, 2);
-	base = luaL_checkinteger(L, 3);
-	top = luaL_checkinteger(L, 4);
+	player_id = script_checkinteger(L, 1);
+	stat = script_checkinteger(L, 2);
+	base = script_checkinteger(L, 3);
+	top = script_checkinteger(L, 4);
 	p = id_to_player(player_id);
 	if (p == NULL) {
 		printf("script warning: player %lld is undefined\n", player_id);
@@ -693,8 +726,8 @@ script_npcstatup(lua_State *L)
 	struct npc *npc;
 	int b;
 
-	npc_id = luaL_checkinteger(L, 1);
-	stat = luaL_checkinteger(L, 2);
+	npc_id = script_checkinteger(L, 1);
+	stat = script_checkinteger(L, 2);
 	npc = id_to_npc(npc_id);
 	if (npc == NULL) {
 		printf("script warning: npc %lld is undefined\n", npc_id);
@@ -718,8 +751,8 @@ script_npcstatdown(lua_State *L)
 	struct npc *npc;
 	int b;
 
-	npc_id = luaL_checkinteger(L, 1);
-	stat = luaL_checkinteger(L, 2);
+	npc_id = script_checkinteger(L, 1);
+	stat = script_checkinteger(L, 2);
 	npc = id_to_npc(npc_id);
 	if (npc == NULL) {
 		printf("script warning: npc %lld is undefined\n", npc_id);
@@ -743,10 +776,10 @@ script_substat(lua_State *L)
 	lua_Integer stat, constant, percent;
 	struct player *p;
 
-	player_id = luaL_checkinteger(L, 1);
-	stat = luaL_checkinteger(L, 2);
-	constant = luaL_checkinteger(L, 3);
-	percent = luaL_checkinteger(L, 4);
+	player_id = script_checkinteger(L, 1);
+	stat = script_checkinteger(L, 2);
+	constant = script_checkinteger(L, 3);
+	percent = script_checkinteger(L, 4);
 	p = id_to_player(player_id);
 	if (p == NULL) {
 		printf("script warning: player %lld is undefined\n", player_id);
@@ -778,10 +811,10 @@ script_npcaddstat(lua_State *L)
 	lua_Integer stat, constant, percent;
 	struct npc *npc;
 
-	npc_id = luaL_checkinteger(L, 1);
-	stat = luaL_checkinteger(L, 2);
-	constant = luaL_checkinteger(L, 3);
-	percent = luaL_checkinteger(L, 4);
+	npc_id = script_checkinteger(L, 1);
+	stat = script_checkinteger(L, 2);
+	constant = script_checkinteger(L, 3);
+	percent = script_checkinteger(L, 4);
 
 	npc = id_to_npc(npc_id);
 	if (npc == NULL) {
@@ -803,10 +836,10 @@ script_npchealstat(lua_State *L)
 	lua_Integer stat, constant, percent;
 	struct npc *npc;
 
-	npc_id = luaL_checkinteger(L, 1);
-	stat = luaL_checkinteger(L, 2);
-	constant = luaL_checkinteger(L, 3);
-	percent = luaL_checkinteger(L, 4);
+	npc_id = script_checkinteger(L, 1);
+	stat = script_checkinteger(L, 2);
+	constant = script_checkinteger(L, 3);
+	percent = script_checkinteger(L, 4);
 
 	npc = id_to_npc(npc_id);
 	if (npc == NULL) {
@@ -828,10 +861,10 @@ script_npcsubstat(lua_State *L)
 	lua_Integer stat, constant, percent;
 	struct npc *npc;
 
-	npc_id = luaL_checkinteger(L, 1);
-	stat = luaL_checkinteger(L, 2);
-	constant = luaL_checkinteger(L, 3);
-	percent = luaL_checkinteger(L, 4);
+	npc_id = script_checkinteger(L, 1);
+	stat = script_checkinteger(L, 2);
+	constant = script_checkinteger(L, 3);
+	percent = script_checkinteger(L, 4);
 
 	npc = id_to_npc(npc_id);
 	if (npc == NULL) {
@@ -863,8 +896,8 @@ script_getvar(lua_State *L)
 	struct player *p;
 	uint32_t value;
 
-	player_id = luaL_checkinteger(L, 1);
-	varname = luaL_checkstring(L, 2);
+	player_id = script_checkinteger(L, 1);
+	varname = script_checkstring(L, 2);
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
@@ -886,9 +919,9 @@ script_setvar(lua_State *L)
 	const char *varname;
 	struct player *p;
 
-	player_id = luaL_checkinteger(L, 1);
-	varname = luaL_checkstring(L, 2);
-	varvalue = luaL_checkinteger(L, 3);
+	player_id = script_checkinteger(L, 1);
+	varname = script_checkstring(L, 2);
+	varvalue = script_checkinteger(L, 3);
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
@@ -910,9 +943,9 @@ script_give(lua_State *L)
 	struct player *p;
 	struct item_config *item;
 
-	player_id = luaL_checkinteger(L, 1);
-	item_name = luaL_checkstring(L, 2);
-	amount = luaL_checkinteger(L, 3);
+	player_id = script_checkinteger(L, 1);
+	item_name = script_checkstring(L, 2);
+	amount = script_checkinteger(L, 3);
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
@@ -941,9 +974,9 @@ script_remove(lua_State *L)
 	struct player *p;
 	struct item_config *item;
 
-	player_id = luaL_checkinteger(L, 1);
-	item_name = luaL_checkstring(L, 2);
-	amount = luaL_checkinteger(L, 3);
+	player_id = script_checkinteger(L, 1);
+	item_name = script_checkstring(L, 2);
+	amount = script_checkinteger(L, 3);
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
@@ -969,7 +1002,7 @@ script_displaybalance(lua_State *L)
 	lua_Integer player_id;
 	struct player *p;
 
-	player_id = luaL_checkinteger(L, 1);
+	player_id = script_checkinteger(L, 1);
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
@@ -992,9 +1025,9 @@ script_held(lua_State *L)
 	struct item_config *item;
 	int result;
 
-	player_id = luaL_checkinteger(L, 1);
-	item_name = luaL_checkstring(L, 2);
-	amount = luaL_checkinteger(L, 3);
+	player_id = script_checkinteger(L, 1);
+	item_name = script_checkstring(L, 2);
+	amount = script_checkinteger(L, 3);
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
@@ -1024,8 +1057,8 @@ script_worn(lua_State *L)
 	struct item_config *item;
 	int result;
 
-	player_id = luaL_checkinteger(L, 1);
-	item_name = luaL_checkstring(L, 2);
+	player_id = script_checkinteger(L, 1);
+	item_name = script_checkstring(L, 2);
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
@@ -1052,7 +1085,7 @@ script_upstairs(lua_State *L)
 	lua_Integer player_id;
 	struct player *p;
 
-	player_id = luaL_checkinteger(L, 1);
+	player_id = script_checkinteger(L, 1);
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
@@ -1080,7 +1113,7 @@ script_downstairs(lua_State *L)
 	lua_Integer player_id;
 	struct player *p;
 
-	player_id = luaL_checkinteger(L, 1);
+	player_id = script_checkinteger(L, 1);
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
@@ -1109,8 +1142,8 @@ script_openshop(lua_State *L)
 	const char *shop_name;
 	struct player *p;
 
-	player_id = luaL_checkinteger(L, 1);
-	shop_name = luaL_checkstring(L, 2);
+	player_id = script_checkinteger(L, 1);
+	shop_name = script_checkstring(L, 2);
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
@@ -1131,8 +1164,8 @@ script_thinkbubble(lua_State *L)
 	struct player *p;
 	struct item_config *item;
 
-	player_id = luaL_checkinteger(L, 1);
-	item_name = luaL_checkstring(L, 2);
+	player_id = script_checkinteger(L, 1);
+	item_name = script_checkstring(L, 2);
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
@@ -1160,10 +1193,10 @@ script_changebound(lua_State *L)
 	struct bound_config *config;
 	struct bound *b;
 
-	x = luaL_checkinteger(L, 1);
-	y = luaL_checkinteger(L, 2);
-	dir = luaL_checkinteger(L, 3);
-	name = luaL_checkstring(L, 4);
+	x = script_checkinteger(L, 1);
+	y = script_checkinteger(L, 2);
+	dir = script_checkinteger(L, 3);
+	name = script_checkstring(L, 4);
 
 	config = server_find_bound_config(name);
 	if (config == NULL) {
@@ -1191,9 +1224,9 @@ script_changeloc(lua_State *L)
 	struct loc_config *config;
 	struct loc *loc;
 
-	x = luaL_checkinteger(L, 1);
-	y = luaL_checkinteger(L, 2);
-	name = luaL_checkstring(L, 3);
+	x = script_checkinteger(L, 1);
+	y = script_checkinteger(L, 2);
+	name = script_checkstring(L, 3);
 
 	loc = server_find_loc(x, y);
 	if (loc == NULL) {
@@ -1219,8 +1252,8 @@ script_restoreloc(lua_State *L)
 	lua_Integer x, y;
 	struct loc *loc;
 
-	x = luaL_checkinteger(L, 1);
-	y = luaL_checkinteger(L, 2);
+	x = script_checkinteger(L, 1);
+	y = script_checkinteger(L, 2);
 
 	loc = server_find_loc(x, y);
 	if (loc == NULL) {
@@ -1242,9 +1275,9 @@ script_shootplayer(lua_State *L)
 	struct player *p, *target;
 	struct projectile_config *proj;
 
-	player_id = luaL_checkinteger(L, 1);
-	target_id = luaL_checkinteger(L, 2);
-	proj_name = luaL_checkstring(L, 3);
+	player_id = script_checkinteger(L, 1);
+	target_id = script_checkinteger(L, 2);
+	proj_name = script_checkstring(L, 3);
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
@@ -1280,9 +1313,9 @@ script_shootnpc(lua_State *L)
 	struct npc *target;
 	struct projectile_config *proj;
 
-	player_id = luaL_checkinteger(L, 1);
-	target_id = luaL_checkinteger(L, 2);
-	proj_name = luaL_checkstring(L, 3);
+	player_id = script_checkinteger(L, 1);
+	target_id = script_checkinteger(L, 2);
+	proj_name = script_checkstring(L, 3);
 
 	p = id_to_player(player_id);
 	if (p == NULL) {
