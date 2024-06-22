@@ -543,6 +543,7 @@ function multi(player, ...)
 	return active_script.answer
 end
 
+dofile("./lua/rs1/monster/chicken.lua")
 dofile("./lua/rs1/npc/asgarnia/barmaid.lua")
 dofile("./lua/rs1/npc/asgarnia/betty.lua")
 dofile("./lua/rs1/npc/asgarnia/brian.lua")

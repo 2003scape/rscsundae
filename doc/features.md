@@ -56,6 +56,7 @@ These should all be implemented in Lua script:
 - [x] Prayer (altars)
 - [x] Magic (missiles vs. players)
 - [x] Magic (missiles vs. NPCs)
+- [ ] Magic (crumble undead) - needs config parser fixes
 - [x] Magic (curses)
 - [ ] Magic (teleportation)
 - [ ] Magic (telegrab)
@@ -146,3 +147,38 @@ These should all be implemented in Lua script:
 - [ ] Using stairs (broken)
 - [ ] Al Kharid general store should reject silk
 - [ ] Equipment level requirements
+- [ ] Silverlight effect
+
+### Drop tables
+
+Most NPCs (that use constant drops) are found within config46.jag.
+The following use randomvar and need to be implemented in script:
+
+- [x] Chicken
+- [ ] Man1 (Man, Thief, Farmer)
+- [ ] Mugger (looks like variation of Man1 table)
+- [ ] Wiz1 (Darkwizard)
+- [ ] Darkerwiz (Darkwizard)
+- [ ] Goblin1
+- [ ] Goblin2
+- [ ] Barbarian
+- [ ] Dwarf
+- [ ] Warrior
+- [ ] Skeleton1
+- [ ] Skeleton2
+- [ ] Skeleton3
+- [ ] Zombie1
+- [ ] Zombie2
+- [ ] Zombie3
+- [ ] Pirate
+- [ ] Guard
+- [ ] Giant
+- [ ] Black Knight
+- [ ] White Knight
+- [ ] Hobgoblin1
+- [ ] Ice Warrior
+- [ ] Chaos dwarf
+- [ ] Moss Giant
+- [ ] Ice Giant
+- [ ] Lesser Demon
+- [ ] Greater Demon
