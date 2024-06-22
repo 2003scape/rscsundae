@@ -1,6 +1,7 @@
 local restore_locs = {}
 local delete_locs = {}
 local talknpc_scripts = {}
+local killnpc_scripts = {}
 local opinv_scripts = {}
 local skillplayer_scripts = {}
 local skillnpc_scripts = {}
@@ -67,6 +68,10 @@ end
 
 function register_oploc2(name, callback)
 	oploc2_scripts[name] = callback;
+end
+
+function register_killnpc(name, callback)
+	killnpc_scripts[name] = callback;
 end
 
 function register_skillnpc(name, spell, callback)
@@ -177,6 +182,27 @@ function script_engine_answer(player, answer)
 	end
 	ps.answer = answer
 	coroutine.resume(ps.co)
+end
+
+function script_engine_killnpc(player, npc, name, x, y)
+	local script = player_scripts[player]
+	if script then
+		return true
+	end
+	name = string.lower(name)
+	script = killnpc_scripts[name]
+	if script then
+		ps = new_player_script(player)
+		ps.co = coroutine.create(function()
+			script(player, npc, x, y)
+			player_scripts[player] = nil
+			playerunbusy(player)
+		end)
+		player_scripts[player] = ps
+		playerbusy(player)
+		return true
+	end
+	return false
 end
 
 function script_engine_talknpc(player, name, npc)
@@ -595,27 +621,30 @@ dofile("./lua/rs1/misc/water.lua")
 --
 for k, v in pairs(_G) do
 	if type(v) == "function" then
-		if string.match(k, "opinv_.*") then
+		if string.match(k, "^opinv_.*") then
 			target = string.gsub(string.sub(k, 7), "_", " ")
 			register_opinv(target, v)
-		elseif string.match(k, "talknpc_.*") then
+		elseif string.match(k, "^talknpc_.*") then
 			target = string.gsub(string.sub(k, 9), "_", " ")
 			register_talknpc(target, v)
-		elseif string.match(k, "skillplayer_.*") then
+		elseif string.match(k, "^skillplayer_.*") then
 			target = string.gsub(string.sub(k, 13), "_", " ")
 			register_skillplayer(target, v)
-		elseif string.match(k, "opbound1_.*") then
+		elseif string.match(k, "^opbound1_.*") then
 			target = string.gsub(string.sub(k, 10), "_", " ")
 			register_opbound1(target, v)
-		elseif string.match(k, "opbound2_.*") then
+		elseif string.match(k, "^opbound2_.*") then
 			target = string.gsub(string.sub(k, 10), "_", " ")
 			register_opbound2(target, v)
-		elseif string.match(k, "oploc1_.*") then
+		elseif string.match(k, "^oploc1_.*") then
 			target = string.gsub(string.sub(k, 8), "_", " ")
 			register_oploc1(target, v)
-		elseif string.match(k, "oploc2_.*") then
+		elseif string.match(k, "^oploc2_.*") then
 			target = string.gsub(string.sub(k, 8), "_", " ")
 			register_oploc2(target, v)
+		elseif string.match(k, "^killnpc_.*") then
+			target = string.gsub(string.sub(k, 9), "_", " ")
+			register_killnpc(target, v)
 		end
 	end
 end

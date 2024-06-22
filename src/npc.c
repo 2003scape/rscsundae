@@ -1,6 +1,7 @@
 #include <assert.h>
 #include "config/config.h"
 #include "entity.h"
+#include "script.h"
 #include "server.h"
 
 static void npc_random_walk(struct npc *);
@@ -9,8 +10,6 @@ static int npc_combat_roll(struct npc *, struct player *);
 void
 npc_die(struct npc *npc, struct player *p)
 {
-	struct item_config *item_config;
-
 	npc->respawn_time = npc->config->respawn / 5;
 
 	if (p != NULL && p->mob.in_combat &&
@@ -24,12 +23,19 @@ npc_die(struct npc *npc, struct player *p)
 		mob_combat_reset(&p->mob);
         }
 
-	for (int i = 0; i < npc->config->drop_count; ++i) {
-		item_config = server_item_config_by_id(npc->config->drops[i].id);
-		assert(item_config != NULL);
-		server_add_temp_item(p, npc->mob.x, npc->mob.y,
-		    item_config->id,
-		    npc->config->drops[i].amount);
+	if (p != NULL) {
+		if (!script_onkillnpc(npc->mob.server->lua, p, npc)) {
+			for (int i = 0; i < npc->config->drop_count; ++i) {
+				struct item_config *item_config;
+				uint16_t id;
+
+				id = npc->config->drops[i].id;
+				item_config = server_item_config_by_id(id);
+				assert(item_config != NULL);
+				server_add_temp_item(p, npc->mob.x, npc->mob.y,
+				    id, npc->config->drops[i].amount);
+			}
+		}
 	}
 
 	npc->mob.x = npc->spawn_x;
