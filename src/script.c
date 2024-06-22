@@ -82,7 +82,7 @@ script_checkstring(lua_State *L, int index)
 	const char *result;
 
 	if (!lua_isstring(L, index)) {
-		printf("Error in Lua script: argument %d is not an integer!\n", index);
+		printf("Error in Lua script: argument %d is not a string!\n", index);
 		return "";
 	}
 	result = lua_tostring(L, index);
