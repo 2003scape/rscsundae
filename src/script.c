@@ -42,6 +42,7 @@ static int script_thinkbubble(lua_State *);
 static int script_upstairs(lua_State *);
 static int script_downstairs(lua_State *);
 static int script_openshop(lua_State *);
+static int script_giveqp(lua_State *);
 static int script_changebound(lua_State *);
 static int script_changeloc(lua_State *);
 static int script_restoreloc(lua_State *);
@@ -1157,6 +1158,39 @@ script_openshop(lua_State *L)
 }
 
 static int
+script_giveqp(lua_State *L)
+{
+	char mes[64];
+	lua_Integer player_id, amount;
+	struct player *p;
+
+	player_id = script_checkinteger(L, 1);
+	amount = script_checkinteger(L, 2);
+
+	p = id_to_player(player_id);
+	if (p == NULL) {
+		printf("script warning: player %lld is undefined\n", player_id);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	/* real authentic typo. sigh. */
+	if (amount == 1) {
+		(void)snprintf(mes, sizeof(mes),
+		    "@gre@You haved gained 1 quest point!");
+	} else {
+		(void)snprintf(mes, sizeof(mes),
+		    "@gre@You haved gained %d quest points!", (int)amount);
+	}
+
+	player_send_message(p, mes);
+
+	p->quest_points += amount;
+	p->stats_changed = true;
+	return 0;
+}
+
+static int
 script_thinkbubble(lua_State *L)
 {
 	lua_Integer player_id;
@@ -1866,6 +1900,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_openshop);
 	lua_setglobal(L, "openshop");
+
+	lua_pushcfunction(L, script_giveqp);
+	lua_setglobal(L, "giveqp");
 
 	lua_pushcfunction(L, script_shootplayer);
 	lua_setglobal(L, "shootplayer");
