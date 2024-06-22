@@ -65,8 +65,9 @@ These should all be implemented in Lua script:
 - [x] Woodcutting
 - [x] Firemaking
 - [x] Crafting (pottery)
-- [ ] Crafting (jewelry)
-- [ ] Crafting (leatherworking)
+- [ ] Crafting (gold jewelry)
+- [ ] Crafting (silver jewelry)
+- [x] Crafting (leatherworking)
 - [ ] Crafting (wool)
 - [ ] Fishing
 - [ ] Cooking (fish/meat)
