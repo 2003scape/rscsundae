@@ -62,6 +62,18 @@ npc_random_walk(struct npc *npc)
 		return;
 	}
 
+	if (npc->mob.in_combat && npc->mob.target_player != -1) {
+		struct player *p;
+
+		p = npc->mob.server->players[npc->mob.target_player];
+		if (p != NULL) {
+			player_send_message(p,
+			    "Your opponent is retreating!");
+			mob_combat_reset(&npc->mob);
+			mob_combat_reset(&p->mob);
+		}
+	}
+
 	attempts = 0;
 
 	do {
@@ -163,7 +175,6 @@ npc_process_combat(struct npc *npc)
 	if (!npc->mob.in_combat) {
 		return;
 	}
-	/* TODO: bravery (or lack thereof) */
 	if (npc->mob.target_player != -1) {
 		struct player *target;
 		int roll;
@@ -174,6 +185,17 @@ npc_process_combat(struct npc *npc)
 			return;
 		}
 
+		/*
+		 * check out replay:
+		 * rsc-preservation.xyz/Combat/Chickens [Feather Gathering] pt1
+		 * for some recordings of retreating from low hits
+		 */
+		if (npc->mob.combat_rounds >= 3 &&
+		    npc->mob.cur_stats[SKILL_HITS] <= npc->config->bravery) {
+			npc_random_walk(npc);
+			return;
+		}
+
 		if (npc->mob.combat_next_hit > 0) {
 			npc->mob.combat_next_hit--;
 			return;
@@ -181,8 +203,8 @@ npc_process_combat(struct npc *npc)
 
 		roll = npc_combat_roll(npc, target);
 		player_damage(target, NULL, roll);
-		target->mob.combat_rounds++;
-		target->mob.combat_timer = npc->mob.server->tick_counter;
+		npc->mob.combat_rounds++;
 		npc->mob.combat_next_hit = 3;
+		target->mob.combat_timer = npc->mob.server->tick_counter;
 	}
 }
