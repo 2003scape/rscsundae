@@ -624,6 +624,7 @@ dofile("./lua/rs1/misc/doors.lua")
 dofile("./lua/rs1/misc/ladders.lua")
 dofile("./lua/rs1/misc/plants.lua")
 dofile("./lua/rs1/misc/water.lua")
+dofile("./lua/rs1/quest/asgarnia/dorics_quest/doric.lua")
 
 --
 -- automatically register triggers
