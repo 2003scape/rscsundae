@@ -62,7 +62,7 @@ static const char *script_checkstring(lua_State *, int);
 static lua_Integer
 script_checkinteger(lua_State *L, int index)
 {
-	/* replacement for script_checkinteger with error handling */
+	/* replacement for luaL_checkinteger with error handling */
 	int isnum = false;
 	lua_Integer result;
 
@@ -78,7 +78,7 @@ script_checkinteger(lua_State *L, int index)
 static const char *
 script_checkstring(lua_State *L, int index)
 {
-	/* replacement for script_checkstring with error handling */
+	/* replacement for luaL_checkstring with error handling */
 	const char *result;
 
 	if (!lua_isstring(L, index)) {
