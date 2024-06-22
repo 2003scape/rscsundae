@@ -89,6 +89,7 @@ player_inv_remove(struct player *p, struct item_config *item, uint32_t count)
 		if (was_worn) {
 			player_recalculate_equip(p);
 		}
+		i = 0;
 	}
 }
 
