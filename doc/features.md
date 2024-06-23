@@ -22,7 +22,7 @@ Engine
 - [x] NPC spawn loading
 - [x] NPC movement
 - [ ] NPC aggression
-- [ ] NPC "bravery" (retreating)
+- [x] NPC "bravery" (retreating)
 - [ ] Line of sight checks
 - [x] Friends list
 - [x] Ignore list
