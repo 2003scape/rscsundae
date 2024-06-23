@@ -150,7 +150,7 @@ These should all be implemented in Lua script:
 - [x] Mixing dyes
 - [ ] Monk of Zamorak wine aggression
 - [x] Picking plants
-- [ ] Cutting webs
+- [x] Cutting webs
 - [x] Water sources
 - [ ] Using the windmill
 - [x] Using ladders
