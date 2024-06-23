@@ -7,7 +7,7 @@ function killnpc_chicken(player, npc, x, y)
 	local ran = randomvar(128)
 	if ran < 20 then
 		addobject(player, "feather", 10, x, y)
-	elseif ran < 76 then
+	elseif ran < 96 then
 		addobject(player, "feather", 3, x, y)
 	end
 end
