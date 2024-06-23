@@ -23,6 +23,7 @@ static int script_male(lua_State *);
 static int script_random(lua_State *);
 static int script_give(lua_State *);
 static int script_remove(lua_State *);
+static int script_sellinv(lua_State *);
 static int script_held(lua_State *);
 static int script_worn(lua_State *);
 static int script_advancestat(lua_State *);
@@ -998,6 +999,59 @@ script_remove(lua_State *L)
 }
 
 static int
+script_sellinv(lua_State *L)
+{
+	const char *item_name;
+	lua_Integer player_id, percentage;
+	struct player *p;
+	struct item_config *item, *coins;
+	double value;
+
+	player_id = script_checkinteger(L, 1);
+	item_name = script_checkstring(L, 2);
+	percentage = script_checkinteger(L, 3);
+
+	p = id_to_player(player_id);
+	if (p == NULL) {
+		printf("script warning: player %lld is undefined\n", player_id);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	coins = server_find_item_config("coins");
+	assert(coins != NULL);
+
+	item = server_find_item_config(item_name);
+	if (item == NULL) {
+		printf("script warning: item %s is undefined\n", item_name);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	value = item->value * (percentage / 100.0);
+
+	/*
+	 * packet order verified, see replay:
+	 * Logg/Tylerbeg/06-13-2018 20.09.59 high alch from 55 to 60 and I got a dmed lol
+	 */
+	if (item->weight > 0) {
+		player_inv_remove(p, item, 1);
+		player_inv_give(p, coins, value);
+	} else {
+		for (int i = 0; i < p->inv_count; ++i) {
+			if (p->inventory[i].id == item->id) {
+				player_inv_remove(p, item,
+				    p->inventory[i].stack);
+				player_inv_give(p, coins,
+				    p->inventory[i].stack * value);
+				break;
+			}
+		}
+	}
+	return 0;
+}
+
+static int
 script_displaybalance(lua_State *L)
 {
 	lua_Integer player_id;
@@ -1872,6 +1926,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_remove);
 	lua_setglobal(L, "remove");
+
+	lua_pushcfunction(L, script_sellinv);
+	lua_setglobal(L, "sellinv");
 
 	lua_pushcfunction(L, script_held);
 	lua_setglobal(L, "held");
