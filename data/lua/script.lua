@@ -434,12 +434,15 @@ function script_engine_usenpc(player, npc, name, item)
 	script = usenpc_scripts[name][item]
 	if script then
 		ps = new_player_script(player)
+		ps.npc = npc
 		ps.co = coroutine.create(function()
 			script(player, npc)
 			player_scripts[player] = nil
+			npcunbusy(npc)
 			playerunbusy(player)
 		end)
 		player_scripts[player] = ps
+		npcbusy(npc)
 		playerbusy(player)
 		return true
 	end
@@ -595,6 +598,7 @@ dofile("./lua/rs1/npc/tanner.lua")
 dofile("./lua/rs1/skill_crafting/dyes.lua")
 dofile("./lua/rs1/skill_crafting/leather.lua")
 dofile("./lua/rs1/skill_crafting/pottery.lua")
+dofile("./lua/rs1/skill_crafting/wool.lua")
 dofile("./lua/rs1/skill_firemaking/fire.lua")
 dofile("./lua/rs1/skill_magic/curses.lua")
 dofile("./lua/rs1/skill_magic/missiles.lua")
@@ -625,6 +629,7 @@ dofile("./lua/rs1/misc/ladders.lua")
 dofile("./lua/rs1/misc/plants.lua")
 dofile("./lua/rs1/misc/water.lua")
 dofile("./lua/rs1/quest/asgarnia/dorics_quest/doric.lua")
+dofile("./lua/rs1/quest/sheep_shearer/fred_the_farmer.lua")
 
 --
 -- automatically register triggers
