@@ -11,10 +11,12 @@ local opbound2_scripts = {}
 local oploc1_scripts = {}
 local oploc2_scripts = {}
 local useloc_scripts = {}
+local usebound_scripts = {}
 local usenpc_scripts = {}
 local useobj_scripts = {}
 local useinv_scripts = {}
 local player_scripts = {}
+local paused_scripts = {}
 local active_script = nil
 
 STAT_ATTACK		= 0
@@ -103,6 +105,13 @@ function register_useloc(name, item, callback)
 	useloc_scripts[name][item] = callback
 end
 
+function register_usebound(name, item, callback)
+	if not usebound_scripts[name] then
+		usebound_scripts[name] = {}
+	end
+	usebound_scripts[name][item] = callback
+end
+
 function register_useobj(item, invitem, callback)
 	if not useobj_scripts[item] then
 		useobj_scripts[item] = {}
@@ -123,6 +132,19 @@ function register_useinv(item1, item2, callback)
 end
 
 function script_engine_tick()
+	for i=1,#paused_scripts do
+		local ps = paused_scripts[i]
+		if ps.delay > 0 then
+			ps.delay = ps.delay - 1;
+		else
+			local result, err = coroutine.resume(ps.co)
+			if not result then
+				print("Script error inside coroutine :" .. err)
+			end
+			table.remove(paused_scripts, i)
+		end
+	end
+	-- regrow tree stumps, etc.
 	for i=1,#restore_locs do
 		local event = restore_locs[i]
 		if event.timer > 0 then
@@ -132,6 +154,7 @@ function script_engine_tick()
 			table.remove(restore_locs, i)
 		end
 	end
+	-- delete temporarily added locs
 	for i=1,#delete_locs do
 		local event = delete_locs[i]
 		if event.timer > 0 then
@@ -456,6 +479,32 @@ function script_engine_useloc(player, name, x, y, item)
 	return false
 end
 
+function script_engine_usebound(player, name, x, y, dir, item)
+	local script = player_scripts[player]
+	if script then
+		return true
+	end
+	name = string.lower(name)
+	item = string.lower(item)
+	script = usebound_scripts[name]
+	if not script then
+		return false
+	end
+	script = usebound_scripts[name][item]
+	if script then
+		ps = new_player_script(player)
+		ps.co = coroutine.create(function()
+			script(player, x, y, dir)
+			player_scripts[player] = nil
+			playerunbusy(player)
+		end)
+		player_scripts[player] = ps
+		playerbusy(player)
+		return true
+	end
+	return false
+end
+
 function script_engine_usenpc(player, npc, name, item)
 	local script = player_scripts[player]
 	if script then
@@ -540,6 +589,15 @@ function script_engine_useinv(player, name, item)
 		return true
 	end
 	return false
+end
+
+function pause(min, max)
+	local amount = min + (math.random() * max)
+
+	table.insert(paused_scripts, active_script)
+	player_scripts[active_script.player] = nil
+	playerunbusy(active_script.player)
+	delay(amount)
 end
 
 function delay(length)
@@ -685,6 +743,7 @@ dofile("./lua/rs1/misc/doors.lua")
 dofile("./lua/rs1/misc/ladders.lua")
 dofile("./lua/rs1/misc/plants.lua")
 dofile("./lua/rs1/misc/water.lua")
+dofile("./lua/rs1/misc/web.lua")
 dofile("./lua/rs1/quest/asgarnia/dorics_quest/doric.lua")
 dofile("./lua/rs1/quest/sheep_shearer/fred_the_farmer.lua")
 
