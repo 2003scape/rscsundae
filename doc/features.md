@@ -85,7 +85,7 @@ These should all be implemented in Lua script:
 ### Quests
 
 - [ ] Cook's Assistant
-- [ ] Sheep Shearer
+- [x] Sheep Shearer
 - [ ] The Restless Ghost
 - [ ] Demon Slayer
 - [ ] Romeo & Juliet
@@ -96,7 +96,7 @@ These should all be implemented in Lua script:
 - [ ] Prince Ali Rescue
 - [ ] Witch's potion
 - [ ] Black knight's fortress
-- [ ] Doric's quest
+- [x] Doric's quest
 - [ ] The knight's sword
 - [ ] Goblin diplomacy
 - [ ] Pirate's treasure
