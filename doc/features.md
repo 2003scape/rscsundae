@@ -37,6 +37,7 @@ Engine
 - [x] Lua scripting
 - [x] Shops
 - [x] Item banking
+- [ ] Spell effects
 - [ ] Player saving (SQLite)
 - [x] Protocol: 110
 - [ ] Protocol: 110 (new player)
@@ -44,6 +45,14 @@ Engine
 - [x] Protocol: RSA decryption
 - [ ] Protocol: 201
 - [x] Protocol: 204
+
+### Known engine bugs
+
+* When entering combat the opponent's new position can sometimes not
+  be sent to the client, resulting in a desync.
+* NPCs can sometimes walk diagonally through walls, indicating there's
+  probably a problem with the collision detection code.
+* Chatting between 110 and 204 clients is currently not possible.
 
 Content
 -------
