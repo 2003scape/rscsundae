@@ -1674,6 +1674,40 @@ script_onuseloc(lua_State *L, struct player *p,
 }
 
 void
+script_onusebound(lua_State *L, struct player *p,
+    struct bound *bound, struct item_config *item)
+{
+	struct bound_config *config;
+	bool result;
+
+	config = server_bound_config_by_id(bound->id);
+	assert(config != NULL);
+
+	for (size_t i = 0; i < config->name_count; ++i) {
+		for (size_t j = 0; j < item->name_count; ++j) {
+			lua_getglobal(L, "script_engine_usebound");
+			if (!lua_isfunction(L, -1)) {
+				puts("script error: can't find essential function script_engine_usebound");
+				return;
+			}
+			lua_pushnumber(L, p->mob.id);
+			lua_pushstring(L, config->names[i]);
+			lua_pushnumber(L, bound->x);
+			lua_pushnumber(L, bound->y);
+			lua_pushnumber(L, bound->dir);
+			lua_pushstring(L, item->names[j]);
+			safe_call(L, 6, 1, p->mob.id);
+			result = lua_toboolean(L, -1);
+			if (result != 0) {
+				return;
+			}
+		}
+	}
+
+	player_send_message(p, "Nothing interesting happens");
+}
+
+void
 script_onskillnpc(lua_State *L, struct player *p,
     struct npc *npc, struct spell_config *spell)
 {

@@ -1735,7 +1735,7 @@ player_process_action(struct player *p)
 		p->action = ACTION_NONE;
 		break;
 	case ACTION_BOUND_USEWITH:
-		if (p->action_bound == NULL) {
+		if (p->action_bound == NULL || p->action_slot >= p->inv_count) {
 			p->action = ACTION_NONE;
 			p->mob.walk_queue_len = 0;
 			p->mob.walk_queue_pos = 0;
@@ -1752,8 +1752,10 @@ player_process_action(struct player *p)
 		if (!mob_reached_bound(&p->mob, bound)) {
 			return;
 		}
-		printf("Use with bound %d\n", p->action_slot);
+		item_config = server_item_config_by_id(p->inventory[p->action_slot].id);
+		assert(item_config != NULL);
 		p->action = ACTION_NONE;
+		script_onusebound(p->mob.server->lua, p, bound, item_config);
 		break;
 	case ACTION_LOC_USEWITH:
 		if (p->action_loc == NULL || p->action_slot >= p->inv_count) {
