@@ -1734,6 +1734,27 @@ player_process_action(struct player *p)
 		}
 		p->action = ACTION_NONE;
 		break;
+	case ACTION_BOUND_USEWITH:
+		if (p->action_bound == NULL) {
+			p->action = ACTION_NONE;
+			p->mob.walk_queue_len = 0;
+			p->mob.walk_queue_pos = 0;
+			return;
+		}
+		bound = server_find_bound(p->action_bound->x, p->action_bound->y,
+		    p->action_bound->dir);
+		if (bound == NULL) {
+			p->action = ACTION_NONE;
+			p->mob.walk_queue_len = 0;
+			p->mob.walk_queue_pos = 0;
+			return;
+		}
+		if (!mob_reached_bound(&p->mob, bound)) {
+			return;
+		}
+		printf("Use with bound %d\n", p->action_slot);
+		p->action = ACTION_NONE;
+		break;
 	case ACTION_LOC_USEWITH:
 		if (p->action_loc == NULL || p->action_slot >= p->inv_count) {
 			p->action = ACTION_NONE;
