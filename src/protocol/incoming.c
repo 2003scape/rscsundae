@@ -1,4 +1,5 @@
 #include <sys/socket.h>
+#include <assert.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -727,6 +728,27 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 		{
 			p->shop = NULL;
 			player_close_ui(p);
+		}
+		break;
+	case OP_CLI_INV_CAST:
+		{
+			uint16_t spell_id, slot;
+			struct spell_config *spell;
+
+			if (buf_getu16(data, offset, len, &slot) == -1) {
+				return;
+			}
+			offset += 2;
+			if (buf_getu16(data, offset, len, &spell_id) == -1) {
+				return;
+			}
+			offset += 2;
+			spell = server_spell_config_by_id(spell_id);
+			if (spell != NULL) {
+				p->action = ACTION_INV_CAST;
+				p->spell = spell;
+				p->action_slot = slot;
+			}
 		}
 		break;
 	case OP_CLI_TRADE_ACCEPT:

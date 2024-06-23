@@ -103,10 +103,6 @@ player_load(struct player *p)
 	p->mob.base_stats[SKILL_HITS] = 10;
 	p->experience[SKILL_HITS] = 4000;
 
-	/* XXX: testing, remove later... */
-	p->mob.cur_stats[SKILL_PRAYER] = 70;
-	p->mob.base_stats[SKILL_PRAYER] = 70;
-
 	p->sprites_base[ANIM_SLOT_HEAD] = ANIM_HEAD1 + 1;
 	p->sprites_base[ANIM_SLOT_BODY] = ANIM_BODY1 + 1;
 	p->sprites_base[ANIM_SLOT_LEGS] = ANIM_LEGS1 + 1;
@@ -1580,6 +1576,20 @@ player_process_action(struct player *p)
 		}
 		script_onuseinv(p->mob.server->lua, p,
 		    item_config, item_config2);
+		p->action = ACTION_NONE;
+		break;
+	case ACTION_INV_CAST:
+		if (p->action_slot >= p->inv_count) {
+			p->action = ACTION_NONE;
+			return;
+		}
+		id = p->inventory[p->action_slot].id;
+		item_config = server_item_config_by_id(id);
+		if (p->spell == NULL || item_config == NULL) {
+			p->action = ACTION_NONE;
+			return;
+		}
+		printf("Cast %s on %s\n", p->spell->name, item_config->names[0]);
 		p->action = ACTION_NONE;
 		break;
 	case ACTION_ITEM_TAKE:
