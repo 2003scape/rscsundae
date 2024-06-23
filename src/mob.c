@@ -28,6 +28,14 @@ mob_face(struct mob *mob, int x, int y)
 	int dif_x = mob->x - x;
 	int dif_y = mob->y - y;
 
+	if (mob->moved) {
+		/*
+		 * can't move and change direction in same tick,
+		 * or protocol breaks
+		 */
+		return;
+	}
+
 	if (dif_x == 0) {
 		if (dif_y > 0) {
 			mob->dir = MOB_DIR_NORTH;

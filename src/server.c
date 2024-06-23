@@ -322,8 +322,8 @@ server_tick(void)
 		player_parse_incoming(s.players[i]);
 		player_process_combat(s.players[i]);
 		player_process_action(s.players[i]);
-		script_process(s.lua, s.players[i]);
 		mob_process_walk_queue(&s.players[i]->mob);
+		script_process(s.lua, s.players[i]);
 		if (s.players[i]->mob.moved) {
 			player_close_ui(s.players[i]);
 		}
