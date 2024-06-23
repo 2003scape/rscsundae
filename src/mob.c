@@ -5,7 +5,7 @@
 #include "zone.h"
 
 static int mob_combat_max_roll(int, int);
-static int mob_combat_roll_damage(struct ranctx *, int, int);
+static int mob_combat_roll_damage(int, int);
 
 static int
 mob_combat_max_roll(int stat, int bonus)
@@ -14,12 +14,11 @@ mob_combat_max_roll(int stat, int bonus)
 }
 
 static int
-mob_combat_roll_damage(struct ranctx *ran, int stat, int bonus)
+mob_combat_roll_damage(int stat, int bonus)
 {
 	int max = mob_combat_max_roll(stat, bonus);
-	float f = ranval(ran) / (float)UINT32_MAX;
-	float roll = max * f;
-	return (int)((roll + 320.0f) / 640.0f);
+	double roll = max * server_random();
+	return (int)((roll + 320.0) / 640.0);
 }
 
 void
@@ -76,15 +75,15 @@ mob_combat_xp(struct mob *mob)
 }
 
 int
-mob_combat_roll(struct ranctx *ran, int att_stat, int att_bonus,
+mob_combat_roll(int att_stat, int att_bonus,
     int def_stat, int def_bonus, int str_stat, int str_bonus)
 {
 	int att_roll, def_roll;
 
-	att_roll = ranval(ran) % mob_combat_max_roll(att_stat, att_bonus);
-	def_roll = ranval(ran) % mob_combat_max_roll(def_stat, def_bonus);
+	att_roll = mob_combat_max_roll(att_stat, att_bonus) * server_random();
+	def_roll = mob_combat_max_roll(def_stat, def_bonus) * server_random();
 	if (att_roll > def_roll) {
-		return mob_combat_roll_damage(ran, str_stat, str_bonus);
+		return mob_combat_roll_damage(str_stat, str_bonus);
 	}
 	return 0;
 }

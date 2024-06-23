@@ -1115,3 +1115,11 @@ server_remove_temp_item(uint64_t unique_id)
 		}
 	}
 }
+
+
+double
+server_random(void)
+{
+	/* emulation of java's Math.random() */
+	return ranval(&s.ran) / (double)UINT32_MAX;
+}

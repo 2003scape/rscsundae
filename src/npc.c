@@ -83,10 +83,8 @@ npc_random_walk(struct npc *npc)
 	attempts = 0;
 
 	do {
-		rx = ranval(&npc->mob.server->ran) /
-		    (double)UINT32_MAX;
-		ry = ranval(&npc->mob.server->ran) /
-		    (double)UINT32_MAX;
+		rx = server_random();
+		ry = server_random();
 
 		min_x = npc->spawn_x - npc->config->wander_range;
 		if (min_x < 0) {
@@ -169,8 +167,7 @@ npc_combat_roll(struct npc *npc, struct player *defender)
 {
 	int def = player_get_defense_boosted(defender);
 
-	return mob_combat_roll(&npc->mob.server->ran,
-	    npc->mob.cur_stats[SKILL_ATTACK], 0,
+	return mob_combat_roll(npc->mob.cur_stats[SKILL_ATTACK], 0,
 	    def, defender->bonus_armour,
 	    npc->mob.cur_stats[SKILL_STRENGTH], 0);
 }

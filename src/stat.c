@@ -90,7 +90,7 @@ stat_random(struct mob *mob, int stat,
 	high = (int)(top_probability * (level - 1.0) / 98.0);
 	chance = (low + high) + 1;
 
-	random = (ranval(&mob->server->ran) / (double)UINT32_MAX) * 256.0;
+	random = server_random() * 256.0;
 	return random <= chance;
 }
 

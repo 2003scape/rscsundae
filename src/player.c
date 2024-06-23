@@ -25,7 +25,7 @@ static int player_pvp_roll(struct player *, struct player *);
 static int player_pvm_roll(struct player *, struct npc *);
 static int player_pvp_ranged_roll(struct player *, struct player *);
 static int player_pvm_ranged_roll(struct player *, struct npc *);
-static int player_magic_damage_roll(struct player *, int);
+static int player_magic_damage_roll(int);
 static bool player_wilderness_check(struct player *, struct player *);
 static bool player_consume_ammo(struct player *, struct projectile_config *);
 static bool player_init_combat(struct player *, struct mob *);
@@ -370,8 +370,7 @@ player_pvp_ranged_roll(struct player *attacker, struct player *defender)
 
 	assert(attacker->projectile != NULL);
 
-	return mob_combat_roll(&attacker->mob.server->ran,
-	    8 + attacker->mob.cur_stats[SKILL_RANGED],
+	return mob_combat_roll(8 + attacker->mob.cur_stats[SKILL_RANGED],
 	    attacker->projectile->aim,
 	    def, defender->bonus_armour,
 	    8 + attacker->mob.cur_stats[SKILL_RANGED],
@@ -383,8 +382,7 @@ player_pvm_ranged_roll(struct player *attacker, struct npc *npc)
 {
 	assert(attacker->projectile != NULL);
 
-	return mob_combat_roll(&attacker->mob.server->ran,
-	    8 + attacker->mob.cur_stats[SKILL_RANGED],
+	return mob_combat_roll(8 + attacker->mob.cur_stats[SKILL_RANGED],
 	    attacker->projectile->aim,
 	    npc->mob.cur_stats[SKILL_DEFENSE], 0,
 	    8 + attacker->mob.cur_stats[SKILL_RANGED],
@@ -397,8 +395,7 @@ player_pvm_roll(struct player *p, struct npc *npc)
 	int att = player_get_attack_boosted(p);
 	int str = player_get_strength_boosted(p);
 
-	return mob_combat_roll(&p->mob.server->ran,
-	    att, p->bonus_weaponaim,
+	return mob_combat_roll(att, p->bonus_weaponaim,
 	    npc->mob.cur_stats[SKILL_DEFENSE], 0,
 	    str, p->bonus_weaponpower);
 }
@@ -410,17 +407,15 @@ player_pvp_roll(struct player *attacker, struct player *defender)
 	int def = player_get_defense_boosted(defender);
 	int str = player_get_strength_boosted(attacker);
 
-	return mob_combat_roll(&attacker->mob.server->ran,
-	    att, attacker->bonus_weaponaim,
+	return mob_combat_roll(att, attacker->bonus_weaponaim,
 	    def, defender->bonus_armour,
 	    str, attacker->bonus_weaponpower);
 }
 
 static int
-player_magic_damage_roll(struct player *p, int power)
+player_magic_damage_roll(int power)
 {
-	double rand = ranval(&p->mob.server->ran) / (double)UINT32_MAX;
-	double dmg = (power + 5.0) * rand;
+	double dmg = (power + 5.0) * server_random();
 
 	return dmg / 10;
 }
@@ -589,7 +584,7 @@ player_shoot_pvm(struct player *p, struct projectile_config *projectile,
 			stat_advance(p, SKILL_RANGED, roll * 16, 0);
 		}
 	} else if (projectile->power > 0) {
-		roll = player_magic_damage_roll(p, projectile->power);
+		roll = player_magic_damage_roll(projectile->power);
 	}
 
 	if (projectile->power > 0) {
@@ -657,7 +652,7 @@ player_shoot_pvp(struct player *p, struct projectile_config *projectile,
 			stat_advance(p, SKILL_RANGED, roll * 16, 0);
 		}
 	} else if (projectile->power > 0) {
-		roll = player_magic_damage_roll(p, projectile->power);
+		roll = player_magic_damage_roll(projectile->power);
 	}
 
 	if (projectile->power > 0) {
@@ -1883,8 +1878,8 @@ player_can_cast(struct player *p, struct spell_config *spell)
 	 */
 	magic_level = p->mob.cur_stats[SKILL_MAGIC];
 	if ((magic_level - spell->level) < 10) {
-		double r1 = ranval(&p->mob.server->ran) / (double)UINT32_MAX;
-		double r2 = ranval(&p->mob.server->ran) / (double)UINT32_MAX;
+		double r1 = server_random();
+		double r2 = server_random();
 		double roll_spell = spell->level * r1;
 		double roll_player = (magic_level + (p->bonus_magic * 1.5)) * r2;
 		if (roll_player < roll_spell) {

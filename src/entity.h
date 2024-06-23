@@ -343,7 +343,7 @@ struct player {
 /* mob.c */
 bool mob_within_range(struct mob *, int, int, int);
 void mob_face(struct mob *, int, int);
-int mob_combat_roll(struct ranctx *, int, int, int, int, int, int);
+int mob_combat_roll(int, int, int, int, int, int);
 int mob_wilderness_level(struct mob *);
 size_t get_nearby_npcs(struct mob *, struct npc **, size_t, int);
 size_t get_nearby_players(struct mob *, struct player **, size_t, int);

@@ -495,7 +495,7 @@ script_random(lua_State *L)
 	lua_Integer result;
 
 	probability = script_checkinteger(L, 1);
-	result = (int)((ranval(&serv->ran) / (double)UINT32_MAX) * 255.0);
+	result = (int)(255.0 * server_random());
 	lua_pushboolean(L, result < probability);
 	return 1;
 }
@@ -504,11 +504,10 @@ static int
 script_randomvar(lua_State *L)
 {
 	lua_Integer probability;
-	double d, result;
+	double result;
 
 	probability = script_checkinteger(L, 1);
-	d = ranval(&serv->ran) / (double)UINT32_MAX;
-	result = d * probability;
+	result = probability * server_random();
 	lua_pushinteger(L, (lua_Integer)result);
 	return 1;
 }
