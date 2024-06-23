@@ -1589,7 +1589,7 @@ player_process_action(struct player *p)
 			p->action = ACTION_NONE;
 			return;
 		}
-		printf("Cast %s on %s\n", p->spell->name, item_config->names[0]);
+		script_onspellinv(p->mob.server->lua, p, item_config);
 		p->action = ACTION_NONE;
 		break;
 	case ACTION_ITEM_TAKE:

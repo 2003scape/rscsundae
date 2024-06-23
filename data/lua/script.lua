@@ -5,6 +5,7 @@ local killnpc_scripts = {}
 local opinv_scripts = {}
 local skillplayer_scripts = {}
 local skillnpc_scripts = {}
+local spellinv_scripts = {}
 local opbound1_scripts = {}
 local opbound2_scripts = {}
 local oploc1_scripts = {}
@@ -79,6 +80,13 @@ function register_skillnpc(name, spell, callback)
 		skillnpc_scripts[spell] = {}
 	end
 	skillnpc_scripts[spell][name] = callback
+end
+
+function register_spellinv(name, spell, callback)
+	if not spellinv_scripts[spell] then
+		spellinv_scripts[spell] = {}
+	end
+	spellinv_scripts[spell][name] = callback
 end
 
 function register_usenpc(name, item, callback)
@@ -258,6 +266,34 @@ function script_engine_skillnpc(player, name, npc, spell)
 		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, npc)
+			player_scripts[player] = nil
+			playerunbusy(player)
+		end)
+		player_scripts[player] = ps
+		playerbusy(player)
+		return true
+	end
+	return false
+end
+
+function script_engine_spellinv(player, name, spell)
+	local script = player_scripts[player]
+	if script then
+		return true
+	end
+	spell = string.lower(spell)
+	name = string.lower(name)
+	if not spellinv_scripts[spell] then
+		return false
+	end
+	script = spellinv_scripts[spell][name]
+	if not script then
+		script = spellinv_scripts[spell]["_"]
+	end
+	if script then
+		ps = new_player_script(player)
+		ps.co = coroutine.create(function()
+			script(player, name)
 			player_scripts[player] = nil
 			playerunbusy(player)
 		end)

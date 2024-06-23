@@ -1524,6 +1524,34 @@ script_onuseinv(lua_State *L, struct player *p,
 }
 
 void
+script_onspellinv(lua_State *L, struct player *p,
+    struct item_config *item)
+{
+	bool result;
+
+	assert(item != NULL);
+	assert(p->spell != NULL);
+
+	for (size_t i = 0; i < item->name_count; ++i) {
+		lua_getglobal(L, "script_engine_spellinv");
+		if (!lua_isfunction(L, -1)) {
+			puts("script error: can't find essential function script_engine_spellinv");
+			return;
+		}
+		lua_pushnumber(L, p->mob.id);
+		lua_pushstring(L, item->names[i]);
+		lua_pushstring(L, p->spell->name);
+		safe_call(L, 3, 1, p->mob.id);
+		result = lua_toboolean(L, -1);
+		if (result != 0) {
+			return;
+		}
+	}
+
+	player_send_message(p, "Nothing interesting happens");
+}
+
+void
 script_onusenpc(lua_State *L, struct player *p,
     struct npc *npc, struct item_config *item)
 {

@@ -24,8 +24,8 @@ void script_onuseobj(lua_State *, struct player *,
     struct item_config *, int, int, struct item_config *);
 void script_onuseinv(lua_State *, struct player *,
     struct item_config *, struct item_config *);
+void script_onspellinv(lua_State *, struct player *, struct item_config *);
 void script_onusenpc(lua_State *, struct player *,
     struct npc *, struct item_config *);
 bool script_onkillnpc(lua_State *, struct player *, struct npc *);
-
 #endif
