@@ -557,6 +557,25 @@ function multi(player, ...)
 	return active_script.answer
 end
 
+-- https://github.com/2004Scape/Server/blob/main/data/src/scripts/drop%20tables/scripts/shared_droptables.rs2
+function randomherb(player, x, y)
+	addobject(player, "coins", 10, x, y)
+end
+
+-- https://github.com/2004Scape/Server/blob/main/data/src/scripts/drop%20tables/scripts/shared_droptables.rs2
+function randomjewel(player, x, y)
+	local ran = randomvar(128)
+	if ran < 32 then
+		addobject(player, "uncut sapphire", 1, x, y)
+	elseif ran < 48 then
+		addobject(player, "uncut emerald", 1, x, y)
+	elseif ran < 56 then
+		addobject(player, "uncut ruby", 1, x, y)
+	elseif ran < 58 then
+		addobject(player, "uncut diamond", 1, x, y)
+	end
+end
+
 dofile("./lua/rs1/monster/chicken.lua")
 dofile("./lua/rs1/monster/imp.lua")
 dofile("./lua/rs1/npc/asgarnia/barmaid.lua")
