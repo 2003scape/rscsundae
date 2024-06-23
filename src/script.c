@@ -1542,7 +1542,14 @@ script_onusenpc(lua_State *L, struct player *p,
 			lua_pushstring(L, item->names[j]);
 			safe_call(L, 4, 1, p->mob.id);
 			result = lua_toboolean(L, -1);
+			/*
+			 * replay:
+			 * rsc-preservation.xyz/Quests/sheep-shearer-zezima
+			 * has the sheep facing the player even on failure
+			 */
 			if (result != 0) {
+				mob_face(&npc->mob, p->mob.x, p->mob.y);
+				mob_face(&p->mob, npc->mob.x, npc->mob.y);
 				return;
 			}
 		}
