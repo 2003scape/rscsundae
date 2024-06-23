@@ -69,7 +69,7 @@ These should all be implemented in Lua script:
 - [x] Magic (curses)
 - [ ] Magic (teleportation)
 - [ ] Magic (telegrab)
-- [ ] Magic (alchemy)
+- [x] Magic (alchemy)
 - [ ] Magic (superheat)
 - [ ] Magic (enchantment)
 - [x] Woodcutting
