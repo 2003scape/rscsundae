@@ -246,3 +246,4 @@ You search the coffin and find some human remains
 @que@The door is locked
 @que@You unlock the door
 @que@You go through the door
+@que@You just went through a secret door

@@ -66,3 +66,31 @@ function oploc2_manholeopen(player, x, y)
 	changeloc(x, y, "manholeclosed")
 	delay(3)
 end
+
+-- Logg/Tylerbeg/08-02-2018 03.50.02 barbarian village and edgeville
+function opbound1_dungeondoor(player, x, y, dir)
+	mes(player, "@que@The door is locked")
+end
+
+-- Logg/Tylerbeg/08-02-2018 03.50.02 barbarian village and edgeville
+function usebound_dungeondoor_dungeonkey(player, x, y, dir)
+	thinkbubble(player, "dungeonkey")
+	mes(player, "@que@You unlock the door")
+	mes(player, "@que@You go through the door")
+	boundaryteleport(player, x, y, dir)
+	changebound(x, y, dir, "openlockeddoor")
+	pause(5, 5)
+	changebound(x, y, dir, "dungeondoor")
+end
+
+register_usebound("dungeondoor", "dungeonkey", usebound_dungeondoor_dungeonkey)
+
+-- RSC 2001/replays master archive/Walk around/Misthalin- Edgeville/edgeville dungeon- odd looking wall - in and out
+function opbound1_odd_looking_wall(player, x, y, dir)
+	mes(player, "@que@You just went through a secret door")
+	boundaryteleport(player, x, y, dir)
+	changebound(x, y, dir, "blank")
+	-- XXX might also be a delay, not sure
+	pause(2, 2)
+	changebound(x, y, dir, "odd looking wall")
+end
