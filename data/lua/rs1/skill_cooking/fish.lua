@@ -111,6 +111,7 @@ local function cook_fish(player, fish, loc)
 		mes(player,
 		    string.format("@que@You need a cooking level of %d to cook %s",
 			    fish.level, fish.name))
+		return
 	end
 	thinkbubble(player, fish.raw)
 	mes(player, string.format("@que@You cook the %s on the %s", fish.name, loc))
