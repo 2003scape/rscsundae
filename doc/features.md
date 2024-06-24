@@ -83,7 +83,7 @@ These should all be implemented in Lua script:
 - [ ] Fishing
 - [x] Cooking (fish/meat)
 - [ ] Cooking (bread)
-- [ ] Cooking (wine)
+- [x] Cooking (wine)
 - [ ] Cooking (pies)
 - [ ] Cooking (pizzas)
 - [ ] Cooking (cake)
