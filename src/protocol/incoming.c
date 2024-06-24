@@ -944,6 +944,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			offset += 2;
 			p->action = ACTION_BOUND_USEWITH;
 			p->action_bound = server_find_bound(x, y, dir);
+			p->action_slot = slot;
 		}
 		break;
 	case OP_CLI_INV_USEWITH:
