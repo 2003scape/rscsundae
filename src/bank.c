@@ -50,9 +50,6 @@ player_bank_remove(struct player *p, uint16_t id, uint32_t amount)
 		} else {
 			p->bank[i].amount -= amount;
 		}
-		if (amount > 0) {
-			player_send_show_bank(p);
-		}
 		return amount;
 	}
 	return 0;
@@ -76,6 +73,7 @@ player_withdraw(struct player *p, uint16_t id, uint32_t amount)
 			amount = player_bank_remove(p, id, amount);
 			if (amount > 0) {
 				player_inv_give(p, config, amount);
+				player_send_show_bank(p);
 			}
 			return;
 		}
@@ -88,6 +86,7 @@ player_withdraw(struct player *p, uint16_t id, uint32_t amount)
 		amount = player_bank_remove(p, id, amount);
 		if (amount > 0) {
 			player_inv_give(p, config, amount);
+			player_send_show_bank(p);
 		}
 	}
 	return;

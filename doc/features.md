@@ -53,7 +53,6 @@ Engine
 * NPCs can sometimes walk diagonally through walls, indicating there's
   probably a problem with the collision detection code.
 * Chatting between 110 and 204 clients is currently not possible.
-* Inventory is not updated while in the bank interface on 204.
 * NPC/player actions should cause following to start.
 
 Content
