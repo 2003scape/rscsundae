@@ -27,8 +27,8 @@ local function mizgog_progress(player, npc)
 		remove(player, "white bead", 1)
 		give(player, "amulet of accuracy", 1)
 		advancestat(player, STAT_MAGIC, 1500, 400)
-		giveqp(player, 1)
 		setvar(player, "mizgog_stage", 2)
+		giveqp(player, 1)
 	elseif held(player, "red bead", 1) or
 	    held(player, "yellow bead", 1) or
 	    held(player, "black bead", 1) or
@@ -59,7 +59,7 @@ local function mizgog_givequest(player, npc)
 		npcsay(npc, "I could do with some help")
 		npcsay(npc, "The wizard Grayzag next door decided he didn't like me")
 		npcsay(npc, "So he cast of spell of summoning")
-		npcsay(npc, "And summoned hundred of little imps")
+		npcsay(npc, "And summoned hundreds of little imps")
 		npcsay(npc, "These imps stole all sorts of my things")
 		npcsay(npc, "Most of these things I don't really care about")
 		npcsay(npc, "They're just eggs and balls of string and things")
@@ -81,24 +81,24 @@ end
 
 local function mizgog_intro(player, npc)
 	npcsay(npc, "Hello there")
-	local say = multi(player,
+	local resp = multi(player,
 		"Give me a quest!",
 		"Most of your friends are pretty quiet aren't they?")
-	if say == 1 then
+	if resp == 1 then
 		mizgog_givequest(player, npc)
-	elseif say == 2 then
+	elseif resp == 2 then
 		mizgog_smalltalk(player, npc)
 	end
 end
 
 local function mizgog_after(player, npc)
-	local say = multi(player,
+	local resp = multi(player,
 		"Got any more quests?",
 		"Most of your friends are pretty quiet aren't they?")
-	if say == 1 then
+	if resp == 1 then
 		say(player, "Got any more quests?")
 		npcsay(npc, "No Everything is good with the world today")
-	elseif say == 2 then
+	elseif resp == 2 then
 		mizgog_smalltalk(player, npc)
 	end
 end

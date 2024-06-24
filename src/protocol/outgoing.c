@@ -1847,6 +1847,41 @@ player_send_show_bank(struct player *p)
 }
 
 int
+player_send_quests(struct player *p)
+{
+	uint8_t quests_complete[17];
+	size_t offset = 0;
+
+	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		        OP_SRV_QUESTS);
+
+	for (size_t i = 0; i < p->variable_count; ++i) {
+		if (strcmp(p->variables[i].name, "doric_stage") == 0) {
+			if (p->variables[i].value >= 2) {
+				quests_complete[3] = true;
+			}
+		} else if (strcmp(p->variables[i].name, "mizgog_stage") == 0) {
+			if (p->variables[i].value >= 2) {
+				quests_complete[7] = true;
+			}
+		} else if (strcmp(p->variables[i].name, "fred_stage") == 0) {
+			if (p->variables[i].value >= 2) {
+				quests_complete[11] = true;
+			}
+		}
+	}
+
+	for (size_t i = 0; i < sizeof(quests_complete); ++i) {
+		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+		    quests_complete[i]) == -1) {
+			return -1;
+		}
+	}
+
+	return player_write_packet(p, p->tmpbuf, offset);
+}
+
+int
 player_send_close_bank(struct player *p)
 {
 	size_t offset = 0;

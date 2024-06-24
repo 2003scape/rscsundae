@@ -1237,6 +1237,7 @@ script_giveqp(lua_State *L)
 	}
 
 	player_send_message(p, mes);
+	player_send_quests(p);
 
 	p->quest_points += amount;
 	p->stats_changed = true;

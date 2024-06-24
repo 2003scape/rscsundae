@@ -458,6 +458,7 @@ int player_send_show_bank(struct player *);
 int player_send_close_bank(struct player *);
 int player_send_shop(struct player *, const char *);
 int player_send_close_shop(struct player *);
+int player_send_quests(struct player *);
 int player_notify_friend_online(struct player *, int64_t);
 int player_notify_friend_offline(struct player *, int64_t);
 int32_t player_variable_get(struct player *, const char *);

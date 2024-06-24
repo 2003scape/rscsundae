@@ -87,6 +87,8 @@ local function fred_give(player, npc)
 		mes(player, "@gre@Well done you have completed the sheep shearer quest")
 		give(player, "coins", 60)
 		advancestat(player, SKILL_CRAFTING, 500, 100)
+		setvar(player, "fred_stage", 2)
+		setvar(player, "fred_wool", 0)
 		giveqp(player, 1)
 		return
 	end
