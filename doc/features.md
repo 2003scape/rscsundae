@@ -104,7 +104,7 @@ These should all be implemented in Lua script:
 - [ ] Vampire Slayer
 - [x] Imp catcher
 - [ ] Prince Ali Rescue
-- [ ] Witch's potion
+- [x] Witch's potion
 - [ ] Black knight's fortress
 - [x] Doric's quest
 - [ ] The knight's sword

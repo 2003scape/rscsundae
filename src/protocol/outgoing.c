@@ -1868,6 +1868,10 @@ player_send_quests(struct player *p)
 			if (p->variables[i].value >= 2) {
 				quests_complete[11] = true;
 			}
+		} else if (strcmp(p->variables[i].name, "hetty_stage") == 0) {
+			if (p->variables[i].value >= 3) {
+				quests_complete[15] = true;
+			}
 		}
 	}
 
