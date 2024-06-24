@@ -79,7 +79,7 @@ These should all be implemented in Lua script:
 - [ ] Crafting (gold jewelry)
 - [ ] Crafting (silver jewelry)
 - [x] Crafting (leatherworking)
-- [ ] Crafting (wool)
+- [x] Crafting (wool)
 - [ ] Fishing
 - [ ] Cooking (fish/meat)
 - [ ] Cooking (bread)
