@@ -81,7 +81,7 @@ These should all be implemented in Lua script:
 - [x] Crafting (leatherworking)
 - [x] Crafting (wool)
 - [ ] Fishing
-- [ ] Cooking (fish/meat)
+- [x] Cooking (fish/meat)
 - [ ] Cooking (bread)
 - [ ] Cooking (wine)
 - [ ] Cooking (pies)
