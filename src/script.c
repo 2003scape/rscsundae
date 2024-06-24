@@ -55,6 +55,7 @@ static int script_addobject(lua_State *);
 static int script_delobject(lua_State *);
 static int script_getvar(lua_State *);
 static int script_setvar(lua_State *);
+static int script_addnpc(lua_State *);
 static struct player *id_to_player(lua_Integer);
 static struct npc *id_to_npc(lua_Integer);
 static void safe_call(lua_State *, int, int, int);
@@ -1260,6 +1261,34 @@ script_openshop(lua_State *L)
 }
 
 static int
+script_addnpc(lua_State *L)
+{
+	const char *npc_name;
+	lua_Integer x, y;
+	struct npc_config *npc_config;
+	int result;
+
+	npc_name = script_checkstring(L, 1);
+	x = script_checkinteger(L, 2);
+	y = script_checkinteger(L, 3);
+
+	npc_config = server_find_npc_config(npc_name);
+	if (npc_config == NULL) {
+		printf("script warning: npc config \"%s\" not found\n", npc_name);
+		return 0;
+	}
+
+	result = server_add_npc(npc_config->id, x, y);
+	if (result < 0) {
+		printf("script warning: unable to add npc, server_add_npc failed\n");
+		return 0;
+	}
+
+	lua_pushinteger(L, result);
+	return 1;
+}
+
+static int
 script_giveqp(lua_State *L)
 {
 	char mes[64];
@@ -2114,6 +2143,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_setvar);
 	lua_setglobal(L, "setvar");
+
+	lua_pushcfunction(L, script_addnpc);
+	lua_setglobal(L, "addnpc");
 
 	if (luaL_dofile(L, "./lua/script.lua") != LUA_OK) {
 		printf("script error %s:\n",  lua_tostring(L, -1));

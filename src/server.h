@@ -102,6 +102,7 @@ struct loc_config *server_find_loc_config(const char *);
 struct bound_config *server_bound_config_by_id(int);
 struct bound_config *server_find_bound_config(const char *);
 struct npc_config *server_npc_config_by_id(int);
+struct npc_config *server_find_npc_config(const char *);
 struct spell_config *server_spell_config_by_id(int);
 struct projectile_config *server_find_projectile(const char *);
 struct shop_config *server_find_shop(const char *);

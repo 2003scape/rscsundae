@@ -1007,6 +1007,19 @@ server_npc_config_by_id(int id)
 	return &s.npc_config[id];
 }
 
+struct npc_config *
+server_find_npc_config(const char *name)
+{
+	for (size_t i = 0; i < s.npc_config_count; i++) {
+		for (size_t j = 0; j < s.npc_config[i].name_count; j++) {
+			if (strcasecmp(s.npc_config[i].names[j], name) == 0) {
+				return &s.npc_config[i];
+			}
+		}
+	}
+	return NULL;
+}
+
 struct projectile_config *
 server_find_projectile(const char *name)
 {
@@ -1067,7 +1080,7 @@ server_add_npc(int id, int x, int y)
 		if (i > s.max_npc_id) {
 			s.max_npc_id = i;
 		}
-		return 0;
+		return i;
 	}
 	printf("WARNING: failed to add NPC, too many\n");
 	return -1;
