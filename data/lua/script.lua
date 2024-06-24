@@ -745,6 +745,7 @@ dofile("./lua/rs1/misc/plants.lua")
 dofile("./lua/rs1/misc/water.lua")
 dofile("./lua/rs1/misc/web.lua")
 dofile("./lua/rs1/quest/asgarnia/dorics_quest/doric.lua")
+dofile("./lua/rs1/quest/imp_catcher/mizgog.lua")
 dofile("./lua/rs1/quest/sheep_shearer/fred_the_farmer.lua")
 
 --

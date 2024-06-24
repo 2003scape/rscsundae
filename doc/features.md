@@ -102,7 +102,7 @@ These should all be implemented in Lua script:
 - [ ] Shield of Arrav
 - [ ] Ernest the chicken
 - [ ] Vampire Slayer
-- [ ] Imp catcher
+- [x] Imp catcher
 - [ ] Prince Ali Rescue
 - [ ] Witch's potion
 - [ ] Black knight's fortress
