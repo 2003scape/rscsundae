@@ -1,5 +1,4 @@
 -- 1e_Luis/Quests/Witchs Potion.pcap
--- TODO: should be able to intentionally burn during witch's potion
 
 local function cook_meat(player)
 	thinkbubble(player, "rawmeat")
