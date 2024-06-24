@@ -54,7 +54,7 @@ Engine
   probably a problem with the collision detection code.
 * Chatting between 110 and 204 clients is currently not possible.
 * Inventory is not updated while in the bank interface on 204.
-* Can't log out immediately after logging in.
+* NPC/player actions should cause following to start.
 
 Content
 -------

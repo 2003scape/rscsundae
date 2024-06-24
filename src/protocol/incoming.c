@@ -173,10 +173,17 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 		break;
 	case OP_CLI_LOGOUT:
 		{
-			if (p->mob.in_combat || p->mob.server->tick_counter <
-			    (p->mob.damage_timer + 17)) {
+			if (p->mob.in_combat || p->script_active) {
 				player_send_logout_reject(p);
 				return;
+			}
+
+			if (p->mob.damage_timer != 0) {
+				if (p->mob.server->tick_counter <=
+				    (p->mob.damage_timer + 15)) {
+					player_send_logout_reject(p);
+					return;
+				}
 			}
 
 			player_send_logout(p);
