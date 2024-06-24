@@ -97,8 +97,8 @@ Intentionally not implemented
 
 * Most variable commands. Use Lua operators.
 * `addplaystat`, `subplaystat` and friends. Use the regular `addstat` functions.
-* `jump(labelname)` - use Lua functions
-* `fork(labelname)` - use Lua functions
-* `end()` - use Lua `return`
-* `ifstatabove(stat,value)` - use `statatleast`
-* `setcoord(coordinate)`
+* `jump(labelname)` - use Lua functions.
+* `fork(labelname)` - use Lua functions.
+* `end()` - use Lua `return`.
+* `ifstatabove(stat,value)` - use `statatleast`.
+* `setcoord(coordinate)` - use Lua variables.
