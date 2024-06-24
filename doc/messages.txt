@@ -241,3 +241,8 @@ You cut the diamond
 @que@You need a crafting skill of level 30 to make this
 @que@You need a crafting skill of level 40 to make this
 @que@You need a crafting skill of level 50 to make this
+You open the coffin
+You search the coffin and find some human remains
+@que@The door is locked
+@que@You unlock the door
+@que@You go through the door
