@@ -87,7 +87,7 @@ These should all be implemented in Lua script:
 - [ ] Cooking (pies)
 - [ ] Cooking (pizzas)
 - [ ] Cooking (cake)
-- [ ] Cooking (stew)
+- [x] Cooking (stew)
 - [x] Mining
 - [ ] Smithing (forging)
 - [x] Smithing (smelting)

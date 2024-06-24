@@ -247,3 +247,5 @@ You search the coffin and find some human remains
 @que@You unlock the door
 @que@You go through the door
 @que@You just went through a secret door
+@que@You squeeze the grapes into the jug
+@que@You make some nice wine
