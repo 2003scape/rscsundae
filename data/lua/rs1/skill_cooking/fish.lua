@@ -127,104 +127,12 @@ local function cook_fish(player, fish, loc)
 	end
 end
 
-function useloc_range_raw_shrimp(player, x, y)
-	cook_fish(player, fish_types["shrimp"], "stove")
+for k, v in pairs(fish_types) do
+	register_useloc("range", v.raw, function(player, x, y)
+		cook_fish(player, v, "stove")
+	end)
+
+	register_useloc("fire", v.raw, function(player, x, y)
+		cook_fish(player, v, "fire")
+	end)
 end
-
-function useloc_range_raw_anchovies(player, x, y)
-	cook_fish(player, fish_types["anchovies"], "stove")
-end
-
-function useloc_range_raw_sardine(player, x, y)
-	cook_fish(player, fish_types["sardine"], "stove")
-end
-
-function useloc_range_raw_herring(player, x, y)
-	cook_fish(player, fish_types["herring"], "stove")
-end
-
-function useloc_range_raw_trout(player, x, y)
-	cook_fish(player, fish_types["trout"], "stove")
-end
-
-function useloc_range_raw_pike(player, x, y)
-	cook_fish(player, fish_types["pike"], "stove")
-end
-
-function useloc_range_raw_salmon(player, x, y)
-	cook_fish(player, fish_types["salmon"], "stove")
-end
-
-function useloc_range_raw_tuna(player, x, y)
-	cook_fish(player, fish_types["tuna"], "stove")
-end
-
-function useloc_range_raw_lobster(player, x, y)
-	cook_fish(player, fish_types["lobster"], "stove")
-end
-
-function useloc_range_raw_swordfish(player, x, y)
-	cook_fish(player, fish_types["swordfish"], "stove")
-end
-
-function useloc_fire_raw_shrimp(player, x, y)
-	cook_fish(player, fish_types["shrimp"], "fire")
-end
-
-function useloc_fire_raw_anchovies(player, x, y)
-	cook_fish(player, fish_types["anchovies"], "fire")
-end
-
-function useloc_fire_raw_sardine(player, x, y)
-	cook_fish(player, fish_types["sardine"], "fire")
-end
-
-function useloc_fire_raw_herring(player, x, y)
-	cook_fish(player, fish_types["herring"], "fire")
-end
-
-function useloc_fire_raw_trout(player, x, y)
-	cook_fish(player, fish_types["trout"], "fire")
-end
-
-function useloc_fire_raw_pike(player, x, y)
-	cook_fish(player, fish_types["pike"], "fire")
-end
-
-function useloc_fire_raw_salmon(player, x, y)
-	cook_fish(player, fish_types["salmon"], "fire")
-end
-
-function useloc_fire_raw_tuna(player, x, y)
-	cook_fish(player, fish_types["tuna"], "fire")
-end
-
-function useloc_fire_raw_lobster(player, x, y)
-	cook_fish(player, fish_types["lobster"], "fire")
-end
-
-function useloc_fire_raw_swordfish(player, x, y)
-	cook_fish(player, fish_types["swordfish"], "fire")
-end
-
-register_useloc("range", "raw shrimp", useloc_range_raw_shrimp)
-register_useloc("range", "raw anchovies", useloc_range_raw_anchovies)
-register_useloc("range", "raw sardine", useloc_range_raw_sardine)
-register_useloc("range", "raw herring", useloc_range_raw_herring)
-register_useloc("range", "raw trout", useloc_range_raw_trout)
-register_useloc("range", "raw pike", useloc_range_raw_pike)
-register_useloc("range", "raw salmon", useloc_range_raw_salmon)
-register_useloc("range", "raw tuna", useloc_range_raw_tuna)
-register_useloc("range", "raw lobster", useloc_range_raw_lobster)
-register_useloc("range", "raw swordfish", useloc_range_raw_swordfish)
-
-register_useloc("fire", "raw shrimp", useloc_fire_raw_shrimp)
-register_useloc("fire", "raw anchovies", useloc_fire_raw_anchovies)
-register_useloc("fire", "raw sardine", useloc_fire_raw_sardine)
-register_useloc("fire", "raw herring", useloc_fire_raw_herring)
-register_useloc("fire", "raw trout", useloc_fire_raw_trout)
-register_useloc("fire", "raw pike", useloc_fire_raw_pike)
-register_useloc("fire", "raw salmon", useloc_fire_raw_salmon)
-register_useloc("fire", "raw tuna", useloc_fire_raw_tuna)
-register_useloc("fire", "raw lobster", useloc_fire_raw_lobster)
-register_useloc("fire", "raw swordfish", useloc_fire_raw_swordfish)
