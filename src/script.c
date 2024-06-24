@@ -40,6 +40,7 @@ static int script_statrandom(lua_State *);
 static int script_npcstatup(lua_State *);
 static int script_npcstatdown(lua_State *);
 static int script_thinkbubble(lua_State *);
+static int script_boundaryteleport(lua_State *);
 static int script_upstairs(lua_State *);
 static int script_downstairs(lua_State *);
 static int script_openshop(lua_State *);
@@ -1134,6 +1135,54 @@ script_worn(lua_State *L)
 }
 
 static int
+script_boundaryteleport(lua_State *L)
+{
+	lua_Integer player_id, x, y, dir;
+	struct player *p;
+
+	player_id = script_checkinteger(L, 1);
+	x = script_checkinteger(L, 2);
+	y = script_checkinteger(L, 3);
+	dir = script_checkinteger(L, 4);
+
+	p = id_to_player(player_id);
+	if (p == NULL) {
+		printf("script warning: player %lld is undefined\n", player_id);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	switch (dir) {
+	case BOUND_DIR_VERT:
+		if (p->mob.x == x && p->mob.y == y) {
+			p->mob.y--;
+		} else {
+			p->mob.y++;
+		}
+		break;
+	case BOUND_DIR_HORIZ:
+		if (p->mob.x == x && p->mob.y == y) {
+			p->mob.x--;
+		} else {
+			p->mob.x++;
+		}
+		break;
+	case BOUND_DIR_DIAG_NW_SE:
+		/* TODO */
+		break;
+	case BOUND_DIR_DIAG_NE_SW:
+		/* TODO */
+		break;
+	}
+
+	p->teleported = true;
+
+	/* doesn't seem necessary but it's what the official server did */
+	player_send_plane_init(p);
+	return 0;
+}
+
+static int
 script_upstairs(lua_State *L)
 {
 	lua_Integer player_id;
@@ -2017,6 +2066,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_thinkbubble);
 	lua_setglobal(L, "thinkbubble");
+
+	lua_pushcfunction(L, script_boundaryteleport);
+	lua_setglobal(L, "boundaryteleport");
 
 	lua_pushcfunction(L, script_upstairs);
 	lua_setglobal(L, "upstairs");
