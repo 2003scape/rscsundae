@@ -115,7 +115,7 @@ These should all be implemented in Lua script:
 ### Miscellaneous
 
 - [ ] Brass key
-- [ ] Muddy key and chest
+- [x] Muddy key and chest
 - [x] Hans NPC dialogue
 - [x] Silk trader NPC dialogue
 - [x] Tanner NPC dialogue
