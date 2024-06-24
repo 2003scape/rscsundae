@@ -175,7 +175,7 @@ function script_engine_process(player)
 	if not ps then
 		return
 	end
-	active_script = ps 
+	active_script = ps
 	if ps.delay > 0 then
 		ps.delay = ps.delay - 1
 	end
@@ -756,6 +756,11 @@ dofile("./lua/rs1/quest/asgarnia/witches_potion/hetty.lua")
 dofile("./lua/rs1/quest/asgarnia/witches_potion/rat.lua")
 dofile("./lua/rs1/quest/imp_catcher/mizgog.lua")
 dofile("./lua/rs1/quest/sheep_shearer/fred_the_farmer.lua")
+dofile("./lua/rs1/quest/vampire_slayer/coffin.lua")
+dofile("./lua/rs1/quest/vampire_slayer/cupboard.lua")
+dofile("./lua/rs1/quest/vampire_slayer/dr_harlow.lua")
+dofile("./lua/rs1/quest/vampire_slayer/morgan.lua")
+dofile("./lua/rs1/quest/vampire_slayer/vampire.lua")
 
 --
 -- automatically register triggers
