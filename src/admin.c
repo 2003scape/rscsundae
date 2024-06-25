@@ -165,5 +165,22 @@ player_parse_admin_command(struct player *p, char *str)
 		(void)snprintf(msg, sizeof(msg),
 		    "coords: x = %u, y = %u", p->mob.x, p->mob.y);
 		player_send_message(p, msg);
+	} else if (strcmp(cmd, "addnpc") == 0) {
+		struct npc_config *config;
+		char *name;
+
+		name = strtok(NULL, " ");
+		if (name == NULL) {
+			player_send_message(p, "Usage: addnpc name");
+			return;
+		}
+
+		config = server_find_npc_config(name);
+		if (config == NULL) {
+			player_send_message(p, "Warning: npc not found");
+			return;
+		}
+
+		server_add_npc(config->id, p->mob.x, p->mob.y);
 	}
 }

@@ -1078,7 +1078,7 @@ server_add_npc(int id, int x, int y)
 		    npc->mob.base_stats[SKILL_HITS] = npc->config->hits;
 		s.npcs[i] = npc;
 		if (i > s.max_npc_id) {
-			s.max_npc_id = i;
+			s.max_npc_id = i + 1;
 		}
 		return i;
 	}
