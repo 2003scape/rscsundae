@@ -1,10 +1,14 @@
--- TODO
-function npcattack_vampire(player, npc, x, y)
+-- rsc-preservation.xyz/Quests/Vampire Slayer
+
+function attacknpc_vampire(player, npc)
 	if held(player, "garlic", 1) then
+		-- https://github.com/2004Scape/Server/blob/438fb2082a1440d82cf7f2a9c7dd32b28438a465/data/src/scripts/quests/quest_vampire/scripts/count_draynor.rs2#L12
+		if not npcstatdown(npc, STAT_HITS) then
+			npcsubstat(npc, STAT_ATTACK, 10, 0)
+			npcsubstat(npc, STAT_DEFENSE, 40, 0)
+			npcsubstat(npc, STAT_STRENGTH, 10, 0)
+		end
 		mes(player, "The vampire appears to weaken")
-		npcsubstat(npc, STAT_ATTACK, 1, 50)
-		npcsubstat(npc, STAT_DEFENSE, 1, 50)
-		npcsubstat(npc, STAT_STRENGTH, 1, 50)
 	end
 end
 
