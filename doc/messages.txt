@@ -270,3 +270,6 @@ You search the coffin and find some human remains
 @que@You catch a lobster
 @que@You catch some shrimps
 @que@You catch some anchovies
+@que@
+@que@You go through the door
+@que@The door slams behind you!

@@ -94,3 +94,37 @@ function opbound1_odd_looking_wall(player, x, y, dir)
 	pause(2, 2)
 	changebound(x, y, dir, "odd looking wall")
 end
+
+function opbound1_haunteddoor(player, x, y, dir)
+	-- it's probably possible to break this, see
+	-- RSC 2001/3/f2p (not 100% complete)/scenery- draynor manor- front- door- open- fail- doot wont open
+	-- the good news is that one out of two doors will always work
+	local locked = getvar(player, "manor_locked")
+	if locked == 0 then
+		-- 1e_Luis/Quests/Ernest the Chicken
+		mes(player, "@que@") -- maybe intended to be spooky?
+		boundaryteleport(player, x, y, dir)
+		mes(player, "@que@You go through the door")
+		setvar(player, "manor_locked", 1)
+		changebound(x, y, dir, "openlockeddoor")
+		-- it's definitely a pause() here, see the replay with luis walking
+		pause(2, 2)
+		mes(player, "@que@The door slams behind you!")
+		changebound(x, y, dir, "haunteddoor")
+	else
+		mes(player, "@que@The door won't open")
+	end
+end
+
+function opbound1_backdoor(player, x, y, dir)
+	-- 1e_Luis/Quests/Ernest the Chicken
+	-- RSC 2001/3/f2p (not 100% complete)/scenery- draynor manor- back entrance- door- open- close- success
+	mes(player, "@que@") -- maybe intended to be spooky?
+	boundaryteleport(player, x, y, dir)
+	mes(player, "@que@You go through the door")
+	setvar(player, "manor_locked", 0)
+	changebound(x, y, dir, "openlockeddoor")
+	-- it's definitely a pause() here, see the replay with luis walking
+	pause(2, 2)
+	changebound(x, y, dir, "backdoor")
+end

@@ -47,6 +47,7 @@ Engine
 - [ ] Protocol: 201
 - [x] Protocol: 204
 - [ ] Five minute movement timer (should be optional)
+- [ ] "Your X ability has returned to normal" message
 
 ### Known engine bugs
 
