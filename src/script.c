@@ -1339,7 +1339,7 @@ script_teleport(lua_State *L)
 }
 
 static int
-script_getqp(lua_State *)
+script_getqp(lua_State *L)
 {
 	lua_Integer player_id;
 	struct player *p;
@@ -2223,7 +2223,7 @@ script_init(struct server *s)
 	lua_setglobal(L, "teleport");
 
 	lua_pushcfunction(L, script_getqp);
-	lua_setgloval(L, "getqp");
+	lua_setglobal(L, "getqp");
 
 	if (luaL_dofile(L, "./lua/script.lua") != LUA_OK) {
 		printf("script error %s:\n",  lua_tostring(L, -1));
