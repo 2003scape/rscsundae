@@ -38,13 +38,18 @@ function talknpc_dr_harlow(player, npc)
 
 	npcsay(npc, "Buy me a drrink pleassh")
 
-	local choices = { "No you've had enough", "Ok mate" }
+	local resp
 
-	if stage == 1 and not held(player, "stake", 1) then
-		table.insert(choices, "Morgan needs your help")
+	if stage == 1 and (not held(player, "stake", 1)) then
+		resp = multi(player,
+			"No you've had enough",
+			"Ok mate",
+			"Morgan needs your help")
+	else
+		resp = multi(player,
+			"No you've had enough",
+			"Ok mate")
 	end
-
-	local resp = multi(player, choices)
 
 	if resp == 1 then
 		say(player, "No you've had enough")
