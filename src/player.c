@@ -1473,6 +1473,24 @@ player_get_nearby_items(struct player *p,
 }
 
 void
+player_takeobject(struct player *p, struct ground_item *item)
+{
+	struct item_config *config;
+
+	config = server_item_config_by_id(item->id);
+	assert(config != NULL);
+
+	player_inv_give(p, config, item->stack);
+
+	if (item->respawn) {
+		item->respawn_time = p->mob.server->tick_counter +
+		    (config->respawn_rate / 5);
+	} else {
+		server_remove_temp_item(item->unique_id);
+	}
+}
+
+void
 player_process_action(struct player *p)
 {
 	struct npc *npc;
@@ -1626,12 +1644,8 @@ player_process_action(struct player *p)
 		if (!mob_reached_item(&p->mob, item)) {
 			return;
 		}
-		player_inv_give(p, item_config, item->stack);
-		if (item->respawn) {
-			item->respawn_time = p->mob.server->tick_counter +
-			    (item_config->respawn_rate / 5);
-		} else {
-			server_remove_temp_item(item->unique_id);
+		if (!script_ontakeobj(p->mob.server->lua, p, item)) {
+			player_takeobject(p, item);
 		}
 		p->action = ACTION_NONE;
 		break;

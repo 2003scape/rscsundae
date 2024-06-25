@@ -53,6 +53,7 @@ static int script_shootnpc(lua_State *);
 static int script_multi(lua_State *);
 static int script_addobject(lua_State *);
 static int script_delobject(lua_State *);
+static int script_takeobject(lua_State *);
 static int script_getvar(lua_State *);
 static int script_setvar(lua_State *);
 static int script_addnpc(lua_State *);
@@ -278,6 +279,46 @@ script_delobject(lua_State *L)
 	} else {
 		server_remove_temp_item(item->unique_id);
 	}
+	return 0;
+}
+
+static int
+script_takeobject(lua_State *L)
+{
+	lua_Integer id, x, y;
+	const char *name;
+	struct item_config *config;
+	struct ground_item *item;
+	struct player *p;
+
+	id = script_checkinteger(L, 1);
+	name = script_checkstring(L, 2);
+	x = script_checkinteger(L, 3);
+	y = script_checkinteger(L, 4);
+
+	p = id_to_player(id);
+	if (p == NULL) {
+		printf("script warning: player %lld is undefined\n", id);
+		script_cancel(L, id);
+		return 0;
+	}
+
+	config = server_find_item_config(name);
+	if (config == NULL) {
+		printf("script warning: item %s is undefined\n", name);
+		script_cancel(L, id);
+		return 0;
+	}
+
+	item = server_find_ground_item(p, x, y, config->id);
+	if (item == NULL) {
+		printf("script warning: item %s at %lld %lld is undefined\n",
+			name, x, y);
+		script_cancel(L, id);
+		return 0;
+	}
+
+	player_takeobject(p, item);
 	return 0;
 }
 
@@ -2049,6 +2090,34 @@ script_onkillnpc(lua_State *L, struct player *p, struct npc *npc)
 	return false;
 }
 
+bool
+script_ontakeobj(lua_State *L, struct player *p, struct ground_item *item)
+{
+	struct item_config *config;
+	bool result;
+
+	config = server_item_config_by_id(item->id);
+	assert(config != NULL);
+
+	for (size_t i = 0; i < config->name_count; ++i) {
+		lua_getglobal(L, "script_engine_takeobj");
+		if (!lua_isfunction(L, -1)) {
+			puts("script error: can't find essential function script_engine_takeobj");
+			return false;
+		}
+		lua_pushnumber(L, p->mob.id);
+		lua_pushstring(L, config->names[i]);
+		lua_pushnumber(L, item->x);
+		lua_pushnumber(L, item->y);
+		safe_call(L, 4, 1, p->mob.id);
+		result = lua_toboolean(L, -1);
+		if (result != 0) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void
 script_cancel(lua_State *L, uint16_t player_id)
 {
@@ -2226,6 +2295,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_delobject);
 	lua_setglobal(L, "delobject");
+
+	lua_pushcfunction(L, script_takeobject);
+	lua_setglobal(L, "takeobject");
 
 	lua_pushcfunction(L, script_getvar);
 	lua_setglobal(L, "getvar");

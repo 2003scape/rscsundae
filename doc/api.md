@@ -54,6 +54,7 @@ Implemented
 * `getvar(variable)` - implemented as `getvar(player, variable)` in Lua.
 * `setvar(variable, value)` - implemented as `setvar(player, variable, value)` in Lua.
 * `delobject()` - implemented as `delobject(player, object, x, y)` in Lua.
+* `takeobject()` - implemented as `takeobject(player, object, x, y)` in Lua.
 * `changeloc(location)` - implemented as `changeloc(x, y, location)` in Lua.
 * `upstairs()` - implemented as `upstairs(player)` in Lua.
 * `downstairs()` - implemented as `downstairs(player)` in Lua.
@@ -82,7 +83,6 @@ Not implemented
 * `showeffect(type)`
 * `delinv()`
 * `ifobjectvisible()`
-* `takeobject()`
 * `ifnearnpc(npc)`
 * `ifnearvisnpc(npc)`
 * `npcattack()`

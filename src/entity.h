@@ -411,6 +411,7 @@ int player_get_defense_boosted(struct player *);
 int player_get_strength_boosted(struct player *);
 int32_t player_variable_get(struct player *, const char *);
 void player_variable_set(struct player *, const char *, int32_t);
+void player_takeobject(struct player *, struct ground_item *);
 
 /* admin.c */
 void player_parse_admin_command(struct player *, char *);

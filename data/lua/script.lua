@@ -2,6 +2,7 @@ local restore_locs = {}
 local delete_locs = {}
 local talknpc_scripts = {}
 local killnpc_scripts = {}
+local takeobj_scripts = {}
 local attacknpc_scripts = {}
 local opinv_scripts = {}
 local skillplayer_scripts = {}
@@ -80,6 +81,10 @@ end
 
 function register_killnpc(name, callback)
 	killnpc_scripts[name] = callback;
+end
+
+function register_takeobj(name, callback)
+	takeobj_scripts[name] = callback;
 end
 
 function register_skillnpc(name, spell, callback)
@@ -242,6 +247,27 @@ function script_engine_attacknpc(player, npc, name, x, y)
 		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, npc, x, y)
+			player_scripts[player] = nil
+			playerunbusy(player)
+		end)
+		player_scripts[player] = ps
+		playerbusy(player)
+		return true
+	end
+	return false
+end
+
+function script_engine_takeobj(player, name, x, y)
+	local script = player_scripts[player]
+	if script then
+		return true
+	end
+	name = string.lower(name)
+	script = takeobj_scripts[name]
+	if script then
+		ps = new_player_script(player)
+		ps.co = coroutine.create(function()
+			script(player, x, y)
 			player_scripts[player] = nil
 			playerunbusy(player)
 		end)
@@ -828,6 +854,9 @@ for k, v in pairs(_G) do
 		elseif string.match(k, "^attacknpc_.*") then
 			target = string.gsub(string.sub(k, 11), "_", " ")
 			register_attacknpc(target, v)
+		elseif string.match(k, "^takeobj_.*") then
+			target = string.gsub(string.sub(k, 9), "_", " ")
+			register_takeobj(target, v)
 		end
 	end
 end
