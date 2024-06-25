@@ -1322,8 +1322,6 @@ script_teleport(lua_State *L)
 	x = script_checkinteger(L, 2);
 	y = script_checkinteger(L, 3);
 
-	printf("teleporting to: %u %u\n", x, y);
-
 	p = id_to_player(player_id);
 	if (p == NULL) {
 		printf("script warning: player %lld is undefined\n", player_id);

@@ -757,18 +757,6 @@ dofile("./lua/rs1/quest/asgarnia/witches_potion/rat.lua")
 dofile("./lua/rs1/quest/imp_catcher/mizgog.lua")
 dofile("./lua/rs1/quest/sheep_shearer/fred_the_farmer.lua")
 
-register_opinv("superchisel", function(player)
-	mes(player, "Where to?")
-	local locs = {
-		{ x = 120, y = 648 },
-		{ x = 120, y = 504 },
-		{ x = 312, y = 552 },
-		{ x = 223, y = 448 }
-	}
-	local resp = multi(player, "Lumbridge", "Varrock", "Falador", "Edgeville")
-	teleport(player, locs[resp].x, locs[resp].y)
-end)
-
 --
 -- automatically register triggers
 -- note that this does not work for entities that contain special
