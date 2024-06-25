@@ -45,6 +45,7 @@ Engine
 - [x] Protocol: RSA decryption
 - [ ] Protocol: 201
 - [x] Protocol: 204
+- [ ] Five minute movement timer (should be optional)
 
 ### Known engine bugs
 
