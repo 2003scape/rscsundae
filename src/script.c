@@ -56,6 +56,9 @@ static int script_delobject(lua_State *);
 static int script_getvar(lua_State *);
 static int script_setvar(lua_State *);
 static int script_addnpc(lua_State *);
+static int script_playercoord(lua_State *);
+static int script_teleport(lua_State *);
+static int script_getqp(lua_State *);
 static struct player *id_to_player(lua_Integer);
 static struct npc *id_to_npc(lua_Integer);
 static void safe_call(lua_State *, int, int, int);
@@ -1289,6 +1292,72 @@ script_addnpc(lua_State *L)
 }
 
 static int
+script_playercoord(lua_State *L)
+{
+	lua_Integer player_id;
+	struct player *p;
+
+	player_id = script_checkinteger(L, 1);
+
+	p = id_to_player(player_id);
+	if (p == NULL) {
+		printf("script warning: player %lld is undefined\n", player_id);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	lua_pushinteger(L, p->mob.x);
+	lua_pushinteger(L, p->mob.y);
+	return 2;
+}
+
+
+static int
+script_teleport(lua_State *L)
+{
+	lua_Integer player_id, x, y;
+	struct player *p;
+
+	player_id = script_checkinteger(L, 1);
+	x = script_checkinteger(L, 2);
+	y = script_checkinteger(L, 3);
+
+	printf("teleporting to: %u %u\n", x, y);
+
+	p = id_to_player(player_id);
+	if (p == NULL) {
+		printf("script warning: player %lld is undefined\n", player_id);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	/* TODO: send teleport effect */
+	p->mob.x = x;
+	p->mob.y = y;
+	p->teleported = true;
+	return 0;
+}
+
+static int
+script_getqp(lua_State *)
+{
+	lua_Integer player_id;
+	struct player *p;
+
+	player_id = script_checkinteger(L, 1);
+
+	p = id_to_player(player_id);
+	if (p == NULL) {
+		printf("script warning: player %lld is undefined\n", player_id);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	lua_pushinteger(L, p->quest_points);
+	return 1;
+}
+
+static int
 script_giveqp(lua_State *L)
 {
 	char mes[64];
@@ -2146,6 +2215,15 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_addnpc);
 	lua_setglobal(L, "addnpc");
+
+	lua_pushcfunction(L, script_playercoord);
+	lua_setglobal(L, "playercoord");
+
+	lua_pushcfunction(L, script_teleport);
+	lua_setglobal(L, "teleport");
+
+	lua_pushcfunction(L, script_getqp);
+	lua_setgloval(L, "getqp");
 
 	if (luaL_dofile(L, "./lua/script.lua") != LUA_OK) {
 		printf("script error %s:\n",  lua_tostring(L, -1));

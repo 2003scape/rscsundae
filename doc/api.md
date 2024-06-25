@@ -67,6 +67,10 @@ Implemented
 * `ifnpcstatup(stat)` - implemented as `npcstatup(npc, stat)` in Lua.
 * `ifnpcstatdown(stat)` - implemented as `npcstatdown(npc, stat)` in Lua.
 * `shootplayer(projectile)` - implemented as `shootplayer(player, target, projectile)` in Lua.
+* `ifqp(value)` - implemented as `getqp(player)` in Lua.
+* `playercoord()` - implemented as is in Lua, returns x, y values.
+* `addnpc(npc)` - implemented as `addnpc(npc_name)` in Lua and returns npc handle.
+* `teleport()` - implemented as `teleport(player, x, y)` in Lua.
 
 Not implemented
 ---------------
@@ -75,10 +79,6 @@ Not implemented
 * `changelevel(level)`
 * `changelevelup()`
 * `changeleveldown()`
-* `ifqp(value)`
-* `playercoord()`
-* `addnpc(npc)`
-* `teleport()`
 * `showeffect(type)`
 * `delinv()`
 * `ifobjectvisible()`

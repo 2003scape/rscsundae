@@ -408,6 +408,8 @@ void player_init_adventurer(struct player *);
 int player_get_attack_boosted(struct player *);
 int player_get_defense_boosted(struct player *);
 int player_get_strength_boosted(struct player *);
+int32_t player_variable_get(struct player *, const char *);
+void player_variable_set(struct player *, const char *, int32_t);
 
 /* admin.c */
 void player_parse_admin_command(struct player *, char *);
@@ -461,8 +463,6 @@ int player_send_close_shop(struct player *);
 int player_send_quests(struct player *);
 int player_notify_friend_online(struct player *, int64_t);
 int player_notify_friend_offline(struct player *, int64_t);
-int32_t player_variable_get(struct player *, const char *);
-void player_variable_set(struct player *, const char *, int32_t);
 
 /* npc.c */
 void npc_damage(struct npc *, struct player * , int);

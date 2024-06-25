@@ -159,5 +159,9 @@ player_parse_admin_command(struct player *p, char *str)
 				p->variables[i].value);
 			player_send_message(p, msg);
 		}
+	} else if (strcmp(cmd, "coords") == 0) {
+		char msg[64];
+		(void)snprintf(msg, sizeof(msg), "coords: x = %u, y = %u", p->mob.x, p->mob.y);
+		player_send_message(p, msg);
 	}
 }
