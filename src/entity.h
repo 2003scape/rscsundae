@@ -184,6 +184,7 @@ struct mob {
 	int16_t target_player;
 	int16_t target_npc;
 	int16_t following_player;
+	int16_t following_npc;
 };
 
 enum animslot {

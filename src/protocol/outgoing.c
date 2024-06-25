@@ -158,8 +158,7 @@ player_send_npc_movement(struct player *p)
 			bitpos += 4;
 		} else if (known_npc->mob.moved) {
 			/*
-			 * TODO: this assertion can be fired!!! it's fatal
-			 * because there isn't room in the next bits
+			 * it's fatal because there isn't room in the next bits
 			 */
 			assert(known_npc->mob.dir != MOB_DIR_COMBAT_LEFT &&
 			    known_npc->mob.dir != MOB_DIR_COMBAT_RIGHT);
@@ -347,8 +346,7 @@ player_send_movement(struct player *p)
 			bitpos += 4;
 		} else if (known_player->mob.moved) {
 			/*
-			 * TODO: this assertion can be fired!!! it's fatal
-			 * because there isn't room in the next bits
+			 * it's fatal because there isn't room in the next bits
 			 */
 			assert(known_player->mob.dir != MOB_DIR_COMBAT_LEFT &&
 			    known_player->mob.dir != MOB_DIR_COMBAT_RIGHT);

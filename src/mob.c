@@ -338,6 +338,7 @@ mob_reached_loc(struct mob *mob, struct loc *loc)
 void
 mob_process_walk_queue(struct mob *mob)
 {
+	struct mob *following = NULL;
 	int plane = 0;
 	int dir;
 	int x, y;
@@ -352,22 +353,36 @@ mob_process_walk_queue(struct mob *mob)
 			return;
 		}
 	}
+
 	if (mob->following_player != -1) {
 		struct player *p;
 
 		p = mob->server->players[mob->following_player];
 		if (p != NULL) {
-			if (mob_within_range(mob, p->mob.x, p->mob.y, 2)) {
-				return;
-			}
-			if (!mob_within_range(mob, p->mob.x, p->mob.y, 3)) {
-				mob->walk_queue_x[0] = p->mob.x;
-				mob->walk_queue_y[0] = p->mob.y;
-				mob->walk_queue_pos = 0;
-				mob->walk_queue_len = 1;
-			}
+			following = &p->mob;
 		} else {
 			mob->following_player = -1;
+		}
+	} else if (mob->following_npc != -1) {
+		struct npc *npc;
+
+		npc = mob->server->npcs[mob->following_npc];
+		if (npc != NULL) {
+			following = &npc->mob;
+		} else {
+			mob->following_npc = -1;
+		}
+	}
+
+	if (following != NULL) {
+		if (mob_within_range(mob, following->x, following->y, 2)) {
+			return;
+		}
+		if (!mob_within_range(mob, following->x, following->y, 3)) {
+			mob->walk_queue_x[0] = following->x;
+			mob->walk_queue_y[0] = following->y;
+			mob->walk_queue_pos = 0;
+			mob->walk_queue_len = 1;
 		}
 	}
 

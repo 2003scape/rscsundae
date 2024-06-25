@@ -23,6 +23,7 @@ Engine
 - [x] NPC movement
 - [ ] NPC aggression
 - [x] NPC "bravery" (retreating)
+- [ ] NPC "regenerate" timer
 - [ ] Line of sight checks
 - [x] Friends list
 - [x] Ignore list
@@ -49,14 +50,14 @@ Engine
 
 ### Known engine bugs
 
-* When entering combat the opponent's new position can sometimes not
-  be sent to the client, resulting in a desync.
+* Can get stuck in combat. Probably due to lack of pathing check
+  in player_init_combat.
 * NPCs can sometimes walk diagonally through walls, indicating there's
   probably a problem with the collision detection code.
 * Chatting between 110 and 204 clients is currently not possible.
-* NPC/player actions should cause following to start.
 * Should be impossible for NPCs to walk through other NPCs and players.
 * Should be impossible for players to walk through aggressive NPCs.
+* Quest list is broken on 204.
 
 Content
 -------

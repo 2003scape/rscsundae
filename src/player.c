@@ -74,6 +74,7 @@ player_create(struct server *s, int sock)
 	p->mob.server = s;
 
 	p->mob.following_player = -1;
+	p->mob.following_npc = -1;
 	p->trading_player = -1;
 	p->projectile_target_player = UINT16_MAX;
 	p->projectile_target_npc = UINT16_MAX;
@@ -561,6 +562,7 @@ player_shoot_pvm(struct player *p, struct projectile_config *projectile,
 	p->mob.walk_queue_len = 0;
 	p->mob.walk_queue_pos = 0;
 	p->mob.following_player = -1;
+	p->mob.following_npc = -1;
 
 	/* TODO: verify reachability */
 
@@ -611,6 +613,7 @@ player_shoot_pvp(struct player *p, struct projectile_config *projectile,
 	p->mob.walk_queue_len = 0;
 	p->mob.walk_queue_pos = 0;
 	p->mob.following_player = -1;
+	p->mob.following_npc = -1;
 
 	if (projectile->type != PROJECTILE_TYPE_MAGIC) {
 		range = projectile->range;
@@ -728,6 +731,7 @@ player_init_combat(struct player *p, struct mob *target)
 		p->mob.walk_queue_len = 0;
 		p->mob.walk_queue_pos = 0;
 	} else {
+		/* TODO: should verify path (visibility) here */
 		p->mob.walk_queue_x[0] = target->x;
 		p->mob.walk_queue_y[0] = target->y;
 		p->mob.walk_queue_len = 1;
@@ -740,6 +744,12 @@ player_init_combat(struct player *p, struct mob *target)
 
 	player_close_ui(p);
 	player_clear_actions(p);
+
+	if (target->moved) {
+		/* can't move and enter combat in the same tick */
+		/* due to protocol limitations */
+		return false;
+	}
 
 	p->mob.in_combat = true;
 	p->mob.combat_next_hit = 0;
@@ -785,6 +795,8 @@ player_process_combat(struct player *p)
 				 * hp bar in client takes roughly 4 seconds
 				 * to be gone
 				 */
+				p->mob.following_player = -1;
+				p->mob.following_npc = -1;
 				p->mob.walk_queue_pos = 0;
 				p->mob.walk_queue_len = 0;
 				mob_combat_reset(&p->mob);
@@ -1369,6 +1381,7 @@ player_clear_actions(struct player *p)
 {
 	p->action = ACTION_NONE;
 	p->mob.following_player = -1;
+	p->mob.following_npc = -1;
 	p->trading_player = -1;
 	p->ui_design_open = false;
 }
@@ -1480,6 +1493,8 @@ player_process_action(struct player *p)
 			return;
 		}
 		p->mob.target_npc = p->action_npc;
+		p->mob.following_npc = p->action_npc;
+		p->mob.following_player = -1;
 		p->action = ACTION_NONE;
 		break;
 	case ACTION_NPC_USEWITH:
@@ -1493,6 +1508,8 @@ player_process_action(struct player *p)
 			return;
 		}
 		if (!mob_within_range(&p->mob, npc->mob.x, npc->mob.y, 2)) {
+			p->mob.following_npc = p->action_npc;
+			p->mob.following_player = -1;
 			return;
 		}
 		p->mob.walk_queue_len = 0;
@@ -1510,6 +1527,8 @@ player_process_action(struct player *p)
 			return;
 		}
 		if (!mob_within_range(&p->mob, npc->mob.x, npc->mob.y, 2)) {
+			p->mob.following_npc = p->action_npc;
+			p->mob.following_player = -1;
 			return;
 		}
 		if (npc->busy) {
@@ -1675,6 +1694,8 @@ player_process_action(struct player *p)
 			return;
 		}
 		p->mob.target_player = target->mob.id;
+		p->mob.following_player = target->mob.id;
+		p->mob.following_npc = -1;
 		p->action = ACTION_NONE;
 		break;
 	case ACTION_PLAYER_CAST:
