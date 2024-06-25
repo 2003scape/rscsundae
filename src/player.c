@@ -825,6 +825,8 @@ player_process_combat(struct player *p)
 
 			target->mob.combat_next_hit = 3;
 			p->mob.target_player = -1;
+
+			script_onattacknpc(p->mob.server->lua, p, target);
 		}
 		return;
 	}

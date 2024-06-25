@@ -2002,6 +2002,28 @@ script_onoploc2(lua_State *L, struct player *p, struct loc *loc)
 	player_send_message(p, "Nothing interesting happens");
 }
 
+void
+script_onattacknpc(lua_State *L, struct player *p, struct npc *npc)
+{
+	bool result = false;
+
+	for (size_t i = 0; i < npc->config->name_count; ++i) {
+		lua_getglobal(L, "script_engine_attacknpc");
+		if (!lua_isfunction(L, -1)) {
+			puts("script error: can't find essential function script_engine_attacknpc");
+			return;
+		}
+		lua_pushnumber(L, p->mob.id);
+		lua_pushnumber(L, npc->mob.id);
+		lua_pushstring(L, npc->config->names[i]);
+		safe_call(L, 3, 1, p->mob.id);
+		result = lua_toboolean(L, -1);
+		if (result != 0) {
+			return;
+		}
+	}
+}
+
 bool
 script_onkillnpc(lua_State *L, struct player *p, struct npc *npc)
 {
