@@ -642,7 +642,7 @@ function addloc(name, x, y, timer)
 
 	table.insert(delete_locs, target)
 	player_scripts[active_script.player] = nil
-	playerunbusy(player)
+	playerunbusy(active_script.player)
 	coroutine.yield(active_script.co)
 end
 
@@ -744,6 +744,7 @@ dofile("./lua/rs1/skill_crafting/leather.lua")
 dofile("./lua/rs1/skill_crafting/pottery.lua")
 dofile("./lua/rs1/skill_crafting/wool.lua")
 dofile("./lua/rs1/skill_firemaking/fire.lua")
+dofile("./lua/rs1/skill_fishing/saltfish.lua")
 dofile("./lua/rs1/skill_magic/alchemy.lua")
 dofile("./lua/rs1/skill_magic/curses.lua")
 dofile("./lua/rs1/skill_magic/missiles.lua")

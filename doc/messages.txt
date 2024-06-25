@@ -249,3 +249,17 @@ You search the coffin and find some human remains
 @que@You just went through a secret door
 @que@You squeeze the grapes into the jug
 @que@You make some nice wine
+@que@You need a net to catch these fish
+@que@You need a fishing rod to bait these fish
+@que@You need a fly fishing rod to lure these fish
+@que@You need a harpoon to catch these fish
+@que@You need at least level 20 fishing to lure these fish
+@que@You need at least level 25 fishing to bait these fish
+@que@You need at least level 40 fishing to catch lobsters
+@que@You attempt to catch some fish
+@que@You attempt to catch a fish
+@que@You fail to catch anything
+@que@You catch a salmon
+@que@You catch a trout
+@que@You catch some shrimps
+@que@You catch some anchovies
