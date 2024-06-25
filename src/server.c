@@ -23,8 +23,9 @@
 #include "utility.h"
 #include "zone.h"
 
-/* XXX no idea what's authentic here */
-#define MAX_IDLE_TICKS		(20)
+
+/* <MrAndrew> it's 40 cycles, which is about 25 seconds */
+#define MAX_IDLE_TICKS		(40)
 
 struct server s = {0};
 
