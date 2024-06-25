@@ -55,7 +55,7 @@ function talknpc_dr_harlow(player, npc)
 		say(player, "He wanted me to ask you how i should go about stopping it")
 		npcsay(npc, "Buy me a beer then i'll teash you what you need to know")
 
-		local resp = mutli(
+		local resp = multi(
 			player,
 			"Ok mate",
 			"But this is your friend Morgan we're talking about"
