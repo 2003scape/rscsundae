@@ -1856,6 +1856,11 @@ player_send_quests(struct player *p)
 	uint8_t quests_complete[17];
 	size_t offset = 0;
 
+	if (p->protocol_rev > 110) {
+		/* TODO needs to be implemented */
+		return -1;
+	}
+
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 		        OP_SRV_QUESTS);
 
@@ -1871,6 +1876,10 @@ player_send_quests(struct player *p)
 		} else if (strcmp(p->variables[i].name, "fred_stage") == 0) {
 			if (p->variables[i].value >= 2) {
 				quests_complete[11] = true;
+			}
+		} else if (strcmp(p->variables[i].name, "vampire_stage") == 0) {
+			if (p->variables[i].value >= 2) {
+				quests_complete[14] = true;
 			}
 		} else if (strcmp(p->variables[i].name, "hetty_stage") == 0) {
 			if (p->variables[i].value >= 3) {
