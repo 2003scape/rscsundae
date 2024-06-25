@@ -49,8 +49,9 @@ end
 
 -- no replay available but this says they're aggressive for maces:
 -- https://web.archive.org/web/20021225111111/http://www.tip.it/runescape/index.php3?monster_id=48
-function takeobj_steel_mace(player, x, y)
-	if not attempt_monk_aggression(player) then
-		takeobject(player, "steel mace", x, y)
-	end
-end
+--
+--function takeobj_steel_mace(player, x, y)
+--	if not attempt_monk_aggression(player) then
+--		takeobject(player, "steel mace", x, y)
+--	end
+--end
