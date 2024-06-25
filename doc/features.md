@@ -101,7 +101,7 @@ These should all be implemented in Lua script:
 - [ ] Romeo & Juliet
 - [ ] Shield of Arrav
 - [ ] Ernest the chicken
-- [ ] Vampire Slayer
+- [x] Vampire Slayer
 - [x] Imp catcher
 - [ ] Prince Ali Rescue
 - [x] Witch's potion
