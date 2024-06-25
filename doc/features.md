@@ -152,7 +152,7 @@ These should all be implemented in Lua script:
 - [x] Strength Potions
 - [x] Dying capes
 - [x] Mixing dyes
-- [ ] Monk of Zamorak wine aggression
+- [x] Monk of Zamorak wine aggression
 - [x] Picking plants
 - [x] Cutting webs
 - [x] Water sources
