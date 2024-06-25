@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <strings.h>
 #include <math.h>
 #include "entity.h"
 #include "server.h"
@@ -144,6 +145,24 @@ get_nearby_npcs(struct mob *mob,
 		}
 	}
 	return count;
+}
+
+struct npc *
+mob_find_nearby_npc(struct mob *mob, const char *name)
+{
+	struct npc *npcs[16];
+	size_t n;
+
+	n = get_nearby_npcs(mob, npcs, 16, 16);
+
+	for (size_t i = 0; i < n; ++i) {
+		for (size_t j = 0; j < npcs[i]->config->name_count; ++j) {
+			if (strcasecmp(name, npcs[i]->config->names[j]) == 0) {
+				return npcs[i];
+			}
+		}
+	}
+	return NULL;
 }
 
 size_t

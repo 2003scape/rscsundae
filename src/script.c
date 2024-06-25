@@ -20,6 +20,7 @@ static int script_playerbusy(lua_State *);
 static int script_playerunbusy(lua_State *);
 static int script_npcsay(lua_State *);
 static int script_male(lua_State *);
+static int script_nearnpc(lua_State *);
 static int script_random(lua_State *);
 static int script_give(lua_State *);
 static int script_remove(lua_State *);
@@ -531,6 +532,35 @@ script_male(lua_State *L)
 	}
 
 	lua_pushboolean(L, p->gender == MOB_GENDER_MALE);
+	return 1;
+}
+
+static int
+script_nearnpc(lua_State *L)
+{
+	lua_Integer player_id;
+	struct player *p;
+	const char *name;
+	struct npc *npc;
+
+	player_id = script_checkinteger(L, 1);
+	name = script_checkstring(L, 2);
+
+	p = id_to_player(player_id);
+	if (p == NULL) {
+		printf("script warning: player %lld is undefined\n", player_id);
+		script_cancel(L, player_id);
+		lua_pushnil(L);
+		return 1;
+	}
+
+	npc = mob_find_nearby_npc(&p->mob, name);
+	if (npc != NULL) {
+		lua_pushinteger(L, npc->mob.id);
+		return 1;
+	}
+
+	lua_pushnil(L);
 	return 1;
 }
 
@@ -2313,6 +2343,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_teleport);
 	lua_setglobal(L, "teleport");
+
+	lua_pushcfunction(L, script_nearnpc);
+	lua_setglobal(L, "nearnpc");
 
 	lua_pushcfunction(L, script_qp);
 	lua_setglobal(L, "qp");

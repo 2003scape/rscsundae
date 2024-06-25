@@ -357,6 +357,7 @@ bool mob_reached_bound(struct mob *, struct bound *);
 bool mob_reached_loc(struct mob *, struct loc *);
 void mob_die(struct mob *);
 void mob_process_walk_queue(struct mob *);
+struct npc *mob_find_nearby_npc(struct mob *, const char *);
 
 /* player.c */
 struct player *player_create(struct server *, int);

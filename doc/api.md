@@ -70,7 +70,8 @@ Implemented
 * `shootplayer(projectile)` - implemented as `shootplayer(player, target, projectile)` in Lua.
 * `ifqp(value)` - implemented as `qp(player)` in Lua.
 * `playercoord()` - implemented as `playercoord(player)` in Lua, returns x, y values.
-* `addnpc(npc)` - implemented as `addnpc(npc, x, y)` in Lua and returns npc handle.
+* `addnpc(npc)` - implemented as `addnpc(npc, x, y)` in Lua, returns npc handle.
+* `ifnearnpc(npc)` - implemented as `nearnpc(player, npc)` in Lua, returns npc handle or nil.
 * `teleport()` - implemented as `teleport(player, x, y)` in Lua.
 
 Not implemented
@@ -83,7 +84,6 @@ Not implemented
 * `showeffect(type)`
 * `delinv()`
 * `ifobjectvisible()`
-* `ifnearnpc(npc)`
 * `ifnearvisnpc(npc)`
 * `npcattack()`
 * `ifnpcvisible()`
