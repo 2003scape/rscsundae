@@ -1,14 +1,16 @@
+-- rsc-preservation.xyz/Quests/Vampire Slayer
+
 local function dr_harlow_give_beer(player, npc)
 	say(player, "Ok mate")
 
 	if held(player, "beer", 1) then
-		remove(player, "beer", 1)
 		mes(player, "You give a beer to Dr Harlow")
+		remove(player, "beer", 1)
 		npcsay(npc, "Cheersh matey")
 		return true
 	end
 
-	say(player, "I'll just go buy one")
+	say(player, "I'll just go and buy one")
 	return false
 end
 
@@ -20,8 +22,8 @@ local function dr_harlow_kill_vampires(player, npc)
 	npcsay(npc, "Otherwishe he'll just regenerate")
 	npcsay(npc, "Yes your killing blow must be done with a stake")
 	npcsay(npc, "I jusht happen to have one on me")
-	give(player, "stake", 1)
 	mes(player, "Dr Harlow hands you a stake")
+	give(player, "stake", 1)
 	npcsay(npc, "You'll need a hammer to hand to drive it in properly as well")
 	npcsay(npc, "One last thing")
 	npcsay(npc, "It's wise to carry garlic with you")
