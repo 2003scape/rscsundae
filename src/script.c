@@ -58,7 +58,7 @@ static int script_setvar(lua_State *);
 static int script_addnpc(lua_State *);
 static int script_playercoord(lua_State *);
 static int script_teleport(lua_State *);
-static int script_getqp(lua_State *);
+static int script_qp(lua_State *);
 static struct player *id_to_player(lua_Integer);
 static struct npc *id_to_npc(lua_Integer);
 static void safe_call(lua_State *, int, int, int);
@@ -1337,7 +1337,7 @@ script_teleport(lua_State *L)
 }
 
 static int
-script_getqp(lua_State *L)
+script_qp(lua_State *L)
 {
 	lua_Integer player_id;
 	struct player *p;
@@ -2220,8 +2220,8 @@ script_init(struct server *s)
 	lua_pushcfunction(L, script_teleport);
 	lua_setglobal(L, "teleport");
 
-	lua_pushcfunction(L, script_getqp);
-	lua_setglobal(L, "getqp");
+	lua_pushcfunction(L, script_qp);
+	lua_setglobal(L, "qp");
 
 	if (luaL_dofile(L, "./lua/script.lua") != LUA_OK) {
 		printf("script error %s:\n",  lua_tostring(L, -1));

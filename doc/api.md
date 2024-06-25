@@ -67,9 +67,9 @@ Implemented
 * `ifnpcstatup(stat)` - implemented as `npcstatup(npc, stat)` in Lua.
 * `ifnpcstatdown(stat)` - implemented as `npcstatdown(npc, stat)` in Lua.
 * `shootplayer(projectile)` - implemented as `shootplayer(player, target, projectile)` in Lua.
-* `ifqp(value)` - implemented as `getqp(player)` in Lua.
-* `playercoord()` - implemented as is in Lua, returns x, y values.
-* `addnpc(npc)` - implemented as `addnpc(npc_name)` in Lua and returns npc handle.
+* `ifqp(value)` - implemented as `qp(player)` in Lua.
+* `playercoord()` - implemented as `playercoord(player)` in Lua, returns x, y values.
+* `addnpc(npc)` - implemented as `addnpc(npc, x, y)` in Lua and returns npc handle.
 * `teleport()` - implemented as `teleport(player, x, y)` in Lua.
 
 Not implemented
