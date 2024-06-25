@@ -157,6 +157,12 @@ player_send_npc_movement(struct player *p)
 			p->known_npcs[i] = -1;
 			bitpos += 4;
 		} else if (known_npc->mob.moved) {
+			/*
+			 * TODO: this assertion can be fired!!! it's fatal
+			 * because there isn't room in the next bits
+			 */
+			assert(known_npc->mob.dir != MOB_DIR_COMBAT_LEFT &&
+			    known_npc->mob.dir != MOB_DIR_COMBAT_RIGHT);
 			if (buf_putbits(p->tmpbuf, bitpos++,
 					PLAYER_BUFSIZE, 1, 1) == -1) {
 				return -1;
