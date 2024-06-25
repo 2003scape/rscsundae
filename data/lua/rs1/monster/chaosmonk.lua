@@ -25,16 +25,32 @@ function attacknpc_chaosmonk2(player, npc)
 	attacknpc_chaosmonk1(player, npc)
 end
 
-function takeobj_half_full_wine_jug(player, x, y)
+local function attempt_monk_aggression(player, npc)
 	local npc = nearnpc(player, "chaosmonk1")
 	if npc then
 		attacknpc_chaosmonk1(player, npc)
-		return
+		return true
 	end
 
 	npc = nearnpc(player, "chaosmonk2")
 	if npc then
 		attacknpc_chaosmonk2(player, npc)
-		return
+		return true
+	end
+
+	return false
+end
+
+function takeobj_half_full_wine_jug(player, x, y)
+	if not attempt_monk_aggression(player) then
+		takeobject(player, "half full wine jug", x, y)
+	end
+end
+
+-- no replay available but this says they're aggressive for maces:
+-- https://web.archive.org/web/20021225111111/http://www.tip.it/runescape/index.php3?monster_id=48
+function takeobj_steel_mace(player, x, y)
+	if not attempt_monk_aggression(player) then
+		takeobject(player, "steel mace", x, y)
 	end
 end
