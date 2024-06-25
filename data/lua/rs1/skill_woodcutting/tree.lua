@@ -61,11 +61,11 @@ function useloc_tree_rune_axe(player, x, y)
 	thinkbubble(player, "rune axe")
 	mes(player, "@que@You swing your rune axe at the tree...")
 	do_woodcut(player, x, y,
-		statrandom(STAT_WOODCUTTING, 224, 700))
+		statrandom(player, STAT_WOODCUTTING, 224, 700))
 end
 
 -- later client versions (after 2002 or so) have one-click woodcutting
-function oploc1_tree(player, x, y)
+function oploc1_tree1(player, x, y)
 	-- more powerful axes seem to be preferred when the player has
 	-- multiple types held, see
 	-- ./RSC 2001/replays master archive/Skilling/Woodcutting/Regular trees/woodcutting- skilling- regular trees, steel axe- 36 wc.pcap
@@ -89,17 +89,23 @@ function oploc1_tree(player, x, y)
 	end
 end
 
-function oploc2_deadtree1(player, x, y)
-	oploc1_tree(player, x, y)
+function oploc1_tree2(player, x, y)
+	oploc1_tree1(player, x, y)
 end
 
-register_useloc("tree", "bronze axe", useloc_tree_bronze_axe)
-register_useloc("tree", "iron axe", useloc_tree_iron_axe)
-register_useloc("tree", "steel axe", useloc_tree_steel_axe)
-register_useloc("tree", "black axe", useloc_tree_black_axe)
-register_useloc("tree", "mithril axe", useloc_tree_mithril_axe)
-register_useloc("tree", "adamantite axe", useloc_tree_adamantite_axe)
-register_useloc("tree", "rune axe", useloc_tree_rune_axe)
+function oploc2_deadtree1(player, x, y)
+	oploc1_tree1(player, x, y)
+end
+
+for k, v in ipairs({ "tree1", "tree2", "deadtree1" }) do
+	register_useloc(v, "bronze axe", useloc_tree_bronze_axe)
+	register_useloc(v, "iron axe", useloc_tree_iron_axe)
+	register_useloc(v, "steel axe", useloc_tree_steel_axe)
+	register_useloc(v, "black axe", useloc_tree_black_axe)
+	register_useloc(v, "mithril axe", useloc_tree_mithril_axe)
+	register_useloc(v, "adamantite axe", useloc_tree_adamantite_axe)
+	register_useloc(v, "rune axe", useloc_tree_rune_axe)
+end
 
 --
 -- success/failure rate analysis
