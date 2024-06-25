@@ -16,8 +16,8 @@ function killnpc_vampire(player, npc, x, y)
 		mes(player, "You hammer the stake in to the vampires chest!")
 
 		if stage == 1 then
-			mes(player, "Well done you have completed the vampire slayer quest")
 			advancestat(player, STAT_ATTACK, 1300, 600)
+			mes(player, "@gre@Well done you have completed the vampire slayer quest")
 			setvar(player, "vampire_stage", 2)
 			giveqp(player, 3)
 		end
