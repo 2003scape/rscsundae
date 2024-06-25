@@ -8,7 +8,7 @@ function useloc_saltfish_net(player, x, y)
 	    statrandom(player, STAT_FISHING, 24, 128) then
 		mes(player, "@que@You catch some anchovies")
 		give(player, "raw anchovies", 1)
-		advancestat(player, STAT_FISHING, 40, 0)
+		advancestat(player, STAT_FISHING, 160, 0)
 	elseif statrandom(player, STAT_FISHING, 48, 256) then
 		mes(player, "@que@You catch some shrimps")
 		give(player, "raw shrimp", 1)

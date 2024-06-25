@@ -19,12 +19,12 @@ function useloc_freshfish_fly_fishing_rod(player, x, y)
 		mes(player, "@que@You catch a salmon")
 		remove(player, "feather", 1)
 		give(player, "raw salmon", 1)
-		advancestat(player, STAT_FISHING, 360, 0)
+		advancestat(player, STAT_FISHING, 280, 0)
 	elseif statrandom(player, STAT_FISHING, 32, 192) then
 		mes(player, "@que@You catch a trout")
 		remove(player, "feather", 1)
 		give(player, "raw trout", 1)
-		advancestat(player, STAT_FISHING, 280, 0)
+		advancestat(player, STAT_FISHING, 200, 0)
 	else
 		mes(player, "@que@You fail to catch anything")
 	end

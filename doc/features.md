@@ -55,6 +55,8 @@ Engine
   probably a problem with the collision detection code.
 * Chatting between 110 and 204 clients is currently not possible.
 * NPC/player actions should cause following to start.
+* Should be impossible for NPCs to walk through other NPCs and players.
+* Should be impossible for players to walk through aggressive NPCs.
 
 Content
 -------
@@ -81,7 +83,7 @@ These should all be implemented in Lua script:
 - [ ] Crafting (silver jewelry)
 - [x] Crafting (leatherworking)
 - [x] Crafting (wool)
-- [ ] Fishing
+- [x] Fishing
 - [x] Cooking (fish/meat)
 - [ ] Cooking (bread)
 - [x] Cooking (wine)

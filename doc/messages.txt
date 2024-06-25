@@ -253,6 +253,7 @@ You search the coffin and find some human remains
 @que@You need a fishing rod to bait these fish
 @que@You need a fly fishing rod to lure these fish
 @que@You need a harpoon to catch these fish
+@que@You need a lobster pot to catch lobsters
 @que@You need at least level 20 fishing to lure these fish
 @que@You need at least level 25 fishing to bait these fish
 @que@You need at least level 40 fishing to catch lobsters
@@ -261,5 +262,11 @@ You search the coffin and find some human remains
 @que@You fail to catch anything
 @que@You catch a salmon
 @que@You catch a trout
+@que@You catch a sardine
+@que@You catch a herring
+@que@You catch a pike
+@que@You catch a tuna
+@que@You catch a swordfish
+@que@You catch a lobster
 @que@You catch some shrimps
 @que@You catch some anchovies
