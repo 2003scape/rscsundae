@@ -18,6 +18,7 @@ function killnpc_vampire(player, npc, x, y)
 	if worn(player, "stake", 1) and held(player, "hammer", 1) then
 		remove(player, "stake", 1)
 		mes(player, "You hammer the stake in to the vampires chest!")
+		addobject(player, "bones", 1, x, y)
 
 		if stage == 1 then
 			advancestat(player, STAT_ATTACK, 1300, 600)

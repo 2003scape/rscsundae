@@ -10,19 +10,6 @@ static int npc_combat_roll(struct npc *, struct player *);
 void
 npc_die(struct npc *npc, struct player *p)
 {
-	npc->respawn_time = npc->config->respawn / 5;
-
-	if (p != NULL && p->mob.in_combat &&
-	    p->mob.target_npc == npc->mob.id) {
-		player_award_combat_xp(p, &npc->mob);
-	}
-
-	mob_die(&npc->mob);
-
-	if (p->mob.target_npc == npc->mob.id) {
-		mob_combat_reset(&p->mob);
-        }
-
 	if (p != NULL) {
 		if (!script_onkillnpc(npc->mob.server->lua, p, npc)) {
 			for (int i = 0; i < npc->config->drop_count; ++i) {
@@ -35,7 +22,26 @@ npc_die(struct npc *npc, struct player *p)
 				server_add_temp_item(p, npc->mob.x, npc->mob.y,
 				    id, npc->config->drops[i].amount);
 			}
+		} else {
+			script_process(p->mob.server->lua, p);
+			if (npc->mob.cur_stats[SKILL_HITS] > 0) {
+				/* the killnpc trigger can restore hits */
+				return;
+			}
 		}
+	}
+
+	npc->respawn_time = npc->config->respawn / 5;
+
+	if (p != NULL && p->mob.in_combat &&
+	    p->mob.target_npc == npc->mob.id) {
+		player_award_combat_xp(p, &npc->mob);
+	}
+
+	mob_die(&npc->mob);
+
+	if (p->mob.target_npc == npc->mob.id) {
+		mob_combat_reset(&p->mob);
 	}
 
 	npc->mob.x = npc->spawn_x;
@@ -46,7 +52,11 @@ void
 npc_damage(struct npc *npc, struct player *p , int roll)
 {
 	if (roll >= npc->mob.cur_stats[SKILL_HITS]) {
+		npc->mob.cur_stats[SKILL_HITS] = 0;
 		npc_die(npc, p);
+	}
+
+	if (npc->mob.cur_stats[SKILL_HITS] == 0) {
 		return;
 	}
 
