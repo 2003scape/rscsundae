@@ -8,10 +8,7 @@ local function morgan_seek_help(player, npc)
 	npcsay(npc, "He can normally be found in the Jolly boar inn these days")
 	npcsay(npc, "He's a bit of an old soak")
 	npcsay(npc, "Mention his old friend Morgan")
-	npcsay(
-		npc,
-		"I'm sure he wouldn't want his old friend to be killed by a vampire"
-	)
+	npcsay(npc, "I'm sure he wouldn't want his old friend to be killed by a vampire")
 	say(player, "I'll look him up then")
 	setvar(player, "vampire_stage", 1)
 end
@@ -22,19 +19,14 @@ function talknpc_morgan(player, npc)
 	if stage == 0 then
 		npcsay(npc, "Please please help us, bold hero")
 		say(player, "What's the problem?")
-		npcsay(
-			npc,
-			"Our little village has been dreadfully ravaged by an evil vampire"
-		)
+		npcsay(npc, "Our little village has been dreadfully ravaged by an evil vampire")
 		npcsay(npc, "There's hardly any of us left")
 		npcsay(npc, "We need someone to get rid of him once and for good")
 
-		local resp = multi(
-			player,
+		local resp = multi(player,
 			"No. vampires are scary",
 			"Ok I'm up for an adventure",
-			"I tried fighting him. He wouldn't die"
-		)
+			"I tried fighting him. He wouldn't die")
 
 		if resp == 1 then
 			say(player, "No. vampires are scary")
