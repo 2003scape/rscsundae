@@ -9,8 +9,7 @@ local function fail_req(player, stat, name, level)
 		failed = true
 	end
 	-- magical cabbage
-	if statup(player, stat) and
-	    not statatleast(player, stat, level + 3) then
+	if statup(player, stat) then
 		failed = true
 	end
 	if failed then
