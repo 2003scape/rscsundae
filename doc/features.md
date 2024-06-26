@@ -157,7 +157,7 @@ These should all be implemented in Lua script:
 - [x] Picking plants
 - [x] Cutting webs
 - [x] Water sources
-- [ ] Using the windmill
+- [x] Using the windmill
 - [x] Using ladders
 - [x] Using stairs
 - [ ] Al Kharid general store should reject silk
