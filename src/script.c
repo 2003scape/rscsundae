@@ -1303,8 +1303,6 @@ script_upstairs(lua_State *L)
 		return 0;
 	}
 
-	/* TODO should be aware of stair locs at destination */
-
 	if (p->mob.y < (PLANE_LEVEL_INC * 3)) {
 		y += PLANE_LEVEL_INC;
 	} else {
@@ -1379,8 +1377,6 @@ script_downstairs(lua_State *L)
 		script_cancel(L, player_id);
 		return 0;
 	}
-
-	/* TODO should be aware of stair locs at destination */
 
 	if (p->mob.y > PLANE_LEVEL_INC) {
 		y -= PLANE_LEVEL_INC;
