@@ -1503,6 +1503,16 @@ player_process_action(struct player *p)
 	uint16_t id, id2;
 	uint32_t stack;
 
+	if (p->action != ACTION_NONE &&
+	    p->action != ACTION_NPC_CAST &&
+	    p->action != ACTION_PLAYER_CAST &&
+	    p->mob.in_combat) {
+		player_send_message(p,
+		    "You can't do that whilst you are fighting");
+		p->action = ACTION_NONE;
+		return;
+	}
+
 	switch (p->action) {
 	case ACTION_NPC_ATTACK:
 		npc = p->mob.server->npcs[p->action_npc];
