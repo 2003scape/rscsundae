@@ -1316,8 +1316,7 @@ script_upstairs(lua_State *L)
 		return 0;
 	}
 
-	printf("Upstairs loc direction %d\n", loc->dir);
-	/* XXX: not all directions handled */
+	/* XXX: don't hardcode directions */
 	switch (loc->dir) {
 	case 0:
 		y += 3;
@@ -1394,8 +1393,7 @@ script_downstairs(lua_State *L)
 		return 0;
 	}
 
-	printf("Downstairs loc direction %d\n", loc->dir);
-	/* XXX: not all directions handled */
+	/* XXX: don't hardcode directions */
 	switch (loc->dir) {
 	case 0:
 		y--;
