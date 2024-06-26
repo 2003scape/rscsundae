@@ -693,6 +693,10 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				p->mob.target_player = -1;
 				player_clear_actions(p);
 			}
+			/*
+			 * can't perform actions on locs while a step is
+			 * pending so don't add steps we've reached
+			 */
 			if (p->mob.walk_queue_x[steps] != p->mob.x ||
 			    p->mob.walk_queue_y[steps] != p->mob.y) {
 				p->mob.walk_queue_len = steps + 1;
