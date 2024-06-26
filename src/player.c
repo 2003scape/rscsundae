@@ -1475,7 +1475,7 @@ player_get_nearby_items(struct player *p,
 			continue;
 		}
 		zone = server_find_zone(item->x, item->y);
-		if (zone == NULL) {
+		if (zone == NULL || zone->plane != orig->plane) {
 			continue;
 		}
 		if (abs(zone->x - (int)orig->x) > 3 ||
