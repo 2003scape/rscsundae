@@ -60,6 +60,7 @@ Engine
 * Should be impossible for players to walk through aggressive NPCs.
 * Quest list is broken on 204.
 * Adding temporary items (i.e. by windmill script) is broken.
+* Spam clicking blocks actions.
 
 Content
 -------
@@ -160,10 +161,11 @@ These should all be implemented in Lua script:
 - [x] Water sources
 - [ ] Using the windmill
 - [x] Using ladders
-- [ ] Using stairs (broken)
+- [x] Using stairs
 - [ ] Al Kharid general store should reject silk
 - [ ] Equipment level requirements
 - [ ] Silverlight effect
+- [ ] Punching dummies
 
 ### Drop tables
 

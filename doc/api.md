@@ -56,8 +56,10 @@ Implemented
 * `delobject()` - implemented as `delobject(player, object, x, y)` in Lua.
 * `takeobject()` - implemented as `takeobject(player, object, x, y)` in Lua.
 * `changeloc(location)` - implemented as `changeloc(x, y, location)` in Lua.
-* `upstairs()` - implemented as `upstairs(player)` in Lua.
-* `downstairs()` - implemented as `downstairs(player)` in Lua.
+* `upstairs()` - implemented as `upstairs(player, x, y)` in Lua.
+* `downstairs()` - implemented as `downstairs(player, x, y)` in Lua.
+* `changelevelup()` - implemented as `changelevelup(player)` in Lua.
+* `changeleveldown()` - implemented as `changeleveldown(player)` in Lua.
 * `npcsay(string)` - implemented as `npcsay(npc, string)` in Lua.
 * `npcbusy()` - implemented as `npcbusy(npc)` in Lua.
 * `npcunbusy()` - implemented as `npcunbusy(npc)` in Lua.
@@ -79,8 +81,6 @@ Not implemented
 
 * `modpause(mindelay, maxdelay)`
 * `changelevel(level)`
-* `changelevelup()`
-* `changeleveldown()`
 * `showeffect(type)`
 * `delinv()`
 * `ifobjectvisible()`

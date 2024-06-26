@@ -44,6 +44,8 @@ static int script_thinkbubble(lua_State *);
 static int script_boundaryteleport(lua_State *);
 static int script_upstairs(lua_State *);
 static int script_downstairs(lua_State *);
+static int script_changelevelup(lua_State *);
+static int script_changeleveldown(lua_State *);
 static int script_openshop(lua_State *);
 static int script_giveqp(lua_State *);
 static int script_changebound(lua_State *);
@@ -1258,7 +1260,7 @@ script_boundaryteleport(lua_State *L)
 }
 
 static int
-script_upstairs(lua_State *L)
+script_changelevelup(lua_State *L)
 {
 	lua_Integer player_id;
 	struct player *p;
@@ -1271,8 +1273,6 @@ script_upstairs(lua_State *L)
 		script_cancel(L, player_id);
 		return 0;
 	}
-
-	/* TODO should be aware of stair locs at destination */
 
 	if (p->mob.y < (PLANE_LEVEL_INC * 3)) {
 		p->mob.y += PLANE_LEVEL_INC;
@@ -1286,7 +1286,59 @@ script_upstairs(lua_State *L)
 }
 
 static int
-script_downstairs(lua_State *L)
+script_upstairs(lua_State *L)
+{
+	lua_Integer player_id, x, y;
+	struct player *p;
+	struct loc *loc;
+
+	player_id = script_checkinteger(L, 1);
+	x = script_checkinteger(L, 2);
+	y = script_checkinteger(L, 3);
+
+	p = id_to_player(player_id);
+	if (p == NULL) {
+		printf("script warning: player %lld is undefined\n", player_id);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	/* TODO should be aware of stair locs at destination */
+
+	if (p->mob.y < (PLANE_LEVEL_INC * 3)) {
+		y += PLANE_LEVEL_INC;
+	} else {
+		y -= (PLANE_LEVEL_INC * 3);
+	}
+
+	loc = server_find_loc(x, y);
+	if (loc == NULL) {
+		return 0;
+	}
+
+	printf("Upstairs loc direction %d\n", loc->dir);
+	/* XXX: not all directions handled */
+	switch (loc->dir) {
+	case 0:
+		y += 3;
+		break;
+	case 4:
+		y--;
+		break;
+	case 6:
+		x--;
+		break;
+	}
+
+	p->mob.x = x;
+	p->mob.y = y;
+	p->teleported = true;
+	player_send_plane_init(p);
+	return 0;
+}
+
+static int
+script_changeleveldown(lua_State *L)
 {
 	lua_Integer player_id;
 	struct player *p;
@@ -1300,14 +1352,64 @@ script_downstairs(lua_State *L)
 		return 0;
 	}
 
-	/* TODO should be aware of stair locs at destination */
-
 	if (p->mob.y > PLANE_LEVEL_INC) {
 		p->mob.y -= PLANE_LEVEL_INC;
 	} else {
 		p->mob.y += (PLANE_LEVEL_INC * 3);
 	}
 
+	p->teleported = true;
+	player_send_plane_init(p);
+	return 0;
+}
+
+static int
+script_downstairs(lua_State *L)
+{
+	lua_Integer player_id, x, y;
+	struct player *p;
+	struct loc *loc;
+
+	player_id = script_checkinteger(L, 1);
+	x = script_checkinteger(L, 2);
+	y = script_checkinteger(L, 3);
+
+	p = id_to_player(player_id);
+	if (p == NULL) {
+		printf("script warning: player %lld is undefined\n", player_id);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	/* TODO should be aware of stair locs at destination */
+
+	if (p->mob.y > PLANE_LEVEL_INC) {
+		y -= PLANE_LEVEL_INC;
+	} else {
+		y += (PLANE_LEVEL_INC * 3);
+	}
+
+	loc = server_find_loc(x, y);
+	if (loc == NULL) {
+		return 0;
+	}
+
+	printf("Downstairs loc direction %d\n", loc->dir);
+	/* XXX: not all directions handled */
+	switch (loc->dir) {
+	case 0:
+		y--;
+		break;
+	case 4:
+		y += 3;
+		break;
+	case 6:
+		x += 3;
+		break;
+	}
+
+	p->mob.x = x;
+	p->mob.y = y;
 	p->teleported = true;
 	player_send_plane_init(p);
 	return 0;
@@ -2292,6 +2394,12 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_downstairs);
 	lua_setglobal(L, "downstairs");
+
+	lua_pushcfunction(L, script_changelevelup);
+	lua_setglobal(L, "changelevelup");
+
+	lua_pushcfunction(L, script_changeleveldown);
+	lua_setglobal(L, "changeleveldown");
 
 	lua_pushcfunction(L, script_openshop);
 	lua_setglobal(L, "openshop");
