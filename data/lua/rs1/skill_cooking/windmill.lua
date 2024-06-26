@@ -1,7 +1,9 @@
 -- rsc-preservation.xyz/Quests/cooks-assistant.pcap
 
 function takeobj_flourheap(player, x, y)
-	-- XXX probably a message here, but i don't think we have it?
+	-- RSC 2001/replays master archive/Item info/Alphabetical/P/itemspawn-pot of flour (chute)- attempt to pick up without pot.pcap
+	mes(player, "@que@I can't pick it up!")
+	mes(player, "@que@I need a pot to hold it in")
 end
 
 function useobj_flourheap_pot(player, x, y)
