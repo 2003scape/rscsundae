@@ -1049,6 +1049,9 @@ player_wear(struct player *p, int slot)
 	if (type == NULL || type->equip_type == 0) {
 		return -1;
 	}
+	if (!script_onwearobj(p->mob.server->lua, p, type)) {
+		return -1;
+	}
 	/* XXX should be delayed by tick? */
 	for (int i = 0; i < p->inv_count; ++i) {
 		if (i == slot || !p->inventory[i].worn) {

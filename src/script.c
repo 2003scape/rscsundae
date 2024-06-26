@@ -2217,6 +2217,31 @@ script_onkillnpc(lua_State *L, struct player *p, struct npc *npc)
 }
 
 bool
+script_onwearobj(lua_State *L, struct player *p, struct item_config *item)
+{
+	bool result;
+
+	assert(p != NULL);
+	assert(item != NULL);
+
+	for (size_t i = 0; i < item->name_count; ++i) {
+		lua_getglobal(L, "script_engine_wearobj");
+		if (!lua_isfunction(L, -1)) {
+			puts("script error: can't find essential function script_engine_wearobj");
+			return true;
+		}
+		lua_pushnumber(L, p->mob.id);
+		lua_pushstring(L, item->names[i]);
+		safe_call(L, 2, 1, p->mob.id);
+		result = lua_toboolean(L, -1);
+		if (result != 0) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool
 script_ontakeobj(lua_State *L, struct player *p, struct ground_item *item)
 {
 	struct item_config *config;

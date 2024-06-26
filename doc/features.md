@@ -47,6 +47,7 @@ Engine
 - [ ] Protocol: 201
 - [x] Protocol: 204
 - [ ] Five minute movement timer (should be optional)
+- [ ] Al Kharid general store should reject silk
 
 ### Known engine bugs
 
@@ -160,8 +161,7 @@ These should all be implemented in Lua script:
 - [x] Using the windmill
 - [x] Using ladders
 - [x] Using stairs
-- [ ] Al Kharid general store should reject silk
-- [ ] Equipment level requirements
+- [x] Equipment level requirements
 - [ ] Silverlight effect
 - [ ] Punching dummies
 

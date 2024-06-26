@@ -3,6 +3,7 @@ local delete_locs = {}
 local talknpc_scripts = {}
 local killnpc_scripts = {}
 local takeobj_scripts = {}
+local wearobj_scripts = {}
 local attacknpc_scripts = {}
 local opinv_scripts = {}
 local skillplayer_scripts = {}
@@ -85,6 +86,10 @@ end
 
 function register_takeobj(name, callback)
 	takeobj_scripts[name] = callback;
+end
+
+function register_wearobj(name, callback)
+	wearobj_scripts[name] = callback;
 end
 
 function register_skillnpc(name, spell, callback)
@@ -375,6 +380,17 @@ function script_engine_spellinv(player, name, spell)
 		player_scripts[player] = ps
 		playerbusy(player)
 		return true
+	end
+	return false
+end
+
+function script_engine_wearobj(player, name)
+	name = string.lower(name)
+	script = wearobj_scripts[name]
+	if script then
+		if not script(player, name) then
+			return true
+		end
 	end
 	return false
 end
@@ -788,6 +804,7 @@ dofile("./lua/rs1/skill_woodcutting/tree.lua")
 dofile("./lua/rs1/items/asgarnia/alcohol.lua")
 dofile("./lua/rs1/items/food.lua")
 dofile("./lua/rs1/items/cabbage.lua")
+dofile("./lua/rs1/items/equipment.lua")
 dofile("./lua/rs1/items/kebab.lua")
 dofile("./lua/rs1/items/spinachroll.lua")
 dofile("./lua/rs1/items/meat.lua")
