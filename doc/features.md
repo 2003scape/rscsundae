@@ -175,7 +175,7 @@ The following use randomvar and need to be implemented in script:
 - [ ] Mugger (looks like variation of Man1 table)
 - [ ] Wiz1 (Darkwizard)
 - [ ] Darkerwiz (Darkwizard)
-- [ ] Goblin1
+- [x] Goblin1
 - [ ] Goblin2
 - [ ] Barbarian
 - [ ] Dwarf

@@ -740,6 +740,7 @@ end
 
 dofile("./lua/rs1/monster/chaosmonk.lua")
 dofile("./lua/rs1/monster/chicken.lua")
+dofile("./lua/rs1/monster/goblin1.lua")
 dofile("./lua/rs1/monster/imp.lua")
 dofile("./lua/rs1/monster/man1.lua")
 dofile("./lua/rs1/npc/asgarnia/barmaid.lua")
