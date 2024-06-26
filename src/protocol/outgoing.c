@@ -1865,7 +1865,11 @@ player_send_quests(struct player *p)
 		        OP_SRV_QUESTS);
 
 	for (size_t i = 0; i < p->variable_count; ++i) {
-		if (strcmp(p->variables[i].name, "doric_stage") == 0) {
+		if (strcmp(p->variables[i].name, "cook_stage") == 0) {
+			if (p->variables[i].value >= 2) {
+				quests_complete[1] = true;
+			}
+		} else if (strcmp(p->variables[i].name, "doric_stage") == 0) {
 			if (p->variables[i].value >= 2) {
 				quests_complete[3] = true;
 			}
