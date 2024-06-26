@@ -19,6 +19,7 @@
 #include "utility.h"
 #include "zone.h"
 
+static void player_stat_changed(struct player *, int);
 static void player_restore_stat(struct player *, int);
 static void player_restore_stats(struct player *);
 static int player_pvp_roll(struct player *, struct player *);
@@ -1146,11 +1147,26 @@ player_award_combat_xp(struct player *p, struct mob *target)
 }
 
 static void
+player_stat_changed(struct player *p, int stat)
+{
+	char mes[64];
+
+	if (stat != SKILL_PRAYER && stat != SKILL_HITS &&
+	    p->mob.cur_stats[stat] == p->mob.base_stats[stat]) {
+		(void)snprintf(mes, sizeof(mes),
+		    "Your %s ability has returned to normal",
+		    skill_names[stat]);
+		player_send_message(p, mes);
+	}
+	player_send_stat(p, stat);
+}
+
+static void
 player_restore_stat(struct player *p, int stat)
 {
 	if (p->mob.cur_stats[stat] < p->mob.base_stats[stat]) {
 		p->mob.cur_stats[stat]++;
-		player_send_stat(p, stat);
+		player_stat_changed(p, stat);
 	}
 }
 
@@ -1171,7 +1187,7 @@ player_slow_restore(struct player *p)
 	for (int i = 0; i < MAX_SKILL_ID; ++i) {
 		if (p->mob.cur_stats[i] > p->mob.base_stats[i]) {
 			p->mob.cur_stats[i]--;
-			player_send_stat(p, i);
+			player_stat_changed(p, i);
 		}
 	}
 	if (!p->prayers[PRAY_RAPID_HEAL]) {
