@@ -163,7 +163,7 @@ These should all be implemented in Lua script:
 - [x] Using stairs
 - [x] Equipment level requirements
 - [ ] Silverlight effect
-- [ ] Punching dummies
+- [x] Punching dummies
 
 ### Drop tables
 
