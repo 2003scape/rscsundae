@@ -130,3 +130,6 @@ Smithing, Mining
 - There was no spell timer until widespread abuse of
   Runebot and AutoRune in 2002.  This will be a config option,
   with the spell timer enabled by default.
+- Some 2001 era mechanics are probably lost forever (e.g. rates
+  for mining from before fatigue), so we'll have to make do with
+  using the later mechanics.

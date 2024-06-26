@@ -14,11 +14,12 @@ Since RSC-C runs on old and low-power mobile devices, RSC Sundae
 should target similar devices.
 
 An initial target for RSC Sundae should be to accurately replicate
-RS Classic on the 10th December 2001, since lots of preserved data
-exists for this date. This should be accomplished using the
-original game's unmodified free data files. By using the same API and
-data sources as the original game, the hope is that it becomes
-more difficult to implement content inaccurately.
+RS Classic content from the final F2P-only version of the game from
+10th December 2001, since lots of preserved data exists for this
+revision.  This should be accomplished using the original game's
+unmodified free data files.  By using the same API and data sources as
+the original game, the hope is that it becomes more difficult to
+implement content inaccurately.
 
 For clients, RSC Sundae supports the 110 protocol (the original
 Java mudclient110 from December 2001), and the 204 protocol
