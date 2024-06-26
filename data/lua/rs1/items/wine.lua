@@ -5,6 +5,7 @@ function opinv_wine(player)
 	mes(player, "@que@You drink the wine")
 	mes(player, "@que@It makes you feel a bit dizzy")
 	remove(player, "wine", 1)
+	give(player, "jug", 1)
 	substat(player, STAT_ATTACK, 3, 0)
 	if statdown(player, STAT_HITS) then
 		-- Logg/Tylerbeg/07-26-2018 11.44.01 mapping the kharazi jungle.pcap
