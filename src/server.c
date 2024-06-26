@@ -1092,6 +1092,8 @@ int
 server_add_temp_item(struct player *owner, int x, int y, int id, uint32_t stack)
 {
 	struct ground_item item = {0};
+	int plane = 0;
+	int w_y = y;
 
 	item.id = id;
 	item.x = x;
@@ -1100,6 +1102,18 @@ server_add_temp_item(struct player *owner, int x, int y, int id, uint32_t stack)
 	item.owner = owner != NULL ? owner->mob.id : UINT16_MAX;
 	item.creation_time = s.tick_counter;
 	item.unique_id = s.ground_item_counter++;
+
+	while (w_y > PLANE_LEVEL_INC) {
+		w_y -= PLANE_LEVEL_INC;
+		plane++;
+	}
+
+	if ((s.adjacency[plane][x][w_y] & ADJ_BLOCK_NORTH) != 0 &&
+	    (s.adjacency[plane][x][w_y] & ADJ_BLOCK_SOUTH) != 0 &&
+	    (s.adjacency[plane][x][w_y] & ADJ_BLOCK_EAST) != 0 &&
+	    (s.adjacency[plane][x][w_y] & ADJ_BLOCK_WEST) != 0) {
+		item.on_surface = true;
+	}
 
 	if (s.temp_item_count >= s.temp_item_max) {
 		size_t n = s.temp_item_max * 2;
