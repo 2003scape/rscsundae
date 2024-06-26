@@ -689,13 +689,15 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				p->mob.walk_queue_y[i + 1] = (uint16_t)new_y;
 			}
 			if (opcode != OP_CLI_WALK_ENTITY) {
-				p->action = ACTION_NONE;
 				p->mob.target_npc = -1;
 				p->mob.target_player = -1;
+				player_clear_actions(p);
 			}
-			p->mob.walk_queue_len = steps + 1;
-			p->mob.walk_queue_pos = 0;
-			player_clear_actions(p);
+			if (p->mob.walk_queue_x[steps] != p->mob.x ||
+			    p->mob.walk_queue_y[steps] != p->mob.y) {
+				p->mob.walk_queue_len = steps + 1;
+				p->mob.walk_queue_pos = 0;
+			}
 		}
 		break;
 	case OP_CLI_SHOP_SELL:

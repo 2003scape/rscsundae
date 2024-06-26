@@ -60,7 +60,6 @@ Engine
 * Should be impossible for players to walk through aggressive NPCs.
 * Quest list is broken on 204.
 * Adding temporary items (i.e. by windmill script) is broken.
-* Spam clicking blocks actions.
 
 Content
 -------
