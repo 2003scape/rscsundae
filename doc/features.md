@@ -58,7 +58,6 @@ Engine
 * Should be impossible for NPCs to walk through other NPCs and players.
 * Should be impossible for players to walk through aggressive NPCs.
 * Quest list is broken on 204.
-* Adding temporary items (i.e. by windmill script) is broken.
 
 Content
 -------
