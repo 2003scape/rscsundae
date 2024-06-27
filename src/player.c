@@ -1605,22 +1605,21 @@ player_process_action(struct player *p)
 			}
 			return;
 		}
+		p->action = ACTION_NONE;
+		p->mob.walk_queue_len = 0;
+		p->mob.walk_queue_pos = 0;
 		if (npc->busy) {
 			char mes[128];
 
 			(void)snprintf(mes, sizeof(mes),
 			    "%s is busy at the moment", npc->config->names[0]);
 			player_send_message(p, mes);
-			p->action = ACTION_NONE;
-			return;
+		} else {
+			/* TODO: check sight */
+			npc->talk_target = p->mob.id;
+			mob_face(&p->mob, npc->mob.x, npc->mob.y);
+			script_onnpctalk(p->mob.server->lua, p, npc);
 		}
-		/* TODO: check sight */
-		npc->talk_target = p->mob.id;
-		p->mob.walk_queue_len = 0;
-		p->mob.walk_queue_pos = 0;
-		mob_face(&p->mob, npc->mob.x, npc->mob.y);
-		script_onnpctalk(p->mob.server->lua, p, npc);
-		p->action = ACTION_NONE;
 		break;
 	case ACTION_INV_DROP:
 		if (p->action_slot >= p->inv_count) {
