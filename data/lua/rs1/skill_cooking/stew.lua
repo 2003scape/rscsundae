@@ -1,43 +1,37 @@
 -- Logg/Tylerbeg/08-01-2018 21.50.15 cooking pizza and cake
 -- Logg/Tylerbeg/08-02-2018 21.05.11 east ardougne, chaos tower, clocktower dungeon, hazeel cult dungeon.pcap
 
-function useinv_bowl_of_water_rawmeat(player)
+register_useinv("bowl of water", "rawmeat", function(player)
 	mes(player, "@que@you need to precook the meat")
-end
+end)
 
-function useinv_bowl_of_water_potato(player)
+register_useinv("bowl of water", "potato", function(player)
 	mes(player, "@que@You cut up the potato and put it into the bowl")
 	remove(player, "potato", 1)
 	remove(player, "bowl of water", 1)
 	give(player, "stew1", 1)
-end
+end)
 
-function useinv_stew1_cookedmeat(player)
+register_useinv("stew1", "cookedmeat", function(player)
 	mes(player, "@que@You cut up the meat and put it into the stew")
 	remove(player, "cookedmeat", 1)
 	remove(player, "stew1", 1)
 	give(player, "uncooked stew", 1)
-end
+end)
 
-function useinv_bowl_of_water_cookedmeat(player)
+register_useinv("bowl of water", "cookedmeat", function(player)
 	mes(player, "@que@You cut up the meat and put it into the bowl")
 	remove(player, "cookedmeat", 1)
 	remove(player, "bowl of water", 1)
 	give(player, "stew2", 1)
-end
+end)
 
-function useinv_stew2_potato(player)
+register_useinv("stew2", "potato", function(player)
 	mes(player, "@que@You cut up the potato and put it into the stew")
 	remove(player, "potato", 1)
 	remove(player, "stew2", 1)
 	give(player, "uncooked stew", 1)
-end
-
-register_useinv("bowl of water", "rawmeat", useinv_bowl_of_water_rawmeat)
-register_useinv("bowl of water", "cookedmeat", useinv_bowl_of_water_cookedmeat)
-register_useinv("bowl of water", "potato", useinv_bowl_of_water_potato)
-register_useinv("stew1", "cookedmeat", useinv_stew1_cookedmeat)
-register_useinv("stew2", "potato", useinv_stew2_potato)
+end)
 
 function cook_stew(player, device, low, high)
 	if not statatleast(player, STAT_COOKING, 25) then
