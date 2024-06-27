@@ -65,7 +65,7 @@ local function smelt_gold(player)
 	mes(player, "@que@You place a lump of gold in the furnace")
 	delay(3)
 	mes(player, "@que@You retrieve a bar of gold")
-	remove(player, "gold ", 1)
+	remove(player, "gold", 1)
 	give(player, "gold bar", 1)
 	advancestat(player, STAT_SMITHING, 90, 0)
 end
