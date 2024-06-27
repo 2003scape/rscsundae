@@ -10,7 +10,7 @@
 -- RSC 2001/replays master archive/Skilling/Crafting/pottery- potter's wheel- create unfired pot
 -- RSC 2001/replays master archive/Skilling/Crafting/pottery- potter's wheel- create unfired bowl
 -- 1e_Luis/Skilling/Crafting requirements and Observatory quick
-function useloc_potters_wheel_softclay(player, x, y)
+register_useloc("potter's wheel", "soft clay", function(player)
 	thinkbubble(player, "soft clay")
 	mes(player, "@que@What would you like to make?")
 	local res = multi(player,
@@ -41,10 +41,10 @@ function useloc_potters_wheel_softclay(player, x, y)
 		remove(player, "soft clay", 1)
 		give(player, "unfired bowl", 1)
 	end
-end
+end)
 
 --SC 2001/replays master archive/Skilling/Crafting/pottery- pottery oven- create pot
-function useloc_pottery_oven_unfired_pot(player, x, y)
+register_useloc("pottery oven", "unfired pot", function(player)
 	thinkbubble(player, "unfired pot")
 	mes(player, "@que@You put the pot in the oven")
 	remove(player, "unfired pot", 1)
@@ -54,10 +54,10 @@ function useloc_pottery_oven_unfired_pot(player, x, y)
 	mes(player, "@que@You remove a pot from the oven")
 	advancestat(player, STAT_CRAFTING, 15, 0)
 	give(player, "pot", 1)
-end
+end)
 
 -- RSC 2001/replays master archive/Skilling/Crafting/pottery- pottery oven- create pie dish
-function useloc_pottery_oven_unfired_pie_dish(player, x, y)
+register_useloc("pottery oven", "unfired pie dish", function(player)
 	thinkbubble(player, "unfired pie dish")
 	mes(player, "@que@You put the pie dish in the oven")
 	remove(player, "unfired pie dish", 1)
@@ -67,10 +67,10 @@ function useloc_pottery_oven_unfired_pie_dish(player, x, y)
 	mes(player, "@que@You remove a dish from the oven")
 	advancestat(player, STAT_CRAFTING, 40, 0)
 	give(player, "pie dish", 1)
-end
+end)
 
 -- RSC 2001/replays master archive/Skilling/Crafting/pottery- pottery oven- create bowl
-function useloc_pottery_oven_unfired_bowl(player, x, y)
+register_useloc("pottery oven", "unfired bowl", function(player)
 	thinkbubble(player, "unfired bowl")
 	mes(player, "@que@You put the bowl in the oven")
 	remove(player, "unfired bowl", 1)
@@ -80,20 +80,14 @@ function useloc_pottery_oven_unfired_bowl(player, x, y)
 	mes(player, "@que@You remove a bowl from the oven")
 	advancestat(player, STAT_CRAFTING, 60, 0)
 	give(player, "bowl", 1)
-end
+end)
 
 -- RSC 2001/7/crafting- create soft clay
-function useinv_water_clay(player)
+register_useinv("water", "clay", function(player)
 	mes(player, "@que@You mix the clay and water")
 	remove(player, "water", 1)
 	remove(player, "clay", 1)
 	give(player, "soft clay", 1)
 	delay(2)
 	mes(player, "@que@You now have some soft workable clay")
-end
-
-register_useinv("water", "clay", useinv_water_clay)
-register_useloc("pottery oven", "unfired pot", useloc_pottery_oven_unfired_pot)
-register_useloc("pottery oven", "unfired pie dish", useloc_pottery_oven_unfired_pie_dish)
-register_useloc("pottery oven", "unfired bowl", useloc_pottery_oven_unfired_bowl)
-register_useloc("potter's wheel", "soft clay", useloc_potters_wheel_softclay)
+end)
