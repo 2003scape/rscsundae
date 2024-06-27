@@ -85,7 +85,7 @@ function talknpc_urhney(player, npc)
 	table.insert(choices, "Well that's friendly")
 	table.insert(choices, "I've come to repossess your house")
 
-	local resp = multi(player, choices)
+	local resp = multi(player, table.unpack(choices))
 	resp = choices[resp]
 	if resp == "Father Aereck sent me to talk to you" then
 		urhney_aereck(player, npc)
@@ -94,6 +94,9 @@ function talknpc_urhney(player, npc)
 		npcsay(npc, "How careless can you get")
 		npcsay(npc, "Those things aren't easy to come by you know")
 		npcsay(npc, "It's a good job I've got a spare")
+		give(player, "amulet of ghostspeak", 1)
+		mes(player, "Father Urhney hands you an amulet")
+		delay(3)
 		npcsay(npc, "Be more careful this time")
 		say(player, "Ok I'll try to be")
 	elseif resp == "Well that's friendly" then

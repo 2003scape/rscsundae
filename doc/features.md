@@ -102,7 +102,7 @@ These should all be implemented in Lua script:
 
 - [x] Cook's Assistant
 - [x] Sheep Shearer
-- [ ] The Restless Ghost
+- [x] The Restless Ghost
 - [ ] Demon Slayer
 - [ ] Romeo & Juliet
 - [ ] Shield of Arrav

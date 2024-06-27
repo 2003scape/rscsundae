@@ -7,6 +7,9 @@ end
 
 function oploc1_openghostcoffin(player, x, y)
 	mes(player, "There's a skeleton without a skull in here")
+	if not nearnpc(player, "ghostx") then
+		addnpc("ghostx", 103, 674) 
+	end
 end
 
 function oploc2_openghostcoffin(player, x, y)
@@ -16,10 +19,16 @@ end
 
 -- rsc-preservation.xyz/Quests/The restless ghost - Part 2
 
-function useloc_ghostcoffin_ghostskull(player, x, y)
+function useloc_openghostcoffin_ghostskull(player, x, y)
+	if getvar(player, "ghost_stage") ~= 4 then
+		mes(player, "Nothing interesting happens")
+		return
+	end
 	mes(player, "You put the skull in the coffin")
 	delay(3)
 	remove(player, "ghostskull", 1)
+	--TODO: implement delnpc
+	--delnpc("ghostx")
 	mes(player, "The ghost has vanished")
 	delay(3)
 	mes(player, "You think you hear a faint voice in the air")
@@ -32,4 +41,4 @@ function useloc_ghostcoffin_ghostskull(player, x, y)
 	setvar(player, "ghost_stage", 5)
 end
 
-register_useloc("ghostcoffin", "ghostskull", useloc_ghostcoffin_ghostskull)
+register_useloc("openghostcoffin", "ghostskull", useloc_openghostcoffin_ghostskull)

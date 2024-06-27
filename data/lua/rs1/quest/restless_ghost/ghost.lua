@@ -98,6 +98,7 @@ local function ghost_fail_interesting(player, npc)
 end
 
 local function ghost_fail(player, npc)
+	say(player, "Hello ghost, how are you?")
 	npcsay(npc, "Wooo wooo wooooo")
 	local resp = multi(player,
 		"Sorry I don't speak ghost",
@@ -118,7 +119,7 @@ local function ghost_task(player, npc)
 	npcsay(npc, "I should think it is probably because")
 	npcsay(npc, "A warlock has come along and stolen my skull")
 	npcsay(npc, "If you look inside my coffin there")
-	npcsay(npc, "you'll find my corspse without a head on it")
+	npcsay(npc, "you'll find my corpse without a head on it")
 	say(player, "Do you know where this warlock might be now?")
 	npcsay(npc, "I think it was one of the warlocks who lives in a big tower")
 	npcsay(npc, "In the sea southwest from here")
@@ -179,6 +180,7 @@ local function ghost_amulet(player, npc)
 end
 
 local function ghost_intro(player, npc)
+	say(player, "Hello ghost, how are you?")
 	npcsay(npc, "Not very good actually")
 	say(player, "What's the problem then?")
 	npcsay(npc, "Did you just understand what I said?")

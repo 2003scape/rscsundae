@@ -41,7 +41,7 @@ local function priest_progress(player, npc)
 	local stage = getvar(player, "ghost_stage")
 	npcsay(npc, "Have you got rid of the ghost yet?")
 	if stage == 1 then
-		say(player, "I can't find father Urhney at the moment"
+		say(player, "I can't find father Urhney at the moment")
 		npcsay(npc, "Well to get to the swamp he is in")
 		npcsay(npc, "you need to go round the back of the castle")
 		npcsay(npc, "The swamp is on the otherside of the fence to the south")
