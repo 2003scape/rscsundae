@@ -147,61 +147,51 @@ local function smelt_runite(player)
 	advancestat(player, STAT_SMITHING, 200, 0)
 end
 
-function useloc_furnace_copper_ore(player, x, y)
+register_useloc("furnace", "copper ore", function(player)
 	thinkbubble(player, "copper ore")
 	smelt_bronze(player)
-end
+end)
 
-function useloc_furnace_tin_ore(player, x, y)
+register_useloc("furnace", "tin ore", function(player)
 	thinkbubble(player, "tin ore")
 	smelt_bronze(player)
-end
+end)
 
-function useloc_furnace_iron_ore(player, x, y)
+register_useloc("furnace", "iron ore", function(player)
 	thinkbubble(player, "iron ore")
 	if held(player, "coal", 1) then
 		smelt_steel(player)
 	else
 		smelt_iron(player)
 	end
-end
+end)
 
-function useloc_furnace_coal(player, x, y)
+register_useloc("furnace", "coal", function(player)
 	thinkbubble(player, "coal")
 	smelt_steel(player)
-end
+end)
 
-function useloc_furnace_silver(player, x, y)
+register_useloc("furnace", "silver", function(player)
 	thinkbubble(player, "silver")
 	smelt_silver(player)
-end
+end)
 
-function useloc_furnace_gold(player, x, y)
+register_useloc("furnace", "gold", function(player)
 	thinkbubble(player, "gold")
 	smelt_gold(player)
-end
+end)
 
-function useloc_furnace_mithril_ore(player, x, y)
+register_useloc("furnace", "mithril ore", function(player)
 	thinkbubble(player, "mithril ore")
 	smelt_mithril(player)
-end
+end)
 
-function useloc_furnace_adamantite_ore(player, x, y)
+register_useloc("furnace", "adamantite ore", function(player)
 	thinkbubble(player, "adamantite ore")
 	smelt_adamantite(player)
-end
+end)
 
-function useloc_furnace_runite_ore(player, x, y)
+register_useloc("furnace", "runite ore", function(player)
 	thinkbubble(player, "runite ore")
 	smelt_runite(player)
-end
-
-register_useloc("furnace", "copper ore", useloc_furnace_copper_ore)
-register_useloc("furnace", "tin ore", useloc_furnace_tin_ore)
-register_useloc("furnace", "iron ore", useloc_furnace_iron_ore)
-register_useloc("furnace", "coal", useloc_furnace_coal)
-register_useloc("furnace", "silver", useloc_furnace_silver)
-register_useloc("furnace", "gold", useloc_furnace_gold)
-register_useloc("furnace", "mithril ore", useloc_furnace_mithril_ore)
-register_useloc("furnace", "adamantite ore", useloc_furnace_adamantite_ore)
-register_useloc("furnace", "runite ore", useloc_furnace_runite_ore)
+end)
