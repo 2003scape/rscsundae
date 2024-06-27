@@ -83,11 +83,20 @@ register_useloc("pottery oven", "unfired bowl", function(player)
 end)
 
 -- RSC 2001/7/crafting- create soft clay
-register_useinv("water", "clay", function(player)
+function make_softclay(player, water, vessel)
 	mes(player, "@que@You mix the clay and water")
-	remove(player, "water", 1)
+	remove(player, water, 1)
 	remove(player, "clay", 1)
+	give(player, vessel, 1)
 	give(player, "soft clay", 1)
 	delay(2)
 	mes(player, "@que@You now have some soft workable clay")
+end
+
+register_useinv("waterjug", "clay", function(player)
+	make_softclay(player, "waterjug", "jug")
+end)
+
+register_useinv("waterbucket", "clay", function(player)
+	make_softclay(player, "waterbucket", "bucket")
 end)
