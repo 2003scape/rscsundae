@@ -738,6 +738,7 @@ function randomjewel(player, x, y)
 	end
 end
 
+dofile("./lua/rs1/monster/barbarian.lua")
 dofile("./lua/rs1/monster/chaosmonk.lua")
 dofile("./lua/rs1/monster/chicken.lua")
 dofile("./lua/rs1/monster/goblin1.lua")
