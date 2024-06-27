@@ -102,3 +102,14 @@ Intentionally not implemented
 * `end()` - use Lua `return`.
 * `ifstatabove(stat,value)` - use `statatleast`.
 * `setcoord(coordinate)` - use Lua variables.
+
+Implementation details
+----------------------
+
+* The wiki claims that the Vampire should face the player when its
+  coffin is opened.  Likely `ifnearnpc` causes this behaviour to happen,
+  the docs note that it marks the player as interacting with a NPC.
+* Since there is no way to check whether a NPC is busy, it's likely
+  that `ifnearvisnpc` ignores NPCs that are busy, and this is how
+  distraction mechanics (e.g. in the knight's sword quest) are
+  implemented.
