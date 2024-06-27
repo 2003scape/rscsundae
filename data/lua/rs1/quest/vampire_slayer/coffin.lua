@@ -2,9 +2,10 @@ local function vampire_wake_up(player)
 	-- https://youtu.be/U3_ci_WbF3Q?t=436
 	-- count draynor jumps out of the coffin when you open OR search it
 
-	-- TODO do not allow duplicating vampire
-	addnpc("vampire", 205, 3382)
-	mes(player, "A vampire jumps out of the coffin")
+	if not nearnpc(player, "vampire") then
+		addnpc("vampire", 205, 3382)
+		mes(player, "A vampire jumps out of the coffin")
+	end
 end
 
 function oploc1_vampshutcoffin(player, x, y)
