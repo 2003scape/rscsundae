@@ -58,7 +58,7 @@ register_useloc("fire", "uncooked pizza", function(player, x, y)
 	mes(player, "@que@You need a proper oven to cook this")
 end)
 
-register_useloc("range", "uncooked pizza", function(player, x, y)
+local function cook_pizza(player)
 	if not statatleast(player, STAT_COOKING, 35) then
 		mes(player, "@que@You need a cooking level of 35 to make pizza")
 		return
@@ -76,4 +76,12 @@ register_useloc("range", "uncooked pizza", function(player, x, y)
 		mes(player, "@que@You accidentally burn the pizza")
 		give(player, "burnt pizza", 1)
 	end
+end
+
+register_useloc("range", "uncooked pizza", function(player, x, y)
+	cook_pizza(player)
+end)
+
+register_useloc("cookrange", "uncooked pizza", function(player, x, y)
+	cook_pizza(player)
 end)
