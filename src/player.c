@@ -1544,7 +1544,9 @@ player_process_action(struct player *p)
 	uint32_t stack;
 
 	if (p->action != ACTION_NONE &&
+	    p->action != ACTION_NPC_ATTACK &&
 	    p->action != ACTION_NPC_CAST &&
+	    p->action != ACTION_PLAYER_ATTACK &&
 	    p->action != ACTION_PLAYER_CAST &&
 	    p->mob.in_combat) {
 		player_send_message(p,
