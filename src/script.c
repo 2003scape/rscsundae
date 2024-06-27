@@ -558,6 +558,8 @@ script_nearnpc(lua_State *L)
 
 	npc = mob_find_nearby_npc(&p->mob, name);
 	if (npc != NULL) {
+		mob_face(&npc->mob, p->mob.x, p->mob.y);
+		mob_face(&p->mob, npc->mob.x, npc->mob.y);
 		lua_pushinteger(L, npc->mob.id);
 		return 1;
 	}
