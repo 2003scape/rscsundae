@@ -66,6 +66,7 @@ player_parse_admin_command(struct player *p, char *str)
 		p->mob.x += strtol(x_str, NULL, 10);
 		p->mob.y += strtol(y_str, NULL, 10);
 		p->teleported = true;
+		player_send_plane_init(p);
 	} else if (strcmp(cmd, "ftele") == 0) {
 		char *x_str;
 		char *y_str;
@@ -82,6 +83,7 @@ player_parse_admin_command(struct player *p, char *str)
 		p->mob.x = strtol(x_str, NULL, 10);
 		p->mob.y = strtol(y_str, NULL, 10);
 		p->teleported = true;
+		player_send_plane_init(p);
 	} else if (strcmp(cmd, "advancestat") == 0) {
 		char *stat_str;
 		char *xp_str;
