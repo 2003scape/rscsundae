@@ -742,6 +742,11 @@ player_init_combat(struct player *p, struct mob *target)
 	/* successful catch, combat lock the target */
 	target->walk_queue_len = 0;
 	target->walk_queue_pos = 0;
+	target->following_player = -1;
+	target->following_npc = -1;
+
+	p->mob.following_player = -1;
+	p->mob.following_npc = -1;
 
 	player_close_ui(p);
 	player_clear_actions(p);
@@ -805,6 +810,14 @@ player_process_combat(struct player *p)
 			}
 
 			if (!player_init_combat(p, &target->mob)) {
+				/* prefer the route from the client if available */
+				if ((p->mob.walk_queue_len -
+					    p->mob.walk_queue_pos) == 0 &&
+				    !mob_within_range(&p->mob,
+				    target->mob.x, target->mob.y, 3)) {
+					p->mob.following_player = target->mob.id;
+					p->mob.following_npc = -1;
+				}
 				return;
 			}
 
@@ -833,6 +846,14 @@ player_process_combat(struct player *p)
 			}
 
 			if (!player_init_combat(p, &target->mob)) {
+				/* prefer the route from the client if available */
+				if ((p->mob.walk_queue_len -
+					    p->mob.walk_queue_pos) == 0 &&
+				    !mob_within_range(&p->mob,
+				    target->mob.x, target->mob.y, 3)) {
+					p->mob.following_player = -1;
+					p->mob.following_npc = target->mob.id;
+				}
 				return;
 			}
 
@@ -1540,8 +1561,6 @@ player_process_action(struct player *p)
 			return;
 		}
 		p->mob.target_npc = p->action_npc;
-		p->mob.following_npc = p->action_npc;
-		p->mob.following_player = -1;
 		p->action = ACTION_NONE;
 		break;
 	case ACTION_NPC_USEWITH:
@@ -1555,8 +1574,11 @@ player_process_action(struct player *p)
 			return;
 		}
 		if (!mob_within_range(&p->mob, npc->mob.x, npc->mob.y, 2)) {
-			p->mob.following_npc = p->action_npc;
-			p->mob.following_player = -1;
+			/* let client take first (pathed) steps */
+			if ((p->mob.walk_queue_len - p->mob.walk_queue_pos) == 0) {
+				p->mob.following_npc = p->action_npc;
+				p->mob.following_player = -1;
+			}
 			return;
 		}
 		p->mob.walk_queue_len = 0;
@@ -1574,8 +1596,11 @@ player_process_action(struct player *p)
 			return;
 		}
 		if (!mob_within_range(&p->mob, npc->mob.x, npc->mob.y, 2)) {
-			p->mob.following_npc = p->action_npc;
-			p->mob.following_player = -1;
+			/* let client take first (pathed) steps */
+			if ((p->mob.walk_queue_len - p->mob.walk_queue_pos) == 0) {
+				p->mob.following_npc = p->action_npc;
+				p->mob.following_player = -1;
+			}
 			return;
 		}
 		if (npc->busy) {
@@ -1737,8 +1762,6 @@ player_process_action(struct player *p)
 			return;
 		}
 		p->mob.target_player = target->mob.id;
-		p->mob.following_player = target->mob.id;
-		p->mob.following_npc = -1;
 		p->action = ACTION_NONE;
 		break;
 	case ACTION_PLAYER_CAST:
