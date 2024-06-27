@@ -33,18 +33,23 @@ function useinv_stew2_potato(player)
 	give(player, "uncooked stew", 1)
 end
 
-function useloc_range_uncooked_stew(player, x, y)
+register_useinv("bowl of water", "rawmeat", useinv_bowl_of_water_rawmeat)
+register_useinv("bowl of water", "cookedmeat", useinv_bowl_of_water_cookedmeat)
+register_useinv("bowl of water", "potato", useinv_bowl_of_water_potato)
+register_useinv("stew1", "cookedmeat", useinv_stew1_cookedmeat)
+register_useinv("stew2", "potato", useinv_stew2_potato)
+
+function cook_stew(player, device, low, high)
 	if not statatleast(player, STAT_COOKING, 25) then
 		-- XXX message assumed, not in replay
 		mes(player, "@que@You need a cooking level of 25 to cook stew")
 		return
 	end
 	thinkbubble(player, "uncooked stew")
-	mes(player, "@que@You cook the stew on the range...")
+	mes(player, string.format("@que@You cook the stew on the %s...", device))
 	remove(player, "uncooked stew", 1)
 	delay(3)
-	-- chance from 2004scape
-	if statrandom(player, STAT_COOKING, 68, 392) then
+	if statrandom(player, STAT_COOKING, low, high) then
 		mes(player, "@que@The stew is now nicely cooked")
 		give(player, "stew", 1)
 		advancestat(player, STAT_COOKING, 360, 0)
@@ -62,9 +67,17 @@ function opinv_burnt_stew(player)
 	mes(player, "@que@You empty the burnt stew from the bowl")
 end
 
-register_useinv("bowl of water", "rawmeat", useinv_bowl_of_water_rawmeat)
-register_useinv("bowl of water", "cookedmeat", useinv_bowl_of_water_cookedmeat)
-register_useinv("bowl of water", "potato", useinv_bowl_of_water_potato)
-register_useinv("stew1", "cookedmeat", useinv_stew1_cookedmeat)
-register_useinv("stew2", "potato", useinv_stew2_potato)
-register_useloc("range", "uncooked stew", useloc_range_uncooked_stew)
+-- chances from 2004scape:
+-- https://github.com/2004Scape/Server/blob/79cedb0c2fa7cf2360d17393be085239c8059ee7/data/src/scripts/skill_cooking/configs/cooking_source/cooking_generic.dbrow#L17
+
+register_useloc("fire", "uncooked stew", function(player, x, y)
+	cook_stew(player, "fire", 68, 392)
+end)
+
+register_useloc("range", "uncooked stew", function(player, x, y)
+	cook_stew(player, "range", 68, 392)
+end)
+
+register_useloc("cookrange", "uncooked stew", function(player, x, y)
+	cook_stew(player, "range", 78, 412)
+end)

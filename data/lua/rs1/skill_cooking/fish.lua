@@ -12,7 +12,9 @@ local fish_types = {
 		mes = "The shrimp is now nicely cooked",
 		xp = 120,
 		low = 128,
-		high = 512
+		high = 512,
+		low_special = 138,
+		high_special = 532,
 	},
 	anchovies = {
 		level = 1,
@@ -22,7 +24,9 @@ local fish_types = {
 		mes = "The anchovies are now nicely cooked",
 		xp = 120,
 		low = 128,
-		high = 512
+		high = 512,
+		low_special = 138,
+		high_special = 532,
 	},
 	sardine = {
 		level = 1,
@@ -32,7 +36,9 @@ local fish_types = {
 		mes = "The sardine is now nicely cooked",
 		xp = 160,
 		low = 118,
-		high = 492
+		high = 492,
+		low_special = 128,
+		high_special = 512,
 	},
 	herring = {
 		level = 5,
@@ -42,7 +48,9 @@ local fish_types = {
 		mes = "The herring is now nicely cooked",
 		xp = 200,
 		low = 108,
-		high = 472
+		high = 472,
+		low_special = 118,
+		high_special = 492,
 	},
 	trout = {
 		level = 15,
@@ -52,7 +60,9 @@ local fish_types = {
 		mes = "The trout is now nicely cooked",
 		xp = 280,
 		low = 88,
-		high = 432
+		high = 432,
+		low_special = 98,
+		high_special = 452,
 	},
 	pike = {
 		level = 20,
@@ -62,7 +72,9 @@ local fish_types = {
 		mes = "The pike is now nicely cooked",
 		xp = 320,
 		low = 78,
-		high = 412
+		high = 412,
+		low_special = 88,
+		high_special = 432,
 	},
 	salmon = {
 		level = 25,
@@ -72,7 +84,9 @@ local fish_types = {
 		mes = "The salmon is now nicely cooked",
 		xp = 360,
 		low = 68,
-		high = 392
+		high = 392,
+		low_special = 78,
+		high_special = 402,
 	},
 	tuna = {
 		level = 30,
@@ -107,6 +121,17 @@ local fish_types = {
 }
 
 local function cook_fish(player, fish, loc)
+	local low = fish.low
+	local high = fish.high
+	if loc == "cookrange" then
+		if fish.low_special then
+			low = fish.low_special
+		end
+		if fish.high_special then
+			high = fish.high_special
+		end
+		loc = "stove"
+	end
 	if not statatleast(player, STAT_COOKING, fish.level) then
 		mes(player,
 		    string.format("@que@You need a cooking level of %d to cook %s",
@@ -128,6 +153,10 @@ local function cook_fish(player, fish, loc)
 end
 
 for k, v in pairs(fish_types) do
+	register_useloc("cookrange", v.raw, function(player, x, y)
+		cook_fish(player, v, "cookrange")
+	end)
+
 	register_useloc("range", v.raw, function(player, x, y)
 		cook_fish(player, v, "stove")
 	end)

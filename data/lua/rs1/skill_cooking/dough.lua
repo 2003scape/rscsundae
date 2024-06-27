@@ -58,3 +58,4 @@ register_useinv("bowl of water", "flourpot", function(player)
 end)
 
 register_useloc("range", "bread dough", useloc_range_bread_dough)
+register_useloc("cookrange", "bread dough", useloc_range_bread_dough)

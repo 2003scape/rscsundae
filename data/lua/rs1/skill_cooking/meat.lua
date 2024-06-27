@@ -1,11 +1,10 @@
 -- 1e_Luis/Quests/Witchs Potion.pcap
 
-local function cook_meat(player)
+local function cook_meat(player, low, high)
 	thinkbubble(player, "rawmeat")
 	remove(player, "rawmeat", 1)
 	delay(3)
-	-- https://oldschool.runescape.wiki/w/Cooked_meat?oldid=14686423
-	if statrandom(player, STAT_COOKING, 128, 640) then
+	if statrandom(player, STAT_COOKING, low, high) then
 		mes(player, "@que@The meat is now nicely cooked")
 		give(player, "cookedmeat", 1)
 		advancestat(player, STAT_COOKING, 120, 0)
@@ -15,15 +14,19 @@ local function cook_meat(player)
 	end
 end
 
-function useloc_range_rawmeat(player, x, y)
-	mes(player, "@que@You cook the meat on the stove...")
-	cook_meat(player)
-end
+-- https://oldschool.runescape.wiki/w/Cooked_meat?oldid=14686423&action=edit
 
-function useloc_fire_rawmeat(player, x, y)
+register_useloc("fire", "rawmeat", function(player, x, y)
 	mes(player, "@que@You cook the meat on the fire...")
-	cook_meat(player)
-end
+	cook_meat(player, 128, 512)
+end)
 
-register_useloc("fire", "rawmeat", useloc_fire_rawmeat)
-register_useloc("range", "rawmeat", useloc_range_rawmeat)
+register_useloc("range", "rawmeat", function(player, x, y)
+	mes(player, "@que@You cook the meat on the stove...")
+	cook_meat(player, 128, 512)
+end)
+
+register_useloc("cookrange", "rawmeat", function(player, x, y)
+	mes(player, "@que@You cook the meat on the stove...")
+	cook_meat(player, 138, 532)
+end)
