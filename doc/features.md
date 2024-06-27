@@ -90,7 +90,7 @@ These should all be implemented in Lua script:
 - [x] Cooking (bread)
 - [x] Cooking (wine)
 - [ ] Cooking (pies)
-- [ ] Cooking (pizzas)
+- [x] Cooking (pizzas)
 - [ ] Cooking (cake)
 - [x] Cooking (stew)
 - [x] Cooking (special range)
