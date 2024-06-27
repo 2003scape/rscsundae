@@ -127,7 +127,7 @@ mob_within_range(struct mob *mob, int x, int y, int range)
 
 size_t
 get_nearby_npcs(struct mob *mob,
-		struct npc **list, size_t max, int radius)
+		struct npc **list, size_t max, int radius, bool exclude_busy)
 {
 	int max_id = mob->server->max_npc_id;
 	size_t count = 0;
@@ -139,6 +139,9 @@ get_nearby_npcs(struct mob *mob,
 		}
 		if (count >= max) {
 			break;
+		}
+		if (exclude_busy && (npc->busy || npc->mob.in_combat)) {
+			continue;
 		}
 		if (mob_within_range(mob, npc->mob.x, npc->mob.y, radius)) {
 			list[count++] = npc;
@@ -153,7 +156,7 @@ mob_find_nearby_npc(struct mob *mob, const char *name)
 	struct npc *npcs[16];
 	size_t n;
 
-	n = get_nearby_npcs(mob, npcs, 16, 16);
+	n = get_nearby_npcs(mob, npcs, 16, 16, true);
 
 	for (size_t i = 0; i < n; ++i) {
 		for (size_t j = 0; j < npcs[i]->config->name_count; ++j) {

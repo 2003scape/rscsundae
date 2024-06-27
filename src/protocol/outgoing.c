@@ -128,7 +128,7 @@ player_send_npc_movement(struct player *p)
 	size_t new_known_count = 0;
 
 	nearby_count = get_nearby_npcs(&p->mob, nearby,
-	    MAX_KNOWN_NPCS, UPDATE_RADIUS);
+	    MAX_KNOWN_NPCS, UPDATE_RADIUS, false);
 
 	buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 		  OP_SRV_NPC_MOVEMENT);
