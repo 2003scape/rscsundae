@@ -1,10 +1,10 @@
 -- RSC 2001/replays master archive/Skilling/Firemaking/firemaking- light- fail due to inside inventory
-function useinv_tinderbox_logs(player)
+register_useinv("logs", "tinderbox", function(player)
 	mes(player, "@que@I think you should put the logs down before you light them!")
-end
+end)
 
 -- rsc-preservation.xyz/Skilling/some woodcutting and firemaking at low levels.pcap
-function useobj_tinderbox_logs(player, x, y)
+register_useobj("logs", "tinderbox", function(player, x, y)
 	if blocked(x, y) then
 		mes(player, "@que@You can't light a fire here")
 		return
@@ -26,8 +26,4 @@ function useobj_tinderbox_logs(player, x, y)
 	else
 		mes(player, "@que@You fail to light a fire")
 	end
-end
-
-
-register_useobj("logs", "tinderbox", useobj_tinderbox_logs)
-register_useinv("logs", "tinderbox", useinv_tinderbox_logs)
+end)
