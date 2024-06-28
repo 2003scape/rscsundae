@@ -6,6 +6,8 @@
 
 static void npc_random_walk(struct npc *);
 static int npc_combat_roll(struct npc *, struct player *);
+static void npc_hunt_target(struct npc *, struct zone *);
+static bool npc_init_combat(struct npc *, struct player *);
 
 void
 npc_die(struct npc *npc, struct player *p)
@@ -130,27 +132,122 @@ npc_random_walk(struct npc *npc)
 	npc->mob.walk_queue_pos = 0;
 }
 
+static void
+npc_hunt_target(struct npc *npc, struct zone *zone)
+{
+	struct player *p;
+	bool restrict_hunt = false;
+
+	if (npc->mob.cur_stats[SKILL_HITS] <= npc->config->bravery) {
+		return;
+	}
+
+	if (npc->mob.server->restrict_npc_aggression) {
+		restrict_hunt = true;
+		if (mob_wilderness_level(&npc->mob) > 0) {
+			restrict_hunt = false;
+		}
+	}
+
+	for (int i = 0; i < zone->player_max; ++i) {
+		if (zone->players[i] == UINT16_MAX) {
+			continue;
+		}
+
+
+		p = npc->mob.server->players[zone->players[i]];
+		if (p == NULL) {
+			zone->players[i] = UINT16_MAX;
+			continue;
+		}
+
+		if (p->mob.in_combat || p->chased_by_npc != UINT16_MAX) {
+			continue;
+		}
+
+		if (restrict_hunt &&
+		    p->mob.combat_level > (npc->config->combat_level * 2)) {
+			continue;
+		}
+
+		if (!mob_within_range(&p->mob, npc->mob.x, npc->mob.y,
+		    npc->config->hunt_range + 1)) {
+			continue;
+		}
+
+		p->chased_by_npc = npc->mob.id;
+		npc->mob.target_player = p->mob.id;
+		return;
+	}
+}
+
 void
 npc_process_movement(struct npc *npc)
 {
 	struct zone *zone_old;
 	struct zone *zone_new;
 
-	if (npc->busy || npc->mob.in_combat) {
+	if (npc->busy) {
 		return;
 	}
-	if (npc->random_walk_timer == 0) {
-		if (npc->mob.following_player == -1) {
-			double r = ranval(&npc->mob.server->ran) /
-			    (double)UINT32_MAX;
 
-			/* XXX: needs verifying */
-			npc->random_walk_timer = 1 + (int)(r * 30);
-			npc_random_walk(npc);
+	/*
+	 * like players, NPCs appear to be stunned slightly after combat, see
+	 * RSC 2001/replays master archive/Walk around/Misthalin- Lumbridge/walkaround- lumbridge road to varrock- road up to wheatfield digsite- dark mage aggressive - lvl 1-1-1
+	 */
+	if (npc->mob.server->tick_counter < (npc->mob.combat_timer + 6)) {
+		return;
+	}
+
+	zone_old = server_find_zone(npc->mob.x, npc->mob.y);
+
+	if (npc->mob.in_combat) {
+		struct player *p;
+
+		p = npc->mob.server->players[npc->mob.target_player];
+		if (npc->mob.x == p->mob.x && npc->mob.y == p->mob.y) {
+			return;
 		}
 	} else {
-		npc->random_walk_timer--;
+		if (npc->mob.following_player != -1) {
+			struct player *p;
+
+			p = npc->mob.server->players[npc->mob.following_player];
+			if (p == NULL) {
+				npc->mob.following_player = -1;
+				return;
+			}
+
+			/*
+			 * aggressive NPCs used to be able to get stuck outside
+			 * of their range, see various replays of jungle
+			 * spiders on hazelmere's island
+			 */
+			if (!mob_within_range(&p->mob,
+			    npc->spawn_x, npc->spawn_y,
+			    npc->config->wander_range * 2)) {
+				p->chased_by_npc = UINT16_MAX;
+				npc->mob.following_player = -1;
+				return;
+			}
+		} else if (npc->config->aggression > 2) {
+			npc_hunt_target(npc, zone_old);
+		}
+
+		if (npc->random_walk_timer == 0) {
+			if (npc->mob.following_player == -1) {
+				double r = ranval(&npc->mob.server->ran) /
+				    (double)UINT32_MAX;
+
+				/* XXX: needs verifying */
+				npc->random_walk_timer = 1 + (int)(r * 30);
+				npc_random_walk(npc);
+			}
+		} else {
+			npc->random_walk_timer--;
+		}
 	}
+
 	int pos = npc->mob.walk_queue_pos;
 	if ((npc->mob.walk_queue_len - pos) <= 0) {
 		return;
@@ -172,8 +269,6 @@ npc_process_movement(struct npc *npc)
 		}
 		break;
 	}
-
-	zone_old = server_find_zone(npc->mob.x, npc->mob.y);
 
 	mob_process_walk_queue(&npc->mob);
 
@@ -199,42 +294,125 @@ npc_combat_roll(struct npc *npc, struct player *defender)
 	    npc->mob.cur_stats[SKILL_STRENGTH], 0);
 }
 
+static bool
+npc_init_combat(struct npc *npc, struct player *target)
+{
+	/*
+	 * like players, NPCs appear to be stunned slightly after combat, see
+	 * RSC 2001/replays master archive/Walk around/Misthalin- Lumbridge/walkaround- lumbridge road to varrock- road up to wheatfield digsite- dark mage aggressive - lvl 1-1-1
+	 */
+
+	if (target->mob.in_combat ||
+	    npc->mob.server->tick_counter <
+	    (target->mob.combat_timer + 6)) {
+		target->chased_by_npc = UINT16_MAX;
+		npc->mob.following_player = -1;
+		npc->mob.following_npc = -1;
+		npc->mob.walk_queue_pos = 0;
+		npc->mob.walk_queue_len = 0;
+		mob_combat_reset(&npc->mob);
+		return false;
+	}
+
+	if (!mob_within_range(&npc->mob, target->mob.x, target->mob.y, 2)) {
+		npc->mob.walk_queue_x[0] = target->mob.x;
+		npc->mob.walk_queue_y[0] = target->mob.y;
+		npc->mob.walk_queue_pos = 0;
+		npc->mob.walk_queue_len = 1;
+		return false;
+	}
+
+	player_send_message(target, "You are under attack!");
+
+	npc->mob.walk_queue_len = 0;
+	npc->mob.walk_queue_pos = 0;
+
+	/* successful catch, combat lock the target */
+	target->mob.walk_queue_len = 0;
+	target->mob.walk_queue_pos = 0;
+	target->mob.following_player = -1;
+	target->mob.following_npc = -1;
+
+	npc->mob.following_player = -1;
+	npc->mob.following_npc = -1;
+
+	player_close_ui(target);
+	player_clear_actions(target);
+
+	npc->mob.in_combat = true;
+	npc->mob.combat_next_hit = 0;
+	npc->mob.combat_rounds = 0;
+
+	target->mob.target_player = -1;
+	target->mob.target_npc = npc->mob.id;
+	target->mob.in_combat = true;
+	target->mob.combat_rounds = 0;
+	target->mob.dir = MOB_DIR_COMBAT_RIGHT;
+	return true;
+}
+
 void
 npc_process_combat(struct npc *npc)
 {
-	if (!npc->mob.in_combat) {
+	struct player *target;
+	int roll;
+
+	if (npc->mob.target_player == -1) {
 		return;
 	}
-	if (npc->mob.target_player != -1) {
-		struct player *target;
-		int roll;
 
-		target = npc->mob.server->players[npc->mob.target_player];
-		if (target == NULL) {
-			mob_combat_reset(&npc->mob);
-			return;
-		}
+	target = npc->mob.server->players[npc->mob.target_player];
 
-		/*
-		 * check out replay:
-		 * rsc-preservation.xyz/Combat/Chickens [Feather Gathering] pt1
-		 * for some recordings of retreating from low hits
-		 */
-		if (npc->mob.combat_rounds >= 3 &&
-		    npc->mob.cur_stats[SKILL_HITS] <= npc->config->bravery) {
-			npc_random_walk(npc);
-			return;
-		}
-
-		if (npc->mob.combat_next_hit > 0) {
-			npc->mob.combat_next_hit--;
-			return;
-		}
-
-		roll = npc_combat_roll(npc, target);
-		player_damage(target, NULL, roll);
-		npc->mob.combat_rounds++;
-		npc->mob.combat_next_hit = 3;
-		target->mob.combat_timer = npc->mob.server->tick_counter;
+	if (target == NULL) {
+		mob_combat_reset(&npc->mob);
+		return;
 	}
+
+	if (!npc->mob.in_combat) {
+		npc_init_combat(npc, target);
+		return;
+	}
+
+	if (target->mob.dir == MOB_DIR_COMBAT_RIGHT) {
+		if (npc->mob.x != target->mob.x ||
+		    npc->mob.y != target->mob.y) {
+			npc->mob.walk_queue_x[0] = target->mob.x;
+			npc->mob.walk_queue_y[0] = target->mob.y;
+			npc->mob.walk_queue_len = 1;
+			npc->mob.walk_queue_pos = 0;
+			return;
+		}
+		if (!npc->mob.moved) {
+			npc->mob.dir = MOB_DIR_COMBAT_LEFT;
+		}
+	}
+
+	target->chased_by_npc = UINT16_MAX;
+	npc->mob.following_player = -1;
+
+	if (npc->mob.dir != MOB_DIR_COMBAT_LEFT) {
+		return;
+	}
+
+	/*
+	 * check out replay:
+	 * rsc-preservation.xyz/Combat/Chickens [Feather Gathering] pt1
+	 * for some recordings of retreating from low hits
+	 */
+	if (npc->mob.combat_rounds >= 3 &&
+	    npc->mob.cur_stats[SKILL_HITS] <= npc->config->bravery) {
+		npc_random_walk(npc);
+		return;
+	}
+
+	if (npc->mob.combat_next_hit > 0) {
+		npc->mob.combat_next_hit--;
+		return;
+	}
+
+	roll = npc_combat_roll(npc, target);
+	player_damage(target, NULL, roll);
+	npc->mob.combat_rounds++;
+	npc->mob.combat_next_hit = 3;
+	target->mob.combat_timer = npc->mob.server->tick_counter;
 }

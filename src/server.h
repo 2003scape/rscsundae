@@ -78,6 +78,8 @@ struct server {
 	bool cast_without_runes;
 	/* original server had no spell timer until runebot was developed */
 	bool spell_timer;
+	/* https://classic.runescape.wiki/w/Update:Updates_galore! */
+	bool restrict_npc_aggression;
 	int xp_multiplier;
 	lua_State *lua;
 	struct rsa rsa;

@@ -33,6 +33,9 @@ server_parse_settings(void *user, const char *section,
 			s->cast_without_runes = (strtol(value, NULL, 10) == 0);
 		} else if (strcmp(name, "spell_timer") == 0) {
 			s->spell_timer = (strtol(value, NULL, 10) != 0);
+		} else if (strcmp(name, "restrict_npc_aggression") == 0) {
+			s->restrict_npc_aggression =
+			    (strtol(value, NULL, 10) != 0);
 		} else {
 			return 0;
 		}

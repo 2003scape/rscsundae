@@ -944,6 +944,9 @@ config_parse_npcs(char *buffer, size_t len, size_t *num_npcs,
 		npcs[i].hits = tmpl;
 		offset = tmp;
 
+		npcs[i].combat_level = (npcs[i].attack + npcs[i].defense +
+		    npcs[i].strength + npcs[i].hits) / 4;
+
 		tmpl = 0;
 		tmp = next_token_int(buffer, offset, len, &tmpl);
 		if (tmp == -1 || tmpl > UINT8_MAX) {

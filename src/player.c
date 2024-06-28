@@ -77,6 +77,7 @@ player_create(struct server *s, int sock)
 	p->mob.following_player = -1;
 	p->mob.following_npc = -1;
 	p->trading_player = -1;
+	p->chased_by_npc = UINT16_MAX;
 	p->projectile_target_player = UINT16_MAX;
 	p->projectile_target_npc = UINT16_MAX;
 	p->bubble_id = UINT16_MAX;

@@ -339,6 +339,7 @@ struct player {
 	struct playervar *variables;
 	size_t variable_count;
 	size_t variable_max;
+	uint16_t chased_by_npc;
 };
 
 /* mob.c */

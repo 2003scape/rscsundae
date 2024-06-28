@@ -152,6 +152,7 @@ struct npc_config {
 	uint8_t defense;
 	uint8_t strength;
 	uint8_t hits;
+	uint8_t combat_level;
 	uint8_t aggression;
 	uint8_t bravery;	/* hits at which to retreat */
 	uint8_t regeneration;
