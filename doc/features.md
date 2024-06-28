@@ -171,7 +171,7 @@ Most NPCs (that use constant drops) are found within config46.jag.
 The following use randomvar and need to be implemented in script:
 
 - [x] Chicken
-- [x] Man1 (Man, Thief, Farmer)
+- [x] Man1 (Man, Thief, Farmer, Warrior)
 - [ ] Mugger (looks like variation of Man1 table)
 - [ ] Wiz1 (Darkwizard)
 - [ ] Darkerwiz (Darkwizard)
@@ -179,7 +179,6 @@ The following use randomvar and need to be implemented in script:
 - [ ] Goblin2
 - [x] Barbarian
 - [ ] Dwarf
-- [ ] Warrior
 - [ ] Skeleton1
 - [ ] Skeleton2
 - [ ] Skeleton3
