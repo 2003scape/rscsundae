@@ -410,13 +410,17 @@ server_tick(void)
 	}
 
 	for (int i = 0; i < s.max_npc_id; ++i) {
-		if (restore_tick) {
+		if (s.npcs[i]->regen_timer > 0) {
+			s.npcs[i]->regen_timer--;
+		} else {
 			for (int j = 0; j < MAX_SKILL_ID; ++j) {
 				if (s.npcs[i]->mob.cur_stats[j] <
 				    s.npcs[i]->mob.base_stats[j]) {
 					s.npcs[i]->mob.cur_stats[j]++;
 				}
 			}
+			s.npcs[i]->regen_timer =
+			    s.npcs[i]->config->regeneration;
 		}
 		if (s.npcs[i]->respawn_time > 0) {
 			s.npcs[i]->respawn_time--;

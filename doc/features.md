@@ -23,7 +23,7 @@ Engine
 - [x] NPC movement
 - [x] NPC aggression
 - [x] NPC "bravery" (retreating)
-- [ ] NPC "regenerate" timer
+- [x] NPC "regenerate" timer
 - [ ] Line of sight checks
 - [x] Friends list
 - [x] Ignore list

@@ -222,6 +222,7 @@ struct npc {
 	uint16_t spawn_x;
 	uint16_t spawn_y;
 	uint8_t busy;
+	uint8_t regen_timer;
 };
 
 enum rpg_class {
