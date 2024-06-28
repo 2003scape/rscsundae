@@ -589,6 +589,10 @@ player_shoot_pvm(struct player *p, struct projectile_config *projectile,
 		roll = player_magic_damage_roll(projectile->power);
 	}
 
+	if (target->mob.target_player == -1) {
+		target->mob.target_player = p->mob.id;
+	}
+
 	if (projectile->power > 0) {
 		npc_damage(target, p, roll);
 	}

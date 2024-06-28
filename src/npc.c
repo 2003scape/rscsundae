@@ -176,6 +176,7 @@ npc_hunt_target(struct npc *npc, struct zone *zone)
 		}
 
 		p->chased_by_npc = npc->mob.id;
+		npc->mob.following_player = p->mob.id;
 		npc->mob.target_player = p->mob.id;
 		return;
 	}
@@ -233,6 +234,7 @@ npc_process_movement(struct npc *npc)
 			    npc->config->wander_range * 2)) {
 				p->chased_by_npc = UINT16_MAX;
 				npc->mob.following_player = -1;
+				npc->mob.target_player = -1;
 				return;
 			}
 		} else if (npc->config->aggression > 2) {
