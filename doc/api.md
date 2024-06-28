@@ -69,6 +69,7 @@ Implemented
 * `healnpcstat(stat,constant,percent)` - implemented as `npchealstat(npc, stat, constant, percent)` in Lua (TODO: rename?)
 * `ifnpcstatup(stat)` - implemented as `npcstatup(npc, stat)` in Lua.
 * `ifnpcstatdown(stat)` - implemented as `npcstatdown(npc, stat)` in Lua.
+* `npcattack()` - implemented as `npcattack(npc, player)` in Lua.
 * `shootplayer(projectile)` - implemented as `shootplayer(player, target, projectile)` in Lua.
 * `ifqp(value)` - implemented as `qp(player)` in Lua.
 * `playercoord()` - implemented as `playercoord(player)` in Lua, returns x, y values.
@@ -85,7 +86,6 @@ Not implemented
 * `delinv()`
 * `ifobjectvisible()`
 * `ifnearvisnpc(npc)`
-* `npcattack()`
 * `ifnpcvisible()`
 * `delnpc()`
 * `changenpc(npc)`

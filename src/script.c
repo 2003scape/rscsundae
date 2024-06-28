@@ -397,11 +397,20 @@ script_multi(lua_State *L)
 static int
 script_npcattack(lua_State *L)
 {
-	lua_Integer npc_id = script_checkinteger(L, 1);
+	lua_Integer npc_id, player_id;
+	struct npc *npc;
 
-	(void)npc_id;
-	printf("npcattack\n");
+	npc_id = script_checkinteger(L, 1);
+	player_id = script_checkinteger(L, 2);
 
+	npc = id_to_npc(npc_id);
+	if (npc == NULL) {
+		printf("script warning: npc %lld is undefined\n", npc_id);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	npc->mob.target_player = player_id;
 	return 0;
 }
 
