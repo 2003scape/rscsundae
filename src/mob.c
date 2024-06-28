@@ -146,8 +146,8 @@ mob_get_nearby_npcs(struct mob *mob,
 		list[count++] = tmp[i];
 	}
 
-	for (int x = -1; x < 2; ++x) {
-		for (int y = -1; y < 2; ++y) {
+	for (int x = -2; x < 3; ++x) {
+		for (int y = -2; y < 3; ++y) {
 			if (x == 0 && y == 0) {
 				continue;
 			}
@@ -162,7 +162,11 @@ mob_get_nearby_npcs(struct mob *mob,
 			tmp_count = zone_find_npcs(zone,
 			    mob->server, tmp, 128, exclude_busy);
 			for (size_t i = 0; i < tmp_count && count < max; ++i) {
-				list[count++] = tmp[i];
+				/* keep within protocol limits */
+				if (mob_within_range(mob,
+				    tmp[i]->mob.x, tmp[i]->mob.y, 16)) {
+					list[count++] = tmp[i];
+				}
 			}
 		}
 	}
@@ -206,8 +210,8 @@ mob_get_nearby_players(struct mob *mob, struct player **list, size_t max)
 		list[count++] = tmp[i];
 	}
 
-	for (int x = -1; x < 2; ++x) {
-		for (int y = -1; y < 2; ++y) {
+	for (int x = -2; x < 3; ++x) {
+		for (int y = -2; y < 3; ++y) {
 			if (x == 0 && y == 0) {
 				continue;
 			}
@@ -222,7 +226,11 @@ mob_get_nearby_players(struct mob *mob, struct player **list, size_t max)
 			tmp_count = zone_find_players(zone,
 			    mob->server, tmp, 128);
 			for (size_t i = 0; i < tmp_count && count < max; ++i) {
-				list[count++] = tmp[i];
+				/* keep within protocol limits */
+				if (mob_within_range(mob,
+				    tmp[i]->mob.x, tmp[i]->mob.y, 16)) {
+					list[count++] = tmp[i];
+				}
 			}
 		}
 	}
