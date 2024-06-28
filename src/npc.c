@@ -373,6 +373,9 @@ npc_process_combat(struct npc *npc)
 		return;
 	}
 
+	target->chased_by_npc = UINT16_MAX;
+	npc->mob.following_player = -1;
+
 	if (target->mob.dir == MOB_DIR_COMBAT_RIGHT) {
 		if (npc->mob.x != target->mob.x ||
 		    npc->mob.y != target->mob.y) {
@@ -386,9 +389,6 @@ npc_process_combat(struct npc *npc)
 			npc->mob.dir = MOB_DIR_COMBAT_LEFT;
 		}
 	}
-
-	target->chased_by_npc = UINT16_MAX;
-	npc->mob.following_player = -1;
 
 	if (npc->mob.dir != MOB_DIR_COMBAT_LEFT) {
 		return;
