@@ -160,7 +160,7 @@ npc_hunt_target(struct npc *npc)
 		}
 
 		if (restrict_hunt &&
-		    p->mob.combat_level > (npc->config->combat_level * 2)) {
+		    p->combat_level > (npc->config->combat_level * 2)) {
 			continue;
 		}
 

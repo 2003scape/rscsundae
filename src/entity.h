@@ -176,7 +176,6 @@ struct mob {
 	uint8_t combat_next_hit;
 	uint8_t cur_stats[MAX_SKILL_ID];
 	uint8_t base_stats[MAX_SKILL_ID];
-	uint8_t combat_level;
 	uint8_t chat_len;
 	uint8_t chat_compressed_len;
 	char chat_enc[MAX_CHAT_LEN];
@@ -262,6 +261,7 @@ struct player {
 	uint8_t sprites_base[MAX_ENTITY_SPRITES];
 	uint8_t sprites[MAX_ENTITY_SPRITES];
 	uint8_t client_settings[MAX_CLIENT_SETTINGS];
+	uint8_t combat_level;
 	uint8_t gender;
 	uint8_t hair_colour;
 	uint8_t top_colour;

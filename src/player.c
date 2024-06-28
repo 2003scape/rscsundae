@@ -684,8 +684,8 @@ player_wilderness_check(struct player *p, struct player *target)
 		return false;
 	}
 
-	int difference = abs(target->mob.combat_level -
-	    (int)p->mob.combat_level);
+	int difference = abs(target->combat_level -
+	    (int)p->combat_level);
 
 	if (difference > depth) {
 		char msgdepth[64];
@@ -1135,8 +1135,8 @@ player_recalculate_combat_level(struct player *p)
 		    (defense * 0.25) + (hits * 0.25));
 	}
 
-	if (level != p->mob.combat_level) {
-		p->mob.combat_level = level;
+	if (level != p->combat_level) {
+		p->combat_level = level;
 		p->appearance_changed = true;
 	}
 }

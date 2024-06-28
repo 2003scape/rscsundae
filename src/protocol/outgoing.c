@@ -535,7 +535,7 @@ player_send_appearance(struct player *p, void *tmpbuf, size_t offset)
 		return -1;
 	}
 	if (buf_putu8(tmpbuf, offset++, PLAYER_BUFSIZE,
-		      p->mob.combat_level) == -1) {
+		      p->combat_level) == -1) {
 		return -1;
 	}
 	if (buf_putu8(tmpbuf, offset++, PLAYER_BUFSIZE,
