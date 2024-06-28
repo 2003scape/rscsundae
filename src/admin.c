@@ -63,10 +63,9 @@ player_parse_admin_command(struct player *p, char *str)
 		}
 
 		/* jagex coordinate syntax not yet supported */
-		p->mob.x += strtol(x_str, NULL, 10);
-		p->mob.y += strtol(y_str, NULL, 10);
-		p->teleported = true;
-		player_send_plane_init(p);
+		player_teleport(p,
+		    p->mob.x + strtol(x_str, NULL, 10),
+		    p->mob.y + strtol(y_str, NULL, 10));
 	} else if (strcmp(cmd, "ftele") == 0) {
 		char *x_str;
 		char *y_str;
@@ -80,10 +79,9 @@ player_parse_admin_command(struct player *p, char *str)
 		}
 
 		/* jagex coordinate syntax not yet supported */
-		p->mob.x = strtol(x_str, NULL, 10);
-		p->mob.y = strtol(y_str, NULL, 10);
-		p->teleported = true;
-		player_send_plane_init(p);
+		player_teleport(p,
+		    strtol(x_str, NULL, 10),
+		    strtol(y_str, NULL, 10));
 	} else if (strcmp(cmd, "advancestat") == 0) {
 		char *stat_str;
 		char *xp_str;

@@ -1218,6 +1218,7 @@ script_boundaryteleport(lua_State *L)
 {
 	lua_Integer player_id, x, y, dir;
 	struct player *p;
+	int dest_x, dest_y;
 
 	player_id = script_checkinteger(L, 1);
 	x = script_checkinteger(L, 2);
@@ -1231,19 +1232,22 @@ script_boundaryteleport(lua_State *L)
 		return 0;
 	}
 
+	dest_x = p->mob.x;
+	dest_y = p->mob.y;
+
 	switch (dir) {
 	case BOUND_DIR_VERT:
 		if (p->mob.x == x && p->mob.y == y) {
-			p->mob.y--;
+			dest_y--;
 		} else {
-			p->mob.y++;
+			dest_y++;
 		}
 		break;
 	case BOUND_DIR_HORIZ:
 		if (p->mob.x == x && p->mob.y == y) {
-			p->mob.x--;
+			dest_x--;
 		} else {
-			p->mob.x++;
+			dest_x++;
 		}
 		break;
 	case BOUND_DIR_DIAG_NW_SE:
@@ -1254,10 +1258,7 @@ script_boundaryteleport(lua_State *L)
 		break;
 	}
 
-	p->teleported = true;
-
-	/* doesn't seem necessary but it's what the official server did */
-	player_send_plane_init(p);
+	player_teleport(p, dest_x, dest_y);
 	return 0;
 }
 
@@ -1329,10 +1330,7 @@ script_upstairs(lua_State *L)
 		break;
 	}
 
-	p->mob.x = x;
-	p->mob.y = y;
-	p->teleported = true;
-	player_send_plane_init(p);
+	player_teleport(p, x, y);
 	return 0;
 }
 
@@ -1341,6 +1339,7 @@ script_changeleveldown(lua_State *L)
 {
 	lua_Integer player_id;
 	struct player *p;
+	int y;
 
 	player_id = script_checkinteger(L, 1);
 
@@ -1352,13 +1351,12 @@ script_changeleveldown(lua_State *L)
 	}
 
 	if (p->mob.y > PLANE_LEVEL_INC) {
-		p->mob.y -= PLANE_LEVEL_INC;
+		y = p->mob.y - PLANE_LEVEL_INC;
 	} else {
-		p->mob.y += (PLANE_LEVEL_INC * 3);
+		y = p->mob.y + (PLANE_LEVEL_INC * 3);
 	}
 
-	p->teleported = true;
-	player_send_plane_init(p);
+	player_teleport(p, p->mob.x, y);
 	return 0;
 }
 
@@ -1404,10 +1402,7 @@ script_downstairs(lua_State *L)
 		break;
 	}
 
-	p->mob.x = x;
-	p->mob.y = y;
-	p->teleported = true;
-	player_send_plane_init(p);
+	player_teleport(p, x, y);
 	return 0;
 }
 
@@ -1499,9 +1494,7 @@ script_teleport(lua_State *L)
 	}
 
 	/* TODO: send teleport effect */
-	p->mob.x = x;
-	p->mob.y = y;
-	p->teleported = true;
+	player_teleport(p, x, y);
 	return 0;
 }
 

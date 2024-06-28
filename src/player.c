@@ -502,9 +502,8 @@ player_die(struct player *p, struct player *victor)
 		player_send_message(victor, msg);
 	}
 
-	p->mob.x = p->mob.server->start_tile_x;
-	p->mob.y = p->mob.server->start_tile_y;
-	p->teleported = true;
+	player_teleport(p,
+	    p->mob.server->start_tile_x, p->mob.server->start_tile_y);
 }
 
 void
@@ -2135,4 +2134,14 @@ player_variable_set(struct player *p, const char *varname, int32_t value)
 	p->variables[p->variable_count].name = strdup(varname);
 	p->variables[p->variable_count].value = value;
 	p->variable_count += 1;
+}
+
+void
+player_teleport(struct player *p, int x, int y)
+{
+	p->mob.x = x;
+	p->mob.y = y;
+
+	p->teleported = true;
+	player_send_plane_init(p);
 }

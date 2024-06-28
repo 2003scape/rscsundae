@@ -405,6 +405,7 @@ void player_shoot_pvp(struct player *, struct projectile_config *,
 void player_shoot_pvm(struct player *, struct projectile_config *,
     struct npc *);
 void player_skull(struct player *, struct player *);
+void player_teleport(struct player *, int, int);
 void player_init_class(struct player *);
 void player_init_adventurer(struct player *);
 int player_get_attack_boosted(struct player *);
