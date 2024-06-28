@@ -133,6 +133,9 @@ npc_random_walk(struct npc *npc)
 void
 npc_process_movement(struct npc *npc)
 {
+	struct zone *zone_old;
+	struct zone *zone_new;
+
 	if (npc->busy || npc->mob.in_combat) {
 		return;
 	}
@@ -169,7 +172,21 @@ npc_process_movement(struct npc *npc)
 		}
 		break;
 	}
+
+	zone_old = server_find_zone(npc->mob.x, npc->mob.y);
+
 	mob_process_walk_queue(&npc->mob);
+
+	zone_new = server_find_zone(npc->mob.x, npc->mob.y);
+
+	if (zone_old != zone_new) {
+		if (zone_old != NULL) {
+			zone_remove_npc(zone_old, npc->mob.id);
+		}
+		if (zone_new != NULL) {
+			zone_add_npc(zone_new, npc->mob.id);
+		}
+	}
 }
 
 static int

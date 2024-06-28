@@ -129,8 +129,9 @@ player_load(struct player *p)
 
 	player_recalculate_combat_level(p);
 
-	p->mob.x = p->mob.server->start_tile_x;
-	p->mob.y = p->mob.server->start_tile_y;
+	player_teleport(p,
+	    p->mob.server->start_tile_x,
+	    p->mob.server->start_tile_y);
 	return 0;
 }
 
@@ -2139,9 +2140,44 @@ player_variable_set(struct player *p, const char *varname, int32_t value)
 void
 player_teleport(struct player *p, int x, int y)
 {
+	struct zone *zone_old;
+	struct zone *zone_new;
+
+	zone_old = server_find_zone(p->mob.x, p->mob.y);
+	zone_new = server_find_zone(x, y);
+
+	if (zone_old != NULL && zone_old != zone_new) {
+		zone_remove_player(zone_old, p->mob.id);
+	}
+
+	if (zone_new != NULL && zone_old != zone_new) {
+		zone_add_player(zone_new, p->mob.id);
+	}
+
 	p->mob.x = x;
 	p->mob.y = y;
 
 	p->teleported = true;
 	player_send_plane_init(p);
+}
+
+void
+player_process_movement(struct player *p)
+{
+	struct zone *zone_old;
+	struct zone *zone_new;
+
+	zone_old = server_find_zone(p->mob.x, p->mob.y);
+
+	mob_process_walk_queue(&p->mob);
+
+	zone_new = server_find_zone(p->mob.x, p->mob.y);
+
+	if (zone_old != NULL && zone_old != zone_new) {
+		zone_remove_player(zone_old, p->mob.id);
+	}
+
+	if (zone_new != NULL && zone_old != zone_new) {
+		zone_add_player(zone_new, p->mob.id);
+	}
 }

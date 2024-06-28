@@ -83,6 +83,10 @@ struct zone {
 	struct ground_item *items;
 	uint16_t item_count;
 	uint16_t item_max;
+	uint16_t *npcs;
+	uint16_t npc_max;
+	uint16_t *players;
+	uint16_t player_max;
 };
 
 struct zone *server_find_zone(int, int);
@@ -94,5 +98,17 @@ struct bound *server_find_bound(int, int, int);
 void server_add_bound(struct server *, struct bound *);
 struct ground_item *server_find_ground_item(struct player *, int, int, int);
 void server_add_item_respawn(struct ground_item *);
+
+void zone_add_player(struct zone *, uint16_t);
+void zone_remove_player(struct zone *, uint16_t);
+
+void zone_add_npc(struct zone *, uint16_t);
+void zone_remove_npc(struct zone *, uint16_t);
+
+size_t zone_find_npcs(struct zone *, struct server *,
+    struct npc **, size_t, bool);
+
+size_t zone_find_players(struct zone *, struct server *,
+    struct player **, size_t);
 
 #endif

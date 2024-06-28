@@ -371,3 +371,144 @@ server_add_item_respawn(struct ground_item *item)
 	memcpy(&zone->items[zone->item_count++],
 	    item, sizeof(struct ground_item));
 }
+
+void
+zone_add_player(struct zone *zone, uint16_t player_id)
+{
+	bool found_slot = false;
+
+	for (size_t i = 0; i < zone->player_max; ++i) {
+		if (zone->players[i] == UINT16_MAX) {
+			/* unoccupied slot */
+			zone->players[i] = player_id;
+			return;
+		}
+	}
+
+	uint16_t new_max = zone->player_max;
+
+	if (new_max == 0) {
+		new_max = 8;
+	} else {
+		new_max *= 2;
+	}
+	if (reallocarr(&zone->players, new_max, sizeof(uint16_t)) == -1) {
+		return;
+	}
+	for (size_t i = zone->player_max; i < new_max; ++i) {
+		if (found_slot) {
+			zone->players[i] = UINT16_MAX;
+		} else {
+			zone->players[i] = player_id;
+			found_slot = true;
+		}
+	}
+	zone->player_max = new_max;
+}
+
+void
+zone_add_npc(struct zone *zone, uint16_t npc_id)
+{
+	bool found_slot = false;
+
+	for (size_t i = 0; i < zone->npc_max; ++i) {
+		if (zone->npcs[i] == UINT16_MAX) {
+			/* unoccupied slot */
+			zone->npcs[i] = npc_id;
+			return;
+		}
+	}
+
+	uint16_t new_max = zone->npc_max;
+
+	if (new_max == 0) {
+		new_max = 2;
+	} else {
+		new_max *= 2;
+	}
+	if (reallocarr(&zone->npcs, new_max, sizeof(uint16_t)) == -1) {
+		return;
+	}
+	for (size_t i = zone->npc_max; i < new_max; ++i) {
+		if (found_slot) {
+			zone->npcs[i] = UINT16_MAX;
+		} else {
+			zone->npcs[i] = npc_id;
+			found_slot = true;
+		}
+	}
+	zone->npc_max = new_max;
+}
+
+void
+zone_remove_player(struct zone *zone, uint16_t player_id)
+{
+	for (size_t i = 0; i < zone->player_max; ++i) {
+		if (zone->players[i] == player_id) {
+			zone->players[i] = UINT16_MAX;
+			return;
+		}
+	}
+}
+
+void
+zone_remove_npc(struct zone *zone, uint16_t npc_id)
+{
+	for (size_t i = 0; i < zone->npc_max; ++i) {
+		if (zone->npcs[i] == npc_id) {
+			zone->npcs[i] = UINT16_MAX;
+			return;
+		}
+	}
+}
+
+size_t
+zone_find_npcs(struct zone *zone, struct server *s,
+    struct npc **list, size_t max, bool exclude_busy)
+{
+	size_t count = 0;
+
+	for (int i = 0; i < zone->npc_max; ++i) {
+		if (zone->npcs[i] == UINT16_MAX) {
+			continue;
+		}
+		struct npc *npc = s->npcs[zone->npcs[i]];
+		if (npc == NULL) {
+			zone->npcs[i] = UINT16_MAX;
+			continue;
+		}
+		if (exclude_busy && (npc->busy || npc->mob.in_combat)) {
+			continue;
+		}
+		if (count < max) {
+			list[count++] = npc;
+		} else {
+			break;
+		}
+	}
+	return count;
+}
+
+size_t
+zone_find_players(struct zone *zone, struct server *s,
+    struct player **list, size_t max)
+{
+	size_t count = 0;
+
+	for (int i = 0; i < zone->player_max; ++i) {
+		if (zone->players[i] == UINT16_MAX) {
+			continue;
+		}
+		struct player *p = s->players[zone->players[i]];
+		if (p == NULL) {
+			zone->players[i] = UINT16_MAX;
+		} else if (p->name != -1) {
+			if (count < max) {
+				list[count++] = p;
+			} else {
+				break;
+			}
+		}
+	}
+	return count;
+}

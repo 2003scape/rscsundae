@@ -12,8 +12,6 @@
 #include "../utility.h"
 #include "../zone.h"
 
-#define UPDATE_RADIUS		(15)
-
 #define MAX_NEARBY_LOCS		(256)
 #define MAX_NEARBY_BOUNDS	(256)
 #define MAX_NEARBY_ITEMS	(512)
@@ -34,6 +32,28 @@ static ssize_t player_send_projectile_pvp(struct player *, void *, size_t);
 static ssize_t player_send_projectile_pvm(struct player *, void *, size_t);
 static ssize_t player_send_chat(struct player *, struct mob *, size_t);
 static int player_write_packet(struct player *, void *, size_t);
+static bool within_update_radius(struct player *, int, int, int);
+
+static bool
+within_update_radius(struct player *p, int x, int y, int range)
+{
+	struct zone *origin, *zone;
+
+	origin = server_find_zone(p->mob.x, p->mob.y);
+	zone = server_find_zone(x, y);
+	if (origin != NULL && zone != NULL) {
+		if (origin->plane != zone->plane) {
+			return false;
+		}
+		if (abs(zone->x - (int)origin->x) > range ||
+		    abs(zone->y - (int)origin->y) > range) {
+			return false;
+		}
+	} else {
+		return false;
+	}
+	return true;
+}
 
 static int
 player_write_packet(struct player *p, void *b, size_t len)
@@ -127,8 +147,8 @@ player_send_npc_movement(struct player *p)
 	size_t nearby_count = 0;
 	size_t new_known_count = 0;
 
-	nearby_count = get_nearby_npcs(&p->mob, nearby,
-	    MAX_KNOWN_NPCS, UPDATE_RADIUS, false);
+	nearby_count = mob_get_nearby_npcs(&p->mob, nearby,
+	    MAX_KNOWN_NPCS, false);
 
 	buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 		  OP_SRV_NPC_MOVEMENT);
@@ -147,8 +167,8 @@ player_send_npc_movement(struct player *p)
 		}
 		known_npc = p->mob.server->npcs[p->known_npcs[i]];
 		if (known_npc == NULL ||
-		    !mob_within_range(&known_npc->mob,
-			p->mob.x, p->mob.y, UPDATE_RADIUS) ||
+		    !within_update_radius(p,
+			known_npc->mob.x, known_npc->mob.y, 2) ||
 		    known_npc->respawn_time > 0) {
 			if (buf_putbits(p->tmpbuf, bitpos,
 					PLAYER_BUFSIZE, 4, 15) == -1) {
@@ -291,8 +311,8 @@ player_send_movement(struct player *p)
 	size_t nearby_count = 0;
 	size_t new_known_count = 0;
 
-	nearby_count = get_nearby_players(&p->mob, nearby,
-	    MAX_KNOWN_PLAYERS, UPDATE_RADIUS);
+	nearby_count = mob_get_nearby_players(&p->mob, nearby,
+	    MAX_KNOWN_PLAYERS);
 
 	buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 		  OP_SRV_PLAYER_MOVEMENT);
@@ -335,9 +355,9 @@ player_send_movement(struct player *p)
 		known_player = p->mob.server->players[p->known_players[i]];
 		if (known_player == NULL ||
 		    known_player->logout_confirmed ||
-		    known_player->teleported ||
-		    !mob_within_range(&known_player->mob,
-			p->mob.x, p->mob.y, UPDATE_RADIUS)) {
+		    !within_update_radius(p,
+			known_player->mob.x, known_player->mob.y, 2) ||
+		    known_player->teleported) {
 			if (buf_putbits(p->tmpbuf, bitpos,
 					PLAYER_BUFSIZE, 4, 15) == -1) {
 				return -1;
@@ -1509,33 +1529,16 @@ player_send_ground_items(struct player *p)
 	size_t nearby_count = 0;
 	size_t new_known_count = 0;
 	size_t update_count = 0;
-	struct zone *origin;
-	struct zone *zone;
 
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 		        OP_SRV_GROUND_ITEMS);
 
-	origin = server_find_zone(p->mob.x, p->mob.y);
-	if (origin == NULL) {
-		return -1;
-	}
-
 	for (size_t i = 0; i < p->known_item_count; ++i) {
-		bool out_of_range = false;
-
 		global_item = server_find_ground_item(p, p->known_items[i].x,
 		    p->known_items[i].y, p->known_items[i].id);
 		item = &p->known_items[i];
-		zone = server_find_zone(item->x, item->y);
-		if (zone != NULL) {
-			if (abs(zone->x - (int)origin->x) > 3 ||
-			    abs(zone->y - (int)origin->y) > 3) {
-				out_of_range = true;
-			}
-		} else {
-			out_of_range = true;
-		}
-		if (global_item == NULL || out_of_range ||
+		if (global_item == NULL ||
+		    !within_update_radius(p, item->x, item->y, 3) ||
 		    !player_can_see_item(p, item)) {
 			/* remove the item from the player's view */
 			if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,

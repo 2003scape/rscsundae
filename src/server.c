@@ -323,7 +323,7 @@ server_tick(void)
 		player_parse_incoming(s.players[i]);
 		player_process_combat(s.players[i]);
 		player_process_action(s.players[i]);
-		mob_process_walk_queue(&s.players[i]->mob);
+		player_process_movement(s.players[i]);
 		script_process(s.lua, s.players[i]);
 		if (s.players[i]->mob.moved) {
 			player_close_ui(s.players[i]);
@@ -1050,6 +1050,7 @@ int
 server_add_npc(int id, int x, int y)
 {
 	struct npc *npc;
+	struct zone *zone;
 
 	for (size_t i = 0; i < MAXNPCS; ++i) {
 		if (s.npcs[i] != NULL) {
@@ -1079,6 +1080,10 @@ server_add_npc(int id, int x, int y)
 		npc->mob.cur_stats[SKILL_HITS] =
 		    npc->mob.base_stats[SKILL_HITS] = npc->config->hits;
 		s.npcs[i] = npc;
+		zone = server_find_zone(x, y);
+		if (zone != NULL) {
+			zone_add_npc(zone, i);
+		}
 		if (i > s.max_npc_id) {
 			s.max_npc_id = i + 1;
 		}
