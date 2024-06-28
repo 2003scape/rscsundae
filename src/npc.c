@@ -205,8 +205,11 @@ npc_process_movement(struct npc *npc)
 		struct player *p;
 
 		p = npc->mob.server->players[npc->mob.target_player];
-		if (npc->mob.x == p->mob.x && npc->mob.y == p->mob.y) {
-			return;
+		if (npc->mob.x != p->mob.x || npc->mob.y != p->mob.y) {
+			npc->mob.walk_queue_x[0] = p->mob.x;
+			npc->mob.walk_queue_y[0] = p->mob.y;
+			npc->mob.walk_queue_len = 1;
+			npc->mob.walk_queue_pos = 0;
 		}
 	} else {
 		if (npc->mob.following_player != -1) {
@@ -315,10 +318,6 @@ npc_init_combat(struct npc *npc, struct player *target)
 	}
 
 	if (!mob_within_range(&npc->mob, target->mob.x, target->mob.y, 2)) {
-		npc->mob.walk_queue_x[0] = target->mob.x;
-		npc->mob.walk_queue_y[0] = target->mob.y;
-		npc->mob.walk_queue_pos = 0;
-		npc->mob.walk_queue_len = 1;
 		return false;
 	}
 
@@ -379,10 +378,6 @@ npc_process_combat(struct npc *npc)
 	if (target->mob.dir == MOB_DIR_COMBAT_RIGHT) {
 		if (npc->mob.x != target->mob.x ||
 		    npc->mob.y != target->mob.y) {
-			npc->mob.walk_queue_x[0] = target->mob.x;
-			npc->mob.walk_queue_y[0] = target->mob.y;
-			npc->mob.walk_queue_len = 1;
-			npc->mob.walk_queue_pos = 0;
 			return;
 		}
 		if (!npc->mob.moved) {
