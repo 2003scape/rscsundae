@@ -353,11 +353,11 @@ server_add_item_respawn(struct ground_item *item)
 		return;
 	}
 	if (zone->item_count >= zone->item_max) {
-		uint16_t new_max = 0;
+		uint16_t new_max = zone->item_max;
 
-		if (zone->item_max == 0) {
+		if (new_max == 0) {
 			new_max = 4;
-		} else if (zone->item_max == 4) {
+		} else if (new_max == 4) {
 			new_max = ZONE_AREA;
 		} else {
 			new_max *= 2;
