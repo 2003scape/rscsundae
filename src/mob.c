@@ -113,6 +113,8 @@ mob_combat_reset(struct mob *mob)
 	mob->combat_rounds = 0;
 	mob->target_player = -1;
 	mob->target_npc = -1;
+	mob->following_player = -1;
+	mob->following_npc = -1;
 }
 
 bool

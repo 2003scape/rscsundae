@@ -308,8 +308,6 @@ npc_init_combat(struct npc *npc, struct player *target)
 	    npc->mob.server->tick_counter <
 	    (target->mob.combat_timer + 6)) {
 		target->chased_by_npc = UINT16_MAX;
-		npc->mob.following_player = -1;
-		npc->mob.following_npc = -1;
 		npc->mob.walk_queue_pos = 0;
 		npc->mob.walk_queue_len = 0;
 		mob_combat_reset(&npc->mob);

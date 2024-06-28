@@ -74,8 +74,6 @@ player_create(struct server *s, int sock)
 	p->mob.id = (uint16_t)slot;
 	p->mob.server = s;
 
-	p->mob.following_player = -1;
-	p->mob.following_npc = -1;
 	p->trading_player = -1;
 	p->chased_by_npc = UINT16_MAX;
 	p->projectile_target_player = UINT16_MAX;
@@ -802,8 +800,6 @@ player_process_combat(struct player *p)
 				 * hp bar in client takes roughly 4 seconds
 				 * to be gone
 				 */
-				p->mob.following_player = -1;
-				p->mob.following_npc = -1;
 				p->mob.walk_queue_pos = 0;
 				p->mob.walk_queue_len = 0;
 				mob_combat_reset(&p->mob);
