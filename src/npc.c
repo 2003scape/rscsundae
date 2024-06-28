@@ -6,7 +6,7 @@
 
 static void npc_random_walk(struct npc *);
 static int npc_combat_roll(struct npc *, struct player *);
-static void npc_hunt_target(struct npc *, struct zone *);
+static void npc_hunt_target(struct npc *);
 static bool npc_init_combat(struct npc *, struct player *);
 
 void
@@ -133,10 +133,12 @@ npc_random_walk(struct npc *npc)
 }
 
 static void
-npc_hunt_target(struct npc *npc, struct zone *zone)
+npc_hunt_target(struct npc *npc)
 {
 	struct player *p;
+	struct player *players[128];
 	bool restrict_hunt = false;
+	size_t n;
 
 	if (npc->mob.cur_stats[SKILL_HITS] <= npc->config->bravery) {
 		return;
@@ -149,17 +151,9 @@ npc_hunt_target(struct npc *npc, struct zone *zone)
 		}
 	}
 
-	for (int i = 0; i < zone->player_max; ++i) {
-		if (zone->players[i] == UINT16_MAX) {
-			continue;
-		}
-
-
-		p = npc->mob.server->players[zone->players[i]];
-		if (p == NULL) {
-			zone->players[i] = UINT16_MAX;
-			continue;
-		}
+	n = mob_get_nearby_players(&npc->mob, players, 128);
+	for (size_t i = 0; i < n; ++i) {
+		p = players[i];
 
 		if (p->mob.in_combat || p->chased_by_npc != UINT16_MAX) {
 			continue;
@@ -171,7 +165,7 @@ npc_hunt_target(struct npc *npc, struct zone *zone)
 		}
 
 		if (!mob_within_range(&p->mob, npc->mob.x, npc->mob.y,
-		    npc->config->hunt_range + 1)) {
+		    npc->config->hunt_range + 2)) {
 			continue;
 		}
 
@@ -238,7 +232,7 @@ npc_process_movement(struct npc *npc)
 				return;
 			}
 		} else if (npc->config->aggression > 2) {
-			npc_hunt_target(npc, zone_old);
+			npc_hunt_target(npc);
 		}
 
 		if (npc->random_walk_timer == 0) {
@@ -320,6 +314,7 @@ npc_init_combat(struct npc *npc, struct player *target)
 	}
 
 	if (!mob_within_range(&npc->mob, target->mob.x, target->mob.y, 2)) {
+		npc->mob.following_player = target->mob.id;
 		return false;
 	}
 
