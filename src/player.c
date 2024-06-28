@@ -2158,6 +2158,7 @@ player_teleport(struct player *p, int x, int y)
 	p->mob.x = x;
 	p->mob.y = y;
 
+	p->chased_by_npc = UINT16_MAX;
 	p->teleported = true;
 	player_send_plane_init(p);
 }
@@ -2174,11 +2175,24 @@ player_process_movement(struct player *p)
 
 	zone_new = server_find_zone(p->mob.x, p->mob.y);
 
-	if (zone_old != NULL && zone_old != zone_new) {
-		zone_remove_player(zone_old, p->mob.id);
+	if (zone_old != zone_new) {
+		if (zone_old != NULL) {
+			zone_remove_player(zone_old, p->mob.id);
+		}
+
+		if (zone_new != NULL) {
+			zone_add_player(zone_new, p->mob.id);
+		}
 	}
 
-	if (zone_new != NULL && zone_old != zone_new) {
-		zone_add_player(zone_new, p->mob.id);
+	if (p->chased_by_npc != UINT16_MAX) {
+		struct npc *npc = p->mob.server->npcs[p->chased_by_npc];
+		if (npc == NULL) {
+			return;
+		}
+		/* TODO: maybe should check visibility */
+		if (!mob_within_range(&npc->mob, p->mob.x, p->mob.y, 16)) {
+			p->chased_by_npc = UINT16_MAX;
+		}
 	}
 }

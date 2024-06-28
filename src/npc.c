@@ -222,6 +222,8 @@ npc_process_movement(struct npc *npc)
 			 * aggressive NPCs used to be able to get stuck outside
 			 * of their range, see various replays of jungle
 			 * spiders on hazelmere's island
+			 *
+			 * TODO maybe should check visibility too
 			 */
 			if (!mob_within_range(&p->mob,
 			    npc->spawn_x, npc->spawn_y,
