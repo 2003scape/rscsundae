@@ -21,7 +21,7 @@ Engine
 - [x] Player privacy settings
 - [x] NPC spawn loading
 - [x] NPC movement
-- [ ] NPC aggression
+- [x] NPC aggression
 - [x] NPC "bravery" (retreating)
 - [ ] NPC "regenerate" timer
 - [ ] Line of sight checks
