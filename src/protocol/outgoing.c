@@ -1813,6 +1813,7 @@ player_send_hide_multi(struct player *p)
 		        OP_SRV_HIDE_MULTI);
 
 	p->ui_multi_open = false;
+
 	return player_write_packet(p, p->tmpbuf, offset);
 }
 

@@ -1,5 +1,4 @@
 #include <sys/socket.h>
-#include <assert.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -902,8 +901,8 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			if (buf_getu8(data, offset++, len, &option) == -1) {
 				return;
 			}
-			script_multi_answer(p->mob.server->lua, p, option);
 			p->ui_multi_open = false;
+			script_multi_answer(p->mob.server->lua, p, option);
 		}
 		break;
 	case OP_CLI_BOUND_OP1:
