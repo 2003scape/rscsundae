@@ -25,7 +25,7 @@ function skillplayer_confuse(player, target)
 	end
 end
 
-function skillnpc_confuse(player, target)
+register_skillnpc("_", "confuse", function(player, target)
 	if npcstatdown(target, STAT_ATTACK) then
 		mes(player, "Your opponent already has weakened attack")
 	else
@@ -33,9 +33,9 @@ function skillnpc_confuse(player, target)
 		advancestat(player, STAT_MAGIC, 104, 0)
 		remove_curse_runes(player)
 		shootnpc(player, target, "dummybolt")
-		subnpcstat(target, STAT_ATTACK, 1, 5)
+		npcsubstat(target, STAT_ATTACK, 1, 5)
 	end
-end
+end)
 
 function skillplayer_weaken(player, target)
 	if statdown(target, STAT_STRENGTH) then
@@ -50,7 +50,7 @@ function skillplayer_weaken(player, target)
 	end
 end
 
-function skillnpc_weaken(player, target)
+register_skillnpc("_", "weaken", function(player, target)
 	if npcstatdown(target, STAT_STRENGTH) then
 		mes(player, "Your opponent already has weakened strength")
 	else
@@ -58,9 +58,9 @@ function skillnpc_weaken(player, target)
 		advancestat(player, STAT_MAGIC, 168, 0)
 		remove_curse_runes(player)
 		shootnpc(player, target, "dummybolt")
-		subnpcstat(target, STAT_STRENGTH, 1, 5)
+		npcsubstat(target, STAT_STRENGTH, 1, 5)
 	end
-end
+end)
 
 function skillplayer_curse(player, target)
 	if statdown(target, STAT_DEFENSE) then
@@ -75,7 +75,7 @@ function skillplayer_curse(player, target)
 	end
 end
 
-function skillnpc_curse(player, target)
+register_skillnpc("_", "curse", function(player, npc)
 	if npcstatdown(target, STAT_DEFENSE) then
 		mes(player, "Your opponent already has weakened defence")
 	else
@@ -83,10 +83,6 @@ function skillnpc_curse(player, target)
 		advancestat(player, STAT_MAGIC, 232, 0)
 		remove_curse_runes(player)
 		shootnpc(player, target, "dummybolt")
-		subnpcstat(target, STAT_DEFENSE, 1, 5)
+		npcsubstat(target, STAT_DEFENSE, 1, 5)
 	end
-end
-
-register_skillnpc("_", "confuse", skillnpc_confuse)
-register_skillnpc("_", "weaken", skillnpc_weaken)
-register_skillnpc("_", "curse", skillnpc_curse)
+end)
