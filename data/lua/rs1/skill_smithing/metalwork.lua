@@ -170,7 +170,7 @@ local function make_sword(player, bar_type)
 		make_item(player, "long sword", bar_type, 2)
 	elseif resp == 3 then
 		make_item(player, "scimitar", bar_type, 2)
-	elseif resp == 1 then
+	elseif resp == 4 then
 		make_item(player, "2-handed sword", bar_type, 3)
 	end
 end

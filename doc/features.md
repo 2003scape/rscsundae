@@ -60,6 +60,11 @@ Engine
 * Should be impossible for players to walk through aggressive NPCs.
 * Quest list is broken on 204.
 
+### Other bugs
+
+* When using a bar on an anvil that's some distance away,
+  the script can hang for a few seconds
+
 Content
 -------
 
