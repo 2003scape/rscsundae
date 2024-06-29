@@ -55,6 +55,56 @@ local forging_table = {
 			level = 18, name = "bronze plate mail body"
 		},
 	},
+	["iron bar"] = {
+		["dagger"] = {
+			level = 15, name = "iron dagger"
+		},
+		["hatchet"] = {
+			level = 16, name = "iron axe"
+		},
+		["mace"] = {
+			level = 17, name = "iron mace"
+		},
+		["medium helmet"] = {
+			level = 18, name = "medium iron helmet"
+		},
+		["short sword"] = {
+			level = 19, name = "iron short sword"
+		},
+		["scimitar"] = {
+			level = 20, name = "iron scimitar"
+		},
+		["long sword"] = {
+			level = 21, name = "iron long sword"
+		},
+		["large helmet"] = {
+			level = 22, name = "large iron helmet"
+		},
+		["square shield"] = {
+			level = 23, name = "iron square shield"
+		},
+		["battle axe"] = {
+			level = 25, name = "iron battle axe"
+		},
+		["chain mail body"] = {
+			level = 26, name = "iron chain mail body"
+		},
+		["kite shield"] = {
+			level = 27, name = "iron kite shield"
+		},
+		["2-handed sword"] = {
+			level = 29, name = "iron 2-handed sword"
+		},
+		["plated skirt"] = {
+			level = 31, name = "iron plated skirt"
+		},
+		["plate mail legs"] = {
+			level = 31, name = "iron plate mail legs"
+		},
+		["plate mail body"] = {
+			level = 33, name = "iron plate mail body"
+		},
+	},
 }
 
 local function make_item(player, item_type, bar_type, num_bars)
@@ -238,6 +288,17 @@ register_useloc("doric's anvil", "bronze bar", function(player, x, y)
 	start_smithing(player, "bronze bar")
 end)
 
+register_useloc("doric's anvil", "iron bar", function(player, x, y)
+	if not check_doric(player) then
+		return
+	end
+	start_smithing(player, "iron bar")
+end)
+
 register_useloc("anvil", "bronze bar", function(player, x, y)
 	start_smithing(player, "bronze bar")
+end)
+
+register_useloc("anvil", "iron bar", function(player, x, y)
+	start_smithing(player, "iron bar")
 end)
