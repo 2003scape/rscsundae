@@ -140,6 +140,7 @@ These should all be implemented in Lua script:
 - [x] Banker NPC dialogue
 - [ ] Cook's Guild
 - [ ] Champions' Guild
+- [x] Mining Guild
 - [ ] Monastery (Prayer Guild)
 - [x] Alcohol (beers, wizards mind bomb)
 - [x] Food (fish/meat)
