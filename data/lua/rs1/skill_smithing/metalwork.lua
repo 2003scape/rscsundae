@@ -159,6 +159,156 @@ local forging_table = {
 			level = 48, name = "steel plate mail body"
 		},
 	},
+	["mithril bar"] = {
+		["dagger"] = {
+			level = 50, name = "mithril dagger"
+		},
+		["hatchet"] = {
+			level = 51, name = "mithril axe"
+		},
+		["mace"] = {
+			level = 52, name = "mithril mace"
+		},
+		["medium helmet"] = {
+			level = 53, name = "medium mithril helmet"
+		},
+		["short sword"] = {
+			level = 54, name = "mithril short sword"
+		},
+		["scimitar"] = {
+			level = 55, name = "mithril scimitar"
+		},
+		["long sword"] = {
+			level = 56, name = "mithril long sword"
+		},
+		["large helmet"] = {
+			level = 57, name = "large mithril helmet"
+		},
+		["square shield"] = {
+			level = 58, name = "mithril square shield"
+		},
+		["battle axe"] = {
+			level = 60, name = "mithril battle axe"
+		},
+		["chain mail body"] = {
+			level = 61, name = "mithril chain mail body"
+		},
+		["kite shield"] = {
+			level = 62, name = "mithril kite shield"
+		},
+		["2-handed sword"] = {
+			level = 64, name = "mithril 2-handed sword"
+		},
+		["plated skirt"] = {
+			level = 66, name = "mithril plated skirt"
+		},
+		["plate mail legs"] = {
+			level = 66, name = "mithril plate mail legs"
+		},
+		["plate mail body"] = {
+			level = 68, name = "mithril plate mail body"
+		},
+	},
+	["adamantite bar"] = {
+		["dagger"] = {
+			level = 70, name = "adamantite dagger"
+		},
+		["hatchet"] = {
+			level = 71, name = "adamantite axe"
+		},
+		["mace"] = {
+			level = 72, name = "adamantite mace"
+		},
+		["medium helmet"] = {
+			level = 73, name = "medium adamantite helmet"
+		},
+		["short sword"] = {
+			level = 74, name = "adamantite short sword"
+		},
+		["scimitar"] = {
+			level = 75, name = "adamantite scimitar"
+		},
+		["long sword"] = {
+			level = 76, name = "adamantite long sword"
+		},
+		["large helmet"] = {
+			level = 77, name = "large adamantite helmet"
+		},
+		["square shield"] = {
+			level = 78, name = "adamantite square shield"
+		},
+		["battle axe"] = {
+			level = 80, name = "adamantite battle axe"
+		},
+		["chain mail body"] = {
+			level = 81, name = "adamantite chain mail body"
+		},
+		["kite shield"] = {
+			level = 82, name = "adamantite kite shield"
+		},
+		["2-handed sword"] = {
+			level = 84, name = "adamantite 2-handed sword"
+		},
+		["plated skirt"] = {
+			level = 86, name = "adamantite plated skirt"
+		},
+		["plate mail legs"] = {
+			level = 86, name = "adamantite plate mail legs"
+		},
+		["plate mail body"] = {
+			level = 88, name = "adamantite plate mail body"
+		},
+	},
+	["runite bar"] = {
+		["dagger"] = {
+			level = 85, name = "rune dagger"
+		},
+		["hatchet"] = {
+			level = 86, name = "rune axe"
+		},
+		["mace"] = {
+			level = 87, name = "rune mace"
+		},
+		["medium helmet"] = {
+			level = 88, name = "medium rune helmet"
+		},
+		["short sword"] = {
+			level = 89, name = "rune short sword"
+		},
+		["scimitar"] = {
+			level = 90, name = "rune scimitar"
+		},
+		["long sword"] = {
+			level = 91, name = "rune long sword"
+		},
+		["large helmet"] = {
+			level = 92, name = "large rune helmet"
+		},
+		["square shield"] = {
+			level = 93, name = "rune square shield"
+		},
+		["battle axe"] = {
+			level = 95, name = "rune battle axe"
+		},
+		["chain mail body"] = {
+			level = 96, name = "rune chain mail body"
+		},
+		["kite shield"] = {
+			level = 97, name = "rune kite shield"
+		},
+		["2-handed sword"] = {
+			level = 99, name = "rune 2-handed sword"
+		},
+		["plated skirt"] = {
+			level = 99, name = "rune plated skirt"
+		},
+		["plate mail legs"] = {
+			level = 99, name = "rune plate mail legs"
+		},
+		["plate mail body"] = {
+			level = 99, name = "rune plate mail body"
+		},
+	},
 }
 
 local function make_item(player, item_type, bar_type, num_bars)
@@ -374,6 +524,27 @@ register_useloc("doric's anvil", "steel bar", function(player, x, y)
 	start_smithing(player, "steel bar")
 end)
 
+register_useloc("doric's anvil", "mithril bar", function(player, x, y)
+	if not check_doric(player) then
+		return
+	end
+	start_smithing(player, "mithril bar")
+end)
+
+register_useloc("doric's anvil", "adamantite bar", function(player, x, y)
+	if not check_doric(player) then
+		return
+	end
+	start_smithing(player, "adamantite bar")
+end)
+
+register_useloc("doric's anvil", "runite bar", function(player, x, y)
+	if not check_doric(player) then
+		return
+	end
+	start_smithing(player, "runite bar")
+end)
+
 register_useloc("anvil", "bronze bar", function(player, x, y)
 	start_smithing(player, "bronze bar")
 end)
@@ -384,4 +555,16 @@ end)
 
 register_useloc("anvil", "steel bar", function(player, x, y)
 	start_smithing(player, "steel bar")
+end)
+
+register_useloc("anvil", "mithril bar", function(player, x, y)
+	start_smithing(player, "mithril bar")
+end)
+
+register_useloc("anvil", "adamantite bar", function(player, x, y)
+	start_smithing(player, "adamantite bar")
+end)
+
+register_useloc("anvil", "runite bar", function(player, x, y)
+	start_smithing(player, "runite bar")
 end)

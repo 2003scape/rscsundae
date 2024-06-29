@@ -100,7 +100,7 @@ These should all be implemented in Lua script:
 - [x] Cooking (stew)
 - [x] Cooking (special range)
 - [x] Mining
-- [ ] Smithing (forging)
+- [x] Smithing (forging)
 - [x] Smithing (smelting)
 
 ### Quests
