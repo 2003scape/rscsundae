@@ -137,10 +137,10 @@ shop_remove(struct shop_config *shop, struct player *p, uint16_t id)
 			}
 		} else {
 			if (shop->items[i].restock) {
-				p->shop->items[i].restock_timer =
-				    (p->shop->items[i].restock / 5);
+				shop->items[i].restock_timer =
+				    (shop->items[i].restock / 5);
 			}
-			p->shop->items[i].cur_quantity--;
+			shop->items[i].cur_quantity--;
 		}
 		shop->changed = true;
 		return 0;
