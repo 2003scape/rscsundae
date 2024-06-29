@@ -179,8 +179,8 @@ The following use randomvar and need to be implemented in script:
 - [x] Chicken
 - [x] Man1 (Man, Thief, Farmer, Warrior)
 - [ ] Mugger (looks like variation of Man1 table)
-- [ ] Wiz1 (Darkwizard)
-- [ ] Darkerwiz (Darkwizard)
+- [x] Wiz1 (Darkwizard)
+- [x] Darkerwiz (Darkwizard)
 - [x] Goblin1
 - [ ] Goblin2
 - [x] Barbarian
