@@ -1,5 +1,6 @@
 -- stitched together from too many different replays, including
 -- Logg/Tylerbeg/08-02-2018 02.12.01 white knight castle and dwarven mine
+-- Logg/Tylerbeg/08-04-2018 00.10.40 zanaris.pcap
 -- RSC 2001/replays master archive/Skilling/Smithing/5-admantite/smithing- smith- adamantite plate mail chest.pcap
 -- flying sno (redacted chat) replays/fsnom2@aol.com/06-24-2018 06.45.51.pcap
 -- 1e_Luis/Skilling/Rune smithing table reqs complete.pcap
@@ -105,6 +106,59 @@ local forging_table = {
 			level = 33, name = "iron plate mail body"
 		},
 	},
+	["steel bar"] = {
+		["dagger"] = {
+			level = 30, name = "steel dagger"
+		},
+		["hatchet"] = {
+			level = 31, name = "steel axe"
+		},
+		["mace"] = {
+			level = 32, name = "steel mace"
+		},
+		["medium helmet"] = {
+			level = 33, name = "medium steel helmet"
+		},
+		["short sword"] = {
+			level = 34, name = "steel short sword"
+		},
+		["nails"] = {
+			level = 34, name = "nails"
+		},
+		["scimitar"] = {
+			level = 35, name = "steel scimitar"
+		},
+		["long sword"] = {
+			level = 36, name = "steel long sword"
+		},
+		["large helmet"] = {
+			level = 37, name = "large steel helmet"
+		},
+		["square shield"] = {
+			level = 38, name = "steel square shield"
+		},
+		["battle axe"] = {
+			level = 40, name = "steel battle axe"
+		},
+		["chain mail body"] = {
+			level = 41, name = "steel chain mail body"
+		},
+		["kite shield"] = {
+			level = 42, name = "steel kite shield"
+		},
+		["2-handed sword"] = {
+			level = 44, name = "steel 2-handed sword"
+		},
+		["plated skirt"] = {
+			level = 46, name = "steel plated skirt"
+		},
+		["plate mail legs"] = {
+			level = 46, name = "steel plate mail legs"
+		},
+		["plate mail body"] = {
+			level = 48, name = "steel plate mail body"
+		},
+	},
 }
 
 local function make_item(player, item_type, bar_type, num_bars)
@@ -152,8 +206,14 @@ local function make_item(player, item_type, bar_type, num_bars)
 	end
 
 	advancestat(player, STAT_SMITHING, base_xp * num_bars, 0)
-	give(player, forging_table[bar_type][item_type].name, 1)
-	mes(player, "@que@You hammer the metal and make a " .. item_type)
+
+	if item_type == "nails" then
+		give(player, forging_table[bar_type][item_type].name, 2)
+		mes(player, "@que@You hammer the metal and make some nails")
+	else
+		give(player, forging_table[bar_type][item_type].name, 1)
+		mes(player, "@que@You hammer the metal and make a " .. item_type)
+	end
 end
 
 local function make_helmet(player, bar_type)
@@ -259,11 +319,23 @@ local function start_smithing(player, bar_type)
 	end
 
 	mes(player, "@que@What would you like to make?")
-	local resp = multi(player, "Make Weapon", "Make Armour", "Cancel")
-	if resp == 1 then
-		make_weapon(player, bar_type)
-	elseif resp == 2 then
-		make_armour(player, bar_type)
+	if bar_type == "steel bar" then
+		local resp = multi(player,
+		    "Make Weapon", "Make Armour", "Make Nails", "Cancel")
+		if resp == 1 then
+			make_weapon(player, bar_type)
+		elseif resp == 2 then
+			make_armour(player, bar_type)
+		elseif resp == 3 then
+			make_item(player, "nails", bar_type, 1)
+		end
+	else
+		local resp = multi(player, "Make Weapon", "Make Armour", "Cancel")
+		if resp == 1 then
+			make_weapon(player, bar_type)
+		elseif resp == 2 then
+			make_armour(player, bar_type)
+		end
 	end
 end
 
@@ -295,10 +367,21 @@ register_useloc("doric's anvil", "iron bar", function(player, x, y)
 	start_smithing(player, "iron bar")
 end)
 
+register_useloc("doric's anvil", "steel bar", function(player, x, y)
+	if not check_doric(player) then
+		return
+	end
+	start_smithing(player, "steel bar")
+end)
+
 register_useloc("anvil", "bronze bar", function(player, x, y)
 	start_smithing(player, "bronze bar")
 end)
 
 register_useloc("anvil", "iron bar", function(player, x, y)
 	start_smithing(player, "iron bar")
+end)
+
+register_useloc("anvil", "steel bar", function(player, x, y)
+	start_smithing(player, "steel bar")
 end)
