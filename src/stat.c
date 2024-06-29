@@ -36,7 +36,7 @@ stat_calculate_table(void)
 	for (int i = 0; i < MAX_SKILL_LEVEL; ++i) {
 		int next = i + 1;
 		xp += (int)(next + (300.0 * pow(2.0, next / 7.0)));
-		xp_table[i] = xp;
+		xp_table[i] = xp & 0xffffffc;
 	}
 }
 
