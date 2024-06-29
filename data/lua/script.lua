@@ -233,6 +233,7 @@ function script_engine_answer(player, answer)
 		script_engine_cancel(player)
 		return
 	end
+	active_script = ps
 	ps.answer = answer
 	local result, err = coroutine.resume(ps.co)
 	if not result then
