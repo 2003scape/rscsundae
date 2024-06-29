@@ -32,6 +32,8 @@ Content included in mudclient110
   in 2002.
 - Al Kharid: There was no bank.  This means the furnace closest to an item
   bank was in Falador - just like when Bluerose13x was getting 99 Smithing.
+- Falador: Contains an entrance to the Mining Guild, but to reach the Dwarven
+  Mines you must travel north of the city rather than east.
 - There was no Tutorial Island. You were immediately spawned
   adventure-ready in the game world, next to a Guide character (who
   you could choose to ignore).  Most players will probably welcome this. :)

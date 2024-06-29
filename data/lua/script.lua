@@ -147,7 +147,7 @@ function register_useinv(item1, item2, callback)
 end
 
 function script_engine_tick()
-	for i=1,#paused_scripts do
+	for i=#paused_scripts,1,-1 do
 		local ps = paused_scripts[i]
 		if ps.delay > 0 then
 			ps.delay = ps.delay - 1;
@@ -160,7 +160,7 @@ function script_engine_tick()
 		end
 	end
 	-- regrow tree stumps, etc.
-	for i=1,#restore_locs do
+	for i=#restore_locs,1,-1 do
 		local event = restore_locs[i]
 		if event.timer > 0 then
 			event.timer = event.timer - 1;
@@ -170,7 +170,7 @@ function script_engine_tick()
 		end
 	end
 	-- delete temporarily added locs
-	for i=1,#delete_locs do
+	for i=#delete_locs,1,-1 do
 		local event = delete_locs[i]
 		if event.timer > 0 then
 			event.timer = event.timer - 1;
