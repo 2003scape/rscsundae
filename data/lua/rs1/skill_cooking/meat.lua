@@ -27,6 +27,8 @@ register_useloc("range", "rawmeat", function(player, x, y)
 end)
 
 register_useloc("cookrange", "rawmeat", function(player, x, y)
-	mes(player, "@que@You cook the meat on the stove...")
-	cook_meat(player, 138, 532)
+	if check_cookrange(player) then
+		mes(player, "@que@You cook the meat on the stove...")
+		cook_meat(player, 138, 532)
+	end
 end)

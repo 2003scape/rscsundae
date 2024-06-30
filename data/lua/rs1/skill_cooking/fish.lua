@@ -154,7 +154,9 @@ end
 
 for k, v in pairs(fish_types) do
 	register_useloc("cookrange", v.raw, function(player, x, y)
-		cook_fish(player, v, "cookrange")
+		if check_cookrange(player) then
+			cook_fish(player, v, "cookrange")
+		end
 	end)
 
 	register_useloc("range", v.raw, function(player, x, y)

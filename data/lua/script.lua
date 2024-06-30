@@ -739,8 +739,23 @@ function randomjewel(player, x, y)
 	end
 end
 
-dofile("./lua/content.lua")
+function check_cookrange(player)
+	if getvar(player, "cook_stage") >= 2 then
+		return true
+	end
 
+	-- https://classic.runescape.wiki/w/Transcript:Cook
+
+	local npc = nearnpc(player, "cook")
+
+	if npc then
+		npcsay(npc, "Hey! Who said you could use that?")
+	end
+
+	return false
+end
+
+dofile("./lua/content.lua")
 
 --
 -- automatically register triggers

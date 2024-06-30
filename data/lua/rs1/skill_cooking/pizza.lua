@@ -83,5 +83,7 @@ register_useloc("range", "uncooked pizza", function(player, x, y)
 end)
 
 register_useloc("cookrange", "uncooked pizza", function(player, x, y)
-	cook_pizza(player)
+	if check_cookrange(player) then
+		cook_pizza(player)
+	end
 end)

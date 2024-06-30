@@ -21,7 +21,7 @@ function make_dough(player, watertype, watervessel)
 	end
 end
 
-function useloc_range_bread_dough(player)
+local function cook_dough(player)
 	thinkbubble(player, "bread dough")
 	mes(player, "@que@You cook the dough in the oven...")
 	remove(player, "bread dough", 1)
@@ -57,5 +57,12 @@ register_useinv("bowl of water", "flourpot", function(player)
 	make_dough(player, "bowl of water", "bowl")
 end)
 
-register_useloc("range", "bread dough", useloc_range_bread_dough)
-register_useloc("cookrange", "bread dough", useloc_range_bread_dough)
+register_useloc("range", "bread dough", function(player, x, y)
+	cook_dough(player)
+end)
+
+register_useloc("cookrange", "bread dough", function(player, x, y)
+	if check_cookrange(player) then
+		cook_dough(player)
+	end
+end)

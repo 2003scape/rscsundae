@@ -118,7 +118,9 @@ register_useloc("range", "uncooked redberry pie", function(player)
 end)
 
 register_useloc("cookrange", "uncooked redberry pie", function(player)
-	cook_redberry_pie(player, 108, 462)
+	if check_cookrange(player) then
+		cook_redberry_pie(player, 108, 462)
+	end
 end)
 
 register_useloc("fire", "uncooked meat pie", function(player)
@@ -130,7 +132,9 @@ register_useloc("range", "uncooked meat pie", function(player)
 end)
 
 register_useloc("cookrange", "uncooked meat pie", function(player)
-	cook_meat_pie(player, 88, 432)
+	if check_cookrange(player) then
+		cook_meat_pie(player, 88, 432)
+	end
 end)
 
 register_useloc("fire", "uncooked apple pie", function(player)
@@ -142,5 +146,7 @@ register_useloc("range", "uncooked apple pie", function(player)
 end)
 
 register_useloc("cookrange", "uncooked apple pie", function(player)
-	cook_apple_pie(player, 58, 372)
+	if check_cookrange(player) then
+		cook_apple_pie(player, 58, 372)
+	end
 end)

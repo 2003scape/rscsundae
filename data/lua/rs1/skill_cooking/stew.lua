@@ -73,5 +73,7 @@ register_useloc("range", "uncooked stew", function(player, x, y)
 end)
 
 register_useloc("cookrange", "uncooked stew", function(player, x, y)
-	cook_stew(player, "range", 78, 412)
+	if check_cookrange(player) then
+		cook_stew(player, "range", 78, 412)
+	end
 end)
