@@ -80,6 +80,8 @@ npc_random_walk(struct npc *npc)
 		return;
 	}
 
+	npc->mob.action_walk = false;
+
 	if (npc->mob.in_combat && npc->mob.target_player != -1) {
 		struct player *p;
 
@@ -312,6 +314,8 @@ npc_init_combat(struct npc *npc, struct player *target)
 		mob_combat_reset(&npc->mob);
 		return false;
 	}
+
+	npc->mob.action_walk = true;
 
 	if (!mob_within_range(&npc->mob, target->mob.x, target->mob.y, 2)) {
 		npc->mob.following_player = target->mob.id;
