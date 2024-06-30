@@ -51,19 +51,15 @@ Engine
 
 ### Known engine bugs
 
+* Gate-type locs do not have collision detection handled
 * Can get stuck in combat. Probably due to lack of pathing check
   in player_init_combat.
-* NPCs can sometimes walk diagonally through walls, indicating there's
-  probably a problem with the collision detection code.
 * Chatting between 110 and 204 clients is currently not possible.
 * Should be impossible for NPCs to walk through other NPCs and players.
 * Should be impossible for players to walk through aggressive NPCs.
-* Quest list is broken on 204.
-
-### Other bugs
-
 * When using a bar on an anvil that's some distance away,
   the script can hang for a few seconds
+* Quest list is broken on 204.
 
 Content
 -------

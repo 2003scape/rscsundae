@@ -156,15 +156,11 @@ server_add_loc(struct server *s, struct loc *loc)
 			if (config->type == LOC_TYPE_BLOCKING) {
 				/* TODO LOC_TYPE_GATE */
 				s->adjacency[plane][x][y - y_dec] |=
-				    (ADJ_BLOCK_NORTH | ADJ_BLOCK_SOUTH |
-				    ADJ_BLOCK_EAST | ADJ_BLOCK_WEST);
+				    ADJ_BLOCK;
 			}
 			if (config->type < LOC_TYPE_HAS_HOLE) {
 				s->adjacency[plane][x][y - y_dec] |=
-				    (ADJ_BLOCK_SIGHT_NORTH |
-				    ADJ_BLOCK_SIGHT_SOUTH |
-				    ADJ_BLOCK_SIGHT_EAST |
-				    ADJ_BLOCK_SIGHT_WEST);
+				    ADJ_BLOCK_SIGHT;
 			}
 		}
 	}
@@ -223,24 +219,16 @@ server_add_bound(struct server *s, struct bound *bound)
 	if (old != NULL) {
 		switch (old->dir) {
 		case BOUND_DIR_VERT:
-			s->adjacency[plane][bound->x][y] &=
-			    ~ADJ_BLOCK_NORTH;
-				s->adjacency[plane][bound->x][y - 1] &=
-			    ~ADJ_BLOCK_SOUTH;
-			s->adjacency[plane][bound->x][y] &=
-			    ~ADJ_BLOCK_SIGHT_NORTH;
 			s->adjacency[plane][bound->x][y - 1] &=
-			    ~ADJ_BLOCK_SIGHT_SOUTH;
+			    ~ADJ_BLOCK_VERT;
+			s->adjacency[plane][bound->x][y - 1] &=
+			    ~ADJ_BLOCK_SIGHT_VERT;
 			break;
 		case BOUND_DIR_HORIZ:
-			s->adjacency[plane][bound->x][y] &=
-			    ~ADJ_BLOCK_EAST;
 			s->adjacency[plane][bound->x - 1][y] &=
-			    ~ADJ_BLOCK_WEST;
-			s->adjacency[plane][bound->x][y] &=
-			    ~ADJ_BLOCK_SIGHT_EAST;
+			    ~ADJ_BLOCK_HORIZ;
 			s->adjacency[plane][bound->x - 1][y] &=
-			    ~ADJ_BLOCK_SIGHT_WEST;
+			    ~ADJ_BLOCK_SIGHT_HORIZ;
 			break;
 		case BOUND_DIR_DIAG_NW_SE:
 		case BOUND_DIR_DIAG_NE_SW:
@@ -252,43 +240,32 @@ server_add_bound(struct server *s, struct bound *bound)
 	switch (bound->dir) {
 	case BOUND_DIR_VERT:
 		if (config->block) {
-			s->adjacency[plane][bound->x][y] |=
-			    ADJ_BLOCK_NORTH;
 			s->adjacency[plane][bound->x][y - 1] |=
-			    ADJ_BLOCK_SOUTH;
+			    ADJ_BLOCK_VERT;
 		}
 		if (config->block_projectile) {
-			s->adjacency[plane][bound->x][y] |=
-			    ADJ_BLOCK_SIGHT_NORTH;
 			s->adjacency[plane][bound->x][y - 1] |=
-			    ADJ_BLOCK_SIGHT_SOUTH;
+			    ADJ_BLOCK_SIGHT_VERT;
 		}
 		break;
 	case BOUND_DIR_HORIZ:
 		if (config->block) {
-			s->adjacency[plane][bound->x][y] |=
-			    ADJ_BLOCK_EAST;
 			s->adjacency[plane][bound->x - 1][y] |=
-			    ADJ_BLOCK_WEST;
+			    ADJ_BLOCK_HORIZ;
 		}
 		if (config->block_projectile) {
-			s->adjacency[plane][bound->x][y] |=
-			    ADJ_BLOCK_SIGHT_EAST;
 			s->adjacency[plane][bound->x - 1][y] |=
-			    ADJ_BLOCK_SIGHT_WEST;
+			    ADJ_BLOCK_SIGHT_HORIZ;
 		}
 		break;
 	case BOUND_DIR_DIAG_NW_SE:
 	case BOUND_DIR_DIAG_NE_SW:
 		if (config->block_projectile) {
 			s->adjacency[plane][bound->x][y] |=
-			    (ADJ_BLOCK_SIGHT_NORTH |
-			    ADJ_BLOCK_SIGHT_SOUTH |
-			    ADJ_BLOCK_SIGHT_EAST |
-			    ADJ_BLOCK_SIGHT_WEST);
+			    ADJ_BLOCK_SIGHT;
 		}
 		if (config->block) {
-			s->adjacency[plane][bound->x][y] = 0xff;
+			s->adjacency[plane][bound->x][y] |= ADJ_BLOCK;
 		}
 		break;
 	}
