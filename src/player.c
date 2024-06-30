@@ -2144,14 +2144,6 @@ player_moved(struct player *p, int from_x, int from_y)
 {
 	struct zone *zone_old;
 	struct zone *zone_new;
-	int plane, y;
-	int f_plane, f_y;
-
-	plane = p->mob.y / PLANE_LEVEL_INC;
-	y = p->mob.y - (plane * PLANE_LEVEL_INC);
-
-	f_plane = from_y / PLANE_LEVEL_INC;
-	f_y = from_y - (plane * PLANE_LEVEL_INC);
 
 	zone_old = server_find_zone(from_x, from_y);
 	zone_new = server_find_zone(p->mob.x, p->mob.y);
