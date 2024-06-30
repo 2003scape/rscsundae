@@ -55,8 +55,6 @@ Engine
 * Can get stuck in combat. Probably due to lack of pathing check
   in player_init_combat.
 * Chatting between 110 and 204 clients is currently not possible.
-* Should be impossible for NPCs to walk through other NPCs and players.
-* Should be impossible for players to walk through aggressive NPCs.
 * When using a bar on an anvil that's some distance away,
   the script can hang for a few seconds
 * Quest list is broken on 204.

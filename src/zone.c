@@ -489,3 +489,62 @@ zone_find_players(struct zone *zone, struct server *s,
 	}
 	return count;
 }
+
+bool
+server_player_on_tile(struct server *s, int x, int y)
+{
+	struct zone *zone;
+	struct player *p;
+
+	zone = server_find_zone(x, y);
+	if (zone == NULL) {
+		return false;
+	}
+
+	for (size_t i = 0; i < zone->player_max; ++i) {
+		if (zone->players[i] == UINT16_MAX) {
+			continue;
+		}
+
+		p = s->players[zone->players[i]];
+		if (p == NULL) {
+			zone->players[i] = UINT16_MAX;
+			continue;
+		}
+		if (p->mob.x == x && p->mob.y == y) {
+			return true;
+		}
+	}
+	return false;
+}
+
+bool
+server_npc_on_tile(struct server *s, int x, int y, bool hard)
+{
+	struct npc *npc;
+	struct zone *zone;
+
+	zone = server_find_zone(x, y);
+	if (zone == NULL) {
+		return false;
+	}
+
+	for (size_t i = 0; i < zone->npc_max; ++i) {
+		if (zone->npcs[i] == UINT16_MAX) {
+			continue;
+		}
+
+		npc = s->npcs[zone->npcs[i]];
+		if (npc == NULL) {
+			zone->npcs[i] = UINT16_MAX;
+			continue;
+		}
+		if (hard && npc->config->aggression < 2) {
+			continue;
+		}
+		if (npc->mob.x == x && npc->mob.y == y) {
+			return true;
+		}
+	}
+	return false;
+}

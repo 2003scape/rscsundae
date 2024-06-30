@@ -111,4 +111,7 @@ size_t zone_find_npcs(struct zone *, struct server *,
 size_t zone_find_players(struct zone *, struct server *,
     struct player **, size_t);
 
+bool server_player_on_tile(struct server *, int, int);
+bool server_npc_on_tile(struct server *, int, int, bool);
+
 #endif

@@ -34,8 +34,6 @@
 #define ADJ_BLOCK_SIGHT_HORIZ	(1 << 3)
 #define ADJ_BLOCK		(1 << 4)
 #define ADJ_BLOCK_SIGHT		(1 << 5)
-#define ADJ_MOB			(1 << 6)
-#define ADJ_MOB_HARD		(1 << 7)
 
 struct server {
 	void *loop_ctx;

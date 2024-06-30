@@ -2160,56 +2160,13 @@ player_moved(struct player *p, int from_x, int from_y)
 		if (zone_old != zone_new) {
 			zone_remove_player(zone_old, p->mob.id);
 		}
-		/* update blocking of old tile */
-		bool player_found = false;
-		for (size_t i = 0; i < zone_old->player_max; ++i) {
-			if (zone_old->players[i] == UINT16_MAX) {
-				continue;
-			}
-			struct player *p2;
-
-			p2 = p->mob.server->players[zone_old->players[i]];
-			if (p2 == NULL) {
-				zone_old->players[i] = UINT16_MAX;
-				continue;
-			}
-			if (p2->mob.x == from_x && p2->mob.y == from_y) {
-				player_found = true;
-				break;
-			}
-		}
-		bool npc_found = false;
-		for (size_t i = 0; i < zone_old->npc_max; ++i) {
-			if (zone_old->npcs[i] == UINT16_MAX) {
-				continue;
-			}
-			struct npc *npc;
-
-			npc = p->mob.server->npcs[zone_old->npcs[i]];
-			if (npc == NULL) {
-				zone_old->npcs[i] = UINT16_MAX;
-				continue;
-			}
-			if (npc->mob.x == from_x && npc->mob.y == from_y) {
-				npc_found = true;
-				break;
-			}
-		}
-		if (!player_found && !npc_found) {
-			p->mob.server->adjacency[f_plane][from_x][f_y] &= ~ADJ_MOB;
-		}
 	}
 
 	if (zone_new != NULL) {
 		if (zone_old != zone_new) {
 			zone_add_player(zone_new, p->mob.id);
 		}
-		if ((p->mob.server->adjacency[plane][p->mob.x][y]
-		    & ADJ_MOB) == 0) {
-			p->mob.server->adjacency[plane][p->mob.x][y] |= ADJ_MOB;
-		}
 	}
-
 
 	if (p->chased_by_npc != UINT16_MAX) {
 		struct npc *npc = p->mob.server->npcs[p->chased_by_npc];

@@ -518,11 +518,12 @@ mob_process_walk_queue(struct mob *mob)
 		struct server *s = mob->server;
 
 		if ((s->adjacency[plane][x][ty] & ADJ_BLOCK) != 0 ||
-		    (s->adjacency[plane][x][ty] & ADJ_MOB_HARD) != 0) {
+		    server_npc_on_tile(mob->server, x, y, true)) {
 			return;
 		}
 		if (!mob->action_walk &&
-		    (s->adjacency[plane][x][ty] & ADJ_MOB) != 0) {
+		    (server_player_on_tile(mob->server, x, y) ||
+		    server_npc_on_tile(mob->server, x, y, false))) {
 			return;
 		}
 		switch (dir) {
