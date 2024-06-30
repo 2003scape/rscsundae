@@ -30,6 +30,7 @@ static int player_magic_damage_roll(int);
 static bool player_wilderness_check(struct player *, struct player *);
 static bool player_consume_ammo(struct player *, struct projectile_config *);
 static bool player_init_combat(struct player *, struct mob *);
+static void player_moved(struct player *, int, int);
 
 struct player *
 player_create(struct server *s, int sock)
@@ -2138,52 +2139,77 @@ player_variable_set(struct player *p, const char *varname, int32_t value)
 	p->variable_count += 1;
 }
 
-void
-player_teleport(struct player *p, int x, int y)
+static void
+player_moved(struct player *p, int from_x, int from_y)
 {
 	struct zone *zone_old;
 	struct zone *zone_new;
+	int plane, y;
+	int f_plane, f_y;
 
-	zone_old = server_find_zone(p->mob.x, p->mob.y);
-	zone_new = server_find_zone(x, y);
+	plane = p->mob.y / PLANE_LEVEL_INC;
+	y = p->mob.y - (plane * PLANE_LEVEL_INC);
 
-	if (zone_old != NULL && zone_old != zone_new) {
-		zone_remove_player(zone_old, p->mob.id);
-	}
+	f_plane = from_y / PLANE_LEVEL_INC;
+	f_y = from_y - (plane * PLANE_LEVEL_INC);
 
-	if (zone_new != NULL && zone_old != zone_new) {
-		zone_add_player(zone_new, p->mob.id);
-	}
-
-	p->mob.x = x;
-	p->mob.y = y;
-
-	p->chased_by_npc = UINT16_MAX;
-	p->teleported = true;
-	player_send_plane_init(p);
-}
-
-void
-player_process_movement(struct player *p)
-{
-	struct zone *zone_old;
-	struct zone *zone_new;
-
-	zone_old = server_find_zone(p->mob.x, p->mob.y);
-
-	mob_process_walk_queue(&p->mob);
-
+	zone_old = server_find_zone(from_x, from_y);
 	zone_new = server_find_zone(p->mob.x, p->mob.y);
 
-	if (zone_old != zone_new) {
-		if (zone_old != NULL) {
+	if (zone_old != NULL) {
+		if (zone_old != zone_new) {
 			zone_remove_player(zone_old, p->mob.id);
 		}
+		/* update blocking of old tile */
+		bool player_found = false;
+		for (size_t i = 0; i < zone_old->player_max; ++i) {
+			if (zone_old->players[i] == UINT16_MAX) {
+				continue;
+			}
+			struct player *p2;
 
-		if (zone_new != NULL) {
-			zone_add_player(zone_new, p->mob.id);
+			p2 = p->mob.server->players[zone_old->players[i]];
+			if (p2 == NULL) {
+				zone_old->players[i] = UINT16_MAX;
+				continue;
+			}
+			if (p2->mob.x == from_x && p2->mob.y == from_y) {
+				player_found = true;
+				break;
+			}
+		}
+		bool npc_found = false;
+		for (size_t i = 0; i < zone_old->npc_max; ++i) {
+			if (zone_old->npcs[i] == UINT16_MAX) {
+				continue;
+			}
+			struct npc *npc;
+
+			npc = p->mob.server->npcs[zone_old->npcs[i]];
+			if (npc == NULL) {
+				zone_old->npcs[i] = UINT16_MAX;
+				continue;
+			}
+			if (npc->mob.x == from_x && npc->mob.y == from_y) {
+				npc_found = true;
+				break;
+			}
+		}
+		if (!player_found && !npc_found) {
+			p->mob.server->adjacency[f_plane][from_x][f_y] &= ~ADJ_MOB;
 		}
 	}
+
+	if (zone_new != NULL) {
+		if (zone_old != zone_new) {
+			zone_add_player(zone_new, p->mob.id);
+		}
+		if ((p->mob.server->adjacency[plane][p->mob.x][y]
+		    & ADJ_MOB) == 0) {
+			p->mob.server->adjacency[plane][p->mob.x][y] |= ADJ_MOB;
+		}
+	}
+
 
 	if (p->chased_by_npc != UINT16_MAX) {
 		struct npc *npc = p->mob.server->npcs[p->chased_by_npc];
@@ -2195,4 +2221,30 @@ player_process_movement(struct player *p)
 			p->chased_by_npc = UINT16_MAX;
 		}
 	}
+}
+
+void
+player_teleport(struct player *p, int x, int y)
+{
+	int orig_x = p->mob.x;
+	int orig_y = p->mob.y;
+
+	p->mob.x = x;
+	p->mob.y = y;
+
+	player_moved(p, orig_x, orig_y);
+
+	p->teleported = true;
+	player_send_plane_init(p);
+}
+
+void
+player_process_movement(struct player *p)
+{
+	int orig_x = p->mob.x;
+	int orig_y = p->mob.y;
+
+	mob_process_walk_queue(&p->mob);
+
+	player_moved(p, orig_x, orig_y);
 }

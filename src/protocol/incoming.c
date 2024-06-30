@@ -698,6 +698,8 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			 */
 			if (p->mob.walk_queue_x[steps] != p->mob.x ||
 			    p->mob.walk_queue_y[steps] != p->mob.y) {
+				p->mob.action_walk =
+				    (opcode == OP_CLI_WALK_ENTITY);
 				p->mob.walk_queue_len = steps + 1;
 				p->mob.walk_queue_pos = 0;
 			}

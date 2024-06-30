@@ -517,7 +517,12 @@ mob_process_walk_queue(struct mob *mob)
 	if (x < ZONE_MAX_X && ty < ZONE_MAX_Y && plane < ZONE_MAX_PLANE) {
 		struct server *s = mob->server;
 
-		if ((s->adjacency[plane][x][ty] & ADJ_BLOCK) != 0) {
+		if ((s->adjacency[plane][x][ty] & ADJ_BLOCK) != 0 ||
+		    (s->adjacency[plane][x][ty] & ADJ_MOB_HARD) != 0) {
+			return;
+		}
+		if (!mob->action_walk &&
+		    (s->adjacency[plane][x][ty] & ADJ_MOB) != 0) {
 			return;
 		}
 		switch (dir) {
