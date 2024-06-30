@@ -521,11 +521,20 @@ mob_process_walk_queue(struct mob *mob)
 		    server_npc_on_tile(mob->server, x, y, true)) {
 			return;
 		}
+
+		/*
+		 * Players are prevented from walking through most entities,
+		 * UNLESS they have an action to perform on the tile. This can
+		 * be seen in the documentation for ixBot (it used a strategy
+		 * of keeping bones in inventory, to drop and pick up to regain
+		 * access to occupied tiles).
+		 */
 		if (!mob->action_walk &&
 		    (server_player_on_tile(mob->server, x, y) ||
 		    server_npc_on_tile(mob->server, x, y, false))) {
 			return;
 		}
+
 		switch (dir) {
 		case MOB_DIR_NORTH:
 			if ((s->adjacency[plane][x][ty] & ADJ_BLOCK_VERT) != 0) {

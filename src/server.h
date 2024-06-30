@@ -21,13 +21,6 @@
 #define MAXPLAYERS	(1000)
 #define MAXNPCS		(1000)
 
-/*
- * Players are prevented from walking through most entities, UNLESS they
- * have an action to perform on the tile. This can be seen in the
- * documentation for ixBot (it used a strategy of keeping bones in
- * inventory, to drop and pick up to regain access to occupied tiles).
- */
-
 #define ADJ_BLOCK_VERT		(1 << 0)
 #define ADJ_BLOCK_HORIZ		(1 << 1)
 #define ADJ_BLOCK_SIGHT_VERT	(1 << 2)
