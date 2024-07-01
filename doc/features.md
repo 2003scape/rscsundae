@@ -24,7 +24,7 @@ Engine
 - [x] NPC aggression
 - [x] NPC "bravery" (retreating)
 - [x] NPC "regenerate" timer
-- [ ] Line of sight checks
+- [x] Line of sight checks
 - [x] Friends list
 - [x] Ignore list
 - [x] Locs

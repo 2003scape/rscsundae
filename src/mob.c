@@ -7,7 +7,7 @@
 
 static int mob_combat_max_roll(int, int);
 static int mob_combat_roll_damage(int, int);
-static bool mob_check_collision(struct mob *, int, int, int);
+static bool mob_check_collision(struct mob *, int, int, int, int, int, bool);
 static void mob_next_step(int, int, int, int, int, int *, int *, int *);
 
 static int
@@ -451,7 +451,7 @@ mob_process_walk_queue(struct mob *mob)
 	    mob->walk_queue_x[pos], mob->walk_queue_y[pos],
 	    &x, &y, &dir);
 
-	if (mob_check_collision(mob, x, y, dir)) {
+	if (mob_check_collision(mob, mob->x, mob->y, x, y, dir, false)) {
 		return;
 	}
 
@@ -469,11 +469,11 @@ mob_process_walk_queue(struct mob *mob)
 }
 
 static bool
-mob_check_collision(struct mob *mob, int x, int y, int dir)
+mob_check_collision(struct mob *mob,
+    int cur_x, int cur_y, int x, int y, int dir, bool sight)
 {
-	int cur_x = mob->x;
-	int cur_y = mob->y;
-	int plane = mob->y / PLANE_LEVEL_INC;
+	int block, block_v, block_h;
+	int plane = cur_y / PLANE_LEVEL_INC;
 
 	int ty = y;
 	int cy = cur_y;
@@ -481,12 +481,25 @@ mob_check_collision(struct mob *mob, int x, int y, int dir)
 	cy -= (plane * PLANE_LEVEL_INC);
 	ty -= (plane * PLANE_LEVEL_INC);
 
+	if (sight) {
+		block = ADJ_BLOCK_SIGHT;
+		block_v = ADJ_BLOCK_SIGHT_VERT;
+		block_h = ADJ_BLOCK_SIGHT_HORIZ;
+	} else {
+		block = ADJ_BLOCK;
+		block_v = ADJ_BLOCK_VERT;
+		block_h = ADJ_BLOCK_HORIZ;
+	}
+
 	/* verify reachability */
 	if (x < ZONE_MAX_X && ty < ZONE_MAX_Y && plane < ZONE_MAX_PLANE) {
 		struct server *s = mob->server;
 
-		if ((s->adjacency[plane][x][ty] & ADJ_BLOCK) != 0 ||
-		    server_npc_on_tile(mob->server, x, y, true)) {
+		if ((s->adjacency[plane][x][ty] & block) != 0) {
+			return true;
+		}
+
+		if (!sight && server_npc_on_tile(mob->server, x, y, true)) {
 			return true;
 		}
 
@@ -497,7 +510,7 @@ mob_check_collision(struct mob *mob, int x, int y, int dir)
 		 * of keeping bones in inventory, to drop and pick up to regain
 		 * access to occupied tiles).
 		 */
-		if (!mob->action_walk &&
+		if (!mob->action_walk && !sight &&
 		    (server_player_on_tile(mob->server, x, y) ||
 		    server_npc_on_tile(mob->server, x, y, false))) {
 			return true;
@@ -505,94 +518,94 @@ mob_check_collision(struct mob *mob, int x, int y, int dir)
 
 		switch (dir) {
 		case MOB_DIR_NORTH:
-			if ((s->adjacency[plane][x][ty] & ADJ_BLOCK_VERT) != 0) {
+			if ((s->adjacency[plane][x][ty] & block_v) != 0) {
 				return true;
 			}
 			break;
 		case MOB_DIR_SOUTH:
-			if ((s->adjacency[plane][x][cy] & ADJ_BLOCK_VERT) != 0) {
+			if ((s->adjacency[plane][x][cy] & block_v) != 0) {
 				return true;
 			}
 			break;
 		case MOB_DIR_EAST:
-			if ((s->adjacency[plane][x][ty] & ADJ_BLOCK_HORIZ) != 0) {
+			if ((s->adjacency[plane][x][ty] & block_h) != 0) {
 				return true;
 			}
 			break;
 		case MOB_DIR_WEST:
-			if ((s->adjacency[plane][cur_x][ty] & ADJ_BLOCK_HORIZ) != 0) {
+			if ((s->adjacency[plane][cur_x][ty] & block_h) != 0) {
 				return true;
 			}
 			break;
 		case MOB_DIR_NORTHWEST:
-			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_HORIZ) != 0 &&
-			    (s->adjacency[plane][cur_x][cy - 1] & ADJ_BLOCK_VERT) != 0) {
+			if ((s->adjacency[plane][cur_x][cy] & block_h) != 0 &&
+			    (s->adjacency[plane][cur_x][cy - 1] & block_v) != 0) {
 				return true;
 			}
-			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_HORIZ) != 0 &&
-			    (s->adjacency[plane][cur_x][cy - 1] & ADJ_BLOCK_HORIZ) != 0) {
+			if ((s->adjacency[plane][cur_x][cy] & block_h) != 0 &&
+			    (s->adjacency[plane][cur_x][cy - 1] & block_h) != 0) {
 				return true;
 			}
-			if ((s->adjacency[plane][cur_x + 1][cy - 1] & ADJ_BLOCK_VERT) != 0 &&
-			    (s->adjacency[plane][cur_x][cy - 1] & ADJ_BLOCK_HORIZ) != 0) {
+			if ((s->adjacency[plane][cur_x + 1][cy - 1] & block_v) != 0 &&
+			    (s->adjacency[plane][cur_x][cy - 1] & block_h) != 0) {
 				return true;
 			}
-			if ((s->adjacency[plane][cur_x + 1][cy - 1] & ADJ_BLOCK_VERT) != 0 &&
-			    (s->adjacency[plane][cur_x][cy - 1] & ADJ_BLOCK_VERT) != 0) {
+			if ((s->adjacency[plane][cur_x + 1][cy - 1] & block_v) != 0 &&
+			    (s->adjacency[plane][cur_x][cy - 1] & block_v) != 0) {
 				return true;
 			}
 			break;
 		case MOB_DIR_NORTHEAST:
-			if ((s->adjacency[plane][cur_x - 1][cy - 1] & ADJ_BLOCK_HORIZ) != 0 &&
-			    (s->adjacency[plane][cur_x - 1][cy - 1] & ADJ_BLOCK_VERT) != 0) {
+			if ((s->adjacency[plane][cur_x - 1][cy - 1] & block_h) != 0 &&
+			    (s->adjacency[plane][cur_x - 1][cy - 1] & block_v) != 0) {
 				return true;
 			}
-			if ((s->adjacency[plane][cur_x - 1][cy] & ADJ_BLOCK_HORIZ) != 0 &&
-			    (s->adjacency[plane][cur_x - 1][cy - 1] & ADJ_BLOCK_HORIZ) != 0) {
+			if ((s->adjacency[plane][cur_x - 1][cy] & block_h) != 0 &&
+			    (s->adjacency[plane][cur_x - 1][cy - 1] & block_h) != 0) {
 				return true;
 			}
-			if ((s->adjacency[plane][cur_x - 1][cy - 1] & ADJ_BLOCK_VERT) != 0 &&
-			    (s->adjacency[plane][cur_x][cy - 1] & ADJ_BLOCK_VERT) != 0) {
+			if ((s->adjacency[plane][cur_x - 1][cy - 1] & block_v) != 0 &&
+			    (s->adjacency[plane][cur_x][cy - 1] & block_v) != 0) {
 				return true;
 			}
-			if ((s->adjacency[plane][cur_x][cy - 1] & ADJ_BLOCK_VERT) != 0 &&
-			    (s->adjacency[plane][cur_x - 1][cy] & ADJ_BLOCK_HORIZ) != 0) {
+			if ((s->adjacency[plane][cur_x][cy - 1] & block_v) != 0 &&
+			    (s->adjacency[plane][cur_x - 1][cy] & block_h) != 0) {
 				return true;
 			}
 			break;
 		case MOB_DIR_SOUTHWEST:
-			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_HORIZ) != 0 &&
-			    (s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_VERT) != 0) {
+			if ((s->adjacency[plane][cur_x][cy] & block_h) != 0 &&
+			    (s->adjacency[plane][cur_x][cy] & block_v) != 0) {
 				return true;
 			}
-			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_VERT) != 0 &&
-			    (s->adjacency[plane][cur_x + 1][cy] & ADJ_BLOCK_VERT) != 0) {
+			if ((s->adjacency[plane][cur_x][cy] & block_v) != 0 &&
+			    (s->adjacency[plane][cur_x + 1][cy] & block_v) != 0) {
 				return true;
 			}
-			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_HORIZ) != 0 &&
-			    (s->adjacency[plane][cur_x][cy + 1] & ADJ_BLOCK_HORIZ) != 0) {
+			if ((s->adjacency[plane][cur_x][cy] & block_h) != 0 &&
+			    (s->adjacency[plane][cur_x][cy + 1] & block_h) != 0) {
 				return true;
 			}
-			if ((s->adjacency[plane][cur_x + 1][cy] & ADJ_BLOCK_VERT) != 0 &&
-			    (s->adjacency[plane][cur_x][cy + 1] & ADJ_BLOCK_HORIZ) != 0) {
+			if ((s->adjacency[plane][cur_x + 1][cy] & block_v) != 0 &&
+			    (s->adjacency[plane][cur_x][cy + 1] & block_h) != 0) {
 				return true;
 			}
 			break;
 		case MOB_DIR_SOUTHEAST:
-			if ((s->adjacency[plane][cur_x - 1][cy + 1] & ADJ_BLOCK_HORIZ) != 0 &&
-			    (s->adjacency[plane][cur_x - 1][cy] & ADJ_BLOCK_VERT) != 0) {
+			if ((s->adjacency[plane][cur_x - 1][cy + 1] & block_h) != 0 &&
+			    (s->adjacency[plane][cur_x - 1][cy] & block_v) != 0) {
 				return true;
 			}
-			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_VERT) != 0 &&
-			    (s->adjacency[plane][cur_x - 1][cy] & ADJ_BLOCK_VERT) != 0) {
+			if ((s->adjacency[plane][cur_x][cy] & block_v) != 0 &&
+			    (s->adjacency[plane][cur_x - 1][cy] & block_v) != 0) {
 				return true;
 			}
-			if ((s->adjacency[plane][cur_x - 1][cy] & ADJ_BLOCK_HORIZ) != 0 &&
-			    (s->adjacency[plane][cur_x - 1][cy + 1] & ADJ_BLOCK_HORIZ) != 0) {
+			if ((s->adjacency[plane][cur_x - 1][cy] & block_h) != 0 &&
+			    (s->adjacency[plane][cur_x - 1][cy + 1] & block_h) != 0) {
 				return true;
 			}
-			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_VERT) != 0 &&
-			    (s->adjacency[plane][cur_x - 1][cy] & ADJ_BLOCK_HORIZ) != 0) {
+			if ((s->adjacency[plane][cur_x][cy] & block_v) != 0 &&
+			    (s->adjacency[plane][cur_x - 1][cy] & block_h) != 0) {
 				return true;
 			}
 			break;
@@ -653,4 +666,27 @@ mob_next_step(int cur_x, int cur_y, int cur_dir,
 	*dir_out = dir;
 	*x_out = x;
 	*y_out = y;
+}
+
+bool
+mob_check_visibility(struct mob *mob, int x, int y)
+{
+	int cur_x = mob->x;
+	int cur_y = mob->y;
+	int cur_dir = mob->dir;
+
+	while (cur_x != x || cur_y != y) {
+		int prev_x = cur_x;
+		int prev_y = cur_y;
+
+		mob_next_step(cur_x, cur_y, cur_dir,
+			x, y, &cur_x, &cur_y, &cur_dir);
+
+		if (mob_check_collision(mob, prev_x, prev_y,
+		    cur_x, cur_y, cur_dir, true)) {
+			return false;
+		}
+	}
+
+	return true;
 }

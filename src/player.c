@@ -568,8 +568,6 @@ player_shoot_pvm(struct player *p, struct projectile_config *projectile,
 	p->mob.following_player = -1;
 	p->mob.following_npc = -1;
 
-	/* TODO: verify reachability */
-
 	if (projectile->type != PROJECTILE_TYPE_MAGIC) {
 		/* XXX verify if it's always northwest */
 		p->mob.dir = MOB_DIR_NORTHWEST;
@@ -578,6 +576,11 @@ player_shoot_pvm(struct player *p, struct projectile_config *projectile,
 			return;
 		}
 		p->ranged_timer = 3;
+	}
+
+	if (!mob_check_visibility(&p->mob, target->mob.x, target->mob.y)) {
+		player_send_message(p, "I can't get a clear shot from here");
+		return;
 	}
 
 	if (!player_consume_ammo(p, projectile)) {
@@ -649,11 +652,14 @@ player_shoot_pvp(struct player *p, struct projectile_config *projectile,
 		p->ranged_timer = 3;
 	}
 
-	if (!player_consume_ammo(p, projectile)) {
+	if (!mob_check_visibility(&p->mob, target->mob.x, target->mob.y)) {
+		player_send_message(p, "I can't get a clear shot from here");
 		return;
 	}
 
-	/* TODO: verify reachability */
+	if (!player_consume_ammo(p, projectile)) {
+		return;
+	}
 
 	player_skull(p, target);
 
