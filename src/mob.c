@@ -522,7 +522,9 @@ mob_check_collision(struct mob *mob,
 			return true;
 		}
 
-		if (!sight && server_npc_on_tile(mob->server, x, y, true)) {
+		/* XXX hacky, exact mechanics need verifying */
+		if (!sight && mob->target_npc == -1 &&
+		    server_npc_on_tile(mob->server, x, y, true)) {
 			return true;
 		}
 
