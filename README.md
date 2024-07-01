@@ -63,6 +63,13 @@ build-base pkgconf bzip2-dev lua5.4-dev inih-dev openssl-dev
 
 Run `./configure && make -j2` to build the server.
 
+Contributing
+------------
+
+Read `doc/style.md` first.
+
+Use `git format-patch`. You can email `stormy@mailfence.com`.
+
 Resources
 ---------
 
