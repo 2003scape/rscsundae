@@ -587,7 +587,7 @@ config_parse_locs(char *buffer, size_t len, size_t *num_locs)
 			goto err;
 		}
 		offset = tmp;
-		locs[i].unknown = tmpl;
+		locs[i].block_projectile = tmpl;
 
 		tmp = next_token(buffer, offset, len);
 		if (tmp == -1) {

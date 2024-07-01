@@ -51,7 +51,6 @@ Engine
 
 ### Known engine bugs
 
-* Gate-type locs do not have collision detection handled
 * Can get stuck in combat. Probably due to lack of pathing check
   in player_init_combat.
 * Chatting between 110 and 204 clients is currently not possible.

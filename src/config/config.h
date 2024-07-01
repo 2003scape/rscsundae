@@ -78,8 +78,8 @@ struct prayer_config {
 enum loc_type {
 	LOC_TYPE_PASSTHRU	= 0, /* everything can pass thru */
 	LOC_TYPE_BLOCKING	= 1, /* nothing can pass thru */
-	LOC_TYPE_HAS_HOLE	= 2, /* projectiles can pass thru */
-	LOC_TYPE_GATE		= 3, /* passthru from certain dirs */
+	LOC_TYPE_GATE_CLOSED	= 2, /* passthru from certain dirs */
+	LOC_TYPE_GATE_OPEN	= 3,
 };
 
 /* "location.txt" - definitions for 3d objects */
@@ -92,7 +92,7 @@ struct loc_config {
 	uint8_t width;
 	uint8_t height;
 	uint8_t type;
-	uint8_t unknown; /* XXX */
+	uint8_t block_projectile;
 	char *option;
 	char *option_alt;
 	uint16_t surface_height;

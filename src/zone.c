@@ -155,11 +155,23 @@ server_add_loc(struct server *s, struct loc *loc)
 	for (x = loc->x; x < max_x; ++x) {
 		for (y = loc->y; y < max_y; ++y) {
 			if (config->type == LOC_TYPE_BLOCKING) {
-				/* TODO LOC_TYPE_GATE */
 				s->adjacency[plane][x][y - y_dec] |=
 				    ADJ_BLOCK;
+			} else if (config->type == LOC_TYPE_GATE_CLOSED) {
+				switch (loc->dir) {
+				case MOB_DIR_NORTH:
+				case MOB_DIR_SOUTH:
+					s->adjacency[plane][x][y - y_dec] |=
+					    ADJ_BLOCK_HORIZ;
+					break;
+				case MOB_DIR_WEST:
+				case MOB_DIR_EAST:
+					s->adjacency[plane][x][y - y_dec] |=
+					    ADJ_BLOCK_VERT;
+					break;
+				}
 			}
-			if (config->type < LOC_TYPE_HAS_HOLE) {
+			if (config->block_projectile) {
 				s->adjacency[plane][x][y - y_dec] |=
 				    ADJ_BLOCK_SIGHT;
 			}
