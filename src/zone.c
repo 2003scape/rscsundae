@@ -134,7 +134,8 @@ server_add_loc(struct server *s, struct loc *loc)
 	config = server_loc_config_by_id(loc->id);
 	assert(config != NULL);
 
-	if (loc->dir == 0 || loc->dir == 4) {
+	if (loc->dir == MOB_DIR_NORTH ||
+	    loc->dir == MOB_DIR_SOUTH) {
 		max_x = loc->x + config->width;
 		max_y = loc->y + config->height;
 	} else {

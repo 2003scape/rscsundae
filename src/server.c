@@ -722,7 +722,8 @@ load_map_tile(struct jag_map *chunk,
 			return;
 		}
 		server_add_loc(&s, &loc);
-		if (object_dir == 0 || object_dir == 4) {
+		if (object_dir == MOB_DIR_NORTH ||
+		    object_dir == MOB_DIR_SOUTH) {
 			width = loc_config->width;
 			height = loc_config->height;
 		} else {

@@ -1326,15 +1326,14 @@ script_upstairs(lua_State *L)
 		return 0;
 	}
 
-	/* XXX: don't hardcode directions */
 	switch (loc->dir) {
-	case 0:
+	case MOB_DIR_NORTH:
 		y += 3;
 		break;
-	case 4:
+	case MOB_DIR_SOUTH:
 		y--;
 		break;
-	case 6:
+	case MOB_DIR_EAST:
 		x--;
 		break;
 	}
@@ -1398,15 +1397,14 @@ script_downstairs(lua_State *L)
 		return 0;
 	}
 
-	/* XXX: don't hardcode directions */
 	switch (loc->dir) {
-	case 0:
+	case MOB_DIR_NORTH:
 		y--;
 		break;
-	case 4:
+	case MOB_DIR_SOUTH:
 		y += 3;
 		break;
-	case 6:
+	case MOB_DIR_EAST:
 		x += 3;
 		break;
 	}
