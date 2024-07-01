@@ -7,6 +7,7 @@
 
 static int mob_combat_max_roll(int, int);
 static int mob_combat_roll_damage(int, int);
+static bool mob_check_collision(struct mob *, int, int, int);
 
 static int
 mob_combat_max_roll(int stat, int bonus)
@@ -507,129 +508,10 @@ mob_process_walk_queue(struct mob *mob)
 		}
 	}
 
-	int ty = y;
-	int cy = cur_y;
-
-	cy -= (plane * PLANE_LEVEL_INC);
-	ty -= (plane * PLANE_LEVEL_INC);
-
-	/* verify reachability */
-	if (x < ZONE_MAX_X && ty < ZONE_MAX_Y && plane < ZONE_MAX_PLANE) {
-		struct server *s = mob->server;
-
-		if ((s->adjacency[plane][x][ty] & ADJ_BLOCK) != 0 ||
-		    server_npc_on_tile(mob->server, x, y, true)) {
-			return;
-		}
-
-		/*
-		 * Players are prevented from walking through most entities,
-		 * UNLESS they have an action to perform on the tile. This can
-		 * be seen in the documentation for ixBot (it used a strategy
-		 * of keeping bones in inventory, to drop and pick up to regain
-		 * access to occupied tiles).
-		 */
-		if (!mob->action_walk &&
-		    (server_player_on_tile(mob->server, x, y) ||
-		    server_npc_on_tile(mob->server, x, y, false))) {
-			return;
-		}
-
-		switch (dir) {
-		case MOB_DIR_NORTH:
-			if ((s->adjacency[plane][x][ty] & ADJ_BLOCK_VERT) != 0) {
-				return;
-			}
-			break;
-		case MOB_DIR_SOUTH:
-			if ((s->adjacency[plane][x][cy] & ADJ_BLOCK_VERT) != 0) {
-				return;
-			}
-			break;
-		case MOB_DIR_EAST:
-			if ((s->adjacency[plane][x][ty] & ADJ_BLOCK_HORIZ) != 0) {
-				return;
-			}
-			break;
-		case MOB_DIR_WEST:
-			if ((s->adjacency[plane][cur_x][ty] & ADJ_BLOCK_HORIZ) != 0) {
-				return;
-			}
-			break;
-		case MOB_DIR_NORTHWEST:
-			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_HORIZ) != 0 &&
-			    (s->adjacency[plane][cur_x][cy - 1] & ADJ_BLOCK_VERT) != 0) {
-				return;
-			}
-			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_HORIZ) != 0 &&
-			    (s->adjacency[plane][cur_x][cy - 1] & ADJ_BLOCK_HORIZ) != 0) {
-				return;
-			}
-			if ((s->adjacency[plane][cur_x + 1][cy - 1] & ADJ_BLOCK_VERT) != 0 &&
-			    (s->adjacency[plane][cur_x][cy - 1] & ADJ_BLOCK_HORIZ) != 0) {
-				return;
-			}
-			if ((s->adjacency[plane][cur_x + 1][cy - 1] & ADJ_BLOCK_VERT) != 0 &&
-			    (s->adjacency[plane][cur_x][cy - 1] & ADJ_BLOCK_VERT) != 0) {
-				return;
-			}
-			break;
-		case MOB_DIR_NORTHEAST:
-			if ((s->adjacency[plane][cur_x - 1][cy - 1] & ADJ_BLOCK_HORIZ) != 0 &&
-			    (s->adjacency[plane][cur_x - 1][cy - 1] & ADJ_BLOCK_VERT) != 0) {
-				return;
-			}
-			if ((s->adjacency[plane][cur_x - 1][cy] & ADJ_BLOCK_HORIZ) != 0 &&
-			    (s->adjacency[plane][cur_x - 1][cy - 1] & ADJ_BLOCK_HORIZ) != 0) {
-				return;
-			}
-			if ((s->adjacency[plane][cur_x - 1][cy - 1] & ADJ_BLOCK_VERT) != 0 &&
-			    (s->adjacency[plane][cur_x][cy - 1] & ADJ_BLOCK_VERT) != 0) {
-				return;
-			}
-			if ((s->adjacency[plane][cur_x][cy - 1] & ADJ_BLOCK_VERT) != 0 &&
-			    (s->adjacency[plane][cur_x - 1][cy] & ADJ_BLOCK_HORIZ) != 0) {
-				return;
-			}
-			break;
-		case MOB_DIR_SOUTHWEST:
-			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_HORIZ) != 0 &&
-			    (s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_VERT) != 0) {
-				return;
-			}
-			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_VERT) != 0 &&
-			    (s->adjacency[plane][cur_x + 1][cy] & ADJ_BLOCK_VERT) != 0) {
-				return;
-			}
-			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_HORIZ) != 0 &&
-			    (s->adjacency[plane][cur_x][cy + 1] & ADJ_BLOCK_HORIZ) != 0) {
-				return;
-			}
-			if ((s->adjacency[plane][cur_x + 1][cy] & ADJ_BLOCK_VERT) != 0 &&
-			    (s->adjacency[plane][cur_x][cy + 1] & ADJ_BLOCK_HORIZ) != 0) {
-				return;
-			}
-			break;
-		case MOB_DIR_SOUTHEAST:
-			if ((s->adjacency[plane][cur_x - 1][cy + 1] & ADJ_BLOCK_HORIZ) != 0 &&
-			    (s->adjacency[plane][cur_x - 1][cy] & ADJ_BLOCK_VERT) != 0) {
-				return;
-			}
-			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_VERT) != 0 &&
-			    (s->adjacency[plane][cur_x - 1][cy] & ADJ_BLOCK_VERT) != 0) {
-				return;
-			}
-			if ((s->adjacency[plane][cur_x - 1][cy] & ADJ_BLOCK_HORIZ) != 0 &&
-			    (s->adjacency[plane][cur_x - 1][cy + 1] & ADJ_BLOCK_HORIZ) != 0) {
-				return;
-			}
-			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_VERT) != 0 &&
-			    (s->adjacency[plane][cur_x - 1][cy] & ADJ_BLOCK_HORIZ) != 0) {
-				return;
-			}
-			break;
-		}
+	if (mob_check_collision(mob, x, y, dir)) {
+		return;
 	}
+
 
 	if (x == mob->walk_queue_x[pos] &&
 	    y == mob->walk_queue_y[pos]) {
@@ -642,4 +524,137 @@ mob_process_walk_queue(struct mob *mob)
 		mob->dir = dir;
 		mob->moved = true;
 	}
+}
+
+static bool
+mob_check_collision(struct mob *mob, int x, int y, int dir)
+{
+	int cur_x = mob->x;
+	int cur_y = mob->y;
+	int plane = mob->y / PLANE_LEVEL_INC;
+
+	int ty = y;
+	int cy = cur_y;
+
+	cy -= (plane * PLANE_LEVEL_INC);
+	ty -= (plane * PLANE_LEVEL_INC);
+
+	/* verify reachability */
+	if (x < ZONE_MAX_X && ty < ZONE_MAX_Y && plane < ZONE_MAX_PLANE) {
+		struct server *s = mob->server;
+
+		if ((s->adjacency[plane][x][ty] & ADJ_BLOCK) != 0 ||
+		    server_npc_on_tile(mob->server, x, y, true)) {
+			return true;
+		}
+
+		/*
+		 * Players are prevented from walking through most entities,
+		 * UNLESS they have an action to perform on the tile. This can
+		 * be seen in the documentation for ixBot (it used a strategy
+		 * of keeping bones in inventory, to drop and pick up to regain
+		 * access to occupied tiles).
+		 */
+		if (!mob->action_walk &&
+		    (server_player_on_tile(mob->server, x, y) ||
+		    server_npc_on_tile(mob->server, x, y, false))) {
+			return true;
+		}
+
+		switch (dir) {
+		case MOB_DIR_NORTH:
+			if ((s->adjacency[plane][x][ty] & ADJ_BLOCK_VERT) != 0) {
+				return true;
+			}
+			break;
+		case MOB_DIR_SOUTH:
+			if ((s->adjacency[plane][x][cy] & ADJ_BLOCK_VERT) != 0) {
+				return true;
+			}
+			break;
+		case MOB_DIR_EAST:
+			if ((s->adjacency[plane][x][ty] & ADJ_BLOCK_HORIZ) != 0) {
+				return true;
+			}
+			break;
+		case MOB_DIR_WEST:
+			if ((s->adjacency[plane][cur_x][ty] & ADJ_BLOCK_HORIZ) != 0) {
+				return true;
+			}
+			break;
+		case MOB_DIR_NORTHWEST:
+			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_HORIZ) != 0 &&
+			    (s->adjacency[plane][cur_x][cy - 1] & ADJ_BLOCK_VERT) != 0) {
+				return true;
+			}
+			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_HORIZ) != 0 &&
+			    (s->adjacency[plane][cur_x][cy - 1] & ADJ_BLOCK_HORIZ) != 0) {
+				return true;
+			}
+			if ((s->adjacency[plane][cur_x + 1][cy - 1] & ADJ_BLOCK_VERT) != 0 &&
+			    (s->adjacency[plane][cur_x][cy - 1] & ADJ_BLOCK_HORIZ) != 0) {
+				return true;
+			}
+			if ((s->adjacency[plane][cur_x + 1][cy - 1] & ADJ_BLOCK_VERT) != 0 &&
+			    (s->adjacency[plane][cur_x][cy - 1] & ADJ_BLOCK_VERT) != 0) {
+				return true;
+			}
+			break;
+		case MOB_DIR_NORTHEAST:
+			if ((s->adjacency[plane][cur_x - 1][cy - 1] & ADJ_BLOCK_HORIZ) != 0 &&
+			    (s->adjacency[plane][cur_x - 1][cy - 1] & ADJ_BLOCK_VERT) != 0) {
+				return true;
+			}
+			if ((s->adjacency[plane][cur_x - 1][cy] & ADJ_BLOCK_HORIZ) != 0 &&
+			    (s->adjacency[plane][cur_x - 1][cy - 1] & ADJ_BLOCK_HORIZ) != 0) {
+				return true;
+			}
+			if ((s->adjacency[plane][cur_x - 1][cy - 1] & ADJ_BLOCK_VERT) != 0 &&
+			    (s->adjacency[plane][cur_x][cy - 1] & ADJ_BLOCK_VERT) != 0) {
+				return true;
+			}
+			if ((s->adjacency[plane][cur_x][cy - 1] & ADJ_BLOCK_VERT) != 0 &&
+			    (s->adjacency[plane][cur_x - 1][cy] & ADJ_BLOCK_HORIZ) != 0) {
+				return true;
+			}
+			break;
+		case MOB_DIR_SOUTHWEST:
+			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_HORIZ) != 0 &&
+			    (s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_VERT) != 0) {
+				return true;
+			}
+			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_VERT) != 0 &&
+			    (s->adjacency[plane][cur_x + 1][cy] & ADJ_BLOCK_VERT) != 0) {
+				return true;
+			}
+			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_HORIZ) != 0 &&
+			    (s->adjacency[plane][cur_x][cy + 1] & ADJ_BLOCK_HORIZ) != 0) {
+				return true;
+			}
+			if ((s->adjacency[plane][cur_x + 1][cy] & ADJ_BLOCK_VERT) != 0 &&
+			    (s->adjacency[plane][cur_x][cy + 1] & ADJ_BLOCK_HORIZ) != 0) {
+				return true;
+			}
+			break;
+		case MOB_DIR_SOUTHEAST:
+			if ((s->adjacency[plane][cur_x - 1][cy + 1] & ADJ_BLOCK_HORIZ) != 0 &&
+			    (s->adjacency[plane][cur_x - 1][cy] & ADJ_BLOCK_VERT) != 0) {
+				return true;
+			}
+			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_VERT) != 0 &&
+			    (s->adjacency[plane][cur_x - 1][cy] & ADJ_BLOCK_VERT) != 0) {
+				return true;
+			}
+			if ((s->adjacency[plane][cur_x - 1][cy] & ADJ_BLOCK_HORIZ) != 0 &&
+			    (s->adjacency[plane][cur_x - 1][cy + 1] & ADJ_BLOCK_HORIZ) != 0) {
+				return true;
+			}
+			if ((s->adjacency[plane][cur_x][cy] & ADJ_BLOCK_VERT) != 0 &&
+			    (s->adjacency[plane][cur_x - 1][cy] & ADJ_BLOCK_HORIZ) != 0) {
+				return true;
+			}
+			break;
+		}
+	}
+	return false;
 }
