@@ -88,7 +88,7 @@ npc_random_walk(struct npc *npc)
 		p = npc->mob.server->players[npc->mob.target_player];
 		if (p != NULL) {
 			player_send_message(p,
-			    "Your opponent is retreating!");
+			    "Your opponent is retreating");
 			mob_combat_reset(&npc->mob);
 			mob_combat_reset(&p->mob);
 		}
