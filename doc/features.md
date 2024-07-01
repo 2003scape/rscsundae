@@ -175,7 +175,7 @@ The following use randomvar and need to be implemented in script:
 - [x] Goblin1
 - [ ] Goblin2
 - [x] Barbarian
-- [ ] Dwarf
+- [x] Dwarf
 - [ ] Skeleton1
 - [ ] Skeleton2
 - [ ] Skeleton3
