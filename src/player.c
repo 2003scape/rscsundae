@@ -164,6 +164,9 @@ player_destroy(struct player *p)
 		close(p->sock);
 		p->sock = -1;
 	}
+	free(p->variables);
+	free(p->known_bounds);
+	free(p->known_locs);
 	free(p);
 }
 
