@@ -8,6 +8,7 @@
 static int mob_combat_max_roll(int, int);
 static int mob_combat_roll_damage(int, int);
 static bool mob_check_collision(struct mob *, int, int, int);
+static void mob_next_step(int, int, int, int, int, int *, int *, int *);
 
 static int
 mob_combat_max_roll(int stat, int bonus)
@@ -26,8 +27,9 @@ mob_combat_roll_damage(int stat, int bonus)
 void
 mob_face(struct mob *mob, int x, int y)
 {
-	int dif_x = mob->x - x;
-	int dif_y = mob->y - y;
+	int unused_x;
+	int unused_y;
+	int dir;
 
 	if (mob->moved) {
 		/*
@@ -37,29 +39,10 @@ mob_face(struct mob *mob, int x, int y)
 		return;
 	}
 
-	if (dif_x == 0) {
-		if (dif_y > 0) {
-			mob->dir = MOB_DIR_NORTH;
-		} else if (dif_y < 0) {
-			mob->dir = MOB_DIR_SOUTH;
-		}
-	} else if (dif_x < 0) {
-		if (dif_y == 0) {
-			mob->dir = MOB_DIR_WEST;
-		} else if (dif_y < 0) {
-			mob->dir = MOB_DIR_SOUTHWEST;
-		} else if (dif_y > 0) {
-			mob->dir = MOB_DIR_NORTHWEST;
-		}
-	} else if (dif_x > 0) {
-		if (dif_y == 0) {
-			mob->dir = MOB_DIR_EAST;
-		} else if (dif_y < 0) {
-			mob->dir = MOB_DIR_SOUTHEAST;
-		} else if (dif_y > 0) {
-			mob->dir = MOB_DIR_NORTHEAST;
-		}
-	}
+	mob_next_step(mob->x, mob->y, mob->dir,
+	    x, y, &unused_x, &unused_y, &dir);
+
+	mob->dir = dir;
 }
 
 uint32_t
@@ -410,8 +393,6 @@ mob_process_walk_queue(struct mob *mob)
 	int plane = 0;
 	int dir;
 	int x, y;
-	int dif_x, dif_y;
-	int cur_x, cur_y;
 
 	if (mob->in_combat) {
 		if (mob->dir == MOB_DIR_COMBAT_LEFT ||
@@ -466,59 +447,20 @@ mob_process_walk_queue(struct mob *mob)
 		return;
 	}
 
-	dir = mob->dir;
-	x = cur_x = mob->x;
-	y = cur_y = mob->y;
-	dif_x = cur_x - (int)mob->walk_queue_x[pos];
-	dif_y = cur_y - (int)mob->walk_queue_y[pos];
-
-	if (dif_x == 0) {
-		if (dif_y > 0) {
-			dir = MOB_DIR_NORTH;
-			y = cur_y - 1;
-		} else if (dif_y < 0) {
-			dir = MOB_DIR_SOUTH;
-			y = cur_y + 1;
-		}
-	} else if (dif_x < 0) {
-		if (dif_y == 0) {
-			dir = MOB_DIR_WEST;
-			x = cur_x + 1;
-		} else if (dif_y < 0) {
-			dir = MOB_DIR_SOUTHWEST;
-			x = cur_x + 1;
-			y = cur_y + 1;
-		} else if (dif_y > 0) {
-			dir = MOB_DIR_NORTHWEST;
-			x = cur_x + 1;
-			y = cur_y - 1;
-		}
-	} else if (dif_x > 0) {
-		if (dif_y == 0) {
-			dir = MOB_DIR_EAST;
-			x = cur_x - 1;
-		} else if (dif_y < 0) {
-			dir = MOB_DIR_SOUTHEAST;
-			x = cur_x - 1;
-			y = cur_y + 1;
-		} else if (dif_y > 0) {
-			dir = MOB_DIR_NORTHEAST;
-			x = cur_x - 1;
-			y = cur_y - 1;
-		}
-	}
+	mob_next_step(mob->x, mob->y, mob->dir,
+	    mob->walk_queue_x[pos], mob->walk_queue_y[pos],
+	    &x, &y, &dir);
 
 	if (mob_check_collision(mob, x, y, dir)) {
 		return;
 	}
-
 
 	if (x == mob->walk_queue_x[pos] &&
 	    y == mob->walk_queue_y[pos]) {
 		mob->walk_queue_pos++;
 	}
 
-	if (x != cur_x || y != cur_y) {
+	if (x != mob->x || y != mob->y) {
 		mob->x = x;
 		mob->y = y;
 		mob->dir = dir;
@@ -657,4 +599,58 @@ mob_check_collision(struct mob *mob, int x, int y, int dir)
 		}
 	}
 	return false;
+}
+
+static void
+mob_next_step(int cur_x, int cur_y, int cur_dir,
+    int target_x, int target_y,
+    int *x_out, int *y_out, int *dir_out)
+{
+	int dif_x = cur_x - target_x;
+	int dif_y = cur_y - target_y;
+	int x, y, dir;
+
+	x = cur_x;
+	y = cur_y;
+	dir = cur_dir;
+
+	if (dif_x == 0) {
+		if (dif_y > 0) {
+			dir = MOB_DIR_NORTH;
+			y = cur_y - 1;
+		} else if (dif_y < 0) {
+			dir = MOB_DIR_SOUTH;
+			y = cur_y + 1;
+		}
+	} else if (dif_x < 0) {
+		if (dif_y == 0) {
+			dir = MOB_DIR_WEST;
+			x = cur_x + 1;
+		} else if (dif_y < 0) {
+			dir = MOB_DIR_SOUTHWEST;
+			x = cur_x + 1;
+			y = cur_y + 1;
+		} else if (dif_y > 0) {
+			dir = MOB_DIR_NORTHWEST;
+			x = cur_x + 1;
+			y = cur_y - 1;
+		}
+	} else if (dif_x > 0) {
+		if (dif_y == 0) {
+			dir = MOB_DIR_EAST;
+			x = cur_x - 1;
+		} else if (dif_y < 0) {
+			dir = MOB_DIR_SOUTHEAST;
+			x = cur_x - 1;
+			y = cur_y + 1;
+		} else if (dif_y > 0) {
+			dir = MOB_DIR_NORTHEAST;
+			x = cur_x - 1;
+			y = cur_y - 1;
+		}
+	}
+
+	*dir_out = dir;
+	*x_out = x;
+	*y_out = y;
 }
