@@ -578,7 +578,8 @@ player_shoot_pvm(struct player *p, struct projectile_config *projectile,
 		p->ranged_timer = 3;
 	}
 
-	if (!mob_check_visibility(&p->mob, target->mob.x, target->mob.y)) {
+	if (!mob_check_reachable(&p->mob,
+	    target->mob.x, target->mob.y, true)) {
 		player_send_message(p, "I can't get a clear shot from here");
 		return;
 	}
@@ -652,7 +653,8 @@ player_shoot_pvp(struct player *p, struct projectile_config *projectile,
 		p->ranged_timer = 3;
 	}
 
-	if (!mob_check_visibility(&p->mob, target->mob.x, target->mob.y)) {
+	if (!mob_check_reachable(&p->mob,
+	    target->mob.x, target->mob.y, true)) {
 		player_send_message(p, "I can't get a clear shot from here");
 		return;
 	}
@@ -739,13 +741,21 @@ player_init_combat(struct player *p, struct mob *target)
 		return false;
 	}
 
+	if (!mob_check_reachable(&p->mob, target->x, target->y, false)) {
+		player_send_message(p, "I can't get close enough");
+		p->mob.walk_queue_pos = 0;
+		p->mob.walk_queue_len = 0;
+		mob_combat_reset(&p->mob);
+		return false;
+	}
+
 	if (p->mob.x == target->x &&
 	    p->mob.y == target->y) {
 		p->mob.dir = MOB_DIR_COMBAT_RIGHT;
 		p->mob.walk_queue_len = 0;
 		p->mob.walk_queue_pos = 0;
 	} else {
-		/* TODO: should verify path (visibility) here */
+		p->mob.action_walk = true;
 		p->mob.walk_queue_x[0] = target->x;
 		p->mob.walk_queue_y[0] = target->y;
 		p->mob.walk_queue_len = 1;

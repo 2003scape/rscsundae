@@ -51,8 +51,6 @@ Engine
 
 ### Known engine bugs
 
-* Can get stuck in combat. Probably due to lack of pathing check
-  in player_init_combat.
 * Chatting between 110 and 204 clients is currently not possible.
 * When using a bar on an anvil that's some distance away,
   the script can hang for a few seconds

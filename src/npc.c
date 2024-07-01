@@ -128,6 +128,7 @@ npc_random_walk(struct npc *npc)
 		}
 	} while (!valid && (attempts++) < 10);
 
+	npc->mob.action_walk = false;
 	npc->mob.walk_queue_x[0] = x;
 	npc->mob.walk_queue_y[0] = y;
 	npc->mob.walk_queue_len = 1;
@@ -203,6 +204,7 @@ npc_process_movement(struct npc *npc)
 
 		p = npc->mob.server->players[npc->mob.target_player];
 		if (npc->mob.x != p->mob.x || npc->mob.y != p->mob.y) {
+			npc->mob.action_walk = true;
 			npc->mob.walk_queue_x[0] = p->mob.x;
 			npc->mob.walk_queue_y[0] = p->mob.y;
 			npc->mob.walk_queue_len = 1;
@@ -255,7 +257,6 @@ npc_process_movement(struct npc *npc)
 	if ((npc->mob.walk_queue_len - pos) <= 0) {
 		return;
 	}
-	/* TODO: also need to stop them walking on same tiles as other NPCs */
 	int x = npc->mob.walk_queue_x[pos];
 	int y = npc->mob.walk_queue_y[pos];
 	switch (npc->config->move_restrict) {
@@ -319,6 +320,15 @@ npc_init_combat(struct npc *npc, struct player *target)
 
 	if (!mob_within_range(&npc->mob, target->mob.x, target->mob.y, 2)) {
 		npc->mob.following_player = target->mob.id;
+		return false;
+	}
+
+	if (!mob_check_reachable(&npc->mob,
+	    target->mob.x, target->mob.y, false)) {
+		target->chased_by_npc = UINT16_MAX;
+		npc->mob.walk_queue_pos = 0;
+		npc->mob.walk_queue_len = 0;
+		mob_combat_reset(&npc->mob);
 		return false;
 	}
 

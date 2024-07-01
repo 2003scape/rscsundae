@@ -452,6 +452,29 @@ mob_process_walk_queue(struct mob *mob)
 	    &x, &y, &dir);
 
 	if (mob_check_collision(mob, mob->x, mob->y, x, y, dir, false)) {
+		if (mob->in_combat) {
+			/*
+			 * if we're "in combat" while walking towards a mob,
+			 * they're "caught".  do not enter combat and break
+			 * things if we can't actually reach them.
+			 */
+			if (mob->target_player != -1) {
+				struct player *p;
+
+				p = mob->server->players[mob->target_player];
+				if (p != NULL) {
+					mob_combat_reset(&p->mob);
+				}
+			} else if (mob->target_npc != -1) {
+				struct npc *npc;
+
+				npc = mob->server->npcs[mob->target_npc];
+				if (npc != NULL) {
+					mob_combat_reset(&npc->mob);
+				}
+			}
+			mob_combat_reset(mob);
+		}
 		return;
 	}
 
@@ -669,7 +692,7 @@ mob_next_step(int cur_x, int cur_y, int cur_dir,
 }
 
 bool
-mob_check_visibility(struct mob *mob, int x, int y)
+mob_check_reachable(struct mob *mob, int x, int y, bool sight)
 {
 	int cur_x = mob->x;
 	int cur_y = mob->y;
@@ -683,7 +706,7 @@ mob_check_visibility(struct mob *mob, int x, int y)
 			x, y, &cur_x, &cur_y, &cur_dir);
 
 		if (mob_check_collision(mob, prev_x, prev_y,
-		    cur_x, cur_y, cur_dir, true)) {
+		    cur_x, cur_y, cur_dir, sight)) {
 			return false;
 		}
 	}
