@@ -1604,6 +1604,9 @@ player_process_action(struct player *p)
 			}
 			return;
 		}
+		if (!mob_check_reachable(&p->mob, npc->mob.x, npc->mob.y, false)) {
+			return;
+		}
 		p->mob.walk_queue_len = 0;
 		p->mob.walk_queue_pos = 0;
 		id = p->inventory[p->action_slot].id;
@@ -1629,6 +1632,9 @@ player_process_action(struct player *p)
 		p->action = ACTION_NONE;
 		p->mob.walk_queue_len = 0;
 		p->mob.walk_queue_pos = 0;
+		if (!mob_check_reachable(&p->mob, npc->mob.x, npc->mob.y, false)) {
+			return;
+		}
 		if (npc->busy) {
 			char mes[128];
 
@@ -1636,7 +1642,6 @@ player_process_action(struct player *p)
 			    "%s is busy at the moment", npc->config->names[0]);
 			player_send_message(p, mes);
 		} else {
-			/* TODO: check sight */
 			npc->talk_target = p->mob.id;
 			mob_face(&p->mob, npc->mob.x, npc->mob.y);
 			script_onnpctalk(p->mob.server->lua, p, npc);
