@@ -79,12 +79,12 @@ local function romeo_father(player, npc)
 end
 
 function talknpc_romeo(player, npc)
-	if getvar(player, "romeo_mes") ~= 0 then
-	npcsay(npc, "Please find my Juliet. I am so, so sad")
-		return
-	end
 	local stage = getvar(player, "rj_stage")
 	if stage == 0 then
+		if getvar(player, "romeo_mes") ~= 0 then
+			npcsay(npc, "Please find my Juliet. I am so, so sad")
+			return
+		end
 		romeo_init(player, npc)
 	elseif stage == 1 then
 		say(player, "Romeo, I have a message from Juliet")
@@ -111,5 +111,29 @@ function talknpc_romeo(player, npc)
 		npcsay(npc, "Father Lawrence must be told. only he can help")
 	elseif stage == 3 then
 		romeo_father(player, npc)
+	elseif stage == 4 then
+		if held(player, "cadava", 1) then
+			npcsay(npc, "Ah, you have the potion. I was told what to do by the good Father")
+			npcsay(npc, "Better get it to Juliet. She knows what is happening")
+		else
+			npcsay(npc, "I hope the potion is near ready")
+			npcsay(npc, "It is the last step for the great plan")
+			npcsay(npc, "I hope I will be with my dear one soon")
+		end
+	elseif stage == 5 then
+		say(player, "Romeo, it's all set. Juliet has the potion")
+		npcsay(npc, "Ah right")
+		npcsay(npc, "What potion would that be then?")
+		say(player, "The one to get her to the crypt.")
+		npcsay(npc, "Ah right")
+		npcsay(npc, "So she is dead then. Ah thats a shame.")
+		npcsay(npc, "Thanks for you help anyway.")
+		mes(player, "You have completed the quest of Romeo and Juliet")
+		setvar(player, "rj_stage", 6)
+		giveqp(player, 5)
+	elseif stage == 6 then
+		npcsay(npc, "I heard Juliet had died. Terrible business")
+		npcsay(npc, "Her cousin and I are getting on well though")
+		npcsay(npc, "Thanks for your help")
 	end
 end

@@ -67,16 +67,16 @@ local function juliet_init(player, npc)
 end
 
 function talknpc_juliet(player, npc)
-	if getvar(player, "romeo_mes") ~= 0 then
-		say(player, "Juliet, I come from Romeo")
-		say(player, "He begs me tell you he cares still")
-		npcsay(npc, "Please, Take this message to him")
-		juliet_give_message(player, npc)
-		return
-	end
 	local stage = getvar(player, "rj_stage")
 	if stage == 0 then
-		juliet_init(player, npc)
+		if getvar(player, "romeo_mes") ~= 0 then
+			say(player, "Juliet, I come from Romeo")
+			say(player, "He begs me tell you he cares still")
+			npcsay(npc, "Please, Take this message to him")
+			juliet_give_message(player, npc)
+		else
+			juliet_init(player, npc)
+		end
 	elseif stage == 1 then
 		if held(player, "message", 1) then
 			npcsay(npc, "Please, deliver the message to Romeo with all speed")
@@ -107,5 +107,31 @@ function talknpc_juliet(player, npc)
 		say(player, "I found the Father. Now I seek the apothecary")
 		npcsay(npc, "I do not know where he lives")
 		npcsay(npc, "but please, make haste. My father is close")
+	elseif stage == 4 then
+		if not held(player, "cadava", 1) then
+			say(player, "I have to get a potion made for you")
+			say(player, "Not done that bit yet though. Still trying")
+			npcsay(npc, "Fair luck to you, the end is close")
+			return
+		end
+		say(player, "I have a potion from Father Lawrence")
+		say(player, "it should make you seem dead, and get you away from this place")
+		mes(player, "You pass the potion to Juliet")
+		delay(5)
+		remove(player, "cadava", 1)
+		npcsay(npc, "Wonderful. I just hope Romeo can remember to get me from the Crypt")
+		npcsay(npc, "Many thanks kind friend")
+		npcsay(npc, "Please go to Romeo, make sure he understands")
+		npcsay(npc, "He can be a bit dense sometimes")
+		setvar(player, "rj_stage", 5)
+	elseif stage == 5 then
+		npcsay(npc, "Have you seen Romeo? He will reward you for your help")
+		npcsay(npc, "He is the wealth in this story")
+		npcsay(npc, "I am just the glamour")
+	elseif stage == 6 then
+		npcsay(npc, "I sat in that cold crypt for ages waiting for Romeo")
+		npcsay(npc, "That useless fool never showed up")
+		npcsay(npc, "And all I got was indigestion. I am done with men like him")
+		npcsay(npc, "Now go away before I call my father!")
 	end
 end

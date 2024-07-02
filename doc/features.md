@@ -100,7 +100,7 @@ These should all be implemented in Lua script:
 - [x] Sheep Shearer
 - [x] The Restless Ghost
 - [ ] Demon Slayer
-- [ ] Romeo & Juliet
+- [x] Romeo & Juliet (several bugs not implemented)
 - [ ] Shield of Arrav
 - [ ] Ernest the chicken
 - [x] Vampire Slayer
@@ -132,7 +132,7 @@ These should all be implemented in Lua script:
 - [x] Man NPC dialogue
 - [ ] Thrander NPC dialogue
 - [ ] Bareak NPC dialogue
-- [ ] Apothecary NPC dialogue
+- [x] Apothecary NPC dialogue (a broken dialogue path where he gives the player spot cream twice is not implemented)
 - [x] Banker NPC dialogue
 - [ ] Cook's Guild
 - [ ] Champions' Guild
