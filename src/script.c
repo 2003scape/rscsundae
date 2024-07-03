@@ -2198,7 +2198,7 @@ script_onkillnpc(lua_State *L, struct player *p, struct npc *npc)
 {
 	bool result;
 
-	for (size_t i = 0; i < npc->config->name_count; ++i) {
+	for (size_t i = npc->config->name_count; i-- > 0 ;) {
 		lua_getglobal(L, "script_engine_killnpc");
 		if (!lua_isfunction(L, -1)) {
 			puts("script error: can't find essential function script_engine_killnpc");
