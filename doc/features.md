@@ -40,6 +40,7 @@ Engine
 - [x] Item banking
 - [ ] Spell effects
 - [ ] Player saving (SQLite)
+- [ ] Login server
 - [x] Protocol: 110
 - [ ] Protocol: 110 (new player)
 - [ ] Protocol: 110 (password change)
@@ -179,7 +180,7 @@ The following use randomvar and need to be implemented in script:
 - [ ] Skeleton1
 - [ ] Skeleton2
 - [ ] Skeleton3
-- [ ] Zombie1
+- [x] Zombie1
 - [ ] Zombie2
 - [ ] Zombie3
 - [x] Pirate
