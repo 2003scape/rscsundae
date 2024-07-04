@@ -177,7 +177,7 @@ The following use randomvar and need to be implemented in script:
 - [ ] Goblin2
 - [x] Barbarian
 - [x] Dwarf
-- [ ] Skeleton1
+- [x] Skeleton1
 - [ ] Skeleton2
 - [ ] Skeleton3
 - [x] Zombie1
@@ -186,7 +186,7 @@ The following use randomvar and need to be implemented in script:
 - [x] Pirate
 - [ ] Guard
 - [x] Giant
-- [ ] Black Knight
+- [x] Black Knight
 - [ ] White Knight
 - [x] Hobgoblin1
 - [ ] Ice Warrior
