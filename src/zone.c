@@ -552,6 +552,9 @@ server_npc_on_tile(struct server *s, int x, int y, bool hard)
 			zone->npcs[i] = UINT16_MAX;
 			continue;
 		}
+		if (npc->respawn_time > 0) {
+			continue;
+		}
 		if (hard && npc->config->aggression < 2) {
 			continue;
 		}
