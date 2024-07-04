@@ -124,7 +124,7 @@ These should all be implemented in Lua script:
 - [x] Tanner NPC dialogue
 - [x] Kebab Seller NPC dialogue
 - [ ] Aggie NPC dialogue
-- [ ] Certing (Miles, Niles, Giles NPCs)
+- [x] Certing (Miles, Niles, Giles NPCs)
 - [x] Bartender NPC dialogue
 - [x] Barmaid NPC dialogue
 - [x] Monk NPC dialogue
