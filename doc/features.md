@@ -41,6 +41,8 @@ Engine
 - [ ] Spell effects
 - [ ] Player saving (SQLite)
 - [ ] Login server
+- [ ] Moderation features: player controls
+- [ ] Moderation features: per-player action log
 - [x] Protocol: 110
 - [ ] Protocol: 110 (new player)
 - [ ] Protocol: 110 (password change)
@@ -162,6 +164,7 @@ These should all be implemented in Lua script:
 - [x] Equipment level requirements
 - [ ] Silverlight effect
 - [x] Punching dummies
+- [ ] Guards should retaliate to PvP combat
 
 ### Drop tables
 
