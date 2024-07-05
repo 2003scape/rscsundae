@@ -73,7 +73,7 @@ These should all be implemented in Lua script:
 - [ ] Magic (crumble undead) - needs config parser fixes
 - [x] Magic (curses)
 - [x] Magic (teleportation)
-- [ ] Magic (bones to bananas)
+- [ ] Magic (bones to bananas) - no footage available
 - [ ] Magic (telegrab)
 - [x] Magic (alchemy)
 - [x] Magic (superheat)
