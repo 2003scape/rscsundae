@@ -12,6 +12,7 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include "config/loc.h"
 #include "protocol/opcodes.h"
 #include "server.h"
 #include "loop.h"
@@ -717,6 +718,45 @@ load_map_tile(struct jag_map *chunk,
 		loc.x = global_x;
 		loc.y = global_y;
 		loc.dir = object_dir;
+
+		/*
+		 * this is a hack to normalize mining differences between
+		 * client versions, and also not have some rocks as
+		 * "always mined
+		 */
+		switch (loc.id) {
+		case LOC_TINROCK3:
+			loc.id = loc.orig_id = LOC_TINROCK1;
+			break;
+		case LOC_COPPERROCK3:
+			loc.id = loc.orig_id = LOC_COPPERROCK1;
+			break;
+		case LOC_IRONROCK3:
+			loc.id = loc.orig_id = LOC_IRONROCK1;
+			break;
+		case LOC_GOLDROCK3:
+			loc.id = loc.orig_id = LOC_GOLDROCK1;
+			break;
+		case LOC_CLAYROCK3:
+			loc.id = loc.orig_id = LOC_CLAYROCK1;
+			break;
+		case LOC_SILVERROCK3:
+			loc.id = loc.orig_id = LOC_SILVERROCK1;
+			break;
+		case LOC_COALROCK3:
+			loc.id = loc.orig_id = LOC_COALROCK1;
+			break;
+		case LOC_MITHRILROCK3:
+			loc.id = loc.orig_id = LOC_MITHRILROCK1;
+			break;
+		case LOC_ADAMANTITEROCK3:
+			loc.id = loc.orig_id = LOC_ADAMANTITEROCK1;
+			break;
+		case LOC_RUNITEROCK3:
+			loc.id = loc.orig_id = LOC_RUNITEROCK1;
+			break;
+		}
+
 		loc_config = server_loc_config_by_id(loc.id);
 		if (loc_config == NULL) {
 			return;

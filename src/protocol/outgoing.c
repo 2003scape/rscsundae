@@ -5,6 +5,8 @@
 #include <string.h>
 #include <limits.h>
 #include "opcodes.h"
+#include "../config/item.h"
+#include "../config/loc.h"
 #include "../buffer.h"
 #include "../entity.h"
 #include "../server.h"
@@ -33,6 +35,59 @@ static ssize_t player_send_projectile_pvm(struct player *, void *, size_t);
 static ssize_t player_send_chat(struct player *, struct mob *, size_t);
 static int player_write_packet(struct player *, void *, size_t);
 static bool within_update_radius(struct player *, int, int, int);
+static int encode_loc_id(struct player *, int);
+static int encode_bubble_id(struct player *, int);
+
+static int
+encode_loc_id(struct player *p, int id)
+{
+	/*
+	 * this is a hack to normalize differences in mining behaviour
+	 * between client versions
+	 */
+	if (p->protocol_rev < 159) {
+		/* "mined" rocks stay normal */
+		switch (id) {
+		case LOC_PLAINROCK2:
+		case LOC_PLAINROCK3:
+		case LOC_COPPERROCK2:
+		case LOC_COPPERROCK3:
+		case LOC_TINROCK2:
+		case LOC_TINROCK3:
+		case LOC_IRONROCK2:
+		case LOC_IRONROCK3:
+		case LOC_MITHRILROCK2:
+		case LOC_MITHRILROCK3:
+		case LOC_ADAMANTITEROCK2:
+		case LOC_ADAMANTITEROCK3:
+		case LOC_RUNITEROCK2:
+		case LOC_RUNITEROCK3:
+		case LOC_COALROCK2:
+		case LOC_COALROCK3:
+		case LOC_CLAYROCK2:
+		case LOC_CLAYROCK3:
+		case LOC_SILVERROCK2:
+		case LOC_SILVERROCK3:
+		case LOC_GOLDROCK2:
+		case LOC_GOLDROCK3:
+			return LOC_PLAINROCK1;
+		}
+	}
+	return id;
+}
+
+static int
+encode_bubble_id(struct player *p, int id)
+{
+	/* client versions with multiple pickaxe tiers */
+	if (p->protocol_rev > 168) {
+		switch (id) {
+		case ITEM_PICKAXE:
+			return 1258;
+		}
+	}
+	return id;
+}
 
 static bool
 within_update_radius(struct player *p, int x, int y, int range)
@@ -572,19 +627,19 @@ player_send_damage(struct mob *mob, void *tmpbuf, size_t offset)
 }
 
 static ssize_t
-player_send_bubble(struct player *p, void *tmpbuf, size_t offset)
+player_send_bubble(struct player *p, struct player *p2, size_t offset)
 {
-	if (buf_putu16(tmpbuf, offset, PLAYER_BUFSIZE,
-		       p->mob.id) == -1) {
+	if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
+		       p2->mob.id) == -1) {
 		return -1;
 	}
 	offset += 2;
-	if (buf_putu8(tmpbuf, offset++, PLAYER_BUFSIZE,
+	if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 		      PLAYER_UPDATE_BUBBLE) == -1) {
 		return -1;
 	}
-	if (buf_putu16(tmpbuf, offset, PLAYER_BUFSIZE,
-		       p->bubble_id) == -1) {
+	if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
+		       encode_bubble_id(p, p2->bubble_id)) == -1) {
 		return -1;
 	}
 	offset += 2;
@@ -947,7 +1002,7 @@ player_send_appearance_update(struct player *p)
 	offset += 2;
 
 	if (p->bubble_id != UINT16_MAX) {
-		tmpofs = player_send_bubble(p, p->tmpbuf, offset);
+		tmpofs = player_send_bubble(p, p, offset);
 		if (tmpofs == -1) {
 			return -1;
 		}
@@ -1015,7 +1070,7 @@ player_send_appearance_update(struct player *p)
 			continue;
 		}
 		if (p2->bubble_id != UINT16_MAX) {
-			tmpofs = player_send_bubble(p2, p->tmpbuf, offset);
+			tmpofs = player_send_bubble(p, p2, offset);
 			if (tmpofs == -1) {
 				return -1;
 			}
@@ -1343,8 +1398,8 @@ player_send_locs(struct player *p)
 		if (loc == NULL) {
 			remove = true;
 		} else if (loc->id != p->known_locs[i].id) {
-			if (buf_putu16(p->tmpbuf, offset,
-			    PLAYER_BUFSIZE, loc->id) == -1) {
+			if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
+			    encode_loc_id(p, loc->id)) == -1) {
 				return -1;
 			}
 			offset += 2;
@@ -1413,8 +1468,8 @@ player_send_locs(struct player *p)
 		if (player_has_known_loc(p, nearby[i].x, nearby[i].y)) {
 			continue;
 		}
-		if (buf_putu16(p->tmpbuf, offset,
-		    PLAYER_BUFSIZE, nearby[i].id) == -1) {
+		if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
+		    encode_loc_id(p, nearby[i].id)) == -1) {
 			return -1;
 		}
 		offset += 2;
