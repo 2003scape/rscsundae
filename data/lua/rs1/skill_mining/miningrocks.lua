@@ -49,7 +49,7 @@ local function do_mine_plain(player, x, y)
 	if not do_initial_mining(player) then
 		return
 	end
-	if statrandom(player, STAT_MINING, 64, 375) then
+	if statrandom(player, STAT_MINING, 96, 350) then
 		if not mine_random_jewel(player) then
 			mes(player, "@que@A few lumps of uninteresting rock break off")
 			changeloc(x, y, "plainrock3")
@@ -65,7 +65,7 @@ local function do_mine_clay(player, x, y)
 		return
 	end
 	-- https://classic.runescape.wiki/w/User:Stormykins/Mining_rates
-	if statrandom(player, STAT_MINING, 64, 375) then
+	if statrandom(player, STAT_MINING, 96, 350) then
 		if not mine_random_jewel(player) then
 			mes(player, "@que@You manage to obtain some clay")
 			give(player, "clay", 1)
@@ -83,7 +83,7 @@ local function do_mine_tin(player, x, y)
 		return
 	end
 	-- https://classic.runescape.wiki/w/User:Stormykins/Mining_rates
-	if statrandom(player, STAT_MINING, 64, 375) then
+	if statrandom(player, STAT_MINING, 96, 350) then
 		if not mine_random_jewel(player) then
 			mes(player, "@que@You manage to obtain some tin ore")
 			give(player, "tin ore", 1)
@@ -101,7 +101,7 @@ local function do_mine_copper(player, x, y)
 		return
 	end
 	-- https://classic.runescape.wiki/w/User:Stormykins/Mining_rates
-	if statrandom(player, STAT_MINING, 64, 375) then
+	if statrandom(player, STAT_MINING, 96, 350) then
 		if not mine_random_jewel(player) then
 			mes(player, "@que@You manage to obtain some copper ore")
 			give(player, "copper ore", 1)
