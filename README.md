@@ -1,4 +1,4 @@
-RSC Sundae
+RSC Sundae 🍨
 ==========
 
 https://git.sr.ht/~stormy/rscsundae
