@@ -118,8 +118,9 @@ local function do_mine_iron(player, x, y)
 	if not do_initial_mining(player) then
 		return
 	end
+	-- https://classic.runescape.wiki/w/User:Stormykins/Mining_rates#Iron_rocks
 	if statatleast(player, STAT_MINING, 15) and
-	    statrandom(player, STAT_MINING, 96, 350) then
+	    statrandom(player, STAT_MINING, 64, 256) then
 		if not mine_random_jewel(player) then
 			mes(player, "@que@You manage to obtain some iron ore")
 			give(player, "iron ore", 1)
