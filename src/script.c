@@ -2272,6 +2272,19 @@ script_ontakeobj(lua_State *L, struct player *p, struct ground_item *item)
 }
 
 void
+script_onspellself(lua_State *L, struct player *p, struct spell_config *spell)
+{
+	lua_getglobal(L, "script_engine_spellself");
+	if (!lua_isfunction(L, -1)) {
+		puts("script error: can't find essential function script_engine_spellself");
+		return;
+	}
+	lua_pushnumber(L, p->mob.id);
+	lua_pushstring(L, spell->name);
+	safe_call(L, 2, 0, p->mob.id);
+}
+
+void
 script_cancel(lua_State *L, uint16_t player_id)
 {
 	lua_getglobal(L, "script_engine_cancel");

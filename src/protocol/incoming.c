@@ -465,6 +465,22 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			}
 		}
 		break;
+	case OP_CLI_SELF_CAST:
+		{
+			uint16_t spell_id;
+			struct spell_config *spell;
+
+			if (buf_getu16(data, offset, len, &spell_id) == -1) {
+				return;
+			}
+			offset += 2;
+			spell = server_spell_config_by_id(spell_id);
+			if (spell != NULL && spell->type == SPELL_CAST_ON_SELF) {
+				p->action = ACTION_SELF_CAST;
+				p->spell = spell;
+			}
+		}
+		break;
 	case OP_CLI_ATTACK_PLAYER:
 		{
 			uint16_t id;

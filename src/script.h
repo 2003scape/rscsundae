@@ -15,6 +15,7 @@ void script_onskillplayer(lua_State *, struct player *,
     struct player *, struct spell_config *);
 void script_onskillnpc(lua_State *, struct player *,
     struct npc *, struct spell_config *);
+void script_onspellself(lua_State *, struct player *, struct spell_config *);
 void script_onopbound1(lua_State *, struct player *, struct bound *);
 void script_onopbound2(lua_State *, struct player *, struct bound *);
 void script_onoploc1(lua_State *, struct player *, struct loc *);

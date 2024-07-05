@@ -1917,6 +1917,13 @@ player_process_action(struct player *p)
 		}
 		p->action = ACTION_NONE;
 		break;
+	case ACTION_SELF_CAST:
+		p->action = ACTION_NONE;
+		if (!player_can_cast(p, p->spell)) {
+			return;
+		}
+		script_onspellself(p->mob.server->lua, p, p->spell);
+		break;
 	}
 }
 

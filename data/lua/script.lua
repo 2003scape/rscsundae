@@ -8,6 +8,7 @@ local attacknpc_scripts = {}
 local opinv_scripts = {}
 local skillplayer_scripts = {}
 local skillnpc_scripts = {}
+local spellself_scripts = {}
 local spellinv_scripts = {}
 local opbound1_scripts = {}
 local opbound2_scripts = {}
@@ -86,6 +87,10 @@ end
 
 function register_takeobj(name, callback)
 	takeobj_scripts[name] = callback;
+end
+
+function register_spellself(name, callback)
+	spellself_scripts[name] = callback
 end
 
 function register_wearobj(name, callback)
@@ -355,6 +360,26 @@ function script_engine_skillnpc(player, name, npc, spell)
 		return true
 	end
 	return false
+end
+
+function script_engine_spellself(player, spell)
+	local script = player_scripts[player]
+	if script then
+		return
+	end
+	spell = string.lower(spell)
+	script = spellself_scripts[spell]
+	if script then
+		ps = new_player_script(player)
+		ps.co = coroutine.create(function()
+			script(player)
+			player_scripts[player] = nil
+			playerunbusy(player)
+		end)
+		player_scripts[player] = ps
+		playerbusy(player)
+		return
+	end
 end
 
 function script_engine_spellinv(player, name, spell)
