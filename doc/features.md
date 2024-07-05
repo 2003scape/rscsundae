@@ -72,7 +72,8 @@ These should all be implemented in Lua script:
 - [x] Magic (missiles vs. NPCs)
 - [ ] Magic (crumble undead) - needs config parser fixes
 - [x] Magic (curses)
-- [ ] Magic (teleportation)
+- [x] Magic (teleportation)
+- [ ] Magic (bones to bananas)
 - [ ] Magic (telegrab)
 - [x] Magic (alchemy)
 - [x] Magic (superheat)
