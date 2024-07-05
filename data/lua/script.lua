@@ -821,6 +821,9 @@ for k, v in pairs(_G) do
 		elseif string.match(k, "^takeobj_.*") then
 			target = string.gsub(string.sub(k, 9), "_", " ")
 			register_takeobj(target, v)
+		elseif string.match(k, "^spellself.*") then
+			target = string.gsub(string.sub(k, 10), "_", " ")
+			register_spellself(target, v)
 		end
 	end
 end
