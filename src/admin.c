@@ -129,7 +129,8 @@ player_parse_admin_command(struct player *p, char *str)
 
 		value = player_variable_get(p, varname);
 
-		(void)snprintf(msg, sizeof(msg), "%s=%d", varname, value);
+		(void)snprintf(msg, sizeof(msg),
+			"@que@%s=%d", varname, value);
 		player_send_message(p, msg);
 	} else if (strcmp(cmd, "setvar") == 0) {
 		char *varname;
@@ -155,7 +156,8 @@ player_parse_admin_command(struct player *p, char *str)
 		for (size_t i = 0; i < p->variable_count; i++) {
 			char msg[64];
 
-			(void)snprintf(msg, sizeof(msg), "%s=%d", p->variables[i].name,
+			(void)snprintf(msg, sizeof(msg),
+				"@que@%s=%d", p->variables[i].name,
 				p->variables[i].value);
 			player_send_message(p, msg);
 		}
@@ -163,7 +165,7 @@ player_parse_admin_command(struct player *p, char *str)
 		char msg[64];
 
 		(void)snprintf(msg, sizeof(msg),
-		    "coords: x = %u, y = %u", p->mob.x, p->mob.y);
+		    "@que@coords: x = %u, y = %u", p->mob.x, p->mob.y);
 		player_send_message(p, msg);
 	} else if (strcmp(cmd, "addnpc") == 0) {
 		struct npc_config *config;
