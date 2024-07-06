@@ -1569,6 +1569,8 @@ player_process_action(struct player *p)
 	    p->action != ACTION_NPC_CAST &&
 	    p->action != ACTION_PLAYER_ATTACK &&
 	    p->action != ACTION_PLAYER_CAST &&
+	    /* https://youtu.be/F7vPM8LA1HQ?t=218 */
+	    p->action != ACTION_SELF_CAST &&
 	    p->mob.in_combat) {
 		player_send_message(p,
 		    "You can't do that whilst you are fighting");
@@ -2211,6 +2213,32 @@ player_teleport(struct player *p, int x, int y)
 
 	p->mob.x = x;
 	p->mob.y = y;
+
+	if (p->mob.target_player != -1) {
+		struct player *p2;
+
+		/* no retreat message per https://youtu.be/F7vPM8LA1HQ?t=218 */
+
+		p2 = p->mob.server->players[p->mob.target_player];
+		if (p2 != NULL) {
+			p2->mob.walk_queue_len = 0;
+			p2->mob.walk_queue_pos = 0;
+			mob_combat_reset(&p2->mob);
+		}
+	}
+
+	if (p->mob.target_npc != -1) {
+		struct npc *npc;
+
+		npc = p->mob.server->npcs[p->mob.target_npc];
+		if (npc != NULL) {
+			npc->mob.walk_queue_len = 0;
+			npc->mob.walk_queue_pos = 0;
+			mob_combat_reset(&npc->mob);
+		}
+	}
+
+	mob_combat_reset(&p->mob);
 
 	player_moved(p, orig_x, orig_y);
 
