@@ -21,6 +21,7 @@ static int script_playerunbusy(lua_State *);
 static int script_npcsay(lua_State *);
 static int script_male(lua_State *);
 static int script_nearnpc(lua_State *);
+static int script_nearvisnpc(lua_State *);
 static int script_random(lua_State *);
 static int script_give(lua_State *);
 static int script_remove(lua_State *);
@@ -40,6 +41,7 @@ static int script_statdown(lua_State *);
 static int script_statrandom(lua_State *);
 static int script_npcstatup(lua_State *);
 static int script_npcstatdown(lua_State *);
+static int script_npcvisible(lua_State *);
 static int script_thinkbubble(lua_State *);
 static int script_boundaryteleport(lua_State *);
 static int script_upstairs(lua_State *);
@@ -578,6 +580,38 @@ script_nearnpc(lua_State *L)
 }
 
 static int
+script_nearvisnpc(lua_State *L)
+{
+	lua_Integer player_id;
+	struct player *p;
+	const char *name;
+	struct npc *npc;
+
+	player_id = script_checkinteger(L, 1);
+	name = script_checkstring(L, 2);
+
+	p = id_to_player(player_id);
+	if (p == NULL) {
+		printf("script warning: player %lld is undefined\n", player_id);
+		script_cancel(L, player_id);
+		lua_pushnil(L);
+		return 1;
+	}
+
+	npc = mob_find_nearby_npc(&p->mob, name);
+	if (npc != NULL &&
+	    mob_check_reachable(&p->mob, npc->mob.x, npc->mob.y, true)) {
+		mob_face(&npc->mob, p->mob.x, p->mob.y);
+		mob_face(&p->mob, npc->mob.x, npc->mob.y);
+		lua_pushinteger(L, npc->mob.id);
+		return 1;
+	}
+
+	lua_pushnil(L);
+	return 1;
+}
+
+static int
 script_random(lua_State *L)
 {
 	lua_Integer probability;
@@ -856,6 +890,38 @@ script_npcstatdown(lua_State *L)
 	}
 	b = stat_down(&npc->mob, stat);
 	lua_pushboolean(L, b);
+	return 1;
+}
+
+static int
+script_npcvisible(lua_State *L)
+{
+	lua_Integer player_id, npc_id;
+	struct player *p;
+	struct npc *npc;
+
+	player_id = script_checkinteger(L, 1);
+	npc_id = script_checkinteger(L, 2);
+
+	p = id_to_player(player_id);
+	if (p == NULL) {
+		printf("script warning: player %lld is undefined\n", player_id);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	npc = id_to_npc(npc_id);
+	if (npc == NULL) {
+		printf("script warning: npc %lld is undefined\n", npc_id);
+		lua_pushboolean(L, false);
+		return 1;
+	}
+
+	if (!mob_check_reachable(&p->mob, npc->mob.x, npc->mob.y, true)) {
+		lua_pushboolean(L, false);
+		return 1;
+	}
+	lua_pushboolean(L, true);
 	return 1;
 }
 
@@ -2402,6 +2468,9 @@ script_init(struct server *s)
 	lua_pushcfunction(L, script_npcstatdown);
 	lua_setglobal(L, "npcstatdown");
 
+	lua_pushcfunction(L, script_npcvisible);
+	lua_setglobal(L, "npcvisible");
+
 	lua_pushcfunction(L, script_addstat);
 	lua_setglobal(L, "addstat");
 
@@ -2488,6 +2557,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_nearnpc);
 	lua_setglobal(L, "nearnpc");
+
+	lua_pushcfunction(L, script_nearvisnpc);
+	lua_setglobal(L, "nearvisnpc");
 
 	lua_pushcfunction(L, script_qp);
 	lua_setglobal(L, "qp");
