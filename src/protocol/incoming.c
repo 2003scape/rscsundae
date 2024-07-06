@@ -703,6 +703,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				p->mob.walk_queue_x[i + 1] = (uint16_t)new_x;
 				p->mob.walk_queue_y[i + 1] = (uint16_t)new_y;
 			}
+			player_close_ui(p);
 			if (opcode != OP_CLI_WALK_ENTITY) {
 				p->mob.target_npc = -1;
 				p->mob.target_player = -1;

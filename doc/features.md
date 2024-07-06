@@ -55,8 +55,6 @@ Engine
 ### Known engine bugs
 
 * Chatting between 110 and 204 clients is currently not possible.
-* When using a bar on an anvil that's some distance away,
-  the script can hang for a few seconds
 * Quest list is broken on 204.
 
 Content

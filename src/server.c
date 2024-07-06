@@ -328,9 +328,6 @@ server_tick(void)
 		player_process_action(s.players[i]);
 		player_process_movement(s.players[i]);
 		script_process(s.lua, s.players[i]);
-		if (s.players[i]->mob.moved) {
-			player_close_ui(s.players[i]);
-		}
 		if (drain_tick) {
 			player_prayer_drain(s.players[i]);
 		}
