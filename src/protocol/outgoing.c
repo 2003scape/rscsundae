@@ -9,6 +9,7 @@
 #include "../config/loc.h"
 #include "../buffer.h"
 #include "../entity.h"
+#include "../script.h"
 #include "../server.h"
 #include "../shop.h"
 #include "../utility.h"
@@ -1867,6 +1868,7 @@ player_send_hide_multi(struct player *p)
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 		        OP_SRV_HIDE_MULTI);
 
+	script_cancel_multi(p->mob.server->lua, p->mob.id);
 	p->ui_multi_open = false;
 
 	return player_write_packet(p, p->tmpbuf, offset);

@@ -58,8 +58,6 @@ Engine
 * Quest list is broken on 204.
 * NPC clipping: sir vyvin escapes his tower
 * NPC clipping: thurgo walks diagonally past logs into an inaccessible area
-* Script should be immediately cancelled if it's waiting on a menu
-  and the player walks.
 
 Content
 -------

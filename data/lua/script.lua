@@ -226,6 +226,19 @@ function script_engine_cancel(player)
 	coroutine.close(co)
 end
 
+function script_engine_cancel_multi(player)
+	local ps = player_scripts[player]
+	if ps.option_count > 0 then
+		local co = ps.co
+		if ps.npc ~= nil then
+			npcunbusy(ps.npc)
+		end
+		playerunbusy(player)
+		player_scripts[player] = nil
+		coroutine.close(co)
+	end
+end
+
 function script_engine_answer(player, answer)
 	-- got an answer on a multi dialog
 	local ps = player_scripts[player]

@@ -2363,6 +2363,18 @@ script_cancel(lua_State *L, uint16_t player_id)
 }
 
 void
+script_cancel_multi(lua_State *L, uint16_t player_id)
+{
+	lua_getglobal(L, "script_engine_cancel_multi");
+	if (!lua_isfunction(L, -1)) {
+		puts("script error: can't find essential function script_engine_cancel_multi");
+		return;
+	}
+	lua_pushnumber(L, player_id);
+	lua_pcall(L, 1, 0, 0);
+}
+
+void
 script_multi_answer(lua_State *L, struct player *p, int option)
 {
 	lua_getglobal(L, "script_engine_answer");
