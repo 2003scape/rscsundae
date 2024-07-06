@@ -29,6 +29,7 @@ Between RSC Sundae and modern RuneScape
   on to higher level monsters.
 * You must retreat from melee combat before consuming food.  You can
   only retreat after a minimum of three rounds of melee combat.
+* There is no "run" option. Things are generally spaced closer together.
 * PvP combat is restricted to the Wilderness.
 
 

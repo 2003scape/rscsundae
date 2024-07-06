@@ -56,6 +56,8 @@ Engine
 
 * Chatting between 110 and 204 clients is currently not possible.
 * Quest list is broken on 204.
+* NPC clipping: sir vyvin escapes his tower
+* NPC clipping: thurgo walks diagonally past logs into an inaccessible area
 * Script should be immediately cancelled if it's waiting on a menu
   and the player walks.
 
@@ -113,7 +115,7 @@ These should all be implemented in Lua script:
 - [x] Witch's potion
 - [ ] Black knight's fortress
 - [x] Doric's quest
-- [ ] The knight's sword
+- [x] The knight's sword
 - [ ] Goblin diplomacy
 - [ ] Pirate's treasure
 - [ ] Dragon slayer

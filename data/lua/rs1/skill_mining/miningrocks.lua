@@ -241,24 +241,22 @@ local function do_mine_runite(player, x, y)
 	end
 end
 
-function useloc_plainrock1_pickaxe(player, x, y)
-	do_mine_plain(player, x, y)
-end
-
-function useloc_clayrock1_pickaxe(player, x, y)
-	do_mine_clay(player, x, y)
-end
-
-function useloc_tinrock1_pickaxe(player, x, y)
-	do_mine_tin(player, x, y)
-end
-
-function useloc_copperrock1_pickaxe(player, x, y)
-	do_mine_copper(player, x, y)
-end
-
-function useloc_ironrock1_pickaxe(player, x, y)
-	do_mine_copper(player, x, y)
+local function do_mine_blurite(player, x, y)
+	if not do_initial_mining(player) then
+		return
+	end
+	if statatleast(player, STAT_MINING, 10) and
+	    statrandom(player, STAT_MINING, 95, 350) then
+		if not mine_random_jewel(player) then
+			mes(player, "@que@You manage to obtain some blurite ore")
+			give(player, "blurite ore", 1)
+			advancestat(player, STAT_MINING, 500, 0)
+			changeloc(x, y, "plainrock3")
+			restoreloc(x, y, 850)
+		end
+	else
+		mes(player, "@que@You only succeed in scratching the rock")
+	end
 end
 
 function oploc1_plainrock1(player, x, y)
@@ -381,36 +379,41 @@ function oploc1_runiterock3(player, x, y)
 	do_mine_empty(player, x, y)
 end
 
-register_useloc("plainrock1", "pickaxe", useloc_plainrock1_pickaxe)
-register_useloc("plainrock2", "pickaxe", useloc_plainrock1_pickaxe)
+function oploc1_bluriterock1(player, x, y)
+	do_mine_blurite(player, x, y)
+end
+
+register_useloc("plainrock1", "pickaxe", do_mine_plain)
+register_useloc("plainrock2", "pickaxe", do_mine_plain)
+register_useloc("plainrock3", "pickaxe", do_mine_empty)
+register_useloc("tinrock1", "pickaxe", do_mine_tin)
+register_useloc("tinrock2", "pickaxe", do_mine_tin)
 register_useloc("tinrock3", "pickaxe", do_mine_empty)
-register_useloc("tinrock1", "pickaxe", useloc_tinrock1_pickaxe)
-register_useloc("tinrock2", "pickaxe", useloc_tinrock1_pickaxe)
-register_useloc("tinrock3", "pickaxe", do_mine_empty)
-register_useloc("copperrock1", "pickaxe", useloc_copperrock1_pickaxe)
-register_useloc("copperrock2", "pickaxe", useloc_copperrock1_pickaxe)
+register_useloc("copperrock1", "pickaxe", do_mine_copper)
+register_useloc("copperrock2", "pickaxe", do_mine_copper)
 register_useloc("copperrock3", "pickaxe", do_mine_empty)
-register_useloc("ironrock1", "pickaxe", useloc_ironrock1_pickaxe)
-register_useloc("ironrock2", "pickaxe", useloc_ironrock1_pickaxe)
+register_useloc("ironrock1", "pickaxe", do_mine_iron)
+register_useloc("ironrock2", "pickaxe", do_mine_iron)
 register_useloc("ironrock3", "pickaxe", do_mine_empty)
-register_useloc("mithrilrock1", "pickaxe", useloc_mithrilrock1_pickaxe)
-register_useloc("mithrilrock2", "pickaxe", useloc_mithrilrock1_pickaxe)
+register_useloc("mithrilrock1", "pickaxe", do_mine_mithril)
+register_useloc("mithrilrock2", "pickaxe", do_mine_mithril)
 register_useloc("mithrilrock3", "pickaxe", do_mine_empty)
-register_useloc("adamantiterock1", "pickaxe", useloc_adamantiterock1_pickaxe)
-register_useloc("adamantiterock2", "pickaxe", useloc_adamantiterock1_pickaxe)
+register_useloc("adamantiterock1", "pickaxe", do_mine_adamantite)
+register_useloc("adamantiterock2", "pickaxe", do_mine_adamantite)
 register_useloc("adamantiterock3", "pickaxe", do_mine_empty)
-register_useloc("coalrock1", "pickaxe", useloc_coalrock1_pickaxe)
-register_useloc("coalrock2", "pickaxe", useloc_coalrock1_pickaxe)
+register_useloc("coalrock1", "pickaxe", do_mine_coal)
+register_useloc("coalrock2", "pickaxe", do_mine_coal)
 register_useloc("coalrock3", "pickaxe", do_mine_empty)
-register_useloc("goldrock1", "pickaxe", useloc_goldrock1_pickaxe)
-register_useloc("goldrock2", "pickaxe", useloc_goldrock1_pickaxe)
+register_useloc("goldrock1", "pickaxe", do_mine_gold)
+register_useloc("goldrock2", "pickaxe", do_mine_gold)
 register_useloc("goldrock3", "pickaxe", do_mine_empty)
-register_useloc("clayrock1", "pickaxe", useloc_clayrock1_pickaxe)
-register_useloc("clayrock2", "pickaxe", useloc_clayrock1_pickaxe)
+register_useloc("clayrock1", "pickaxe", do_mine_clay)
+register_useloc("clayrock2", "pickaxe", do_mine_clay)
 register_useloc("clayrock3", "pickaxe", do_mine_empty)
-register_useloc("silverrock1", "pickaxe", useloc_silverrock1_pickaxe)
-register_useloc("silverrock2", "pickaxe", useloc_solverrock1_pickaxe)
+register_useloc("silverrock1", "pickaxe", do_mine_silver)
+register_useloc("silverrock2", "pickaxe", do_mine_silver)
 register_useloc("silverrock3", "pickaxe", do_mine_empty)
-register_useloc("runiterock1", "pickaxe", useloc_runiterock1_pickaxe)
-register_useloc("runiterock2", "pickaxe", useloc_runiterock1_pickaxe)
+register_useloc("runiterock1", "pickaxe", do_mine_runite)
+register_useloc("runiterock2", "pickaxe", do_mine_runite)
 register_useloc("runiterock3", "pickaxe", do_mine_empty)
+register_useloc("bluriterock1", "pickaxe", do_mine_blurite)
