@@ -24,11 +24,13 @@ matter.
 Avoid the use of `sprintf`, `strcpy`, `strcat`, etc.  Use
 `snprintf` instead.
 
-Do not use `alloca`.
+Do not use `alloca` or variable-length stack based arrays to avoid
+unpredictable stack size increases.
 
 Lua code
 --------
 
-* Do not use global variables in content scripts.
+* Do not use global variables in content scripts except if they are constant
+  (not ever changed).
 * Avoid using math.random(), for authentic randomness behaviour
   in content scripts use random() and randomvar() instead.
