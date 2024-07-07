@@ -1,5 +1,6 @@
 dofile("./lua/rs1/monster/barbarian.lua")
 dofile("./lua/rs1/monster/black_knight.lua")
+dofile("./lua/rs1/monster/chaos_dwarf.lua")
 dofile("./lua/rs1/monster/chaosmonk.lua")
 dofile("./lua/rs1/monster/chicken.lua")
 dofile("./lua/rs1/monster/darkerwiz.lua")

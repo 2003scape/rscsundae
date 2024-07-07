@@ -194,7 +194,7 @@ The following use randomvar and need to be implemented in script:
 - [ ] White Knight
 - [x] Hobgoblin1
 - [x] Ice Warrior
-- [ ] Chaos dwarf
+- [x] Chaos dwarf
 - [ ] Moss Giant
 - [ ] Ice Giant
 - [ ] Lesser Demon
