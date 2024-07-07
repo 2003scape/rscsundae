@@ -177,6 +177,12 @@ player_parse_admin_command(struct player *p, char *str)
 			return;
 		}
 
+		for (size_t i = 0; name[i] != '\0'; ++i) {
+			if (name[i] == '_') {
+				name[i] = ' ';
+			}
+		}
+
 		config = server_find_npc_config(name);
 		if (config == NULL) {
 			player_send_message(p, "Warning: npc not found");
