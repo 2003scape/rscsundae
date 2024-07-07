@@ -56,8 +56,7 @@ Engine
 
 * Chatting between 110 and 204 clients is currently not possible.
 * Quest list is broken on 204.
-* NPC clipping: sir vyvin escapes his tower
-* NPC clipping: thurgo walks diagonally past logs into an inaccessible area
+* NPC clipping: probably some remaining issues.
 
 Content
 -------

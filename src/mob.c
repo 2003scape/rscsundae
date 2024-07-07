@@ -563,6 +563,11 @@ mob_check_collision(struct mob *mob,
 			}
 			break;
 		case MOB_DIR_NORTHWEST:
+			/* check for cutting across two blocked tiles */
+			if ((s->adjacency[plane][cur_x + 1][cy] & block) != 0 &&
+			    (s->adjacency[plane][cur_x][cy - 1] & block) != 0) {
+				return true;
+			}
 			if ((s->adjacency[plane][cur_x][cy] & block_h) != 0 &&
 			    (s->adjacency[plane][cur_x][cy - 1] & block_v) != 0) {
 				return true;
@@ -581,6 +586,19 @@ mob_check_collision(struct mob *mob,
 			}
 			break;
 		case MOB_DIR_NORTHEAST:
+			/* check for cutting across two blocked tiles */
+			if ((s->adjacency[plane][cur_x - 1][cy] & block) != 0 &&
+			    (s->adjacency[plane][cur_x][cy - 1] & block) != 0) {
+				return true;
+			}
+			if ((s->adjacency[plane][cur_x][cy - 1] & block_v) != 0 &&
+			    (s->adjacency[plane][cur_x - 1][cy] & block) != 0) {
+				return true;
+			}
+			if ((s->adjacency[plane][cur_x - 1][cy] & block_h) != 0 &&
+			    (s->adjacency[plane][cur_x][cy - 1] & block) != 0) {
+				return true;
+			}
 			if ((s->adjacency[plane][cur_x - 1][cy - 1] & block_h) != 0 &&
 			    (s->adjacency[plane][cur_x - 1][cy - 1] & block_v) != 0) {
 				return true;
@@ -599,6 +617,19 @@ mob_check_collision(struct mob *mob,
 			}
 			break;
 		case MOB_DIR_SOUTHWEST:
+			/* check for cutting across two blocked tiles */
+			if ((s->adjacency[plane][cur_x + 1][cy] & block) != 0 &&
+			    (s->adjacency[plane][cur_x][cy + 1] & block) != 0) {
+				return true;
+			}
+			if ((s->adjacency[plane][cur_x][cy] & block_v) != 0 &&
+			    (s->adjacency[plane][cur_x + 1][cy] & block) != 0) {
+				return true;
+			}
+			if ((s->adjacency[plane][cur_x][cy] & block_h) != 0 &&
+			    (s->adjacency[plane][cur_x][cy + 1] & block) != 0) {
+				return true;
+			}
 			if ((s->adjacency[plane][cur_x][cy] & block_h) != 0 &&
 			    (s->adjacency[plane][cur_x][cy] & block_v) != 0) {
 				return true;
@@ -617,6 +648,23 @@ mob_check_collision(struct mob *mob,
 			}
 			break;
 		case MOB_DIR_SOUTHEAST:
+			/* check for cutting across two blocked tiles */
+			if ((s->adjacency[plane][cur_x - 1][cy] & block) != 0 &&
+			    (s->adjacency[plane][cur_x][cy + 1] & block) != 0) {
+				return true;
+			}
+			if ((s->adjacency[plane][cur_x - 1][cy] & block) != 0 &&
+			    (s->adjacency[plane][cur_x][cy] & block_h) != 0) {
+				return true;
+			}
+			if ((s->adjacency[plane][cur_x - 1][cy] & block_h) != 0 &&
+			    (s->adjacency[plane][cur_x][cy + 1] & block) != 0) {
+				return true;
+			}
+			if ((s->adjacency[plane][cur_x - 1][cy] & block) != 0 &&
+			    (s->adjacency[plane][cur_x][cy] & block_v) != 0) {
+				return true;
+			}
 			if ((s->adjacency[plane][cur_x - 1][cy + 1] & block_h) != 0 &&
 			    (s->adjacency[plane][cur_x - 1][cy] & block_v) != 0) {
 				return true;
