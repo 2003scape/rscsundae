@@ -358,6 +358,9 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			if (buf_getu8(data, offset++, len, &id) == -1) {
 				return;
 			}
+			if (id >= MAX_PRAYERS) {
+				return;
+			}
 			player_prayer_disable(p, id);
 		}
 		break;
@@ -366,6 +369,9 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			uint8_t id;
 
 			if (buf_getu8(data, offset++, len, &id) == -1) {
+				return;
+			}
+			if (id >= MAX_PRAYERS) {
 				return;
 			}
 			player_prayer_enable(p, id);

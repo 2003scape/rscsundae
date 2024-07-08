@@ -1263,7 +1263,9 @@ player_prayer_enable(struct player *p, int prayer)
 		return;
 	}
 	config = server_prayer_config_by_id(prayer);
-	assert(config != NULL);
+	if (config == NULL) {
+		return;
+	}
 	if (p->mob.base_stats[SKILL_PRAYER] < config->level) {
 		return;
 	}
@@ -1330,7 +1332,9 @@ player_prayer_disable(struct player *p, int prayer)
 	}
 	if (p->prayers[prayer]) {
 		config = server_prayer_config_by_id(prayer);
-		assert(config != NULL);
+		if (config == NULL) {
+			return;
+		}
 		p->next_drain = 0;
 		p->drain_counter = 0;
 		p->prayer_drain -= config->drain;
