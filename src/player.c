@@ -1942,19 +1942,15 @@ player_has_reagents(struct player *p, struct spell_config *spell)
 		switch (spell->reagents[i].item_id) {
 		case ITEM_FIRE_RUNE:
 			staff = server_find_item_config("staff of fire");
-			assert(staff != NULL);
 			break;
 		case ITEM_WATER_RUNE:
 			staff = server_find_item_config("staff of water");
-			assert(staff != NULL);
 			break;
 		case ITEM_AIR_RUNE:
 			staff = server_find_item_config("staff of air");
-			assert(staff != NULL);
 			break;
 		case ITEM_EARTH_RUNE:
 			staff = server_find_item_config("staff of earth");
-			assert(staff != NULL);
 			break;
 		default:
 			staff = NULL;
@@ -2028,20 +2024,24 @@ player_init_class(struct player *p)
 	switch (p->rpg_class) {
 	case CLASS_ADVENTURER:
 		item = server_find_item_config("bronze axe");
-		assert(item != NULL);
-		player_inv_give(p, item, 1);
+		if (item != NULL) {
+			player_inv_give(p, item, 1);
+		}
 
 		item = server_find_item_config("tinderbox");
-		assert(item != NULL);
-		player_inv_give(p, item, 1);
+		if (item != NULL) {
+			player_inv_give(p, item, 1);
+		}
 
 		item = server_find_item_config("jug");
-		assert(item != NULL);
-		player_inv_give(p, item, 1);
+		if (item != NULL) {
+			player_inv_give(p, item, 1);
+		}
 
 		item = server_find_item_config("pot");
-		assert(item != NULL);
-		player_inv_give(p, item, 1);
+		if (item != NULL) {
+			player_inv_give(p, item, 1);
+		}
 
 		stat_advance(p, SKILL_ATTACK, 500, 0);
 		stat_advance(p, SKILL_DEFENSE, 500, 0);
@@ -2053,12 +2053,14 @@ player_init_class(struct player *p)
 		break;
 	case CLASS_WARRIOR:
 		item = server_find_item_config("bronze short sword");
-		assert(item != NULL);
-		player_inv_give(p, item, 1);
+		if (item != NULL) {
+			player_inv_give(p, item, 1);
+		}
 
 		item = server_find_item_config("wooden shield");
-		assert(item != NULL);
-		player_inv_give(p, item, 1);
+		if (item != NULL) {
+			player_inv_give(p, item, 1);
+		}
 
 		stat_advance(p, SKILL_ATTACK, 700, 0);
 		stat_advance(p, SKILL_DEFENSE, 700, 0);
@@ -2067,31 +2069,36 @@ player_init_class(struct player *p)
 		break;
 	case CLASS_WIZARD:
 		item = server_find_item_config("staff");
-		assert(item != NULL);
-		player_inv_give(p, item, 1);
+		if (item != NULL) {
+			player_inv_give(p, item, 1);
+		}
 
 		item = server_find_item_config("bluewizhat");
-		assert(item != NULL);
-		player_inv_give(p, item, 1);
+		if (item != NULL) {
+			player_inv_give(p, item, 1);
+		}
 
 		stat_advance(p, SKILL_MAGIC, 2600, 0);
 		break;
 	case CLASS_RANGER:
 		item = server_find_item_config("shortbow");
-		assert(item != NULL);
-		player_inv_give(p, item, 1);
+		if (item != NULL) {
+			player_inv_give(p, item, 1);
+		}
 
 		item = server_find_item_config("arrows");
-		assert(item != NULL);
-		player_inv_give(p, item, 10);
+		if (item != NULL) {
+			player_inv_give(p, item, 10);
+		}
 
 		stat_advance(p, SKILL_RANGED, 2100, 0);
 		stat_advance(p, SKILL_HITS, 3000, 0);
 		break;
 	case CLASS_MINER:
 		item = server_find_item_config("pickaxe");
-		assert(item != NULL);
-		player_inv_give(p, item, 1);
+		if (item != NULL) {
+			player_inv_give(p, item, 1);
+		}
 		stat_advance(p, SKILL_MINING, 2600, 0);
 		break;
 	}
@@ -2107,16 +2114,19 @@ player_init_adventurer(struct player *p)
 	/* post-tutorial island starter pack */
 
 	item = server_find_item_config("bronze axe");
-	assert(item != NULL);
-	player_inv_give(p, item, 1);
+	if (item != NULL) {
+		player_inv_give(p, item, 1);
+	}
 
 	item = server_find_item_config("tinderbox");
-	assert(item != NULL);
-	player_inv_give(p, item, 1);
+	if (item != NULL) {
+		player_inv_give(p, item, 1);
+	}
 
 	item = server_find_item_config("cookedmeat");
-	assert(item != NULL);
-	player_inv_give(p, item, 1);
+	if (item != NULL) {
+		player_inv_give(p, item, 1);
+	}
 }
 
 int32_t

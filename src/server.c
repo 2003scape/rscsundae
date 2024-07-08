@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include "config/loc.h"
 #include "protocol/opcodes.h"
@@ -94,26 +95,13 @@ main(int argc, char **argv)
 	init_opcodes_203();
 	stat_calculate_table();
 
+#ifndef FUZZ
 	if (ini_parse(conffile, server_parse_settings, &s) < 0) {
 		fprintf(stderr, "error parsing ./data/settings.ini\n");
 		return EXIT_FAILURE;
 	}
 
-	if (rsa_init(&s.rsa, s.rsa_exponent, s.rsa_modulus) == -1) {
-		fprintf(stderr, "failed to initialize with rsa private key\n");
-		return EXIT_FAILURE;
-	}
-
 	(void)chdir(basedir);
-
-	printf("starting server on address %s port %d\n",
-	    s.bind_addr, s.port);
-
-	s.lua = script_init(&s);
-	if (s.lua == NULL) {
-		fprintf(stderr, "failed to start script engine\n");
-		return EXIT_FAILURE;
-	}
 
 	if (load_config_jag() == -1) {
 		fprintf(stderr, "error reading config.jag\n");
@@ -127,13 +115,61 @@ main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
+	s.lua = script_init(&s);
+	if (s.lua == NULL) {
+		fprintf(stderr, "failed to start script engine\n");
+		return EXIT_FAILURE;
+	}
+#else
+	s.rsa_exponent = "571fb062048b61721ebfcf1e877153241b70c3aa26edb0f9f06a1b2be07c4e45eaba4fc356ea806cbed298d38613590a53fde0383c3a411758516293240925e5";
+	s.rsa_modulus = "88c38748a58228f7261cdc340b5691d7d0975dee0ecdb717609e6bf971eb3fe723ef9d130e4686813739768ad9472eb46d8bfcc042c1a5fcb05e931f632eea5d";
+
+	struct item_config item = {0};
+
+	item.names[0] = "Coins";
+	item.name_count = 1;
+
+	s.item_config = &item;
+	s.item_config_count = 1;
+#endif
+
+	if (rsa_init(&s.rsa, s.rsa_exponent, s.rsa_modulus) == -1) {
+		fprintf(stderr, "failed to initialize with rsa private key\n");
+		return EXIT_FAILURE;
+	}
+
+	printf("starting server on address %s port %d\n",
+	    s.bind_addr, s.port);
+
 #ifdef PROFILE
 	ProfilerStart("./sundae.prof");
 #endif
 
+#ifndef FUZZ
 	if (loop_start(&s) == -1) {
 		return EXIT_FAILURE;
 	}
+#else
+	struct player *p;
+	int fd, len;
+
+	p = player_create(&s, -1);
+	if (p == NULL) {
+		return EXIT_FAILURE;
+	}
+	fd = open(argv[0], O_RDONLY);
+	if (fd == -1) {
+		return EXIT_FAILURE;
+	}
+	len = read(fd, p->inbuf, 5000);
+	if (len < 0) {
+		return EXIT_FAILURE;
+	}
+	printf("read %zu bytes\n", len);
+	p->inbuf_processed = 0;
+	p->inbuf_len = (size_t)len;
+	player_parse_incoming(p);
+#endif
 	return EXIT_SUCCESS;
 }
 

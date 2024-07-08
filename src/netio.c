@@ -77,6 +77,15 @@ net_player_recv(struct player *p)
 	ssize_t n = recv(p->sock, p->inbuf + p->inbuf_len, max, 0);
 
 	if (n > 0) {
+#if 0
+		/* this is useful for capturing data for e.g. fuzzing */
+		FILE *f = fopen("./packet", "ab");
+		if (f != NULL) {
+			fwrite(p->inbuf + p->inbuf_len, 1, n, f);
+			fflush(f);
+			fclose(f);
+		}
+#endif
 		p->inbuf_len += n;
 	}
 	return 0;
