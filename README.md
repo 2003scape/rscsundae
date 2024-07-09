@@ -70,6 +70,21 @@ Read `doc/style.md` first.
 
 Use `git format-patch`. You can email `stormy@mailfence.com`.
 
+Fuzzing & profiling
+-------------------
+
+Sundae is wired up for performance profiling with gperftools and fuzzing
+with AFL.
+
+For profiling, configure with:
+
+	CFLAGS="-DPROFILE" LDFLAGS="-lprofiler" ./configure
+
+For fuzzing, configure with:
+
+	CFLAGS="-DFUZZ -D_FORTIFY_SOURCE=2 -fstack-protector-all" -fsanitize=undefined" \
+	LDFLAGS="-fsanitize=undefined" ./configure
+
 Resources
 ---------
 
