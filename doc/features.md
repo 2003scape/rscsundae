@@ -56,7 +56,6 @@ Engine
 
 * Chatting between 110 and 204 clients is currently not possible.
 * Quest list is broken on 204.
-* NPC clipping: probably some remaining issues.
 
 Content
 -------
