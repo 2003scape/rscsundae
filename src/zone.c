@@ -10,6 +10,8 @@ static struct zone *zones[ZONE_TOTAL_X][ZONE_TOTAL_Y][ZONE_MAX_PLANE] = {0};
 
 static struct zone *zone_new(int, int, int);
 
+static void remove_loc_collision(struct server *, struct loc *);
+
 static struct zone *
 zone_new(int x, int y, int plane)
 {
@@ -112,6 +114,76 @@ server_del_loc(int x, int y)
 	}
 }
 
+static void
+remove_loc_collision(struct server *s, struct loc *loc)
+{
+	struct loc_config *config;
+	int x, y;
+	int max_x, max_y;
+	int y_dec, plane;
+
+	plane = 0;
+	y = loc->y;
+	while (y > PLANE_LEVEL_INC) {
+		y -= PLANE_LEVEL_INC;
+		plane++;
+	}
+	y_dec = PLANE_LEVEL_INC * plane;
+
+	config = server_loc_config_by_id(loc->id);
+	assert(config != NULL);
+
+	if (config->type == LOC_TYPE_PASSTHRU ||
+	    config->type == LOC_TYPE_GATE_OPEN) {
+		return;
+	}
+
+	if (loc->dir == MOB_DIR_NORTH || loc->dir == MOB_DIR_SOUTH) {
+		max_x = loc->x + config->width;
+		max_y = loc->y + config->height;
+	} else {
+		max_x = loc->x + config->height;
+		max_y = loc->y + config->width;
+	}
+
+	if (config->type == LOC_TYPE_BLOCKING) {
+		for (x = loc->x; x < max_x; ++x) {
+			for (y = loc->y; y < max_y; ++y) {
+				s->adjacency[plane][x][y - y_dec] = 0;
+			}
+		}
+		return;
+	}
+
+	for (x = loc->x; x < max_x; ++x) {
+		for (y = loc->y; y < max_y; ++y) {
+			if (config->block_projectile) {
+				s->adjacency[plane][x][y - y_dec] &=
+				    ~ADJ_BLOCK_SIGHT;
+			}
+
+			switch (loc->dir) {
+			case MOB_DIR_NORTH:
+				s->adjacency[plane][x - 1][y - y_dec] &=
+				    ~ADJ_BLOCK_HORIZ;
+				break;
+			case MOB_DIR_SOUTH:
+				s->adjacency[plane][x][y - y_dec] &=
+				    ~ADJ_BLOCK_HORIZ;
+				break;
+			case MOB_DIR_WEST:
+				s->adjacency[plane][x][y - y_dec] &=
+				    ~ADJ_BLOCK_VERT;
+				break;
+			case MOB_DIR_EAST:
+				s->adjacency[plane][x][y - y_dec - 1] &=
+				    ~ADJ_BLOCK_VERT;
+				break;
+			}
+		}
+	}
+}
+
 void
 server_add_loc(struct server *s, struct loc *loc)
 {
@@ -131,6 +203,11 @@ server_add_loc(struct server *s, struct loc *loc)
 	}
 	y_dec = PLANE_LEVEL_INC * plane;
 
+	old = server_find_loc(loc->x, loc->y);
+	if (old != NULL) {
+		remove_loc_collision(s, old);
+	}
+
 	config = server_loc_config_by_id(loc->id);
 	assert(config != NULL);
 
@@ -141,15 +218,6 @@ server_add_loc(struct server *s, struct loc *loc)
 	} else {
 		max_x = loc->x + config->height;
 		max_y = loc->y + config->width;
-	}
-
-	old = server_find_loc(loc->x, loc->y);
-	if (old != NULL) {
-		for (x = loc->x; x < max_x; ++x) {
-			for (y = loc->y; y < max_y; ++y) {
-				s->adjacency[plane][x][y - y_dec] = 0;
-			}
-		}
 	}
 
 	for (x = loc->x; x < max_x; ++x) {
@@ -168,8 +236,11 @@ server_add_loc(struct server *s, struct loc *loc)
 					    ADJ_BLOCK_HORIZ;
 					break;
 				case MOB_DIR_WEST:
-				case MOB_DIR_EAST:
 					s->adjacency[plane][x][y - y_dec] |=
+					    ADJ_BLOCK_VERT;
+					break;
+				case MOB_DIR_EAST:
+					s->adjacency[plane][x][y - y_dec - 1] |=
 					    ADJ_BLOCK_VERT;
 					break;
 				}

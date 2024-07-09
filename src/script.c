@@ -1690,17 +1690,20 @@ script_changeloc(lua_State *L)
 	lua_Integer x, y;
 	const char *name;
 	struct loc_config *config;
-	struct loc *loc;
+	struct loc loc;
+	struct loc *loc_p;
 
 	x = script_checkinteger(L, 1);
 	y = script_checkinteger(L, 2);
 	name = script_checkstring(L, 3);
 
-	loc = server_find_loc(x, y);
-	if (loc == NULL) {
+	loc_p = server_find_loc(x, y);
+	if (loc_p == NULL) {
 		printf("script warning: couldn't find loc at %lld %lld\n", x, y);
 		return 0;
 	}
+
+	loc = *loc_p;
 
 	config = server_find_loc_config(name);
 	if (config == NULL) {
@@ -1708,9 +1711,9 @@ script_changeloc(lua_State *L)
 		return 0;
 	}
 
-	loc->id = config->id;
+	loc.id = config->id;
 
-	server_add_loc(serv, loc);
+	server_add_loc(serv, &loc);
 	return 0;
 }
 
