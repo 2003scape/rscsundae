@@ -160,6 +160,9 @@ server_add_loc(struct server *s, struct loc *loc)
 			} else if (config->type == LOC_TYPE_GATE_CLOSED) {
 				switch (loc->dir) {
 				case MOB_DIR_NORTH:
+					s->adjacency[plane][x - 1][y - y_dec] |=
+					    ADJ_BLOCK_HORIZ;
+					break;
 				case MOB_DIR_SOUTH:
 					s->adjacency[plane][x][y - y_dec] |=
 					    ADJ_BLOCK_HORIZ;
