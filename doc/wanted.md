@@ -13,3 +13,4 @@ recordings would be very useful for RSC Sundae:
 * Dropping wine of zamorak near Monks of Zamorak and attempting to pick it up
 * Attempting to pick up the steel mace drop from a Monk of Zamorak
 * Trying to complete Cook's Assistant or make bread with a heap of flour
+* String an unstrung holy symbol
