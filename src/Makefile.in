@@ -116,8 +116,8 @@ am__rscsundae_SOURCES_DIST = admin.c bank.c buffer.c mob.c netio.c \
 	ext/libjag/lib/jag_unpack_entry.c \
 	ext/libjag/lib/jag_unpack_file.c ext/reallocarr.c \
 	protocol/incoming.c protocol/opcodes203.c protocol/outgoing.c \
-	protocol/rsa-openssl.c persistence/database-sqlite.c \
-	ext/inih/ini.c loop-kqueue.c loop-ev.c loop-poll.c
+	protocol/rsa-openssl.c ext/inih/ini.c loop-kqueue.c loop-ev.c \
+	loop-poll.c persistence/database-sqlite.c
 am__dirstamp = $(am__leading_dot)dirstamp
 @HAVE_SYSTEM_INIH_FALSE@am__objects_1 = ext/inih/ini.$(OBJEXT)
 @KQUEUE_TRUE@am__objects_2 = loop-kqueue.$(OBJEXT)
@@ -140,13 +140,13 @@ am_rscsundae_OBJECTS = admin.$(OBJEXT) bank.$(OBJEXT) buffer.$(OBJEXT) \
 	ext/libjag/lib/jag_unpack_file.$(OBJEXT) \
 	ext/reallocarr.$(OBJEXT) protocol/incoming.$(OBJEXT) \
 	protocol/opcodes203.$(OBJEXT) protocol/outgoing.$(OBJEXT) \
-	protocol/rsa-openssl.$(OBJEXT) \
-	persistence/database-sqlite.$(OBJEXT) $(am__objects_1) \
-	$(am__objects_2) $(am__objects_3) $(am__objects_4)
+	protocol/rsa-openssl.$(OBJEXT) $(am__objects_1) \
+	$(am__objects_2) $(am__objects_3) $(am__objects_4) \
+	persistence/database-sqlite.$(OBJEXT)
 rscsundae_OBJECTS = $(am_rscsundae_OBJECTS)
 am__DEPENDENCIES_1 =
 rscsundae_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -278,6 +278,8 @@ PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
 PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
+SQLITE3_CFLAGS = @SQLITE3_CFLAGS@
+SQLITE3_LIBS = @SQLITE3_LIBS@
 STRIP = @STRIP@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
@@ -329,7 +331,8 @@ AUTOMAKE_OPTIONS = subdir-objects
 #AM_CPPFLAGS += -Iext/tiny-bignum-c
 #AM_CPPFLAGS += -DWITH_RSA_TINY
 AM_CPPFLAGS = -Iext/libjag/include $(LUA_CFLAGS) $(INIH_CFLAGS) \
-	$(LIBCRYPTO_CFLAGS) -DWITH_RSA_OPENSSL $(am__append_1)
+	$(LIBCRYPTO_CFLAGS) -DWITH_RSA_OPENSSL $(am__append_1) \
+	$(SQLITE3_CFLAGS)
 
 #rscsundae_SOURCES += protocol/rsa-tiny.c
 rscsundae_SOURCES = admin.c bank.c buffer.c mob.c netio.c player.c \
@@ -344,11 +347,10 @@ rscsundae_SOURCES = admin.c bank.c buffer.c mob.c netio.c player.c \
 	ext/libjag/lib/jag_unpack_entry.c \
 	ext/libjag/lib/jag_unpack_file.c ext/reallocarr.c \
 	protocol/incoming.c protocol/opcodes203.c protocol/outgoing.c \
-	protocol/rsa-openssl.c persistence/database-sqlite.c \
-	$(am__append_2) $(am__append_3) $(am__append_4) \
-	$(am__append_5)
+	protocol/rsa-openssl.c $(am__append_2) $(am__append_3) \
+	$(am__append_4) $(am__append_5) persistence/database-sqlite.c
 rscsundae_LDADD = -lm $(libev_LIBS) $(LUA_LIBS) $(INIH_LIBS) \
-	$(LIBCRYPTO_LIBS) -lsqlite3
+	$(LIBCRYPTO_LIBS) $(SQLITE3_LIBS)
 all: all-am
 
 .SUFFIXES:
@@ -488,14 +490,6 @@ protocol/outgoing.$(OBJEXT): protocol/$(am__dirstamp) \
 	protocol/$(DEPDIR)/$(am__dirstamp)
 protocol/rsa-openssl.$(OBJEXT): protocol/$(am__dirstamp) \
 	protocol/$(DEPDIR)/$(am__dirstamp)
-persistence/$(am__dirstamp):
-	@$(MKDIR_P) persistence
-	@: > persistence/$(am__dirstamp)
-persistence/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) persistence/$(DEPDIR)
-	@: > persistence/$(DEPDIR)/$(am__dirstamp)
-persistence/database-sqlite.$(OBJEXT): persistence/$(am__dirstamp) \
-	persistence/$(DEPDIR)/$(am__dirstamp)
 ext/inih/$(am__dirstamp):
 	@$(MKDIR_P) ext/inih
 	@: > ext/inih/$(am__dirstamp)
@@ -504,6 +498,14 @@ ext/inih/$(DEPDIR)/$(am__dirstamp):
 	@: > ext/inih/$(DEPDIR)/$(am__dirstamp)
 ext/inih/ini.$(OBJEXT): ext/inih/$(am__dirstamp) \
 	ext/inih/$(DEPDIR)/$(am__dirstamp)
+persistence/$(am__dirstamp):
+	@$(MKDIR_P) persistence
+	@: > persistence/$(am__dirstamp)
+persistence/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) persistence/$(DEPDIR)
+	@: > persistence/$(DEPDIR)/$(am__dirstamp)
+persistence/database-sqlite.$(OBJEXT): persistence/$(am__dirstamp) \
+	persistence/$(DEPDIR)/$(am__dirstamp)
 
 rscsundae$(EXEEXT): $(rscsundae_OBJECTS) $(rscsundae_DEPENDENCIES) $(EXTRA_rscsundae_DEPENDENCIES) 
 	@rm -f rscsundae$(EXEEXT)
