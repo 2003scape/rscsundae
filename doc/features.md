@@ -39,7 +39,8 @@ Engine
 - [x] Shops
 - [x] Item banking
 - [ ] Spell effects
-- [ ] Player saving (SQLite)
+- [x] Player saving (SQLite)
+- [ ] Player saving (password hashing)
 - [ ] Login server
 - [ ] Moderation features: player controls
 - [ ] Moderation features: per-player action log
