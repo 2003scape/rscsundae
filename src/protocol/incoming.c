@@ -207,14 +207,11 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 
 			p->login_stage = LOGIN_STAGE_GOT_LOGIN;
 
-			player_load(p);
-
-			int res;
-
-			res = database_load_player(&p->mob.server->database, p);
+			int res = player_load(p);
 
 			if (res == -1) {
-				exit(EXIT_FAILURE);
+				p->logout_confirmed = true;
+				net_login_response(p, RESP_RATE_LIMIT);
 				return;
 			}
 

@@ -132,7 +132,8 @@ player_load(struct player *p)
 	player_teleport(p,
 	    p->mob.server->start_tile_x,
 	    p->mob.server->start_tile_y);
-	return 0;
+
+	return database_load_player(&p->mob.server->database, p);
 }
 
 void
