@@ -107,6 +107,11 @@
 #define RESP_REGISTER_OK	(2)
 #define RESP_INVALID		(3)
 #define RESP_ACCOUNT_USED	(4)
+#define RESP_CLIENT_OUTDATED	(5)
+#define RESP_IP_USED		(6)
+#define RESP_RATE_LIMIT		(7)
+#define RESP_TEMP_DISABLED	(11)
+#define RESP_PERM_DISABLED	(12)
 #define RESP_FULL		(14)
 
 extern uint8_t opcodes_in_203[256];
