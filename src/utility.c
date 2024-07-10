@@ -296,3 +296,30 @@ chat_compress(const char *input, char *output)
 
 	return offset;
 }
+
+char*
+buffer_file(const char *filename)
+{
+	FILE *file = fopen(filename, "r");
+	if (file == NULL) {
+		fprintf(stderr, "unable to open file %s\n", filename);
+		return NULL;
+	}
+
+	fseek(file, 0, SEEK_END);
+	long length = ftell(file);
+	fseek(file, 0, SEEK_SET);
+
+	char *buffer = malloc(length + 1);
+	if (buffer == NULL) {
+		fprintf(stderr, "file buffer memory allocation failed\n");
+		fclose(file);
+		return NULL;
+	}
+
+	fread(buffer, 1, length, file);
+	buffer[length] = '\0';
+	fclose(file);
+
+	return buffer;
+}

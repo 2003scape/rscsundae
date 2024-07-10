@@ -26,8 +26,6 @@ const char *skill_names[] = {
 
 static uint32_t xp_table[MAX_SKILL_LEVEL];
 
-static int xp_to_level(uint32_t);
-
 void
 stat_calculate_table(void)
 {
@@ -40,7 +38,7 @@ stat_calculate_table(void)
 	}
 }
 
-static int
+int
 xp_to_level(uint32_t xp)
 {
 	int level = 1;

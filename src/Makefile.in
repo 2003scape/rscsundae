@@ -116,8 +116,8 @@ am__rscsundae_SOURCES_DIST = admin.c bank.c buffer.c mob.c netio.c \
 	ext/libjag/lib/jag_unpack_entry.c \
 	ext/libjag/lib/jag_unpack_file.c ext/reallocarr.c \
 	protocol/incoming.c protocol/opcodes203.c protocol/outgoing.c \
-	protocol/rsa-openssl.c ext/inih/ini.c loop-kqueue.c loop-ev.c \
-	loop-poll.c
+	protocol/rsa-openssl.c persistence/database-sqlite.c \
+	ext/inih/ini.c loop-kqueue.c loop-ev.c loop-poll.c
 am__dirstamp = $(am__leading_dot)dirstamp
 @HAVE_SYSTEM_INIH_FALSE@am__objects_1 = ext/inih/ini.$(OBJEXT)
 @KQUEUE_TRUE@am__objects_2 = loop-kqueue.$(OBJEXT)
@@ -140,7 +140,8 @@ am_rscsundae_OBJECTS = admin.$(OBJEXT) bank.$(OBJEXT) buffer.$(OBJEXT) \
 	ext/libjag/lib/jag_unpack_file.$(OBJEXT) \
 	ext/reallocarr.$(OBJEXT) protocol/incoming.$(OBJEXT) \
 	protocol/opcodes203.$(OBJEXT) protocol/outgoing.$(OBJEXT) \
-	protocol/rsa-openssl.$(OBJEXT) $(am__objects_1) \
+	protocol/rsa-openssl.$(OBJEXT) \
+	persistence/database-sqlite.$(OBJEXT) $(am__objects_1) \
 	$(am__objects_2) $(am__objects_3) $(am__objects_4)
 rscsundae_OBJECTS = $(am_rscsundae_OBJECTS)
 am__DEPENDENCIES_1 =
@@ -181,6 +182,7 @@ am__depfiles_remade = ./$(DEPDIR)/admin.Po ./$(DEPDIR)/bank.Po \
 	ext/libjag/lib/$(DEPDIR)/jag_read_header.Po \
 	ext/libjag/lib/$(DEPDIR)/jag_unpack_entry.Po \
 	ext/libjag/lib/$(DEPDIR)/jag_unpack_file.Po \
+	persistence/$(DEPDIR)/database-sqlite.Po \
 	protocol/$(DEPDIR)/incoming.Po \
 	protocol/$(DEPDIR)/opcodes203.Po \
 	protocol/$(DEPDIR)/outgoing.Po \
@@ -342,10 +344,11 @@ rscsundae_SOURCES = admin.c bank.c buffer.c mob.c netio.c player.c \
 	ext/libjag/lib/jag_unpack_entry.c \
 	ext/libjag/lib/jag_unpack_file.c ext/reallocarr.c \
 	protocol/incoming.c protocol/opcodes203.c protocol/outgoing.c \
-	protocol/rsa-openssl.c $(am__append_2) $(am__append_3) \
-	$(am__append_4) $(am__append_5)
+	protocol/rsa-openssl.c persistence/database-sqlite.c \
+	$(am__append_2) $(am__append_3) $(am__append_4) \
+	$(am__append_5)
 rscsundae_LDADD = -lm $(libev_LIBS) $(LUA_LIBS) $(INIH_LIBS) \
-	$(LIBCRYPTO_LIBS)
+	$(LIBCRYPTO_LIBS) -lsqlite3
 all: all-am
 
 .SUFFIXES:
@@ -485,6 +488,14 @@ protocol/outgoing.$(OBJEXT): protocol/$(am__dirstamp) \
 	protocol/$(DEPDIR)/$(am__dirstamp)
 protocol/rsa-openssl.$(OBJEXT): protocol/$(am__dirstamp) \
 	protocol/$(DEPDIR)/$(am__dirstamp)
+persistence/$(am__dirstamp):
+	@$(MKDIR_P) persistence
+	@: > persistence/$(am__dirstamp)
+persistence/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) persistence/$(DEPDIR)
+	@: > persistence/$(DEPDIR)/$(am__dirstamp)
+persistence/database-sqlite.$(OBJEXT): persistence/$(am__dirstamp) \
+	persistence/$(DEPDIR)/$(am__dirstamp)
 ext/inih/$(am__dirstamp):
 	@$(MKDIR_P) ext/inih
 	@: > ext/inih/$(am__dirstamp)
@@ -504,6 +515,7 @@ mostlyclean-compile:
 	-rm -f ext/*.$(OBJEXT)
 	-rm -f ext/inih/*.$(OBJEXT)
 	-rm -f ext/libjag/lib/*.$(OBJEXT)
+	-rm -f persistence/*.$(OBJEXT)
 	-rm -f protocol/*.$(OBJEXT)
 
 distclean-compile:
@@ -542,6 +554,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@ext/libjag/lib/$(DEPDIR)/jag_read_header.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@ext/libjag/lib/$(DEPDIR)/jag_unpack_entry.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@ext/libjag/lib/$(DEPDIR)/jag_unpack_file.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@persistence/$(DEPDIR)/database-sqlite.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@protocol/$(DEPDIR)/incoming.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@protocol/$(DEPDIR)/opcodes203.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@protocol/$(DEPDIR)/outgoing.Po@am__quote@ # am--include-marker
@@ -694,6 +707,8 @@ distclean-generic:
 	-rm -f ext/inih/$(am__dirstamp)
 	-rm -f ext/libjag/lib/$(DEPDIR)/$(am__dirstamp)
 	-rm -f ext/libjag/lib/$(am__dirstamp)
+	-rm -f persistence/$(DEPDIR)/$(am__dirstamp)
+	-rm -f persistence/$(am__dirstamp)
 	-rm -f protocol/$(DEPDIR)/$(am__dirstamp)
 	-rm -f protocol/$(am__dirstamp)
 
@@ -738,6 +753,7 @@ distclean: distclean-am
 	-rm -f ext/libjag/lib/$(DEPDIR)/jag_read_header.Po
 	-rm -f ext/libjag/lib/$(DEPDIR)/jag_unpack_entry.Po
 	-rm -f ext/libjag/lib/$(DEPDIR)/jag_unpack_file.Po
+	-rm -f persistence/$(DEPDIR)/database-sqlite.Po
 	-rm -f protocol/$(DEPDIR)/incoming.Po
 	-rm -f protocol/$(DEPDIR)/opcodes203.Po
 	-rm -f protocol/$(DEPDIR)/outgoing.Po
@@ -820,6 +836,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ext/libjag/lib/$(DEPDIR)/jag_read_header.Po
 	-rm -f ext/libjag/lib/$(DEPDIR)/jag_unpack_entry.Po
 	-rm -f ext/libjag/lib/$(DEPDIR)/jag_unpack_file.Po
+	-rm -f persistence/$(DEPDIR)/database-sqlite.Po
 	-rm -f protocol/$(DEPDIR)/incoming.Po
 	-rm -f protocol/$(DEPDIR)/opcodes203.Po
 	-rm -f protocol/$(DEPDIR)/outgoing.Po

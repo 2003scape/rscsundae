@@ -2186,6 +2186,14 @@ player_variable_set(struct player *p, const char *varname, int32_t value)
 	p->variable_count += 1;
 }
 
+void
+player_send_welcome(struct player *p)
+{
+	char mes[32];
+	(void)snprintf(mes, sizeof(mes), "Welcome to %s!", p->mob.server->name);
+	player_send_message(p, mes);
+}
+
 static void
 player_moved(struct player *p, int from_x, int from_y)
 {

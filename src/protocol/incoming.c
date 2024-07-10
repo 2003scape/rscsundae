@@ -14,6 +14,7 @@
 #include "../trade.h"
 #include "../utility.h"
 #include "../zone.h"
+#include "../persistence/database.h"
 
 /* roughly one packet per frame at 50fps */
 #define MAX_PACKETS_PER_TICK		(32)
@@ -106,7 +107,8 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 #endif
 
 	if (p->login_stage == LOGIN_STAGE_ZERO) {
-		if ((opcode == OP_CLI_LOGIN || opcode == OP_CLI_RECONNECT)) {
+		if (opcode == OP_CLI_REGISTER ||
+		    opcode == OP_CLI_LOGIN || opcode == OP_CLI_RECONNECT) {
 			p->protocol_rev = 110;
 			p->last_packet = p->mob.server->tick_counter;
 		} else if (opcode == 32) {
@@ -134,6 +136,52 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 	p->last_packet = p->mob.server->tick_counter;
 
 	switch (opcode) {
+	case OP_CLI_REGISTER:
+		{
+			if (p->login_stage == LOGIN_STAGE_GOT_LOGIN) {
+				return;
+			}
+
+			switch (p->protocol_rev) {
+			case 110:
+				if (process_login(p, data, offset, len) == -1) {
+					p->logout_confirmed = true;
+					return;
+				}
+				break;
+			case 203:
+				if (process_login_isaac(p,
+					data, offset, len) == -1) {
+					p->logout_confirmed = true;
+					return;
+				}
+				break;
+			}
+
+			p->login_stage = LOGIN_STAGE_GOT_LOGIN;
+
+			/* we never login directly from the registration, it sends another
+			 * login packet after account is successfuly created */
+			p->logout_confirmed = true;
+
+			int res;
+
+			res = database_new_player(&p->mob.server->database, p);
+
+			if (res == -1) {
+				exit(EXIT_FAILURE);
+				return;
+			}
+
+			/* username taken */
+			if (res == 0) {
+				net_login_response(p, RESP_INVALID);
+				return;
+			}
+
+			net_login_response(p, RESP_REGISTER_OK);
+		}
+		break;
 	case OP_CLI_LOGIN:
 	case OP_CLI_RECONNECT:
 		{
@@ -160,8 +208,37 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			p->login_stage = LOGIN_STAGE_GOT_LOGIN;
 
 			player_load(p);
+
+			int res;
+
+			res = database_load_player(&p->mob.server->database, p);
+
+			if (res == -1) {
+				exit(EXIT_FAILURE);
+				return;
+			}
+
+			/* invalid username or password */
+			if (res == 0) {
+				p->logout_confirmed = true;
+				net_login_response(p, RESP_INVALID);
+				return;
+			}
+
 			player_send_privacy_settings(p);
-			player_send_design_ui(p);
+
+			if (p->login_date == 0) {
+				p->mob.x = p->mob.server->start_tile_x;
+				p->mob.y = p->mob.server->start_tile_y;
+
+				player_send_design_ui(p);
+			} else {
+				player_recalculate_equip(p);
+				player_send_welcome(p);
+			}
+
+			p->login_date = (uint64_t)time(NULL);
+
 			player_send_client_settings(p);
 			player_send_quests(p);
 			player_send_init_friends(p);
@@ -228,7 +305,10 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			offset += 8;
-			player_add_friend(p, target);
+			if (!player_has_friend(p, target) &&
+					!player_has_ignore(p, target)) {
+				player_add_friend(p, target);
+			}
 		}
 		break;
 	case OP_CLI_REMOVE_FRIEND:
@@ -261,7 +341,10 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			offset += 8;
-			player_add_ignore(p, target);
+			if (!player_has_friend(p, target) &&
+					!player_has_ignore(p, target)) {
+				player_add_ignore(p, target);
+			}
 		}
 		break;
 	case OP_CLI_REMOVE_IGNORE:
@@ -842,7 +925,6 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 		break;
 	case OP_CLI_ACCEPT_DESIGN:
 		{
-			char mes[32];
 			uint8_t old_class = p->rpg_class;
 
 			if (!p->ui_design_open) {
@@ -913,9 +995,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			p->ui_design_open = false;
 			p->script_active = false;
 
-			(void)snprintf(mes, sizeof(mes),
-			    "Welcome to %s!", p->mob.server->name);
-			player_send_message(p, mes);
+			player_send_welcome(p);
 		}
 		break;
 	case OP_CLI_ANSWER_MULTI:

@@ -2,9 +2,10 @@
 #define SERVER_H
 #include <lua.h>
 #include "config/config.h"
-#include "protocol/rsa.h"
-#include "ext/flea.h"
+#include "persistence/database.h"
 #include "entity.h"
+#include "ext/flea.h"
+#include "protocol/rsa.h"
 #include "zone.h"
 
 /*
@@ -83,6 +84,7 @@ struct server {
 	struct rsa rsa;
 	char *rsa_exponent;
 	char *rsa_modulus;
+	struct database database;
 };
 
 void server_tick(void);

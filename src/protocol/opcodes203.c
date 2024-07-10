@@ -7,6 +7,7 @@ void
 init_opcodes_203(void)
 {
 	opcodes_in_203[0] = OP_CLI_LOGIN;
+	opcodes_in_203[2] = OP_CLI_REGISTER;
 	opcodes_in_203[216] = OP_CLI_PUBLIC_CHAT;
 	opcodes_in_203[67] = OP_CLI_PING;
 	opcodes_in_203[102] = OP_CLI_LOGOUT;

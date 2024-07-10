@@ -39,6 +39,14 @@ server_parse_settings(void *user, const char *section,
 		} else {
 			return 0;
 		}
+	} else if (strcmp(section, "database") == 0) {
+		if (strcmp(name, "sqlite_filename") == 0) {
+			s->database.filename = strdup(value);
+		} else if (strcmp(name, "sqlite_wal") == 0) {
+			s->database.use_wal = (strtol(value, NULL, 10) == 1);
+		} else {
+			return 0;
+		}
 	} else {
 		return 0;
 	}

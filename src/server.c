@@ -103,6 +103,11 @@ main(int argc, char **argv)
 
 	(void)chdir(basedir);
 
+	if (database_init(&s.database)) {
+		fprintf(stderr, "failed to initialize database\n");
+		return EXIT_FAILURE;
+	}
+
 	if (load_config_jag() == -1) {
 		fprintf(stderr, "error reading config.jag\n");
 		fprintf(stderr, "did you run the fetch-jag-files script from the data directory?\n");
@@ -354,6 +359,10 @@ server_tick(void)
 			server_register_logout(s.players[i]->name);
 			mod37_namedec(s.players[i]->name, name);
 			printf("removed player %s\n", name);
+			if (s.players[i]->login_date != 0 &&
+			    database_save_player(&s.database, s.players[i]) == -1) {
+				exit(EXIT_FAILURE);
+			}
 			player_destroy(s.players[i]);
 			s.players[i] = NULL;
 			continue;

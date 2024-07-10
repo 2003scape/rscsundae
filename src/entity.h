@@ -342,6 +342,7 @@ struct player {
 	struct playervar *variables;
 	size_t variable_count;
 	size_t variable_max;
+	uint64_t login_date;
 	uint16_t chased_by_npc;
 };
 
@@ -420,6 +421,7 @@ int player_get_strength_boosted(struct player *);
 int32_t player_variable_get(struct player *, const char *);
 void player_variable_set(struct player *, const char *, int32_t);
 void player_takeobject(struct player *, struct ground_item *);
+void player_send_welcome(struct player *p);
 
 /* admin.c */
 void player_parse_admin_command(struct player *, char *);

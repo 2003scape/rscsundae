@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 #define OP_CLI_LOGIN		(0)
+#define OP_CLI_REGISTER		(2)
 #define OP_CLI_PUBLIC_CHAT	(3)
 #define OP_CLI_PING		(5)
 #define OP_CLI_LOGOUT		(6)
@@ -103,6 +104,8 @@
 #define OP_SRV_PLAYER_MOVEMENT		(255)
 
 #define RESP_LOGIN_OK		(0)
+#define RESP_REGISTER_OK	(2)
+#define RESP_INVALID		(3)
 #define RESP_ACCOUNT_USED	(4)
 #define RESP_FULL		(14)
 

@@ -1,6 +1,8 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "../config.h"
 
 void username_sanitize(const char *, char *, size_t);
@@ -16,4 +18,6 @@ int reallocarr(void *, size_t, size_t);
 #endif
 
 uint64_t get_time_ms(void);
+
+char* buffer_file(const char *);
 #endif

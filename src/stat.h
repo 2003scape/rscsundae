@@ -7,6 +7,7 @@ extern const char *skill_names[MAX_SKILL_ID];
 
 void stat_calculate_table(void);
 bool stat_is_combat(int);
+int xp_to_level(uint32_t);
 
 void stat_advance(struct player *, int, int, int);
 
