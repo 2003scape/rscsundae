@@ -271,6 +271,13 @@ local function make_ring(player)
 	end
 end
 
+local function string_amulet(player, unstrung, strung)
+	mes(player, "You put some string on your amulet")
+	remove(player, "ball of wool", 1)
+	remove(player, unstrung, 1)
+	give(player, strung, 1)
+end
+
 register_useloc("furnace", "gold bar", function(player, x, y)
 	mes(player, "@que@what would you like to make")
 	local resp = multi(player, "ring", "Necklace", "amulet")
@@ -281,4 +288,24 @@ register_useloc("furnace", "gold bar", function(player, x, y)
 	elseif resp == 3 then
 		make_amulet(player)
 	end
+end)
+
+register_useinv("ball of wool", "nostringgold", function(player)
+	string_amulet(player, "nostringgold", "stringgold")
+end)
+
+register_useinv("ball of wool", "nostringsaph", function(player)
+	string_amulet(player, "nostringsaph", "stringsaph")
+end)
+
+register_useinv("ball of wool", "nostringem", function(player)
+	string_amulet(player, "nostringem", "stringem")
+end)
+
+register_useinv("ball of wool", "nostringrub", function(player)
+	string_amulet(player, "nostringrub", "stringrub")
+end)
+
+register_useinv("ball of wool", "nostringdia", function(player)
+	string_amulet(player, "nostringdia", "stringdia")
 end)
