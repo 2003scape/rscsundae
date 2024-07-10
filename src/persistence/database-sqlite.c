@@ -862,9 +862,7 @@ database_load_player(struct database *database, struct player *player)
 		player->mob.base_stats[i] = xp_to_level(player->experience[i]);
 	}
 
-	/* TODO we should make skull_timer ticks-until-unskulled that negates each
-	 * tick, so if the server restarts this will work more robustly */
-	if (player->mob.server->tick_counter < player->skull_timer) {
+	if (player->skull_timer > 0) {
 		player->skulled = true;
 	}
 

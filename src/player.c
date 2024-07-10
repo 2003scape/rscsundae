@@ -549,8 +549,8 @@ player_skull(struct player *p, struct player *target)
 	/* skull remains for 20 minutes */
 	/* TODO: should track players who attacked us */
 	(void)target;
-	p->skull_timer =
-	    p->mob.server->tick_counter + 2000;
+
+	p->skull_timer = 2000;
 
 	if (!p->skulled) {
 		p->skulled = true;

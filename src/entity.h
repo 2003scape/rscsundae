@@ -271,7 +271,7 @@ struct player {
 	uint8_t skin_colour;
 	uint8_t rpg_class;
 	uint8_t skulled;
-	uint64_t skull_timer;
+	uint16_t skull_timer;
 	uint64_t drain_counter;
 	uint64_t next_drain;
 	uint8_t chat_type;

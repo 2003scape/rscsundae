@@ -382,10 +382,12 @@ server_tick(void)
 		if (rapid_restore_tick) {
 			player_rapid_restore(s.players[i]);
 		}
-		if (s.players[i]->skulled &&
-		    s.tick_counter > s.players[i]->skull_timer) {
-			s.players[i]->skulled = false;
-			s.players[i]->appearance_changed = true;
+		if (s.players[i]->skull_timer > 0) {
+			s.players[i]->skull_timer--;
+			if (s.players[i]->skull_timer == 0) {
+				s.players[i]->skulled = false;
+				s.players[i]->appearance_changed = true;
+			}
 		}
 	}
 
