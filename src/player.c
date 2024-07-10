@@ -28,7 +28,8 @@ static int player_pvp_ranged_roll(struct player *, struct player *);
 static int player_pvm_ranged_roll(struct player *, struct npc *);
 static int player_magic_damage_roll(int);
 static bool player_wilderness_check(struct player *, struct player *);
-static bool player_consume_ammo(struct player *, struct projectile_config *);
+static bool player_consume_ammo(struct player *,
+    struct projectile_config *, struct mob *);
 static bool player_init_combat(struct player *, struct mob *);
 static void player_moved(struct player *, int, int);
 
@@ -525,7 +526,8 @@ player_damage(struct player *p, struct player *aggressor, int roll)
 }
 
 static bool
-player_consume_ammo(struct player *p, struct projectile_config *projectile)
+player_consume_ammo(struct player *p,
+    struct projectile_config *projectile, struct mob *target)
 {
 	struct item_config *ammo_config;
 
@@ -535,6 +537,19 @@ player_consume_ammo(struct player *p, struct projectile_config *projectile)
 	}
 	if (player_inv_held(p, ammo_config, 1)) {
 		player_inv_remove(p, ammo_config, 1);
+		/* XXX verify chance of breaking arrows */
+		if (server_random() >= 0.5) {
+			struct ground_item *item;
+
+			item = server_find_ground_item(p,
+			    target->x, target->y, ammo_config->id);
+			if (item != NULL) {
+				item->stack++;
+			} else {
+				server_add_temp_item(p,
+				    target->x, target->y, ammo_config->id, 1);
+			}
+		}
 		return true;
 	}
 	player_send_message(p, "I've run out of ammo!");
@@ -585,7 +600,7 @@ player_shoot_pvm(struct player *p, struct projectile_config *projectile,
 		return;
 	}
 
-	if (!player_consume_ammo(p, projectile)) {
+	if (!player_consume_ammo(p, projectile, &target->mob)) {
 		return;
 	}
 
@@ -660,7 +675,7 @@ player_shoot_pvp(struct player *p, struct projectile_config *projectile,
 		return;
 	}
 
-	if (!player_consume_ammo(p, projectile)) {
+	if (!player_consume_ammo(p, projectile, &target->mob)) {
 		return;
 	}
 
