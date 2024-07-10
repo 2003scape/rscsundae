@@ -24,6 +24,11 @@ PKG_CHECK_MODULES([LUA], [lua-5.4], [
 		PKG_CHECK_MODULES([LUA], [lua5.4])
 	])
 
+PKG_CHECK_MODULES([SQLITE3], [sqlite3], [
+	], [
+		PKG_CHECK_MODULES([SQLITE3], [sqlite3])
+	])
+
 AM_CONDITIONAL(HAVE_SYSTEM_INIH, true)
 PKG_CHECK_MODULES([INIH], [inih], [
 	], [

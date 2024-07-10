@@ -48,18 +48,15 @@ Dependencies:
 * libev (for the event loop; optional - mostly for macOS and Windows)
 * inih (for parsing the configuration file)
 * libcrypto from OpenSSL (for RSA decryption)
+* SQLite 3 (for player save file persistence)
 
 On Debian Linux and derivatives, install the following:
 
-```
-build-essential pkgconf libbz2-dev liblua5.4-dev libinih-dev libssl-dev
-```
+	build-essential pkgconf libbz2-dev liblua5.4-dev libinih-dev libssl-dev libsqlite3-dev
 
 On Alpine Linux, install the following:
 
-```
-build-base pkgconf bzip2-dev lua5.4-dev inih-dev openssl-dev
-```
+	build-base pkgconf bzip2-dev lua5.4-dev inih-dev openssl-dev sqlite-dev
 
 Run `./configure && make -j2` to build the server.
 
@@ -82,7 +79,7 @@ For profiling, configure with:
 
 For fuzzing, configure with:
 
-	CFLAGS="-DFUZZ -D_FORTIFY_SOURCE=2 -fstack-protector-all" -fsanitize=undefined" \
+	CFLAGS="-DFUZZ -D_FORTIFY_SOURCE=2 -fstack-protector-all -fsanitize=undefined" \
 	LDFLAGS="-fsanitize=undefined" ./configure
 
 Resources

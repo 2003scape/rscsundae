@@ -50,8 +50,6 @@ rscsundae_SOURCES = \
 #rscsundae_SOURCES += protocol/rsa-tiny.c
 rscsundae_SOURCES += protocol/rsa-openssl.c
 
-rscsundae_SOURCES += persistence/database-sqlite.c
-
 if ! HAVE_SYSTEM_INIH
 AM_CPPFLAGS += -Iext/inih
 rscsundae_SOURCES += ext/inih/ini.c
@@ -73,4 +71,6 @@ rscsundae_LDADD += $(LUA_LIBS)
 rscsundae_LDADD += $(INIH_LIBS)
 rscsundae_LDADD += $(LIBCRYPTO_LIBS)
 
-rscsundae_LDADD += -lsqlite3
+rscsundae_SOURCES += persistence/database-sqlite.c
+rscsundae_LDADD += $(SQLITE3_LIBS)
+AM_CPPFLAGS += $(SQLITE3_CFLAGS)
