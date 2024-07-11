@@ -47,16 +47,17 @@ Dependencies:
 * Lua 5.4 (for running content scripts)
 * libev (for the event loop; optional - mostly for macOS and Windows)
 * inih (for parsing the configuration file)
-* libcrypto from OpenSSL (for RSA decryption)
-* SQLite 3 (for player save file persistence)
+* libcrypto from OpenSSL (for RSA decryption, and random number generation on some systems)
+* SQLite3 (for player save file persistence)
+* Argon2 (for secure password storage)
 
 On Debian Linux and derivatives, install the following:
 
-	build-essential pkgconf libbz2-dev liblua5.4-dev libinih-dev libssl-dev libsqlite3-dev
+	build-essential pkgconf libbz2-dev liblua5.4-dev libinih-dev libssl-dev libsqlite3-dev libargon2-dev
 
 On Alpine Linux, install the following:
 
-	build-base pkgconf bzip2-dev lua5.4-dev inih-dev openssl-dev sqlite-dev
+	build-base pkgconf bzip2-dev lua5.4-dev inih-dev openssl-dev sqlite-dev argon2-dev
 
 Run `./configure && make -j2` to build the server.
 
