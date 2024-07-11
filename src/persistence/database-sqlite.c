@@ -551,11 +551,12 @@ database_init(struct database *database)
 		return -1;
 	}
 
-	char get_query[1024] = "SELECT `id`, `rpg_class`, `login_date`, `x`, `y`, "
-		"`quest_points`, `camera_auto`, `one_mouse_button`, `block_public`, "
-		"`block_private`, `block_trade`, `block_duel`, `hair_colour`, "
-		"`top_colour`, `leg_colour`, `skin_colour`, `head_sprite`, "
-		"`body_sprite`, `skull_timer`, ";
+	char get_query[1024] = "SELECT `id`, `password`, `rpg_class`, "
+	    "`login_date`, `x`, `y`, `quest_points`, `camera_auto`, "
+	    "`one_mouse_button`, `block_public`, `block_private`, "
+	    "`block_trade`, `block_duel`, `hair_colour`, `top_colour`, "
+	    "`leg_colour`, `skin_colour`, `head_sprite`, `body_sprite`, "
+	    "`skull_timer`, ";
 
 	for (int i = 0; i < MAX_SKILL_ID; i++) {
 		int remaining = sizeof(get_query) - strlen(get_query);
@@ -758,12 +759,9 @@ database_new_player(struct database *database, struct player *player)
 
 	if (pwhash_hash(&player->mob.server->hash, (char *)salt,
 	    player->password, encoded_pwd, sizeof(encoded_pwd)) == -1) {
-		memset(player->password, 0, sizeof(player->password));
 		printf("password hashing failure\n");
 		return -1;
 	}
-
-	memset(player->password, 0, sizeof(player->password));
 
 	printf("salt is %s\n", salt);
 	printf("hash is %s\n", encoded_pwd);
@@ -794,18 +792,20 @@ database_new_player(struct database *database, struct player *player)
 int
 database_load_player(struct database *database, struct player *player)
 {
+	char username[32];
+	const char *pwhash;
+	int player_id;
+	int res, ret;
+
 	if (db_transaction(database->db, TRANSACTION_START) == -1) {
 		return -1;
 	}
 
-	char username[32];
 	mod37_namedec(player->name, username);
 
 	if (stmt_bind_text(database->db, database->get_player, 1, username) == -1) {
 		return -1;
 	}
-
-	int res;
 
 	res = sqlite3_step(database->get_player);
 
@@ -832,7 +832,16 @@ database_load_player(struct database *database, struct player *player)
 
 	int column_index = 0;
 
-	int player_id = sqlite3_column_int(database->get_player, column_index++);
+	player_id = sqlite3_column_int(database->get_player, column_index++);
+
+	pwhash = (const char *)sqlite3_column_text(database->get_player, column_index++);
+
+	if (pwhash_verify(&player->mob.server->hash,
+	    pwhash, player->password) == -1) {
+		printf("invalid password\n");
+		ret = 0;
+		goto end;
+	}
 
 	player->rpg_class =
 		sqlite3_column_int(database->get_player, column_index++);
@@ -886,30 +895,41 @@ database_load_player(struct database *database, struct player *player)
 	}
 
 	if (stmt_reset(database->db, database->get_player) == -1) {
-		return -1;
+		ret = -1;
+		goto end;
 	}
 
 	if (database_load_player_variables(database, player, player_id) == -1) {
-		return -1;
+		ret = -1;
+		goto end;
 	}
 
 	if (database_load_player_contacts(database, player, player_id) == -1) {
-		return -1;
+		ret = -1;
+		goto end;
 	}
 
 	if (database_load_player_inventory(database, player, player_id) == -1) {
-		return -1;
+		ret = -1;
+		goto end;
 	}
 
 	if (database_load_player_bank(database, player, player_id) == -1) {
-		return -1;
+		ret = -1;
+		goto end;
 	}
 
 	if (db_transaction(database->db, TRANSACTION_END) == -1) {
-		return -1;
+		ret = -1;
+		goto end;
 	}
 
 	return 1;
+
+end:
+	(void)stmt_reset(database->db, database->get_player);
+	(void)db_transaction(database->db, TRANSACTION_END);
+	return ret;
 }
 
 int

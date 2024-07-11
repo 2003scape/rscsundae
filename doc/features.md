@@ -40,7 +40,7 @@ Engine
 - [x] Item banking
 - [ ] Spell effects
 - [x] Player saving (SQLite)
-- [ ] Player saving (password hashing)
+- [x] Player saving (password hashing)
 - [ ] Login server
 - [ ] Moderation features: player controls
 - [ ] Moderation features: per-player action log

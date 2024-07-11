@@ -160,13 +160,16 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 
 			p->login_stage = LOGIN_STAGE_GOT_LOGIN;
 
-			/* we never login directly from the registration, it sends another
-			 * login packet after account is successfuly created */
+			/*
+			 * we never login directly from the registration, it
+			 * sends another login packet after account is successfuly
+			 * created
+			 */
 			p->logout_confirmed = true;
 
-			int res;
+			int res = database_new_player(&p->mob.server->database, p);
 
-			res = database_new_player(&p->mob.server->database, p);
+			memset(p->password, 0, sizeof(p->password));
 
 			if (res == -1) {
 				net_login_response(p, RESP_INVALID);
@@ -208,6 +211,8 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			p->login_stage = LOGIN_STAGE_GOT_LOGIN;
 
 			int res = player_load(p);
+
+			memset(p->password, 0, sizeof(p->password));
 
 			if (res == -1) {
 				p->logout_confirmed = true;
