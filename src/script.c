@@ -1969,7 +1969,7 @@ script_onspellinv(lua_State *L, struct player *p,
 	assert(item != NULL);
 	assert(p->spell != NULL);
 
-	for (size_t i = 0; i < item->name_count; ++i) {
+	for (size_t i = item->name_count; i-- > 0 ;) {
 		lua_getglobal(L, "script_engine_spellinv");
 		if (!lua_isfunction(L, -1)) {
 			puts("script error: can't find essential function script_engine_spellinv");

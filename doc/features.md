@@ -77,7 +77,7 @@ These should all be implemented in Lua script:
 - [ ] Magic (telegrab)
 - [x] Magic (alchemy)
 - [x] Magic (superheat)
-- [ ] Magic (enchantment)
+- [x] Magic (enchantment)
 - [x] Woodcutting
 - [x] Firemaking
 - [x] Crafting (pottery)
