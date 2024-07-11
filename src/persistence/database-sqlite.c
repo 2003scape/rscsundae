@@ -754,11 +754,7 @@ database_new_player(struct database *database, struct player *player)
 
 	/* start to prepare a password hash */
 
-	arc4random_buf(salt, sizeof(salt));
-	for (size_t i = 0; i < sizeof(salt); ++i) {
-		salt[i] = '0' + (salt[i] % ('~' - '0'));
-	}
-	salt[sizeof(salt) - 1] = '\0';
+	gen_salt(salt, sizeof(salt));
 
 	if (pwhash_hash(&player->mob.server->hash, (char *)salt,
 	    player->password, encoded_pwd, sizeof(encoded_pwd)) == -1) {

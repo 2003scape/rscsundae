@@ -23,5 +23,7 @@ void arc4random_buf(void *, size_t);
 
 uint64_t get_time_ms(void);
 
-char* buffer_file(const char *);
+char *buffer_file(const char *);
+
+void gen_salt(unsigned char *, size_t);
 #endif

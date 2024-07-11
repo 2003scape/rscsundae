@@ -337,3 +337,13 @@ arc4random_buf(void *buf, size_t len)
 	}
 }
 #endif
+
+void
+gen_salt(unsigned char *salt, size_t len)
+{
+	arc4random_buf(salt, len);
+	for (size_t i = 0; i < len; ++i) {
+		salt[i] = '0' + (salt[i] % ('~' - '0'));
+	}
+	salt[len - 1] = '\0';
+}
