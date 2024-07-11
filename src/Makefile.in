@@ -117,7 +117,8 @@ am__rscsundae_SOURCES_DIST = admin.c bank.c buffer.c mob.c netio.c \
 	ext/libjag/lib/jag_unpack_file.c ext/reallocarr.c \
 	protocol/incoming.c protocol/opcodes203.c protocol/outgoing.c \
 	protocol/rsa-openssl.c ext/inih/ini.c loop-kqueue.c loop-ev.c \
-	loop-poll.c persistence/database-sqlite.c
+	loop-poll.c persistence/database-sqlite.c \
+	persistence/pwhash-argon2.c
 am__dirstamp = $(am__leading_dot)dirstamp
 @HAVE_SYSTEM_INIH_FALSE@am__objects_1 = ext/inih/ini.$(OBJEXT)
 @KQUEUE_TRUE@am__objects_2 = loop-kqueue.$(OBJEXT)
@@ -142,11 +143,13 @@ am_rscsundae_OBJECTS = admin.$(OBJEXT) bank.$(OBJEXT) buffer.$(OBJEXT) \
 	protocol/opcodes203.$(OBJEXT) protocol/outgoing.$(OBJEXT) \
 	protocol/rsa-openssl.$(OBJEXT) $(am__objects_1) \
 	$(am__objects_2) $(am__objects_3) $(am__objects_4) \
-	persistence/database-sqlite.$(OBJEXT)
+	persistence/database-sqlite.$(OBJEXT) \
+	persistence/pwhash-argon2.$(OBJEXT)
 rscsundae_OBJECTS = $(am_rscsundae_OBJECTS)
 am__DEPENDENCIES_1 =
 rscsundae_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -183,6 +186,7 @@ am__depfiles_remade = ./$(DEPDIR)/admin.Po ./$(DEPDIR)/bank.Po \
 	ext/libjag/lib/$(DEPDIR)/jag_unpack_entry.Po \
 	ext/libjag/lib/$(DEPDIR)/jag_unpack_file.Po \
 	persistence/$(DEPDIR)/database-sqlite.Po \
+	persistence/$(DEPDIR)/pwhash-argon2.Po \
 	protocol/$(DEPDIR)/incoming.Po \
 	protocol/$(DEPDIR)/opcodes203.Po \
 	protocol/$(DEPDIR)/outgoing.Po \
@@ -255,6 +259,8 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
+LIBARGON2_CFLAGS = @LIBARGON2_CFLAGS@
+LIBARGON2_LIBS = @LIBARGON2_LIBS@
 LIBCRYPTO_CFLAGS = @LIBCRYPTO_CFLAGS@
 LIBCRYPTO_LIBS = @LIBCRYPTO_LIBS@
 LIBOBJS = @LIBOBJS@
@@ -332,7 +338,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 #AM_CPPFLAGS += -DWITH_RSA_TINY
 AM_CPPFLAGS = -Iext/libjag/include $(LUA_CFLAGS) $(INIH_CFLAGS) \
 	$(LIBCRYPTO_CFLAGS) -DWITH_RSA_OPENSSL $(am__append_1) \
-	$(SQLITE3_CFLAGS)
+	$(SQLITE3_CFLAGS) $(LIBARGON2_CFLAGS)
 
 #rscsundae_SOURCES += protocol/rsa-tiny.c
 rscsundae_SOURCES = admin.c bank.c buffer.c mob.c netio.c player.c \
@@ -348,9 +354,10 @@ rscsundae_SOURCES = admin.c bank.c buffer.c mob.c netio.c player.c \
 	ext/libjag/lib/jag_unpack_file.c ext/reallocarr.c \
 	protocol/incoming.c protocol/opcodes203.c protocol/outgoing.c \
 	protocol/rsa-openssl.c $(am__append_2) $(am__append_3) \
-	$(am__append_4) $(am__append_5) persistence/database-sqlite.c
+	$(am__append_4) $(am__append_5) persistence/database-sqlite.c \
+	persistence/pwhash-argon2.c
 rscsundae_LDADD = -lm $(libev_LIBS) $(LUA_LIBS) $(INIH_LIBS) \
-	$(LIBCRYPTO_LIBS) $(SQLITE3_LIBS)
+	$(LIBCRYPTO_LIBS) $(SQLITE3_LIBS) $(LIBARGON2_LIBS)
 all: all-am
 
 .SUFFIXES:
@@ -506,6 +513,8 @@ persistence/$(DEPDIR)/$(am__dirstamp):
 	@: > persistence/$(DEPDIR)/$(am__dirstamp)
 persistence/database-sqlite.$(OBJEXT): persistence/$(am__dirstamp) \
 	persistence/$(DEPDIR)/$(am__dirstamp)
+persistence/pwhash-argon2.$(OBJEXT): persistence/$(am__dirstamp) \
+	persistence/$(DEPDIR)/$(am__dirstamp)
 
 rscsundae$(EXEEXT): $(rscsundae_OBJECTS) $(rscsundae_DEPENDENCIES) $(EXTRA_rscsundae_DEPENDENCIES) 
 	@rm -f rscsundae$(EXEEXT)
@@ -557,6 +566,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@ext/libjag/lib/$(DEPDIR)/jag_unpack_entry.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@ext/libjag/lib/$(DEPDIR)/jag_unpack_file.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@persistence/$(DEPDIR)/database-sqlite.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@persistence/$(DEPDIR)/pwhash-argon2.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@protocol/$(DEPDIR)/incoming.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@protocol/$(DEPDIR)/opcodes203.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@protocol/$(DEPDIR)/outgoing.Po@am__quote@ # am--include-marker
@@ -756,6 +766,7 @@ distclean: distclean-am
 	-rm -f ext/libjag/lib/$(DEPDIR)/jag_unpack_entry.Po
 	-rm -f ext/libjag/lib/$(DEPDIR)/jag_unpack_file.Po
 	-rm -f persistence/$(DEPDIR)/database-sqlite.Po
+	-rm -f persistence/$(DEPDIR)/pwhash-argon2.Po
 	-rm -f protocol/$(DEPDIR)/incoming.Po
 	-rm -f protocol/$(DEPDIR)/opcodes203.Po
 	-rm -f protocol/$(DEPDIR)/outgoing.Po
@@ -839,6 +850,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ext/libjag/lib/$(DEPDIR)/jag_unpack_entry.Po
 	-rm -f ext/libjag/lib/$(DEPDIR)/jag_unpack_file.Po
 	-rm -f persistence/$(DEPDIR)/database-sqlite.Po
+	-rm -f persistence/$(DEPDIR)/pwhash-argon2.Po
 	-rm -f protocol/$(DEPDIR)/incoming.Po
 	-rm -f protocol/$(DEPDIR)/opcodes203.Po
 	-rm -f protocol/$(DEPDIR)/outgoing.Po
