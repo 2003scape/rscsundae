@@ -2,6 +2,9 @@
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
+#ifndef HAVE_ARC4RANDOM_BUF
+#include <openssl/rand.h>
+#endif
 #include <ctype.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -297,7 +300,7 @@ chat_compress(const char *input, char *output)
 	return offset;
 }
 
-char*
+char *
 buffer_file(const char *filename)
 {
 	FILE *file = fopen(filename, "r");
@@ -323,3 +326,14 @@ buffer_file(const char *filename)
 
 	return buffer;
 }
+
+#ifndef HAVE_ARC4RANDOM_BUF
+void
+arc4random_buf(void *buf, size_t len)
+{
+	if (RAND_bytes(buf, len) != 1) {
+		fprintf(stderr, "fatal error with RAND_bytes\n");
+		exit(EXIT_FAILURE);
+	}
+}
+#endif

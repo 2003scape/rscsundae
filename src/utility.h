@@ -17,6 +17,10 @@ int chat_compress(const char *, char *);
 int reallocarr(void *, size_t, size_t);
 #endif
 
+#ifndef HAVE_ARC4RANDOM_BUF
+void arc4random_buf(void *, size_t);
+#endif
+
 uint64_t get_time_ms(void);
 
 char* buffer_file(const char *);
