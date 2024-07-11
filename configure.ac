@@ -37,6 +37,8 @@ PKG_CHECK_MODULES([INIH], [inih], [
 
 PKG_CHECK_MODULES([LIBCRYPTO], [libcrypto])
 
+PKG_CHECK_MODULES([LIBARGON2], [libargon2])
+
 AM_SILENT_RULES([yes])
 
 AC_ARG_WITH([kqueue], 

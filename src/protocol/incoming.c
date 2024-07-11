@@ -169,7 +169,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			res = database_new_player(&p->mob.server->database, p);
 
 			if (res == -1) {
-				exit(EXIT_FAILURE);
+				net_login_response(p, RESP_INVALID);
 				return;
 			}
 
@@ -1180,7 +1180,11 @@ process_login(struct player *p, uint8_t *data, size_t offset, size_t len)
 	}
 	password[sizeof(password) - 1] = '\0';
 
+	memcpy(p->password, password, sizeof(password));
+
+#if 0
 	printf("got password %s\n", password);
+#endif
 
 	p->name = name;
 
@@ -1308,8 +1312,12 @@ process_login_isaac(struct player *p, uint8_t *data, size_t offset, size_t len)
 	password[sizeof(password) - 1] = '\0';
 	offset += sizeof(password);
 
+	memcpy(p->password, password, sizeof(password));
+
 	printf("got username %s\n", username);
+#if 0
 	printf("got password %s\n", password);
+#endif
 
 	return 0;
 }

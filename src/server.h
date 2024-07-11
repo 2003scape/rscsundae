@@ -3,6 +3,7 @@
 #include <lua.h>
 #include "config/config.h"
 #include "persistence/database.h"
+#include "persistence/pwhash-argon2.h"
 #include "entity.h"
 #include "ext/flea.h"
 #include "protocol/rsa.h"
@@ -85,6 +86,7 @@ struct server {
 	char *rsa_exponent;
 	char *rsa_modulus;
 	struct database database;
+	struct pwhash_params hash;
 };
 
 void server_tick(void);

@@ -700,14 +700,15 @@ database_init(struct database *database)
 int
 database_new_player(struct database *database, struct player *player)
 {
+	uint8_t salt[32];
+	char username[32];
+	char encoded_pwd[1024];
+
 	if (db_transaction(database->db, TRANSACTION_START) == -1) {
 		return -1;
 	}
 
-	char username[32];
 	mod37_namedec(player->name, username);
-
-	printf("trying to create %s\n", username);
 
 	if (stmt_bind_text(database->db, database->check_username, 1,
 			username) == -1) {
@@ -717,6 +718,8 @@ database_new_player(struct database *database, struct player *player)
 	int res;
 
 	res = sqlite3_step(database->check_username);
+
+	printf("trying to create %s\n", username);
 
 	/* user found */
 	if (res == SQLITE_ROW) {
@@ -749,8 +752,28 @@ database_new_player(struct database *database, struct player *player)
 		return -1;
 	}
 
+	/* start to prepare a password hash */
+
+	arc4random_buf(salt, sizeof(salt));
+	for (size_t i = 0; i < sizeof(salt); ++i) {
+		salt[i] = '0' + (salt[i] % ('~' - '0'));
+	}
+	salt[sizeof(salt) - 1] = '\0';
+
+	if (pwhash_hash(&player->mob.server->hash, (char *)salt,
+	    player->password, encoded_pwd, sizeof(encoded_pwd)) == -1) {
+		memset(player->password, 0, sizeof(player->password));
+		printf("password hashing failure\n");
+		return -1;
+	}
+
+	memset(player->password, 0, sizeof(player->password));
+
+	printf("salt is %s\n", salt);
+	printf("hash is %s\n", encoded_pwd);
+
 	if (stmt_bind_text(database->db, database->new_player, bind_index++,
-			"password") == -1) {
+			encoded_pwd) == -1) {
 		return -1;
 	}
 

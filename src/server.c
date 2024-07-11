@@ -125,6 +125,15 @@ main(int argc, char **argv)
 		fprintf(stderr, "failed to start script engine\n");
 		return EXIT_FAILURE;
 	}
+
+	printf("calculating password hashing params... ");
+	if (pwhash_init(&s.hash) != -1) {
+		printf("time = %u, memory = %u\n",
+		    s.hash.t_cost, s.hash.m_cost);
+	} else {
+		printf("failed\n");
+	}
+
 #else
 	s.rsa_exponent = "571fb062048b61721ebfcf1e877153241b70c3aa26edb0f9f06a1b2be07c4e45eaba4fc356ea806cbed298d38613590a53fde0383c3a411758516293240925e5";
 	s.rsa_modulus = "88c38748a58228f7261cdc340b5691d7d0975dee0ecdb717609e6bf971eb3fe723ef9d130e4686813739768ad9472eb46d8bfcc042c1a5fcb05e931f632eea5d";

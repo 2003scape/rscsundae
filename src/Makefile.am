@@ -74,3 +74,7 @@ rscsundae_LDADD += $(LIBCRYPTO_LIBS)
 rscsundae_SOURCES += persistence/database-sqlite.c
 rscsundae_LDADD += $(SQLITE3_LIBS)
 AM_CPPFLAGS += $(SQLITE3_CFLAGS)
+
+rscsundae_SOURCES += persistence/pwhash-argon2.c
+rscsundae_LDADD += $(LIBARGON2_LIBS)
+AM_CPPFLAGS += $(LIBARGON2_CFLAGS)
