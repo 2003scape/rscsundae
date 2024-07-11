@@ -4,6 +4,8 @@
 #include "pwhash-argon2.h"
 #include "../utility.h"
 
+#define HASH_SIZE	(64)
+
 int
 pwhash_init(struct pwhash_params *p)
 {
@@ -11,7 +13,7 @@ pwhash_init(struct pwhash_params *p)
 	uint32_t mem = 4096;
 	uint8_t salt[32];
 	uint8_t password[32];
-	uint8_t hash[256];
+	uint8_t hash[HASH_SIZE];
 	uint64_t old_time;
 	int res;
 
@@ -65,7 +67,7 @@ pwhash_hash(struct pwhash_params *p,
 	int res;
 
 	res = argon2id_hash_encoded(p->t_cost, p->m_cost, p->parallelism,
-	    pwd, strlen(pwd), salt, strlen(salt), 64,
+	    pwd, strlen(pwd), salt, strlen(salt), HASH_SIZE,
 	    out, outlen);
 	if (res != ARGON2_OK) {
 		printf("%d\n", res);
