@@ -368,10 +368,6 @@ server_tick(void)
 			server_register_logout(s.players[i]->name);
 			mod37_namedec(s.players[i]->name, name);
 			printf("removed player %s\n", name);
-			if (s.players[i]->login_date != 0 &&
-			    database_save_player(&s.database, s.players[i]) == -1) {
-				exit(EXIT_FAILURE);
-			}
 			player_destroy(s.players[i]);
 			s.players[i] = NULL;
 			continue;
@@ -461,6 +457,13 @@ server_tick(void)
 		s.players[i]->mob.damage = UINT8_MAX;
 		s.players[i]->mob.prev_dir = s.players[i]->mob.dir;
 		s.players[i]->last_update = s.tick_counter;
+		if (s.players[i]->login_date != 0) {
+			s.players[i]->save_timer++;
+			if (s.players[i]->save_timer == 500) {
+				(void)database_save_player(&s.database, s.players[i]);
+				s.players[i]->save_timer = 0;
+			}
+		}
 	}
 
 	for (int i = 0; i < s.max_npc_id; ++i) {

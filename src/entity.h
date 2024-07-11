@@ -345,6 +345,7 @@ struct player {
 	size_t variable_max;
 	uint64_t login_date;
 	uint16_t chased_by_npc;
+	uint16_t save_timer;
 };
 
 /* mob.c */
