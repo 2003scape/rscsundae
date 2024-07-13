@@ -147,10 +147,14 @@ mob_get_nearby_npcs(struct mob *mob,
 			    mob->server, tmp, 128, exclude_busy);
 			for (size_t i = 0; i < tmp_count && count < max; ++i) {
 				/* keep within protocol limits */
-				if (mob_within_range(mob,
+				if (!mob_within_range(mob,
 				    tmp[i]->mob.x, tmp[i]->mob.y, 16)) {
-					list[count++] = tmp[i];
+					continue;
 				}
+				if (tmp[i]->respawn_time > 0) {
+					continue;
+				}
+				list[count++] = tmp[i];
 			}
 		}
 	}

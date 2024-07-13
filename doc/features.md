@@ -57,7 +57,6 @@ Engine
 ### Known engine bugs
 
 * Chatting between 110 and 204 clients is currently not possible.
-* Quest list is broken on 204.
 
 Content
 -------
@@ -114,7 +113,7 @@ These should all be implemented in Lua script:
 - [ ] Black knight's fortress
 - [x] Doric's quest
 - [x] The knight's sword
-- [ ] Goblin diplomacy
+- [x] Goblin diplomacy
 - [ ] Pirate's treasure
 - [ ] Dragon slayer
 
@@ -136,6 +135,7 @@ These should all be implemented in Lua script:
 - [x] Man NPC dialogue
 - [ ] Thrander NPC dialogue
 - [ ] Bareak NPC dialogue
+- [x] Wyson the gardener NPC dialogue
 - [x] Apothecary NPC dialogue (a broken dialogue path where he gives the player spot cream twice is not implemented)
 - [x] Banker NPC dialogue
 - [ ] Cook's Guild

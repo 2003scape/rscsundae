@@ -284,9 +284,6 @@ player_send_npc_movement(struct player *p)
 		if (p->known_npc_count >= MAX_KNOWN_NPCS) {
 			break;
 		}
-		if (nearby[i]->respawn_time > 0) {
-			continue;
-		}
 
 		bool known = false;
 		for (size_t j = 0; j < new_known_count; ++j) {
@@ -1914,12 +1911,12 @@ player_send_show_bank(struct player *p)
 int
 player_send_quests(struct player *p)
 {
-	uint8_t quests_complete[17];
+	uint8_t quests_complete[50] = {0};
 	size_t offset = 0;
+	size_t num_quests = 17;
 
-	if (p->protocol_rev > 110) {
-		/* TODO needs to be implemented */
-		return -1;
+	if (p->protocol_rev > 174) {
+		num_quests = 50;
 	}
 
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
@@ -1933,6 +1930,14 @@ player_send_quests(struct player *p)
 		} else if (strcmp(p->variables[i].name, "doric_stage") == 0) {
 			if (p->variables[i].value >= 2) {
 				quests_complete[3] = true;
+			}
+		} else if (strcmp(p->variables[i].name, "ghost_stage") == 0) {
+			if (p->variables[i].value >= 5) {
+				quests_complete[4] = true;
+			}
+		} else if (strcmp(p->variables[i].name, "goblin_stage") == 0) {
+			if (p->variables[i].value >= 5) {
+				quests_complete[5] = true;
 			}
 		} else if (strcmp(p->variables[i].name, "mizgog_stage") == 0) {
 			if (p->variables[i].value >= 2) {
@@ -1961,7 +1966,7 @@ player_send_quests(struct player *p)
 		}
 	}
 
-	for (size_t i = 0; i < sizeof(quests_complete); ++i) {
+	for (size_t i = 0; i < num_quests; ++i) {
 		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 		    quests_complete[i]) == -1) {
 			return -1;
