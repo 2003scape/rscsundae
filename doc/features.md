@@ -135,7 +135,7 @@ These should all be implemented in Lua script:
 - [x] Barbarian NPC dialogue
 - [x] Pirate NPC dialogue
 - [x] Man NPC dialogue
-- [ ] Thrander NPC dialogue
+- [x] Thrander NPC dialogue
 - [ ] Bareak NPC dialogue
 - [x] Wyson the gardener NPC dialogue
 - [x] Apothecary NPC dialogue (a broken dialogue path where he gives the player spot cream twice is not implemented)
