@@ -10,6 +10,8 @@ int64_t mod37_nameenc(const char *);
 char *mod37_namedec(int64_t, char *);
 
 void encode_chat_legacy(const char *, uint8_t *, size_t);
+void decode_chat_legacy(char **, size_t,
+    uint8_t *, size_t, char *, size_t);
 int chat_decompress(uint8_t *, size_t, size_t, char *);
 int chat_compress(const char *, char *);
 

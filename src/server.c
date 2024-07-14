@@ -685,7 +685,7 @@ load_config_jag(void)
 			continue;
 		}
 		if (new_word) {
-			s.words[s.num_words++] = strdup(ch + i);
+			s.words[s.num_words++] = ch + i;
 		}
 		new_word = false;
 	}

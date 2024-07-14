@@ -68,6 +68,135 @@ encode_chat_legacy(const char *mes, uint8_t *out, size_t outlen)
 }
 
 void
+decode_chat_legacy(char **dict, size_t dict_len,
+    uint8_t *mes, size_t inlen, char *out, size_t outlen)
+{
+	size_t off = 0;
+
+	for (size_t i = 0; i < inlen; ++i) {
+		uint8_t b = mes[i];
+		if (b == 0xff) {
+			/* initial header */
+			if (i == (inlen - 1) || (outlen - off) < 6) {
+				break;
+			}
+			uint8_t colour = mes[i + 1];
+			switch (colour) {
+			case 0:
+				memcpy(out + off, "@red@", 5);
+				off += 5;
+				break;
+			case 1:
+				memcpy(out + off, "@gre@", 5);
+				off += 5;
+				break;
+			case 2:
+				memcpy(out + off, "@blu@", 5);
+				off += 5;
+				break;
+			case 3:
+				memcpy(out + off, "@cya@", 5);
+				off += 5;
+				break;
+			case 4:
+				memcpy(out + off, "@ran@", 5);
+				off += 5;
+				break;
+			case 5:
+				memcpy(out + off, "@whi@", 5);
+				off += 5;
+				break;
+			case 6:
+				memcpy(out + off, "@bla@", 5);
+				off += 5;
+				break;
+			case 7:
+				memcpy(out + off, "@ora@", 5);
+				off += 5;
+				break;
+			case 8:
+				memcpy(out + off, "@yel@", 5);
+				off += 5;
+				break;
+			case 9:
+				memcpy(out + off, "@mag@", 5);
+				off += 5;
+				break;
+			}
+		} else if (b < 50) {
+			/* simple byte uncompressed */
+			if (off == (outlen - 1)) {
+				break;
+			}
+			out[off++] = tolower((unsigned char)legacy_chartab[b]);
+		} else if (b < 70) {
+			/* 2-byte pointer to word w/ final space */
+			size_t len;
+			uint16_t entry;
+
+			if (off == (outlen - 1)) {
+				break;
+			}
+
+			entry = ((b - 50) << 8) | mes[++i];
+			if (entry >= dict_len) {
+				continue;
+			}
+			len = strlen(dict[entry]);
+			if ((outlen - off) <= len) {
+				break;
+			}
+			memcpy(out + off, dict[entry], len);
+			off += len;
+
+			if (off == (outlen - 1)) {
+				break;
+			}
+			out[off++] = ' ';
+		} else if (b < 90) {
+			/* 2-byte pointer to word w/o final space */
+			size_t len;
+			uint16_t entry;
+
+			if (off == (outlen - 1)) {
+				break;
+			}
+
+			entry = ((b - 70) << 8) | mes[++i];
+			if (entry >= dict_len) {
+				continue;
+			}
+			len = strlen(dict[entry]);
+			if ((outlen - off) <= len) {
+				break;
+			}
+			memcpy(out + off, dict[entry], len);
+			off += len;
+		} else {
+			/* 1-byte pointer to word w/ final space */
+			size_t len;
+
+			if (b >= dict_len) {
+				continue;
+			}
+			b -= 90;
+			len = strlen(dict[b]);
+			if ((outlen - off) <= len) {
+				break;
+			}
+			memcpy(out + off, dict[b], len);
+			off += len;
+
+			if (off == (outlen - 1)) {
+				break;
+			}
+			out[off++] = ' ';
+		}
+	}
+	out[off++] = '\0';
+}
+
+void
 username_sanitize(const char *name, char *out, size_t len)
 {
 	for (size_t i = 0; i < len; ++i) {

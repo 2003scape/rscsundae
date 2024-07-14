@@ -284,15 +284,32 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 		break;
 	case OP_CLI_PUBLIC_CHAT:
 		{
-			/* want to eventually decode this to moderate */
-			/* FIXME: need to decode for inter-client compat */
+			char mes[MAX_CHAT_LEN];
+
 			size_t msglen = len - 1;
 			if (msglen > MAX_CHAT_LEN) {
 				msglen = MAX_CHAT_LEN;
 			}
-			memcpy(p->mob.chat_enc, data + offset, msglen);
-			p->mob.chat_len = msglen;
 			p->chat_type = CHAT_TYPE_PUBLIC;
+			if (p->protocol_rev <= 163) {
+				memcpy(p->mob.chat_enc, data + offset, msglen);
+				p->mob.chat_len = msglen;
+				decode_chat_legacy(p->mob.server->words,
+				    p->mob.server->num_words,
+				    data + 1, msglen, mes, MAX_CHAT_LEN);
+				printf("legacy chat message: %s\n", mes);
+				p->mob.chat_compressed_len = chat_compress(mes,
+				    p->mob.chat_compressed);
+			} else {
+				memcpy(p->mob.chat_compressed,
+				    data + offset, msglen);
+				p->mob.chat_compressed_len = msglen;
+				chat_decompress(data, offset, msglen, mes);
+				printf("compressed chat message: %s\n", mes);
+				p->mob.chat_len = strlen(mes);
+				encode_chat_legacy(mes,
+				    (uint8_t *)p->mob.chat_enc, p->mob.chat_len);
+			}
 		}
 		break;
 	case OP_CLI_PING:
