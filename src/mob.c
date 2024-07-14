@@ -127,7 +127,9 @@ mob_get_nearby_npcs(struct mob *mob,
 
 	tmp_count = zone_find_npcs(orig, mob->server, tmp, 128, exclude_busy);
 	for (size_t i = 0; i < tmp_count && count < max; ++i) {
-		list[count++] = tmp[i];
+		if (tmp[i]->respawn_time == 0) {
+			list[count++] = tmp[i];
+		}
 	}
 
 	for (int x = -2; x < 3; ++x) {
@@ -151,10 +153,9 @@ mob_get_nearby_npcs(struct mob *mob,
 				    tmp[i]->mob.x, tmp[i]->mob.y, 16)) {
 					continue;
 				}
-				if (tmp[i]->respawn_time > 0) {
-					continue;
+				if (tmp[i]->respawn_time == 0) {
+					list[count++] = tmp[i];
 				}
-				list[count++] = tmp[i];
 			}
 		}
 	}
