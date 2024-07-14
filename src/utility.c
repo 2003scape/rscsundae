@@ -80,7 +80,7 @@ decode_chat_legacy(char **dict, size_t dict_len,
 			if (i == (inlen - 1) || (outlen - off) < 6) {
 				break;
 			}
-			uint8_t colour = mes[i + 1];
+			uint8_t colour = mes[++i];
 			switch (colour) {
 			case 0:
 				memcpy(out + off, "@red@", 5);
