@@ -87,6 +87,8 @@ struct server {
 	char *rsa_modulus;
 	struct database database;
 	struct pwhash_params hash;
+	size_t num_words;
+	char *words[8192];
 };
 
 void server_tick(void);

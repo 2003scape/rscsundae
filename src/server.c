@@ -671,6 +671,26 @@ load_config_jag(void)
 	printf("read configuration for %zu floors\n",
 	    s.floor_config_count);
 
+	if (jag_find_entry(&archive, "words.txt", &entry) == -1 ||
+	    jag_unpack_entry(&entry) == -1) {
+		goto err;
+	}
+
+	bool new_word = true;
+	for (size_t i = 0; i < entry.unpacked_len; ++i) {
+		char *ch = entry.data;
+		if (ch[i] == '\n' || ch[i] == '\r') {
+			ch[i] = '\0';
+			new_word = true;
+			continue;
+		}
+		if (new_word) {
+			s.words[s.num_words++] = strdup(ch + i);
+		}
+		new_word = false;
+	}
+	printf("read %zu good words\n", s.num_words);
+
 	return 0;
 err:
 	if (entry.must_free) {
