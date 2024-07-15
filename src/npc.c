@@ -165,7 +165,7 @@ npc_hunt_target(struct npc *npc)
 	for (size_t i = 0; i < n; ++i) {
 		p = players[i];
 
-		if (p->mob.in_combat || p->chased_by_npc != UINT16_MAX) {
+		if (p->mob.in_combat) {
 			continue;
 		}
 
@@ -177,6 +177,26 @@ npc_hunt_target(struct npc *npc)
 		if (!mob_within_range(&p->mob, npc->mob.x, npc->mob.y,
 		    npc->config->hunt_range + 2)) {
 			continue;
+		}
+
+		/*
+		 * ignore players that are already being chased unless
+		 * we're closer than the NPC chasing them
+		 */
+		if (p->chased_by_npc != UINT16_MAX) {
+			struct npc *npc2;
+
+			npc2 = p->mob.server->npcs[p->chased_by_npc];
+			if (npc2 != NULL &&
+			    mob_distance(&p->mob, npc2->mob.x, npc2->mob.y) <=
+			    mob_distance(&p->mob, npc->mob.x, npc->mob.y)) {
+				continue;
+			}
+
+			npc2->mob.following_player = -1;
+			if (npc2->mob.target_player == p->mob.id) {
+				npc2->mob.target_player = -1;
+			}
 		}
 
 		p->chased_by_npc = npc->mob.id;

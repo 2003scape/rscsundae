@@ -111,6 +111,12 @@ mob_within_range(struct mob *mob, int x, int y, int range)
 	return mob->x > x1 && mob->y > y1 && mob->x < x2 && mob->y < y2;
 }
 
+int
+mob_distance(struct mob *mob, int x, int y)
+{
+	return hypot(abs(x - (int)mob->x), abs(y - (int)mob->y));
+}
+
 size_t
 mob_get_nearby_npcs(struct mob *mob,
 		struct npc **list, size_t max, bool exclude_busy)
