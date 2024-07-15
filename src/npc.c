@@ -56,10 +56,17 @@ npc_damage(struct npc *npc, struct player *p , int roll)
 	if (roll >= npc->mob.cur_stats[SKILL_HITS]) {
 		npc->mob.cur_stats[SKILL_HITS] = 0;
 		npc_die(npc, p);
+		return;
 	}
 
 	if (npc->mob.cur_stats[SKILL_HITS] == 0) {
 		return;
+	}
+
+	if (p != NULL &&
+	    npc->mob.cur_stats[SKILL_HITS] > npc->config->bravery &&
+	    npc->mob.target_player == -1) {
+		npc->mob.target_player = p->mob.id;
 	}
 
 	npc->mob.cur_stats[SKILL_HITS] -= roll;
@@ -173,7 +180,6 @@ npc_hunt_target(struct npc *npc)
 		}
 
 		p->chased_by_npc = npc->mob.id;
-		npc->mob.following_player = p->mob.id;
 		npc->mob.target_player = p->mob.id;
 		return;
 	}
@@ -186,14 +192,6 @@ npc_process_movement(struct npc *npc)
 	struct zone *zone_new;
 
 	if (npc->busy) {
-		return;
-	}
-
-	/*
-	 * like players, NPCs appear to be stunned slightly after combat, see
-	 * RSC 2001/replays master archive/Walk around/Misthalin- Lumbridge/walkaround- lumbridge road to varrock- road up to wheatfield digsite- dark mage aggressive - lvl 1-1-1
-	 */
-	if (npc->mob.server->tick_counter < (npc->mob.combat_timer + 6)) {
 		return;
 	}
 
@@ -240,7 +238,12 @@ npc_process_movement(struct npc *npc)
 		}
 
 		if (npc->random_walk_timer == 0) {
-			if (npc->mob.following_player == -1) {
+			/*
+			 * like players, NPCs appear to be stunned slightly after combat, see
+			 * RSC 2001/replays master archive/Walk around/Misthalin- Lumbridge/walkaround- lumbridge road to varrock- road up to wheatfield digsite- dark mage aggressive - lvl 1-1-1
+			 */
+			if (npc->mob.following_player == -1 &&
+			    npc->mob.server->tick_counter >= (npc->mob.combat_timer + 6)) {
 				double r = ranval(&npc->mob.server->ran) /
 				    (double)UINT32_MAX;
 

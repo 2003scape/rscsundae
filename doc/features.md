@@ -56,7 +56,6 @@ Engine
 
 ### Known engine bugs
 
-* NPCs are not as eager to retaliate as they should be.
 * Ground items appear duplicated to the client when changing planes.
 
 Content
