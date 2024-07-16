@@ -356,6 +356,7 @@ npc_init_combat(struct npc *npc, struct player *target)
 	}
 
 	player_send_message(target, "You are under attack!");
+	script_onattacknpc(npc->mob.server->lua, target, npc);
 
 	npc->mob.walk_queue_len = 0;
 	npc->mob.walk_queue_pos = 0;
