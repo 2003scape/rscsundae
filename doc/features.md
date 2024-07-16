@@ -57,6 +57,7 @@ Engine
 ### Known engine bugs
 
 * Ground items appear duplicated to the client when changing planes.
+* NPC combat can end up one-sided somehow (both remain in-animation).
 
 Content
 -------
@@ -163,7 +164,7 @@ These should all be implemented in Lua script:
 - [x] Using ladders
 - [x] Using stairs
 - [x] Equipment level requirements
-- [ ] Silverlight effect
+- [x] Silverlight effect
 - [x] Punching dummies
 - [ ] Guards should retaliate to PvP combat
 
