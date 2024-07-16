@@ -15,3 +15,4 @@ recordings would be very useful for RSC Sundae:
 * Trying to complete Cook's Assistant or make bread with a heap of flour
 * String an unstrung holy symbol
 * Converting mithril items at Thrander
+* Sailing on the Karamja ship when the Captain and all Seamen are busy
