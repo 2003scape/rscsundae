@@ -55,6 +55,9 @@ function oploc1_sarimjaship(player, x, y)
 	local npc = nearvisnpc(player, "customs officer")
 	if npc then
 		customs_search(player, npc)
+	else
+		-- flying sno (redacted chat) replays/flyingsnomonkey@aol.com/06-06-2018 16.17.22.pcap
+		mes(player, "You need to talk to the customs officer before you can board the ship")
 	end
 end
 
