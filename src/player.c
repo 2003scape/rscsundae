@@ -757,10 +757,10 @@ player_init_combat(struct player *p, struct mob *target)
 	}
 
 	if (!mob_check_reachable(&p->mob, target->x, target->y, false)) {
-		player_send_message(p, "I can't get close enough");
-		p->mob.walk_queue_pos = 0;
-		p->mob.walk_queue_len = 0;
-		mob_combat_reset(&p->mob);
+		if ((p->mob.walk_queue_len - p->mob.walk_queue_pos) == 0) {
+			player_send_message(p, "I can't get close enough");
+			mob_combat_reset(&p->mob);
+		}
 		return false;
 	}
 
