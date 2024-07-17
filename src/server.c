@@ -1177,6 +1177,7 @@ server_add_npc(int id, int x, int y)
 		npc->mob.x = x;
 		npc->mob.y = y;
 		npc->mob.server = &s;
+		npc->mob.is_npc = true;
 		npc->mob.damage = UINT8_MAX;
 		npc->mob.following_player = -1;
 		npc->mob.following_npc = -1;

@@ -504,7 +504,8 @@ mob_process_walk_queue(struct mob *mob)
 
 static bool
 mob_check_collision(struct mob *mob,
-    int cur_x, int cur_y, int x, int y, int dir, bool sight)
+    int cur_x, int cur_y, int x, int y, int dir,
+    bool sight)
 {
 	int block, block_v, block_h;
 	int plane = cur_y / PLANE_LEVEL_INC;
@@ -533,22 +534,23 @@ mob_check_collision(struct mob *mob,
 			return true;
 		}
 
-		/* XXX hacky, exact mechanics need verifying */
-		if (!sight && mob->target_npc == -1 &&
-		    server_npc_on_tile(mob->server, x, y, true)) {
-			return true;
-		}
-
 		/*
-		 * Players are prevented from walking through most entities,
+		 * Players are prevented from walking through other players,
 		 * UNLESS they have an action to perform on the tile. This can
 		 * be seen in the documentation for ixBot (it used a strategy
 		 * of keeping bones in inventory, to drop and pick up to regain
 		 * access to occupied tiles).
+		 *
+		 * The same applies to aggressive NPCs.
 		 */
-		if (!mob->action_walk && !sight &&
-		    (server_player_on_tile(mob->server, x, y) ||
-		    server_npc_on_tile(mob->server, x, y, false))) {
+		if (!sight && !mob->action_walk &&
+		    (server_npc_on_tile(mob->server, x, y, true) ||
+		    server_player_on_tile(mob->server, x, y))) {
+			return true;
+		}
+
+		if (mob->is_npc && !sight && !mob->action_walk &&
+		    server_npc_on_tile(mob->server, x, y, false)) {
 			return true;
 		}
 

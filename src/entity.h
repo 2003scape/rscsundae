@@ -166,6 +166,7 @@ struct mob {
 	uint16_t walk_queue_y[WALK_QUEUE_LEN];
 	uint16_t walk_queue_pos;
 	uint16_t walk_queue_len;
+	uint8_t is_npc;
 	uint8_t action_walk;
 	uint8_t dir;
 	uint8_t prev_dir;
