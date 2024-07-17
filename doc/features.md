@@ -187,7 +187,7 @@ The following use randomvar and need to be implemented in script:
 - [x] Skeleton3
 - [x] Zombie1
 - [x] Zombie2
-- [ ] Zombie3
+- [x] Zombie3
 - [x] Pirate
 - [x] Guard
 - [x] Giant

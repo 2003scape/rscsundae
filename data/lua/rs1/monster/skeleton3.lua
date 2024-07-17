@@ -53,3 +53,8 @@ function killnpc_skeleton3(player, npc, x, y)
 		end
 	end
 end
+
+-- https://classic.runescape.wiki/w/Talk:Zombie#Drops_%2832%29
+function killnpc_zombie3(player, npc, x, y)
+	killnpc_skeleton3(player, npc, x, y)
+end
