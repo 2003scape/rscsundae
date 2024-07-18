@@ -1,7 +1,5 @@
 -- https://classic.runescape.wiki/w/Transcript:Wyson_the_gardener
 -- RSC 2001/replays master archive/NPC (dialogue, notes)/Wyson/dialogue- wyson- all- quests 100%.pcap
--- RSC 2001/7/scenery- falador- park- flower- dig- aggrressive wyson.pcap
--- RSC 2001/7/scenery- falador- park- flowers- 50% pirates treasure- dig- 'seems a shame to dig'.pcap
 
 local function wyson_reject(player, npc)
 	npcsay(npc, "No No thats far too little. Woad leaves are hard to get you know")
@@ -97,13 +95,3 @@ function talknpc_wyson_the_gardener(player, npc)
 		end
 	end
 end
-
-register_useloc("treasureflower", "spade", function(player, x, y)
-	local npc = nearvisnpc(player, "wyson the gardener")
-	if npc then
-		npcsay(npc, "Hey leave off my flowers")
-		npcattack(npc, player)
-	else
-		mes(player, "It seems a shame to dig up these nice flowers for no reason")
-	end
-end)

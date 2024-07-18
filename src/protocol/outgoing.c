@@ -1943,6 +1943,10 @@ player_send_quests(struct player *p)
 			if (p->variables[i].value >= 2) {
 				quests_complete[7] = true;
 			}
+		} else if (strcmp(p->variables[i].name, "treasure_stage") == 0) {
+			if (p->variables[i].value >= 4) {
+				quests_complete[8] = true;
+			}
 		} else if (strcmp(p->variables[i].name, "rj_stage") == 0) {
 			if (p->variables[i].value >= 6) {
 				quests_complete[10] = true;

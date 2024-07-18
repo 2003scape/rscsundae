@@ -48,6 +48,10 @@ local function luthas_complete(player, npc)
 	mes(player, "Luthas hands you 30 coins")
 	give(player, "coins", 30)
 	setvar(player, "crate_bananas", 0)
+	if getvar(player, "rum_stashed") ~= 0 then
+		setvar(player, "rum_stashed", 0)
+		setvar(player, "rum_sent", 1)
+	end
 	delay(3)
 	local resp = multi(player,
 		"Will you pay me for another crate full?",

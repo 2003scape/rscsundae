@@ -58,6 +58,8 @@ Engine
 
 * Ground items appear duplicated to the client when changing planes.
 * NPC combat can end up one-sided somehow (both remain in-animation).
+* Talking to NPCs across diagonals doesn't work
+  (maybe should be excluded from sight checks)
 
 Content
 -------
@@ -115,7 +117,7 @@ These should all be implemented in Lua script:
 - [x] Doric's quest
 - [x] The knight's sword
 - [x] Goblin diplomacy
-- [ ] Pirate's treasure
+- [x] Pirate's treasure
 - [ ] Dragon slayer
 
 ### Miscellaneous

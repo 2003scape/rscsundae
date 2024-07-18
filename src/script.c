@@ -1572,7 +1572,6 @@ script_teleport(lua_State *L)
 		return 0;
 	}
 
-	/* TODO: send teleport effect */
 	player_teleport(p, x, y);
 	return 0;
 }
