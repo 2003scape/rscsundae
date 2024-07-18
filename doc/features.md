@@ -58,6 +58,7 @@ Engine
 
 * Ground items appear duplicated to the client when changing planes.
 * NPC combat can end up one-sided somehow (both remain in-animation).
+* Player moves one tile when ranging a monster that can't reach it.
 * Talking to NPCs across diagonals doesn't work
   (maybe should be excluded from sight checks)
 
