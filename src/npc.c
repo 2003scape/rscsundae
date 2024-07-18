@@ -348,10 +348,6 @@ npc_init_combat(struct npc *npc, struct player *target)
 
 	if (!mob_check_reachable(&npc->mob,
 	    target->mob.x, target->mob.y, false)) {
-		target->chased_by_npc = UINT16_MAX;
-		npc->mob.walk_queue_pos = 0;
-		npc->mob.walk_queue_len = 0;
-		mob_combat_reset(&npc->mob);
 		return false;
 	}
 
