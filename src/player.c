@@ -588,6 +588,13 @@ player_shoot_pvm(struct player *p, struct projectile_config *projectile,
 	p->mob.following_npc = -1;
 
 	if (projectile->type != PROJECTILE_TYPE_MAGIC) {
+		int range = projectile->range;
+		if (mob_distance(&p->mob,
+		    target->mob.x, target->mob.y) > range) {
+			p->mob.following_npc = target->mob.id;
+			return;
+		}
+
 		/* XXX verify if it's always northwest */
 		p->mob.dir = MOB_DIR_NORTHWEST;
 		if (p->ranged_timer > 0) {
@@ -630,7 +637,6 @@ player_shoot_pvp(struct player *p, struct projectile_config *projectile,
     struct player *target)
 {
 	char name[32], message[64];
-	int range;
 	int roll = 0;
 
 	assert(p != NULL);
@@ -643,9 +649,9 @@ player_shoot_pvp(struct player *p, struct projectile_config *projectile,
 	p->mob.following_npc = -1;
 
 	if (projectile->type != PROJECTILE_TYPE_MAGIC) {
-		range = projectile->range;
-		if ((abs(p->mob.x - (int)target->mob.x) > range) ||
-		    (abs(p->mob.y - (int)target->mob.y) > range)) {
+		int range = projectile->range;
+		if (mob_distance(&p->mob,
+		    target->mob.x, target->mob.y) > range) {
 			p->mob.following_player = target->mob.id;
 			return;
 		}
@@ -656,9 +662,7 @@ player_shoot_pvp(struct player *p, struct projectile_config *projectile,
 			p->mob.target_player = -1;
 			return;
 		}
-	}
 
-	if (projectile->type != PROJECTILE_TYPE_MAGIC) {
 		/* XXX verify if it's always northwest */
 		p->mob.dir = MOB_DIR_NORTHWEST;
 		if (p->ranged_timer > 0) {
@@ -1604,6 +1608,13 @@ player_process_action(struct player *p)
 			p->action = ACTION_NONE;
 			return;
 		}
+		if (p->projectile != NULL) {
+			if (mob_distance(&p->mob,
+			    npc->mob.x, npc->mob.y) <= p->projectile->range) {
+				p->mob.walk_queue_len = 0;
+				p->mob.walk_queue_pos = 0;
+			}
+		}
 		p->mob.target_npc = p->action_npc;
 		p->action = ACTION_NONE;
 		break;
@@ -1808,6 +1819,14 @@ player_process_action(struct player *p)
 		if (target == NULL) {
 			p->action = ACTION_NONE;
 			return;
+		}
+		if (p->projectile != NULL) {
+			if (mob_distance(&p->mob,
+			    target->mob.x, target->mob.y) <=
+			    p->projectile->range) {
+				p->mob.walk_queue_len = 0;
+				p->mob.walk_queue_pos = 0;
+			}
 		}
 		p->mob.target_player = target->mob.id;
 		p->action = ACTION_NONE;
