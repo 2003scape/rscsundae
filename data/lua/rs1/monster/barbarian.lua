@@ -7,7 +7,7 @@ local drops = {
 	{ "bronze axe", 1, 6 },
 
 	-- ammunition
-	{ "bronze arrows", 15, 3 },
+	{ "arrows", 15, 3 },
 	{ "law-rune", 1, 1 },
 	{ "mind-rune", 3, 2 },
 	{ "fire-rune", 3, 2 },
