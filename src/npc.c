@@ -25,7 +25,6 @@ npc_die(struct npc *npc, struct player *p)
 				    id, npc->config->drops[i].amount);
 			}
 		} else {
-			script_process(p->mob.server->lua, p);
 			if (npc->mob.cur_stats[SKILL_HITS] > 0) {
 				/* the killnpc trigger can restore hits */
 				return;

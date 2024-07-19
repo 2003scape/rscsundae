@@ -303,12 +303,15 @@ function script_engine_takeobj(player, name, x, y)
 end
 
 function script_engine_killnpc(player, npc, name, x, y)
-	local script = player_scripts[player]
-	if script then
+	name = string.lower(name)
+
+	local ps = player_scripts[player]
+	local script = killnpc_scripts[name]
+	if ps then
+		active_script = ps
+		script(player, npc, x, y)
 		return true
 	end
-	name = string.lower(name)
-	script = killnpc_scripts[name]
 	if script then
 		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
