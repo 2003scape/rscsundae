@@ -13,6 +13,7 @@ recordings would be very useful for RSC Sundae:
 * Dropping wine of zamorak near Monks of Zamorak and attempting to pick it up
 * Attempting to pick up the steel mace drop from a Monk of Zamorak
 * Trying to complete Cook's Assistant or make bread with a heap of flour
+* Using the monastery ladder while not a member and with Abbot Langley busy
 * String an unstrung holy symbol
 * Converting mithril items at Thrander
 * Sailing on the Karamja ship when the Captain and all Seamen are busy
