@@ -201,4 +201,4 @@ The following use randomvar and need to be implemented in script:
 - [x] Moss Giant
 - [x] Ice Giant
 - [x] Lesser Demon
-- [ ] Greater Demon
+- [x] Greater Demon
