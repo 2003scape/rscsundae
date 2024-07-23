@@ -80,6 +80,7 @@ For profiling, configure with:
 
 For fuzzing, configure with:
 
+	CC=afl-gcc \
 	CFLAGS="-DFUZZ -D_FORTIFY_SOURCE=2 -fstack-protector-all -fsanitize=undefined" \
 	LDFLAGS="-fsanitize=undefined" ./configure
 

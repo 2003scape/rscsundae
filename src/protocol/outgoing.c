@@ -1955,6 +1955,10 @@ player_send_quests(struct player *p)
 			if (p->variables[i].value >= 2) {
 				quests_complete[11] = true;
 			}
+		} else if (strcmp(p->variables[i].name, "arrav_stage") == 0) {
+			if (p->variables[i].value >= 5) {
+				quests_complete[12] = true;
+			}
 		} else if (strcmp(p->variables[i].name, "sword_stage") == 0) {
 			if (p->variables[i].value >= 4) {
 				quests_complete[13] = true;

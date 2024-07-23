@@ -125,6 +125,7 @@ player_load(struct player *p)
 	p->plane_changed = true;
 	p->inv_changed = true;
 	p->ui_design_open = true;
+	p->appearance_changed = true;
 
 	p->rpg_class = UINT8_MAX;
 

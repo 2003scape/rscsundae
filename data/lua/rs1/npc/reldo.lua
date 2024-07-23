@@ -5,6 +5,9 @@ local function reldo_init(player, npc)
 	npcsay(npc, "Hello stranger")
 
 	local choices = {}
+	if getvar(player, "arrav_stage") == 0 then
+		table.insert(choices, "I'm in search of a quest")
+	end
 	table.insert(choices, "Do you have anything to trade?")
 	table.insert(choices, "What do you do?")
 	if getvar(player, "sword_stage") > 0 and
@@ -14,7 +17,18 @@ local function reldo_init(player, npc)
 
 	local resp = multi(player, table.unpack(choices))
 	local answer = choices[resp]
-	if answer == "Do you have anything to trade?" then
+	if answer == "I'm in search of a quest" then
+		say(player, "I'm in search of a quest")
+		npcsay(npc, "I don't think there's any here")
+		npcsay(npc, "Let me think actually")
+		npcsay(npc, "If you look in a book")
+		npcsay(npc, "called the shield of Arrav")
+		npcsay(npc, "You'll find a quest in there")
+		npcsay(npc, "I'm not sure where the book is mind you")
+		npcsay(npc, "I'm sure it's somewhere in here")
+		say(player, "Thankyou")
+		setvar(player, "arrav_stage", 1)
+	elseif answer == "Do you have anything to trade?" then
 		say(player, "Do you have anything to trade?")
 		npcsay(npc, "No, sorry. I'm not the trading type")
 		say(player, "ah well")
@@ -49,5 +63,17 @@ local function reldo_init(player, npc)
 end
 
 function talknpc_reldo(player, npc)
-	reldo_init(player, npc)
+	local stage = getvar(player, "arrav_stage")
+	if stage == 2 then
+		say(player, "OK I've read the book")
+		say(player, "Do you know where I can find the Phoenix Gang")
+		npcsay(npc, "No I don't")
+		npcsay(npc, "I think I know someone who will though")
+		npcsay(npc, "Talk to Baraek, the fur trader in the market place")
+		npcsay(npc, "I've heard he has connections with the Phoenix Gang")
+		say(player, "Thanks, I'll try that")
+		setvar(player, "arrav_stage", 3)
+	else
+		reldo_init(player, npc)
+	end
 end
