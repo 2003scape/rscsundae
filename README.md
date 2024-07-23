@@ -91,11 +91,11 @@ Credits
 * Mister Hat (frogdoubler) contributed player persistence support via SQLite,
   and the Vampire Slayer quest.
 * Zachary Penn (Hikilaka) contributed many enhancements to the scripting API,
-  teleportation spells, mixing dyes and capes, player variables support.
+  teleportation spells, mixing dyes and capes, and player variables support.
 * Pazaz served as an influence with their 2004scape project, listened to
   a lot of my theorizing, and helped answer obscure RS questions.
 * Protosstribe got me interested in reverse engineering old clients.
-* The RSC+ Preservation community (especially RSC 2001, Logg, 1e Luis)
+* Members of the RSC community (especially RSC 2001, Logg, 1e Luis)
   recorded many packet captures, without which a lot of information
   used to write this code would be lost.
 
