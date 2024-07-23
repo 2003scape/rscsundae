@@ -12,6 +12,9 @@ static bool npc_init_combat(struct npc *, struct player *);
 void
 npc_die(struct npc *npc, struct player *p)
 {
+	struct zone *zone_old;
+	struct zone *zone_new;
+
 	if (p != NULL) {
 		if (!script_onkillnpc(npc->mob.server->lua, p, npc)) {
 			for (int i = 0; i < npc->config->drop_count; ++i) {
@@ -45,8 +48,21 @@ npc_die(struct npc *npc, struct player *p)
 		mob_combat_reset(&p->mob);
 	}
 
+	zone_old = server_find_zone(npc->mob.x, npc->mob.y);
+
 	npc->mob.x = npc->spawn_x;
 	npc->mob.y = npc->spawn_y;
+
+	zone_new = server_find_zone(npc->mob.x, npc->mob.y);
+
+	if (zone_old != zone_new) {
+		if (zone_old != NULL) {
+			zone_remove_npc(zone_old, npc->mob.id);
+		}
+		if (zone_new != NULL) {
+			zone_add_npc(zone_new, npc->mob.id);
+		}
+	}
 }
 
 void
