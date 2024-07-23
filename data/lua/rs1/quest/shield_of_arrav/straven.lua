@@ -76,6 +76,13 @@ local function straven_reject(player, npc)
 end
 
 function talknpc_straven(player, npc)
+	if getvar(player, "blackarm_stage") >= 2 then
+		npcsay(npc, "hey get away from there")
+		npcsay(npc, "Black arm dog")
+		npcattack(npc, player)
+		return
+	end
+
 	local stage = getvar(player, "phoenix_stage")
 	if stage < 1 then
 		say(player, "What's through that door?")
