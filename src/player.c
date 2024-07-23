@@ -98,6 +98,8 @@ player_create(struct server *s, int sock)
 int
 player_load(struct player *p)
 {
+	int ret;
+
 	for (int i = 0; i < MAX_SKILL_ID; ++i) {
 		p->mob.cur_stats[i] = 1;
 		p->mob.base_stats[i] = 1;
@@ -131,11 +133,14 @@ player_load(struct player *p)
 
 	player_recalculate_combat_level(p);
 
-	player_teleport(p,
-	    p->mob.server->start_tile_x,
-	    p->mob.server->start_tile_y);
+	p->mob.x = p->mob.server->start_tile_x;
+	p->mob.y = p->mob.server->start_tile_y;
 
-	return database_load_player(&p->mob.server->database, p);
+	ret = database_load_player(&p->mob.server->database, p);
+
+	player_moved(p, UINT16_MAX, UINT16_MAX);
+
+	return ret;
 }
 
 void
