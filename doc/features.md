@@ -72,7 +72,7 @@ These should all be implemented in Lua script:
 - [x] Prayer (altars)
 - [x] Magic (missiles vs. players)
 - [x] Magic (missiles vs. NPCs)
-- [ ] Magic (crumble undead) - needs config parser fixes
+- [x] Magic (crumble undead)
 - [x] Magic (curses)
 - [x] Magic (teleportation)
 - [ ] Magic (bones to bananas) - no footage available
@@ -137,7 +137,7 @@ These should all be implemented in Lua script:
 - [x] Pirate NPC dialogue
 - [x] Man NPC dialogue
 - [x] Thrander NPC dialogue
-- [ ] Bareak NPC dialogue
+- [x] Baraek NPC dialogue
 - [x] Wyson the gardener NPC dialogue
 - [x] Apothecary NPC dialogue (a broken dialogue path where he gives the player spot cream twice is not implemented)
 - [x] Banker NPC dialogue
