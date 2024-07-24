@@ -41,6 +41,7 @@ next_token(char *buffer, size_t offset, size_t len)
 	size_t nofs;
 	char ch;
 	uint8_t b;
+	bool quoted = false;
 
 	/* returns the start of the next token */
 
@@ -52,14 +53,29 @@ next_token(char *buffer, size_t offset, size_t len)
 	while (buf_getu8((uint8_t *)buffer, offset++, len, &b) != -1) {
 		ch = (char)b;
 
-		if (offset > 1 && (ch == ',' || ch == ';')) {
+		if (ch == '"' && !quoted) {
+			quoted = true;
+		} else if (ch == '"' && quoted) {
+			quoted = false;
+		}
+
+		if (offset > 1 && (ch == ',' || ch == ';') && !quoted) {
 			nofs = offset - 1;
 			buffer[nofs] = '\0';
 			do {
 				nofs--;
-			} while (nofs > 0 && buffer[nofs] != '\0' &&
+				if (buffer[nofs] == '"') {
+					buffer[nofs] = '\0';
+					while (nofs > 0) {
+						nofs--;
+						if (buffer[nofs] == '"') {
+							return nofs + 1;
+						}
+					}
+				}
+			} while (nofs > 0 && (buffer[nofs] != '\0' &&
 			    buffer[nofs] != ',' && buffer[nofs] != ';' &&
-			    buffer[nofs] != '=');
+			    buffer[nofs] != '='));
 			return nofs + 1;
 		}
 	}
