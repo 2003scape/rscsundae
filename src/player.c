@@ -520,6 +520,8 @@ player_die(struct player *p, struct player *victor)
 	player_reset_prayers(p);
 
 	player_send_death(p);
+
+	p->stats_changed = true;
 	p->appearance_changed = true;
 
 	if (victor != NULL) {
