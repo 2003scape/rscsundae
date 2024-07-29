@@ -138,12 +138,12 @@ player_load(struct player *p)
 
 	p->rpg_class = UINT8_MAX;
 
-	player_recalculate_combat_level(p);
-
 	p->mob.x = p->mob.server->start_tile_x;
 	p->mob.y = p->mob.server->start_tile_y;
 
 	ret = database_load_player(&p->mob.server->database, p);
+
+	player_recalculate_combat_level(p);
 
 	player_moved(p, UINT16_MAX, UINT16_MAX);
 
