@@ -22,6 +22,9 @@
 #define MAX_KNOWN_ZONES		(64)
 #define MAX_BANK_SIZE		(48)
 
+/* number three comes from 2004scape research */
+#define MAX_CACHED_ATTACKERS	(3)
+
 /* signed to accomodate java client */
 #define MAX_STACK_SIZE		(INT32_MAX)
 
@@ -347,6 +350,10 @@ struct player {
 	uint64_t login_date;
 	uint16_t chased_by_npc;
 	uint16_t save_timer;
+	uint16_t player_targets[MAX_CACHED_ATTACKERS];
+	uint16_t player_aggressors[MAX_CACHED_ATTACKERS];
+	uint64_t player_targets_time[MAX_CACHED_ATTACKERS];
+	uint64_t player_aggressors_time[MAX_CACHED_ATTACKERS];
 };
 
 /* mob.c */

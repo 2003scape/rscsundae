@@ -100,6 +100,13 @@ player_load(struct player *p)
 {
 	int ret;
 
+	for (int i = 0; i < MAX_CACHED_ATTACKERS; ++i) {
+		p->player_aggressors[i] = UINT16_MAX;
+		p->player_aggressors_time[i] = 0;
+		p->player_targets[i] = UINT16_MAX;
+		p->player_targets_time[i] = 0;
+	}
+
 	for (int i = 0; i < MAX_SKILL_ID; ++i) {
 		p->mob.cur_stats[i] = 1;
 		p->mob.base_stats[i] = 1;
@@ -445,6 +452,13 @@ player_die(struct player *p, struct player *victor)
 
 	mob_die(&p->mob);
 
+	for (int i = 0; i < MAX_CACHED_ATTACKERS; ++i) {
+		p->player_aggressors[i] = UINT16_MAX;
+		p->player_aggressors_time[i] = 0;
+		p->player_targets[i] = UINT16_MAX;
+		p->player_targets_time[i] = 0;
+	}
+
 	p->mob.walk_queue_len = 0;
 	p->mob.walk_queue_pos = 0;
 	player_clear_actions(p);
@@ -570,10 +584,41 @@ player_consume_ammo(struct player *p,
 void
 player_skull(struct player *p, struct player *target)
 {
-	/* skull remains for 20 minutes */
-	/* TODO: should track players who attacked us */
-	(void)target;
+	int oldest = 0;
 
+	assert(target != NULL);
+
+	for (int i = 0; i < MAX_CACHED_ATTACKERS; ++i) {
+		if (p->player_targets_time[i] <
+		    p->player_targets_time[oldest]) {
+			oldest = i;
+		}
+	}
+	p->player_targets[oldest] = target->mob.id;
+	p->player_targets_time[oldest] = p->mob.server->tick_counter;
+
+	oldest = 0;
+
+	for (int i = 0; i < MAX_CACHED_ATTACKERS; ++i) {
+		if (target->player_aggressors_time[i] <
+		    target->player_aggressors_time[oldest]) {
+			oldest = i;
+		}
+	}
+	target->player_aggressors[oldest] = p->mob.id;
+	target->player_aggressors_time[oldest] =
+	    p->mob.server->tick_counter;
+
+	for (int i = 0; i < MAX_CACHED_ATTACKERS; ++i) {
+		if (p->player_aggressors[i] == target->mob.id) {
+			return;
+		}
+		if (target->player_targets[i] == p->mob.id) {
+			return;
+		}
+	}
+
+	/* skull remains for 20 minutes */
 	p->skull_timer = 2000;
 
 	if (!p->skulled) {
@@ -2260,7 +2305,6 @@ player_moved(struct player *p, int from_x, int from_y)
 		if (npc == NULL) {
 			return;
 		}
-		/* TODO: maybe should check visibility */
 		if (!mob_within_range(&npc->mob, p->mob.x, p->mob.y, 16)) {
 			p->chased_by_npc = UINT16_MAX;
 		}
