@@ -204,9 +204,9 @@ end
 local function prysin_progress(player, npc)
 	npcsay(npc, "So how are you doing with getting the keys?")
 
-	if held(player, "silverlight key 1") and
-	    held(player, "silverlight key 2") and
-	    held(player, "silverlight key 3") then
+	if held(player, "silverlight key 1", 1) and
+	    held(player, "silverlight key 2", 1) and
+	    held(player, "silverlight key 3", 1) then
 		say(player, "I've got them all")
 		npcsay(npc, "Excellent. Now I can give you Silverlight")
 		mes(player, "You give all three keys to Sir Prysin")
@@ -221,16 +221,16 @@ local function prysin_progress(player, npc)
 		return
 	end
 
-	if held(player, "silverlight key 1") or
-	    held(player, "silverlight key 2") or 
-	    held(player, "silverlight key 3") then
-		if held(player, "silverlight key 2") then
+	if held(player, "silverlight key 1", 1) or
+	    held(player, "silverlight key 2", 1) or
+	    held(player, "silverlight key 3", 1) then
+		if held(player, "silverlight key 2", 1) then
 			say(player, "I've got the key off Captain Rovin")
 		end
-		if held(player, "silverlight key 3") then
+		if held(player, "silverlight key 3", 1) then
 			say(player, "I've got the key You dropped down the drain")
 		end
-		if held(player, "silverlight key 1") then
+		if held(player, "silverlight key 1", 1) then
 			say(player, "I've got the key off Wizard Traiborn")
 		end
 	else
