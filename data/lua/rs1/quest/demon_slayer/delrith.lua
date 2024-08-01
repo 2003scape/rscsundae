@@ -14,18 +14,18 @@ end
 
 function attacknpc_delrith(player, npc)
 	if getvar(player, "silverlight_stage") < 1 then
-		say(player, "I'd rather not. He looks scary")
 		nodefault(player)
+		say(player, "I'd rather not. He looks scary")
 		return
 	end
 	if getvar(player, "delrith_stage") >= 2 then
-		mes(player, "You've already done that quest")
 		nodefault(player)
+		mes(player, "You've already done that quest")
 		return
 	end
 	if not worn(player, "silverlight", 1) then
-		say(player, "Maybe I'd better wield silverlight first")
 		nodefault(player)
+		say(player, "Maybe I'd better wield silverlight first")
 	else
 		attacknpc_demon(player, npc)
 	end
