@@ -108,6 +108,10 @@ npc_random_walk(struct npc *npc)
 	bool valid;
 	int attempts;
 
+	if (npc->busy) {
+		return;
+	}
+
 	if (npc->config->wander_range == 0) {
 		return;
 	}
