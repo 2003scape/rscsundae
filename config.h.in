@@ -1,12 +1,12 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Define to 1 if you have the `arc4random_buf' function. */
+/* Define to 1 if you have the 'arc4random_buf' function. */
 #undef HAVE_ARC4RANDOM_BUF
 
 /* Define to 1 if you have the <bzlib.h> header file. */
 #undef HAVE_BZLIB_H
 
-/* Define to 1 if you have the `clock_gettime' function. */
+/* Define to 1 if you have the 'clock_gettime' function. */
 #undef HAVE_CLOCK_GETTIME
 
 /* Define to 1 if you have the <inttypes.h> header file. */
@@ -18,7 +18,7 @@
 /* Define if you have libev */
 #undef HAVE_LIBEV
 
-/* Define to 1 if you have the `reallocarr' function. */
+/* Define to 1 if you have the 'reallocarr' function. */
 #undef HAVE_REALLOCARR
 
 /* Define to 1 if you have the <stdint.h> header file. */
@@ -48,7 +48,7 @@
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
 
-/* Define to 1 if you have the `timerfd_create' function. */
+/* Define to 1 if you have the 'timerfd_create' function. */
 #undef HAVE_TIMERFD_CREATE
 
 /* Define to 1 if you have the <unistd.h> header file. */
@@ -75,7 +75,7 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* Define to 1 if all of the C90 standard headers exist (not just the ones
+/* Define to 1 if all of the C89 standard headers exist (not just the ones
    required in a freestanding environment). This macro is provided for
    backward compatibility; new code need not use it. */
 #undef STDC_HEADERS
