@@ -44,7 +44,6 @@ db_prepare_query(sqlite3 *db, sqlite3_stmt **stmt, const char *query)
 	if (sqlite3_prepare_v2(db, query, -1, stmt, NULL) != SQLITE_OK) {
 		fprintf(stderr, "unable to prepare statement: %s\n",
 			sqlite3_errmsg(db));
-
 		return -1;
 	}
 
@@ -551,7 +550,7 @@ database_init(struct database *database)
 		return -1;
 	}
 
-	char get_query[1024] = "SELECT `id`, `password`, `rpg_class`, "
+	char get_query[2048] = "SELECT `id`, `password`, `rpg_class`, "
 	    "`login_date`, `x`, `y`, `quest_points`, `camera_auto`, "
 	    "`one_mouse_button`, `block_public`, `block_private`, "
 	    "`block_trade`, `block_duel`, `hair_colour`, `top_colour`, "
@@ -562,7 +561,8 @@ database_init(struct database *database)
 		int remaining = sizeof(get_query) - strlen(get_query);
 
 		snprintf(get_query + strlen(get_query), remaining,
-			"`%s_current`, `%s_xp`%s ", skill_names[i], skill_names[i],
+			"`%s_current`, `%s_base`, `%s_xp`%s ",
+			skill_names[i], skill_names[i], skill_names[i],
 			(i < MAX_SKILL_ID - 1) ? "," : "");
 	}
 
@@ -628,13 +628,14 @@ database_init(struct database *database)
 		int remaining = sizeof(save_query) - strlen(save_query);
 
 		snprintf(save_query + strlen(save_query), remaining,
-			"`%s_current` = ?, `%s_xp` = ?, ",
-			skill_names[i], skill_names[i]);
+			"`%s_current` = ?, `%s_base` = ?, `%s_xp` = ?%s ",
+			skill_names[i], skill_names[i], skill_names[i],
+			(i < MAX_SKILL_ID - 1) ? "," : "");
 	}
 
 	snprintf(save_query + strlen(save_query),
 		sizeof(save_query) - strlen(save_query),
-		"`total_level` = ? WHERE `username` = ? RETURNING `id`");
+		" WHERE `username` = ? RETURNING `id`");
 
 	if (db_prepare_query(database->db, &database->save_player,
 			save_query) == -1) {
@@ -884,10 +885,11 @@ database_load_player(struct database *database, struct player *player)
 		player->mob.cur_stats[i] =
 			sqlite3_column_int(database->get_player, column_index++);
 
-		player->experience[i] =
+		player->mob.base_stats[i] =
 			sqlite3_column_int(database->get_player, column_index++);
 
-		player->mob.base_stats[i] = xp_to_level(player->experience[i]);
+		player->experience[i] =
+			sqlite3_column_int(database->get_player, column_index++);
 	}
 
 	if (player->skull_timer > 0) {
@@ -1033,8 +1035,6 @@ database_save_player(struct database *database, struct player *player)
 		return -1;
 	}
 
-	int total_level = 0;
-
 	for (int i = 0; i < MAX_SKILL_ID; i++) {
 		if (stmt_bind_int(database->db, database->save_player, bind_index++,
 				player->mob.cur_stats[i]) == -1) {
@@ -1042,16 +1042,14 @@ database_save_player(struct database *database, struct player *player)
 		}
 
 		if (stmt_bind_int(database->db, database->save_player, bind_index++,
-				player->experience[i]) == -1) {
+				player->mob.base_stats[i]) == -1) {
 			return -1;
 		}
 
-		total_level += player->mob.base_stats[i];
-	}
-
-	if (stmt_bind_int(database->db, database->save_player, bind_index++,
-			total_level) == -1) {
-		return -1;
+		if (stmt_bind_int(database->db, database->save_player, bind_index++,
+				player->experience[i]) == -1) {
+			return -1;
+		}
 	}
 
 	char username[32];
