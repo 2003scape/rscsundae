@@ -16,6 +16,11 @@ npc_die(struct npc *npc, struct player *p)
 	struct zone *zone_new;
 
 	if (p != NULL) {
+		if (p->script_active || p->ui_multi_open) {
+			/* might be waiting on an existing killnpc script */
+			return;
+		}
+
 		if (!script_onkillnpc(npc->mob.server->lua, p, npc)) {
 			for (int i = 0; i < npc->config->drop_count; ++i) {
 				struct item_config *item_config;
@@ -33,6 +38,11 @@ npc_die(struct npc *npc, struct player *p)
 				return;
 			}
 		}
+
+		if (p->script_active || p->ui_multi_open) {
+			/* might be waiting on an existing killnpc script */
+			return;
+		}
 	}
 
 	npc->respawn_time = npc->config->respawn / 5;
@@ -44,7 +54,7 @@ npc_die(struct npc *npc, struct player *p)
 
 	mob_die(&npc->mob);
 
-	if (p->mob.target_npc == npc->mob.id) {
+	if (p != NULL && p->mob.target_npc == npc->mob.id) {
 		mob_combat_reset(&p->mob);
 	}
 
@@ -366,8 +376,9 @@ npc_init_combat(struct npc *npc, struct player *target)
 		return false;
 	}
 
-	player_send_message(target, "You are under attack!");
 	script_onattacknpc(npc->mob.server->lua, target, npc);
+
+	player_send_message(target, "You are under attack!");
 
 	npc->mob.walk_queue_len = 0;
 	npc->mob.walk_queue_pos = 0;

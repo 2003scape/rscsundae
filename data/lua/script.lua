@@ -196,6 +196,10 @@ function script_engine_process(player)
 		return
 	end
 	active_script = ps
+	if coroutine.status(ps.co) == "dead" then
+		script_engine_cancel(player)
+		return
+	end
 	if ps.delay > 0 then
 		ps.delay = ps.delay - 1
 	end
@@ -307,11 +311,6 @@ function script_engine_killnpc(player, npc, name, x, y)
 
 	local ps = player_scripts[player]
 	local script = killnpc_scripts[name]
-	if ps then
-		active_script = ps
-		script(player, npc, x, y)
-		return true
-	end
 	if script then
 		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
@@ -319,8 +318,16 @@ function script_engine_killnpc(player, npc, name, x, y)
 			player_scripts[player] = nil
 			playerunbusy(player)
 		end)
-		player_scripts[player] = ps
+		-- need to run the script in this context for invincible
+		-- NPCs to work properly
 		playerbusy(player)
+		local result, err = coroutine.resume(ps.co)
+		if not result then
+			print("Script error inside coroutine: " .. err)
+			script_engine_cancel(player)
+		else
+			player_scripts[player] = ps
+		end
 		return true
 	end
 	return false

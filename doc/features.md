@@ -105,7 +105,7 @@ These should all be implemented in Lua script:
 - [x] Cook's Assistant
 - [x] Sheep Shearer
 - [x] The Restless Ghost
-- [ ] Demon Slayer
+- [x] Demon Slayer
 - [x] Romeo & Juliet (several bugs not implemented)
 - [x] Shield of Arrav
 - [ ] Ernest the chicken

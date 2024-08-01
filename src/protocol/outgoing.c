@@ -1927,6 +1927,10 @@ player_send_quests(struct player *p)
 			if (p->variables[i].value >= 2) {
 				quests_complete[1] = true;
 			}
+		} else if (strcmp(p->variables[i].name, "delrith_stage") == 0) {
+			if (p->variables[i].value >= 2) {
+				quests_complete[2] = true;
+			}
 		} else if (strcmp(p->variables[i].name, "doric_stage") == 0) {
 			if (p->variables[i].value >= 2) {
 				quests_complete[3] = true;

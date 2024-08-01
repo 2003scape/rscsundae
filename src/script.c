@@ -65,6 +65,7 @@ static int script_addnpc(lua_State *);
 static int script_playercoord(lua_State *);
 static int script_teleport(lua_State *);
 static int script_qp(lua_State *);
+static int script_nodefault(lua_State *);
 static struct player *id_to_player(lua_Integer);
 static struct npc *id_to_npc(lua_Integer);
 static void safe_call(lua_State *, int, int, int);
@@ -1629,6 +1630,34 @@ script_giveqp(lua_State *L)
 	return 0;
 }
 
+/* XXX quite limited still */
+static int
+script_nodefault(lua_State *L)
+{
+	lua_Integer player_id;
+	struct player *p;
+	struct npc *npc;
+
+	player_id = script_checkinteger(L, 1);
+
+	p = id_to_player(player_id);
+	if (p == NULL) {
+		printf("script warning: player %lld is undefined\n", player_id);
+		script_cancel(L, player_id);
+		return 0;
+	}
+
+	if (p->mob.target_npc != -1) {
+		npc = id_to_npc(p->mob.target_npc);
+		if (npc != NULL) {
+			mob_combat_reset(&npc->mob);
+		}
+		mob_combat_reset(&p->mob);
+	}
+
+	return 0;
+}
+
 static int
 script_thinkbubble(lua_State *L)
 {
@@ -2583,6 +2612,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_qp);
 	lua_setglobal(L, "qp");
+
+	lua_pushcfunction(L, script_nodefault);
+	lua_setglobal(L, "nodefault");
 
 	if (luaL_dofile(L, "./lua/script.lua") != LUA_OK) {
 		printf("script error %s:\n",  lua_tostring(L, -1));
