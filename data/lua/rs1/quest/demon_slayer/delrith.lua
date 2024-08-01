@@ -32,19 +32,16 @@ function attacknpc_delrith(player, npc)
 end
 
 function killnpc_delrith(player, npc, x, y)
-	npcbusy(npc)
 	npchealstat(npc, STAT_HITS, 0, 100)
 	mes(player, "As you strike Delrith a vortex opens up")
 	delay(3)
 	say(player, "Now what was that incantation again")
 	delay(3)
-	npcunbusy(npc)
 	local resp = multi(player,
 		"Carlem Gabindo Purchai Zaree Camerinthum",
 		"Purchai Zaree Gabindo Carlem Camerinthum",
 		"Purchai Camerinthum Aber Gabindo Carlem",
 		"Carlem Aber Camerinthum Purchai Gabindo")
-	npcbusy(npc)
 	if resp == 1 then
 		say(player, "Carlem Gabindo Purchai Zaree Camerinthum")
 		delrith_wrong_chant(player)
@@ -63,5 +60,4 @@ function killnpc_delrith(player, npc, x, y)
 		setvar(player, "delrith_stage", 2)
 		giveqp(player, 3)
 	end
-	npcunbusy(npc)
 end

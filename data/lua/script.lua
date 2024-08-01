@@ -313,14 +313,17 @@ function script_engine_killnpc(player, npc, name, x, y)
 	local script = killnpc_scripts[name]
 	if script then
 		ps = new_player_script(player)
+		ps.npc = npc
 		ps.co = coroutine.create(function()
 			script(player, npc, x, y)
 			player_scripts[player] = nil
 			playerunbusy(player)
+			npcunbusy(player)
 		end)
 		-- need to run the script in this context for invincible
 		-- NPCs to work properly
 		playerbusy(player)
+		npcbusy(player)
 		local result, err = coroutine.resume(ps.co)
 		if not result then
 			print("Script error inside coroutine: " .. err)
