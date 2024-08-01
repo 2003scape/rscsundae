@@ -456,6 +456,7 @@ npc_process_combat(struct npc *npc)
 	 * for some recordings of retreating from low hits
 	 */
 	if (npc->mob.combat_rounds >= 3 &&
+	    npc->config->bravery > 0 &&
 	    npc->mob.cur_stats[SKILL_HITS] <= npc->config->bravery) {
 		npc_random_walk(npc);
 		return;
