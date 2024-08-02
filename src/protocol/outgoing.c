@@ -1590,9 +1590,10 @@ player_send_ground_items(struct player *p)
 		global_item = server_find_ground_item(p, p->known_items[i].x,
 		    p->known_items[i].y, p->known_items[i].id);
 		item = &p->known_items[i];
-		if (global_item == NULL ||
+		if ((global_item == NULL ||
 		    !within_update_radius(p, item->x, item->y, 3) ||
-		    !player_can_see_item(p, item)) {
+		    !player_can_see_item(p, item)) &&
+		    mob_distance(&p->mob, item->x, item->y) < 128) {
 			/* remove the item from the player's view */
 			if (buf_putu16(p->tmpbuf, offset, PLAYER_BUFSIZE,
 					item->id | 0x8000) == -1) {
