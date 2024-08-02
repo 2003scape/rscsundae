@@ -57,8 +57,6 @@ Engine
 ### Known engine bugs
 
 * NPC combat can end up one-sided somehow (both remain in-animation).
-* Talking to NPCs across diagonals doesn't work
-  (maybe should be excluded from sight checks)
 
 Content
 -------

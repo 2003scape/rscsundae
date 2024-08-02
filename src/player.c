@@ -1690,6 +1690,9 @@ player_process_action(struct player *p)
 			return;
 		}
 		if (!mob_check_reachable(&p->mob, npc->mob.x, npc->mob.y, false)) {
+			if ((p->mob.walk_queue_len - p->mob.walk_queue_pos) == 0) {
+				p->action = ACTION_NONE;
+			}
 			return;
 		}
 		p->mob.walk_queue_len = 0;
@@ -1714,12 +1717,15 @@ player_process_action(struct player *p)
 			}
 			return;
 		}
+		if (!mob_check_reachable(&p->mob, npc->mob.x, npc->mob.y, false)) {
+			if ((p->mob.walk_queue_len - p->mob.walk_queue_pos) == 0) {
+				p->action = ACTION_NONE;
+			}
+			return;
+		}
 		p->action = ACTION_NONE;
 		p->mob.walk_queue_len = 0;
 		p->mob.walk_queue_pos = 0;
-		if (!mob_check_reachable(&p->mob, npc->mob.x, npc->mob.y, false)) {
-			return;
-		}
 		if (npc->busy) {
 			char mes[128];
 
