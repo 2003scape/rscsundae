@@ -17,3 +17,4 @@ recordings would be very useful for RSC Sundae:
 * String an unstrung holy symbol
 * Converting mithril items at Thrander
 * Sailing on the Karamja ship when the Captain and all Seamen are busy
+* Attempting to enter the cook's guild without requirements and the head chef busy

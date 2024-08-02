@@ -138,7 +138,7 @@ These should all be implemented in Lua script:
 - [x] Wyson the gardener NPC dialogue
 - [x] Apothecary NPC dialogue (a broken dialogue path where he gives the player spot cream twice is not implemented)
 - [x] Banker NPC dialogue
-- [ ] Cook's Guild
+- [x] Cook's Guild
 - [ ] Champions' Guild
 - [x] Mining Guild
 - [x] Monastery (Prayer Guild)
