@@ -1,7 +1,6 @@
 -- teleport spells have no message to confirm they worked
 -- for karamja rum effect, see:
 -- RSC 2001/7/iteminfo- karamja rum- teleport from port sarim to falador.pcap
--- TODO: showeffect
 
 local function remove_teleport_runes(player, primary_rune_name)
 	if not worn(player, "staff of air") then
@@ -31,6 +30,7 @@ function spellself_varrock_teleport(player)
 		remove(player, "karamja rum", 30)
 		advancestat(player, STAT_MAGIC, 280, 0)
 		remove_teleport_runes(player, "fire")
+		showeffect(0, 120, 503)
 	end
 end
 
@@ -41,6 +41,7 @@ function spellself_lumbridge_teleport(player)
 		remove(player, "karamja rum", 30)
 		advancestat(player, STAT_MAGIC, 328, 0)
 		remove_teleport_runes(player, "earth")
+		showeffect(0, 120, 647)
 	end
 end
 
@@ -51,5 +52,6 @@ function spellself_falador_teleport(player)
 		remove(player, "karamja rum", 30)
 		advancestat(player, STAT_MAGIC, 376, 0)
 		remove_teleport_runes(player, "water")
+		showeffect(0, 312, 551)
 	end
 end

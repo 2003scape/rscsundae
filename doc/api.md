@@ -78,13 +78,13 @@ Implemented
 * `ifnearnpc(npc)` - implemented as `nearnpc(player, npc)` in Lua, returns npc handle or nil.
 * `ifnearvisnpc(npc)` - implemented as `nearvisnpc(player, npc)` in Lua, returns npc handle or nil.
 * `teleport()` - implemented as `teleport(player, x, y)` in Lua.
+* `showeffect(type)` - implemented as `showeffect(type, x, y)` in Lua.
 
 Not implemented
 ---------------
 
 * `modpause(mindelay, maxdelay)`
 * `changelevel(level)`
-* `showeffect(type)`
 * `delinv()`
 * `ifobjectvisible()`
 * `delnpc()`

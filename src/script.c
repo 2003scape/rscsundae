@@ -61,6 +61,7 @@ static int script_delobject(lua_State *);
 static int script_takeobject(lua_State *);
 static int script_getvar(lua_State *);
 static int script_setvar(lua_State *);
+static int script_showeffect(lua_State *);
 static int script_addnpc(lua_State *);
 static int script_playercoord(lua_State *);
 static int script_teleport(lua_State *);
@@ -1094,6 +1095,47 @@ script_setvar(lua_State *L)
 	}
 
 	player_variable_set(p, varname, varvalue);
+	return 0;
+}
+
+static int
+script_showeffect(lua_State *L)
+{
+	struct zone *orig;
+	struct zone *zone;
+	struct player *p;
+	struct effect effect;
+
+	effect.id = script_checkinteger(L, 1);
+	effect.x = script_checkinteger(L, 2);
+	effect.y = script_checkinteger(L, 3);
+
+	orig = server_find_zone(effect.x, effect.y);
+	if (orig == NULL) {
+		printf("script warning: zone at %d %d is undefined\n",
+		     effect.x, effect.y);
+		return 0;
+	}
+
+	for (int x = -2; x < 3; ++x) {
+		for (int y = -2; y < 3; ++y) {
+			zone = server_get_zone(orig->x + x,
+			    orig->y + y, orig->plane);
+			if (zone == NULL) {
+				continue;
+			}
+			for (int i = 0; i < zone->player_max; ++i) {
+				if (zone->players[i] == UINT16_MAX) {
+					continue;
+				}
+				p = id_to_player(zone->players[i]);
+				if (p != NULL) {
+					player_send_effect(p, &effect);
+				}
+			}
+		}
+	}
+
 	return 0;
 }
 
@@ -2594,6 +2636,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_setvar);
 	lua_setglobal(L, "setvar");
+
+	lua_pushcfunction(L, script_showeffect);
+	lua_setglobal(L, "showeffect");
 
 	lua_pushcfunction(L, script_addnpc);
 	lua_setglobal(L, "addnpc");

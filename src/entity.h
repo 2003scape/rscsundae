@@ -218,6 +218,12 @@ struct playervar {
 	uint32_t value;
 };
 
+struct effect {
+	uint8_t id;
+	uint16_t x;
+	uint16_t y;
+};
+
 struct npc {
 	struct mob mob;
 	struct npc_config *config;
@@ -486,6 +492,7 @@ int player_send_close_shop(struct player *);
 int player_send_quests(struct player *);
 int player_notify_friend_online(struct player *, int64_t);
 int player_notify_friend_offline(struct player *, int64_t);
+int player_send_effect(struct player *, struct effect *);
 
 /* npc.c */
 void npc_damage(struct npc *, struct player * , int);

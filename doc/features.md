@@ -38,7 +38,7 @@ Engine
 - [x] Lua scripting
 - [x] Shops
 - [x] Item banking
-- [ ] Spell effects
+- [x] Spell effects
 - [x] Player saving (SQLite)
 - [x] Player saving (password hashing)
 - [ ] Login server

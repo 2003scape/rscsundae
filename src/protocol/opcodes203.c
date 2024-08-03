@@ -105,5 +105,5 @@ init_opcodes_203(void)
 	opcodes_out_203[OP_SRV_LOCS] = 48;
 	opcodes_out_203[OP_SRV_GROUND_ITEMS] = 99;
 	opcodes_out_203[OP_SRV_PLAYER_MOVEMENT] = 191;
-	opcodes_out_203[OP_SRV_EFFECTS] = 36;
+	opcodes_out_203[OP_SRV_SHOW_EFFECT] = 36;
 }

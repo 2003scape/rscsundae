@@ -2066,3 +2066,31 @@ player_send_shop(struct player *p, const char *shop_name)
 	p->shop = shop;
 	return player_write_packet(p, p->tmpbuf, offset);
 }
+
+int
+player_send_effect(struct player *p, struct effect *e)
+{
+	size_t offset = 0;
+
+	assert(p != NULL);
+	assert(e != NULL);
+
+	if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+			OP_SRV_SHOW_EFFECT) == -1) {
+		return -1;
+	}
+	if (buf_putu8(p->tmpbuf, offset++,
+	    PLAYER_BUFSIZE, e->id) == -1) {
+		return -1;
+	}
+	if (buf_putu8(p->tmpbuf, offset++,
+	    PLAYER_BUFSIZE, p->mob.x - (int)e->x) == -1) {
+		return -1;
+	}
+	if (buf_putu8(p->tmpbuf, offset++,
+	    PLAYER_BUFSIZE, p->mob.y - (int)e->y) == -1) {
+		return -1;
+	}
+
+	return player_write_packet(p, p->tmpbuf, offset);
+}
