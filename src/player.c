@@ -1880,11 +1880,7 @@ player_process_action(struct player *p)
 		p->action = ACTION_NONE;
 		p->mob.walk_queue_pos = 0;
 		p->mob.walk_queue_len = 0;
-		item_config = server_item_config_by_id(item->id);
-		if (item_config != NULL) {
-			printf("Cast %s on %s\n",
-			    p->spell->name, item_config->names[0]);
-		}
+		script_onspellobj(p->mob.server->lua, p, p->spell, item);
 		break;
 	case ACTION_NPC_CAST:
 		npc = p->mob.server->npcs[p->action_npc];

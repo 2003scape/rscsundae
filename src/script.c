@@ -2388,6 +2388,47 @@ script_onwearobj(lua_State *L, struct player *p, struct item_config *item)
 	return true;
 }
 
+void
+script_onspellobj(lua_State *L, struct player *p,
+    struct spell_config *spell, struct ground_item *item)
+{
+	struct item_config *config;
+	bool result;
+
+	config = server_item_config_by_id(item->id);
+	assert(config != NULL);
+
+	for (size_t i = 0; i < config->name_count; ++i) {
+		lua_getglobal(L, "script_engine_spellobj");
+		if (!lua_isfunction(L, -1)) {
+			puts("script error: can't find essential function script_engine_spellobj");
+			return;
+		}
+		lua_pushnumber(L, p->mob.id);
+		lua_pushstring(L, spell->name);
+		lua_pushstring(L, config->names[i]);
+		lua_pushnumber(L, item->x);
+		lua_pushnumber(L, item->y);
+		safe_call(L, 5, 1, p->mob.id);
+		result = lua_toboolean(L, -1);
+		if (result != 0) {
+			return;
+		}
+	}
+
+	lua_getglobal(L, "script_engine_spellobj");
+	if (!lua_isfunction(L, -1)) {
+		puts("script error: can't find essential function script_engine_spellobj");
+		return;
+	}
+	lua_pushnumber(L, p->mob.id);
+	lua_pushstring(L, spell->name);
+	lua_pushstring(L, "_");
+	lua_pushnumber(L, item->x);
+	lua_pushnumber(L, item->y);
+	safe_call(L, 5, 1, p->mob.id);
+}
+
 bool
 script_ontakeobj(lua_State *L, struct player *p, struct ground_item *item)
 {
