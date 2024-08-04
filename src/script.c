@@ -2415,18 +2415,6 @@ script_onspellobj(lua_State *L, struct player *p,
 			return;
 		}
 	}
-
-	lua_getglobal(L, "script_engine_spellobj");
-	if (!lua_isfunction(L, -1)) {
-		puts("script error: can't find essential function script_engine_spellobj");
-		return;
-	}
-	lua_pushnumber(L, p->mob.id);
-	lua_pushstring(L, spell->name);
-	lua_pushstring(L, "_");
-	lua_pushnumber(L, item->x);
-	lua_pushnumber(L, item->y);
-	safe_call(L, 5, 1, p->mob.id);
 }
 
 bool

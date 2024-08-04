@@ -455,6 +455,9 @@ function script_engine_spellobj(player, spell, name, x, y)
 		return false
 	end
 	script = spellobj_scripts[spell][name]
+	if not script then
+		script = spellobj_scripts[spell]["_"]
+	end
 	if script then
 		ps = new_player_script(player)
 		ps.co = coroutine.create(function()

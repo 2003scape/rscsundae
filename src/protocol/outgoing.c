@@ -2084,11 +2084,11 @@ player_send_effect(struct player *p, struct effect *e)
 		return -1;
 	}
 	if (buf_putu8(p->tmpbuf, offset++,
-	    PLAYER_BUFSIZE, p->mob.x - (int)e->x) == -1) {
+	    PLAYER_BUFSIZE, e->x - (int)p->mob.x) == -1) {
 		return -1;
 	}
 	if (buf_putu8(p->tmpbuf, offset++,
-	    PLAYER_BUFSIZE, p->mob.y - (int)e->y) == -1) {
+	    PLAYER_BUFSIZE, e->y - (int)p->mob.y) == -1) {
 		return -1;
 	}
 
