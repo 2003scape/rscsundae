@@ -518,6 +518,39 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			p->mob.following_player = (int16_t)target;
 		}
 		break;
+	case OP_CLI_ITEM_CAST:
+		{
+			uint16_t x, y;
+			uint16_t target_id, spell_id;
+			struct spell_config *spell;
+			struct ground_item *item;
+
+			if (buf_getu16(data, offset, len, &x) == -1) {
+				return;
+			}
+			offset += 2;
+			if (buf_getu16(data, offset, len, &y) == -1) {
+				return;
+			}
+			offset += 2;
+			if (buf_getu16(data, offset, len, &target_id) == -1) {
+				return;
+			}
+			offset += 2;
+			if (buf_getu16(data, offset, len, &spell_id) == -1) {
+				return;
+			}
+			offset += 2;
+			spell = server_spell_config_by_id(spell_id);
+			item = server_find_ground_item(p, x, y, target_id);
+			if (spell != NULL && item != NULL &&
+			    spell->type == SPELL_CAST_ON_ITEM) {
+				p->action = ACTION_ITEM_CAST;
+				p->action_item = item;
+				p->spell = spell;
+			}
+		}
+		break;
 	case OP_CLI_NPC_CAST:
 		{
 			uint16_t target_id, spell_id;

@@ -1795,6 +1795,10 @@ player_process_action(struct player *p)
 			p->action = ACTION_NONE;
 			return;
 		}
+		if (!player_can_cast(p, p->spell)) {
+			p->action = ACTION_NONE;
+			return;
+		}
 		script_onspellinv(p->mob.server->lua, p, item_config);
 		p->action = ACTION_NONE;
 		break;
@@ -1843,6 +1847,44 @@ player_process_action(struct player *p)
 		    item_config, p->action_item->x, p->action_item->y,
 		    item_config2);
 		p->action = ACTION_NONE;
+		break;
+	case ACTION_ITEM_CAST:
+		item = server_find_ground_item(p,
+		    p->action_item->x, p->action_item->y,
+		    p->action_item->id);
+		if (item == NULL || p->spell == NULL) {
+			p->action = ACTION_NONE;
+			return;
+		}
+		/*
+		 * see replays:
+		 * RSC 2001/replays master archive/Skilling/Magic/spell- law- telekinetic grab (basics, range tests)
+		 * RSC 2001/replays master archive/Skilling/Magic/spell- law- teleport- telekinetic grab (obstruction tests) (reg door)
+		 */
+		if (mob_distance(&p->mob, item->x, item->y) > 4) {
+			if ((p->mob.walk_queue_len - p->mob.walk_queue_pos) == 0) {
+				p->action = ACTION_NONE;
+			}
+			return;
+		}
+		if (!mob_check_reachable(&p->mob, item->x, item->y, true)) {
+			player_send_message(p,
+			    "@que@I can't see the object from here");
+			p->action = ACTION_NONE;
+			return;
+		}
+		if (!player_can_cast(p, p->spell)) {
+			p->action = ACTION_NONE;
+			return;
+		}
+		p->action = ACTION_NONE;
+		p->mob.walk_queue_pos = 0;
+		p->mob.walk_queue_len = 0;
+		item_config = server_item_config_by_id(item->id);
+		if (item_config != NULL) {
+			printf("Cast %s on %s\n",
+			    p->spell->name, item_config->names[0]);
+		}
 		break;
 	case ACTION_NPC_CAST:
 		npc = p->mob.server->npcs[p->action_npc];
