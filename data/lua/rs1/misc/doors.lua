@@ -128,3 +128,8 @@ function opbound1_backdoor(player, x, y, dir)
 	pause(2, 2)
 	changebound(x, y, dir, "backdoor")
 end
+
+function oploc1_unopenable_doors(player, x, y)
+	-- 1e_Luis/Quests/Black Knights Fortress
+	mes(player, "@que@the doors are locked")
+end

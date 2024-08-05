@@ -110,7 +110,7 @@ These should all be implemented in Lua script:
 - [x] Imp catcher
 - [ ] Prince Ali Rescue
 - [x] Witch's potion
-- [ ] Black knight's fortress
+- [x] Black knight's fortress
 - [x] Doric's quest
 - [x] The knight's sword
 - [x] Goblin diplomacy

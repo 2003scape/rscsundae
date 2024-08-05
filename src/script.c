@@ -577,6 +577,7 @@ script_nearnpc(lua_State *L)
 
 	npc = mob_find_nearby_npc(&p->mob, name);
 	if (npc != NULL) {
+		npc->talk_target = p->mob.id;
 		mob_face(&npc->mob, p->mob.x, p->mob.y);
 		mob_face(&p->mob, npc->mob.x, npc->mob.y);
 		lua_pushinteger(L, npc->mob.id);
@@ -609,6 +610,7 @@ script_nearvisnpc(lua_State *L)
 	npc = mob_find_nearby_npc(&p->mob, name);
 	if (npc != NULL &&
 	    mob_check_reachable(&p->mob, npc->mob.x, npc->mob.y, true)) {
+		npc->talk_target = p->mob.id;
 		mob_face(&npc->mob, p->mob.x, p->mob.y);
 		mob_face(&p->mob, npc->mob.x, npc->mob.y);
 		lua_pushinteger(L, npc->mob.id);
@@ -2110,7 +2112,7 @@ script_onuseloc(lua_State *L, struct player *p,
 	assert(config != NULL);
 
 	for (size_t i = 0; i < config->name_count; ++i) {
-		for (size_t j = 0; j < item->name_count; ++j) {
+		for (size_t j = item->name_count; j-- > 0 ;) {
 			lua_getglobal(L, "script_engine_useloc");
 			if (!lua_isfunction(L, -1)) {
 				puts("script error: can't find essential function script_engine_useloc");
@@ -2143,7 +2145,7 @@ script_onusebound(lua_State *L, struct player *p,
 	assert(config != NULL);
 
 	for (size_t i = 0; i < config->name_count; ++i) {
-		for (size_t j = 0; j < item->name_count; ++j) {
+		for (size_t j = item->name_count; j-- > 0 ;) {
 			lua_getglobal(L, "script_engine_usebound");
 			if (!lua_isfunction(L, -1)) {
 				puts("script error: can't find essential function script_engine_usebound");

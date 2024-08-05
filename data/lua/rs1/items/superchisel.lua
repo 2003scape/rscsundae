@@ -134,6 +134,7 @@ local function superchisel_dev(player)
 		for i = 0,15 do
 			advancestat(player, i, 56000000, 0)
 		end
+		giveqp(player, 40)
 	elseif resp == 2 then
 		give(player, "rune 2-handed sword", 1)
 		give(player, "large rune helmet", 1)
