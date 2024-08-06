@@ -1909,6 +1909,12 @@ player_process_action(struct player *p)
 		 * line of sight check should be AFTER spell timer is set
 		 * see Logg/Tylerbeg/08-05-2018 20.12.26 for some reason, I go to the wizards tower, cast fire blast on the demon for a little while, forget what Im doing and leave
 		 */
+		if (!mob_check_reachable(&p->mob,
+		    npc->mob.x, npc->mob.y, true)) {
+			player_send_message(p,
+			    "I can't get a clear shot from here");
+			return;
+		}
 		script_onskillnpc(p->mob.server->lua, p, npc, p->spell);
 		break;
 	case ACTION_PLAYER_ATTACK:
@@ -1952,6 +1958,12 @@ player_process_action(struct player *p)
 		 * line of sight check should be AFTER spell timer is set
 		 * see Logg/Tylerbeg/08-05-2018 20.12.26 for some reason, I go to the wizards tower, cast fire blast on the demon for a little while, forget what Im doing and leave
 		 */
+		if (!mob_check_reachable(&p->mob,
+		    target->mob.x, target->mob.y, true)) {
+			player_send_message(p,
+			    "I can't get a clear shot from here");
+			return;
+		}
 		script_onskillplayer(p->mob.server->lua, p, target, p->spell);
 		break;
 	case ACTION_BOUND_OP1:
