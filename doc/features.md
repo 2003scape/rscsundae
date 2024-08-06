@@ -139,7 +139,7 @@ These should all be implemented in Lua script:
 - [x] Apothecary NPC dialogue (a broken dialogue path where he gives the player spot cream twice is not implemented)
 - [x] Banker NPC dialogue
 - [x] Cook's Guild
-- [ ] Champions' Guild
+- [x] Champions' Guild
 - [x] Mining Guild
 - [x] Monastery (Prayer Guild)
 - [x] Alcohol (beers, wizards mind bomb)
