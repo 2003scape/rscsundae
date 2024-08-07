@@ -1587,6 +1587,9 @@ player_send_ground_items(struct player *p)
 		        OP_SRV_GROUND_ITEMS);
 
 	for (size_t i = 0; i < p->known_item_count; ++i) {
+		if (new_known_count >= MAX_NEARBY_ITEMS) {
+			break;
+		}
 		global_item = server_find_ground_item(p, p->known_items[i].x,
 		    p->known_items[i].y, p->known_items[i].id);
 		item = &p->known_items[i];
@@ -1616,6 +1619,9 @@ player_send_ground_items(struct player *p)
 
 	nearby_count = player_get_nearby_items(p, nearby, MAX_NEARBY_ITEMS);
 	for (size_t i = 0; i < nearby_count; ++i) {
+		if (new_known_count >= MAX_NEARBY_ITEMS) {
+			break;
+		}
 		item = &nearby[i];
 		if (player_has_known_item(p, item->unique_id)) {
 			continue;
