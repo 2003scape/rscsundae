@@ -486,6 +486,8 @@ mob_process_walk_queue(struct mob *mob)
 			}
 			mob_combat_reset(mob);
 		}
+		mob->walk_queue_pos = 0;
+		mob->walk_queue_len = 0;
 		return;
 	}
 
