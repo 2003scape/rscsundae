@@ -58,7 +58,6 @@ Engine
 
 * NPC combat can end up one-sided somehow (both remain in-animation).
 * Player can freeze when oping a loc until they move tiles.
-* Ladder in Draynor Manor is invisible.
 
 Content
 -------

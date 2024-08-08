@@ -8,7 +8,7 @@
 #endif
 
 #ifndef ZONE_AREA
-#define ZONE_AREA	(16)
+#define ZONE_AREA	(64)
 #endif
 
 #ifndef ZONE_MAX_BOUNDS

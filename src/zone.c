@@ -206,6 +206,7 @@ server_add_loc(struct server *s, struct loc *loc)
 	old = server_find_loc(loc->x, loc->y);
 	if (old != NULL) {
 		remove_loc_collision(s, old);
+		old->id = loc->id;
 	}
 
 	config = server_loc_config_by_id(loc->id);
@@ -252,17 +253,15 @@ server_add_loc(struct server *s, struct loc *loc)
 		}
 	}
 
-	if (old != NULL) {
-		old->id = loc->id;
-		return;
-	}
-	zone = server_find_zone(loc->x, loc->y);
-	if (zone == NULL) {
-		return;
-	}
-	if (zone->loc_count < ZONE_AREA) {
-		memcpy(&zone->locs[zone->loc_count++],
-		    loc, sizeof(struct loc));
+	if (old == NULL) {
+		zone = server_find_zone(loc->x, loc->y);
+		if (zone == NULL) {
+			return;
+		}
+		if (zone->loc_count < ZONE_AREA) {
+			memcpy(zone->locs + (zone->loc_count++),
+			    loc, sizeof(struct loc));
+		}
 	}
 }
 
