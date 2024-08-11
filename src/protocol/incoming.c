@@ -225,7 +225,6 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				net_login_response(p, RESP_TEMP_DISABLED);
 				return;
 			}
-			printf("%ld %ld\n", time(NULL), p->ban_end_date);
 
 			if (res > 0) {
 				p->logout_confirmed = true;

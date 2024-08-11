@@ -359,7 +359,14 @@ server_tick(void)
 		if (s.players[i] == NULL) {
 			continue;
 		}
-		if (s.tick_counter > (s.players[i]->last_packet + MAX_IDLE_TICKS)) {
+		if (s.tick_counter > (s.players[i]->last_packet + MAX_IDLE_TICKS) ||
+		    (s.movement_timer &&
+			s.players[i]->mob.movement_timer > 600)) {
+			/*
+			 * in this replay:
+			 * Zephyr (redacted chat) replays/1m d4 r4ng3r/06-14-2018 10.47.53 testing 5 minute logout bug
+			 * he gets kicked roughly 100 ticks after the warning
+			 */
 			player_attempt_logout(s.players[i]);
 		}
 		if (s.players[i]->logout_confirmed) {
@@ -393,6 +400,12 @@ server_tick(void)
 				s.players[i]->skulled = false;
 				s.players[i]->appearance_changed = true;
 			}
+		}
+		if (s.movement_timer &&
+		    (s.players[i]->mob.movement_timer++) == 500) {
+			player_send_message(s.players[i],
+			    "@cya@You have been standing here for 5 mins! "
+			    "Please move to a new area");
 		}
 	}
 

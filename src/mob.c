@@ -501,6 +501,7 @@ mob_process_walk_queue(struct mob *mob)
 		mob->y = y;
 		mob->dir = dir;
 		mob->moved = true;
+		mob->movement_timer = 0;
 	}
 }
 

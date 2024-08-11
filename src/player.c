@@ -620,7 +620,10 @@ player_skull(struct player *p, struct player *target)
 		}
 	}
 
-	/* skull remains for 20 minutes */
+	/*
+	 * skull remains for 20 minutes:
+	 * https://classic.runescape.wiki/w/Update:Newsletter_2
+	 */
 	p->skull_timer = 2000;
 
 	if (!p->skulled) {

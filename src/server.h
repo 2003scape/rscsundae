@@ -80,6 +80,8 @@ struct server {
 	bool spell_timer;
 	/* https://classic.runescape.wiki/w/Update:Updates_galore! */
 	bool restrict_npc_aggression;
+	/* the 5 minute idle movement timer */
+	bool movement_timer;
 	int xp_multiplier;
 	lua_State *lua;
 	struct rsa rsa;

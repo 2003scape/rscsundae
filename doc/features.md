@@ -51,7 +51,7 @@ Engine
 - [x] Protocol: RSA decryption
 - [ ] Protocol: 201
 - [x] Protocol: 204
-- [ ] Five minute movement timer (should be optional)
+- [x] Five minute movement timer (should be optional)
 - [ ] Al Kharid general store should reject silk
 
 ### Known engine bugs
