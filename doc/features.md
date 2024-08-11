@@ -42,7 +42,7 @@ Engine
 - [x] Player saving (SQLite)
 - [x] Player saving (password hashing)
 - [ ] Login server
-- [ ] Moderation features: player controls
+- [x] Moderation features: player controls
 - [ ] Moderation features: per-player action log
 - [ ] Moderation features: login throttle to prevent DoS and bruteforcing
 - [x] Protocol: 110

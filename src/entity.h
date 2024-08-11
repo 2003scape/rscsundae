@@ -303,6 +303,7 @@ struct player {
 	uint8_t quest_points;
 	int64_t friend_list[MAX_FRIENDS];
 	int64_t ignore_list[MAX_IGNORE];
+	int64_t ban_end_date;
 	uint16_t friend_count;
 	uint16_t ignore_count;
 	uint8_t combat_style;

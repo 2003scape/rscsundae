@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../protocol/opcodes.h"
 #include "../server.h"
 #include "../stat.h"
 #include "../utility.h"
@@ -551,8 +552,8 @@ database_init(struct database *database)
 	}
 
 	char get_query[2048] = "SELECT `id`, `password`, `rpg_class`, "
-	    "`rank`, `login_date`, `x`, `y`, `quest_points`, `camera_auto`, "
-	    "`one_mouse_button`, `block_public`, `block_private`, "
+	    "`rank`, `login_date`, `ban_end_date`, `x`, `y`, `quest_points`, "
+	    "`camera_auto`, `one_mouse_button`, `block_public`, `block_private`, "
 	    "`block_trade`, `block_duel`, `hair_colour`, `top_colour`, "
 	    "`leg_colour`, `skin_colour`, `head_sprite`, `body_sprite`, "
 	    "`skull_timer`, ";
@@ -617,7 +618,8 @@ database_init(struct database *database)
 	}
 
 	char save_query[2048] = "UPDATE `players` SET `rpg_class` = ?, "
-		"`login_date` = ?, `x` = ?, `y` = ?, `quest_points` = ?, "
+		"`login_date` = ?, `ban_end_date` = ?, "
+		"`x` = ?, `y` = ?, `quest_points` = ?, "
 		"`camera_auto` = ?, `one_mouse_button` = ?, `block_public` = ?, "
 		"`block_private` = ?, `block_trade` = ?, `block_duel` = ?, "
 		"`hair_colour` = ?, `top_colour` = ?, `leg_colour` = ?, "
@@ -787,7 +789,7 @@ database_new_player(struct database *database, struct player *player)
 		return -1;
 	}
 
-	return 1;
+	return 0;
 }
 
 int
@@ -840,7 +842,7 @@ database_load_player(struct database *database, struct player *player)
 	if (pwhash_verify(&player->mob.server->hash,
 	    pwhash, player->password) == -1) {
 		printf("invalid password\n");
-		ret = 0;
+		ret = RESP_INVALID;
 		goto end;
 	}
 
@@ -849,6 +851,8 @@ database_load_player(struct database *database, struct player *player)
 	player->rank =
 		sqlite3_column_int(database->get_player, column_index++);
 	player->login_date =
+		(uint64_t)sqlite3_column_int64(database->get_player, column_index++);
+	player->ban_end_date =
 		(uint64_t)sqlite3_column_int64(database->get_player, column_index++);
 	player->mob.x = sqlite3_column_int(database->get_player, column_index++);
 	player->mob.y = sqlite3_column_int(database->get_player, column_index++);
@@ -928,7 +932,7 @@ database_load_player(struct database *database, struct player *player)
 		goto end;
 	}
 
-	return 1;
+	return 0;
 
 end:
 	(void)stmt_reset(database->db, database->get_player);
@@ -952,6 +956,11 @@ database_save_player(struct database *database, struct player *player)
 
 	if (stmt_bind_uint64(database->db, database->save_player, bind_index++,
 			player->login_date) == -1) {
+		return -1;
+	}
+
+	if (stmt_bind_uint64(database->db, database->save_player, bind_index++,
+			player->ban_end_date) == -1) {
 		return -1;
 	}
 

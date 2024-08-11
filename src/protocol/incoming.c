@@ -177,7 +177,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			}
 
 			/* username taken */
-			if (res == 0) {
+			if (res > 0) {
 				net_login_response(p, RESP_INVALID);
 				return;
 			}
@@ -220,10 +220,16 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 
-			/* invalid username or password */
-			if (res == 0) {
+			if (time(NULL) < p->ban_end_date) {
 				p->logout_confirmed = true;
-				net_login_response(p, RESP_INVALID);
+				net_login_response(p, RESP_TEMP_DISABLED);
+				return;
+			}
+			printf("%ld %ld\n", time(NULL), p->ban_end_date);
+
+			if (res > 0) {
+				p->logout_confirmed = true;
+				net_login_response(p, res);
 				return;
 			}
 

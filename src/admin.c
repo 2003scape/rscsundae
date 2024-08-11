@@ -155,6 +155,41 @@ player_parse_mod_command(struct player *p, const char *cmd)
 		(void)snprintf(msg, sizeof(msg),
 		    "@que@coords: x = %u, y = %u", p->mob.x, p->mob.y);
 		player_send_message(p, msg);
+	} else if (strcmp(cmd, "tempban") == 0) {
+		char *name;
+		int64_t encoded;
+		struct player *target;
+
+		name = strtok(NULL, " ");
+		if (name == NULL) {
+			player_send_message(p,
+			    "Usage: tempban name_with_spaces");
+			return;
+		}
+		encoded = mod37_nameenc(name);
+		target = server_find_player_name37(encoded);
+		if (target != NULL) {
+			target->ban_end_date = time(NULL) + ((24 * 60) * 60);
+			player_send_logout(target);
+		}
+	} else if (strcmp(cmd, "permban") == 0) {
+		char *name;
+		int64_t encoded;
+		struct player *target;
+
+		name = strtok(NULL, " ");
+		if (name == NULL) {
+			player_send_message(p,
+			    "Usage: permban name_with_spaces");
+			return;
+		}
+		encoded = mod37_nameenc(name);
+		target = server_find_player_name37(encoded);
+		if (target != NULL) {
+			target->ban_end_date = time(NULL) +
+			    ((64000 * 60) * 60);
+			player_send_logout(target);
+		}
 	}
 }
 
