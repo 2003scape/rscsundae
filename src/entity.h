@@ -297,6 +297,7 @@ struct player {
 	uint8_t block_trade;
 	uint8_t block_duel;
 	uint8_t logout_confirmed;
+	uint8_t hidden;
 	uint64_t last_packet;
 	uint32_t experience[MAX_SKILL_ID];
 	uint8_t quest_points;

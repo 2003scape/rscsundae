@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include "entity.h"
@@ -65,6 +66,55 @@ player_parse_mod_command(struct player *p, const char *cmd)
 		if (target != NULL) {
 			player_teleport(p,
 			    target->mob.x, target->mob.y);
+		}
+	} else if (strcmp(cmd, "bringplayer") == 0) {
+		char *name;
+		int64_t encoded;
+		struct player *target;
+
+		name = strtok(NULL, " ");
+		if (name == NULL) {
+			player_send_message(p,
+			    "Usage: bringplayer name_with_spaces");
+			return;
+		}
+		encoded = mod37_nameenc(name);
+		target = server_find_player_name37(encoded);
+		if (target != NULL) {
+			player_teleport(target,
+			    p->mob.x, p->mob.y);
+		}
+	} else if (strcmp(cmd, "uniform") == 0) {
+		int weap, top, bottom;
+
+		weap = config_find_entity("blackmace",
+			p->mob.server->entity_config,
+			p->mob.server->entity_config_count);
+		assert(weap != -1);
+
+		top = config_find_entity("redrobe",
+			p->mob.server->entity_config,
+			p->mob.server->entity_config_count);
+		assert(top != -1);
+
+		bottom = config_find_entity("blueplatemaillegs",
+			p->mob.server->entity_config,
+			p->mob.server->entity_config_count);
+		assert(bottom != -1);
+
+		p->sprites[ANIM_SLOT_HAND] = weap + 1;
+		p->sprites[ANIM_SLOT_SHIRT] = top + 1;
+		p->sprites[ANIM_SLOT_LEGS] = bottom + 1;
+		p->sprites[ANIM_SLOT_TROUSERS] = 0;
+		p->appearance_changed = true;
+	} else if (strcmp(cmd, "hide") == 0) {
+		p->hidden = !p->hidden;
+		if (p->hidden) {
+			player_send_message(p,
+			    "You are now hidden from players. Your chat will not be visible");
+		} else {
+			player_send_message(p,
+			    "You are now visible to players.");
 		}
 	} else if (strcmp(cmd, "tele") == 0) {
 		char *x_str;

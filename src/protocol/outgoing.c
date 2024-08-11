@@ -410,6 +410,7 @@ player_send_movement(struct player *p)
 		    known_player->logout_confirmed ||
 		    !within_update_radius(p,
 			known_player->mob.x, known_player->mob.y, 2) ||
+		    known_player->hidden ||
 		    known_player->teleported) {
 			if (buf_putbits(p->tmpbuf, bitpos,
 					PLAYER_BUFSIZE, 4, 15) == -1) {
@@ -470,7 +471,9 @@ player_send_movement(struct player *p)
 		if (p->known_player_count >= MAX_KNOWN_PLAYERS) {
 			break;
 		}
-		if (nearby[i] == p || nearby[i]->logout_confirmed) {
+		if (nearby[i] == p ||
+		    nearby[i]->logout_confirmed ||
+		    nearby[i]->hidden) {
 			continue;
 		}
 		bool known = false;
