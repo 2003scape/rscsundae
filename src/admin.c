@@ -7,6 +7,7 @@
 #include "utility.h"
 
 void player_parse_mod_command(struct player *, const char *);
+void player_parse_dev_command(struct player *, const char *);
 
 void
 player_parse_admin_command(struct player *p, char *str)
@@ -18,6 +19,98 @@ player_parse_admin_command(struct player *p, char *str)
 		return;
 	}
 	printf("admin command: %s\n", str);
+	if (p->rank > 0) {
+		player_parse_mod_command(p, cmd);
+	}
+
+#ifndef DEV_DISABLED
+	if (p->rank > 1) {
+		player_parse_dev_command(p, cmd);
+	}
+#endif
+}
+
+void
+player_parse_mod_command(struct player *p, const char *cmd)
+{
+	if (strcmp(cmd, "kick") == 0) {
+		char *name;
+		int64_t encoded;
+		struct player *target;
+
+		name = strtok(NULL, " ");
+		if (name == NULL) {
+			player_send_message(p,
+			    "Usage: kick name_with_spaces");
+			return;
+		}
+		encoded = mod37_nameenc(name);
+		target = server_find_player_name37(encoded);
+		if (target != NULL) {
+			player_send_logout(target);
+		}
+	} else if (strcmp(cmd, "findplayer") == 0) {
+		char *name;
+		int64_t encoded;
+		struct player *target;
+
+		name = strtok(NULL, " ");
+		if (name == NULL) {
+			player_send_message(p,
+			    "Usage: findplayer name_with_spaces");
+			return;
+		}
+		encoded = mod37_nameenc(name);
+		target = server_find_player_name37(encoded);
+		if (target != NULL) {
+			player_teleport(p,
+			    target->mob.x, target->mob.y);
+		}
+	} else if (strcmp(cmd, "tele") == 0) {
+		char *x_str;
+		char *y_str;
+
+		x_str = strtok(NULL, " ");
+		y_str = strtok(NULL, " ");
+
+		if (x_str == NULL || y_str == NULL) {
+			player_send_message(p,
+			    "Usage: tele relative_x relative_y");
+			return;
+		}
+
+		/* jagex coordinate syntax not yet supported */
+		player_teleport(p,
+		    p->mob.x + strtol(x_str, NULL, 10),
+		    p->mob.y + strtol(y_str, NULL, 10));
+	} else if (strcmp(cmd, "ftele") == 0) {
+		char *x_str;
+		char *y_str;
+
+		x_str = strtok(NULL, " ");
+		y_str = strtok(NULL, " ");
+
+		if (x_str == NULL || y_str == NULL) {
+			player_send_message(p, "Usage: ftele x y");
+			return;
+		}
+
+		/* jagex coordinate syntax not yet supported */
+		player_teleport(p,
+		    strtol(x_str, NULL, 10),
+		    strtol(y_str, NULL, 10));
+	} else if (strcmp(cmd, "coords") == 0) {
+		char msg[64];
+
+		(void)snprintf(msg, sizeof(msg),
+		    "@que@coords: x = %u, y = %u", p->mob.x, p->mob.y);
+		player_send_message(p, msg);
+	}
+}
+
+void
+player_parse_dev_command(struct player *p, const char *cmd)
+{
 	if (strcmp(cmd, "give") == 0) {
 		struct item_config *item_config;
 		char *item_str;
@@ -52,39 +145,6 @@ player_parse_admin_command(struct player *p, char *str)
 			return;
 		}
 		player_inv_give(p, item_config, amount);
-	} else if (strcmp(cmd, "tele") == 0) {
-		char *x_str;
-		char *y_str;
-
-		x_str = strtok(NULL, " ");
-		y_str = strtok(NULL, " ");
-
-		if (x_str == NULL || y_str == NULL) {
-			player_send_message(p,
-			    "Usage: tele relative_x relative_y");
-			return;
-		}
-
-		/* jagex coordinate syntax not yet supported */
-		player_teleport(p,
-		    p->mob.x + strtol(x_str, NULL, 10),
-		    p->mob.y + strtol(y_str, NULL, 10));
-	} else if (strcmp(cmd, "ftele") == 0) {
-		char *x_str;
-		char *y_str;
-
-		x_str = strtok(NULL, " ");
-		y_str = strtok(NULL, " ");
-
-		if (x_str == NULL || y_str == NULL) {
-			player_send_message(p, "Usage: ftele x y");
-			return;
-		}
-
-		/* jagex coordinate syntax not yet supported */
-		player_teleport(p,
-		    strtol(x_str, NULL, 10),
-		    strtol(y_str, NULL, 10));
 	} else if (strcmp(cmd, "advancestat") == 0) {
 		char *stat_str;
 		char *xp_str;
@@ -164,12 +224,6 @@ player_parse_admin_command(struct player *p, char *str)
 				p->variables[i].value);
 			player_send_message(p, msg);
 		}
-	} else if (strcmp(cmd, "coords") == 0) {
-		char msg[64];
-
-		(void)snprintf(msg, sizeof(msg),
-		    "@que@coords: x = %u, y = %u", p->mob.x, p->mob.y);
-		player_send_message(p, msg);
 	} else if (strcmp(cmd, "addnpc") == 0) {
 		struct npc_config *config;
 		char *name;
@@ -193,47 +247,5 @@ player_parse_admin_command(struct player *p, char *str)
 		}
 
 		server_add_npc(config->id, p->mob.x, p->mob.y);
-	}
-	if (p->rank > 0) {
-		player_parse_mod_command(p, cmd);
-	}
-}
-
-void
-player_parse_mod_command(struct player *p, const char *cmd)
-{
-	if (strcmp(cmd, "kick") == 0) {
-		char *name;
-		int64_t encoded;
-		struct player *target;
-
-		name = strtok(NULL, " ");
-		if (name == NULL) {
-			player_send_message(p,
-			    "Usage: kick name_with_spaces");
-			return;
-		}
-		encoded = mod37_nameenc(name);
-		target = server_find_player_name37(encoded);
-		if (target != NULL) {
-			player_send_logout(target);
-		}
-	} else if (strcmp(cmd, "findplayer") == 0) {
-		char *name;
-		int64_t encoded;
-		struct player *target;
-
-		name = strtok(NULL, " ");
-		if (name == NULL) {
-			player_send_message(p,
-			    "Usage: findplayer name_with_spaces");
-			return;
-		}
-		encoded = mod37_nameenc(name);
-		target = server_find_player_name37(encoded);
-		if (target != NULL) {
-			player_teleport(p,
-			    target->mob.x, target->mob.y);
-		}
 	}
 }
