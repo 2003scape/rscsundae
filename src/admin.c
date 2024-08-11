@@ -4,6 +4,9 @@
 #include "inventory.h"
 #include "server.h"
 #include "stat.h"
+#include "utility.h"
+
+void player_parse_mod_command(struct player *, const char *);
 
 void
 player_parse_admin_command(struct player *p, char *str)
@@ -190,5 +193,47 @@ player_parse_admin_command(struct player *p, char *str)
 		}
 
 		server_add_npc(config->id, p->mob.x, p->mob.y);
+	}
+	if (p->rank > 0) {
+		player_parse_mod_command(p, cmd);
+	}
+}
+
+void
+player_parse_mod_command(struct player *p, const char *cmd)
+{
+	if (strcmp(cmd, "kick") == 0) {
+		char *name;
+		int64_t encoded;
+		struct player *target;
+
+		name = strtok(NULL, " ");
+		if (name == NULL) {
+			player_send_message(p,
+			    "Usage: kick name_with_spaces");
+			return;
+		}
+		encoded = mod37_nameenc(name);
+		target = server_find_player_name37(encoded);
+		if (target != NULL) {
+			player_send_logout(target);
+		}
+	} else if (strcmp(cmd, "findplayer") == 0) {
+		char *name;
+		int64_t encoded;
+		struct player *target;
+
+		name = strtok(NULL, " ");
+		if (name == NULL) {
+			player_send_message(p,
+			    "Usage: findplayer name_with_spaces");
+			return;
+		}
+		encoded = mod37_nameenc(name);
+		target = server_find_player_name37(encoded);
+		if (target != NULL) {
+			player_teleport(p,
+			    target->mob.x, target->mob.y);
+		}
 	}
 }

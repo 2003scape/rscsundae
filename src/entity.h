@@ -264,6 +264,7 @@ struct player {
 	int64_t session_id;
 	int64_t name;
 	int16_t trading_player;
+	uint8_t rank;
 	uint8_t protocol_rev;
 	uint8_t login_stage;
 	uint8_t stats_changed;
@@ -439,7 +440,8 @@ int player_get_strength_boosted(struct player *);
 int32_t player_variable_get(struct player *, const char *);
 void player_variable_set(struct player *, const char *, int32_t);
 void player_takeobject(struct player *, struct ground_item *);
-void player_send_welcome(struct player *p);
+void player_attempt_logout(struct player *);
+void player_send_welcome(struct player *);
 
 /* admin.c */
 void player_parse_admin_command(struct player *, char *);

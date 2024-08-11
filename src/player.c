@@ -2420,3 +2420,22 @@ player_process_movement(struct player *p)
 
 	player_moved(p, orig_x, orig_y);
 }
+
+void
+player_attempt_logout(struct player *p)
+{
+	if (p->mob.in_combat || p->script_active) {
+		player_send_logout_reject(p);
+		return;
+	}
+
+	if (p->mob.damage_timer != 0) {
+		if (p->mob.server->tick_counter <=
+		    (p->mob.damage_timer + 15)) {
+			player_send_logout_reject(p);
+			return;
+		}
+	}
+
+	player_send_logout(p);
+}

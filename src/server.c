@@ -360,7 +360,7 @@ server_tick(void)
 			continue;
 		}
 		if (s.tick_counter > (s.players[i]->last_packet + MAX_IDLE_TICKS)) {
-			player_send_logout(s.players[i]);
+			player_attempt_logout(s.players[i]);
 		}
 		if (s.players[i]->logout_confirmed) {
 			char name[32];
