@@ -108,7 +108,7 @@ These should all be implemented in Lua script:
 - [x] Demon Slayer
 - [x] Romeo & Juliet (several bugs not implemented)
 - [x] Shield of Arrav
-- [ ] Ernest the chicken
+- [x] Ernest the chicken
 - [x] Vampire Slayer
 - [x] Imp catcher
 - [ ] Prince Ali Rescue
