@@ -516,7 +516,7 @@ packet_log(struct player *p, const char *mes, ...)
 		return;
 	}
 
-	strftime(str, sizeof(str), "[%F %H:%M] ", &tm);
+	strftime(str, sizeof(str), "[%F %H:%M:%S] ", &tm);
 	snprintf(str + strlen(str), sizeof(str), "%s", mes);
 
 	va_start(args, mes);
