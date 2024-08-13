@@ -1412,6 +1412,12 @@ player_send_locs(struct player *p)
 		struct loc *loc;
 		bool remove = false;
 
+		if (mob_distance(&p->mob,
+		    p->known_locs[i].x, p->known_locs[i].y) >= 128) {
+			/* no room in payload */
+			continue;
+		}
+
 		loc = server_find_loc(p->known_locs[i].x, p->known_locs[i].y);
 		if (loc == NULL) {
 			remove = true;
@@ -1532,7 +1538,8 @@ player_send_bounds(struct player *p)
 			 * due to a bug
 			 */
 			continue;
-		} else if (bound->id != p->known_bounds[i].id) {
+		} else if (bound->id != p->known_bounds[i].id &&
+		    mob_distance(&p->mob, bound->x, bound->y) < 128) {
 			if (buf_putu16(p->tmpbuf, offset,
 			    PLAYER_BUFSIZE, bound->id) == -1) {
 				return -1;
