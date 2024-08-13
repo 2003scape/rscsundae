@@ -89,7 +89,7 @@ Credits
 
 * Stormy wrote the bulk of the engine and most of the content.
 * Mister Hat (frogdoubler) contributed player persistence support via SQLite,
-  and the Vampire Slayer quest.
+  the Vampire Slayer quest, and the Ernest the Chicken quest.
 * Zachary Penn (Hikilaka) contributed many enhancements to the scripting API,
   teleportation spells, mixing dyes and capes, and player variables support.
 * Pazaz served as an influence with their 2004scape project, listened to
