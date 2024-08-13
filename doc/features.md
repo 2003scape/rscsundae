@@ -58,6 +58,8 @@ Engine
 
 * NPC combat can end up one-sided somehow (both remain in-animation).
 * Cross-protocol private chat is buggy.
+* Locked doors can get frozen if the player goes up or down a level
+  before they reset (clientside only, fixed by logging out).
 
 Content
 -------

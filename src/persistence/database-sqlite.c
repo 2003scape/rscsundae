@@ -375,6 +375,12 @@ database_save_player_variables(struct database *database, struct player *player,
 	}
 
 	for (size_t i = 0; i < player->variable_count; i++) {
+		int value = player->variables[i].value;
+
+		if (value == 0) {
+			continue;
+		}
+
 		int bind_index = 1;
 
 		if (stmt_bind_int(database->db, database->save_player_variable,
@@ -388,7 +394,7 @@ database_save_player_variables(struct database *database, struct player *player,
 		}
 
 		if (stmt_bind_int(database->db, database->save_player_variable,
-				bind_index++, player->variables[i].value) == -1) {
+				bind_index++, value) == -1) {
 			return -1;
 		}
 

@@ -53,6 +53,7 @@ static int script_giveqp(lua_State *);
 static int script_changebound(lua_State *);
 static int script_changeloc(lua_State *);
 static int script_restoreloc(lua_State *);
+static int script_changenpc(lua_State *);
 static int script_shootplayer(lua_State *);
 static int script_shootnpc(lua_State *);
 static int script_multi(lua_State *);
@@ -1817,6 +1818,36 @@ script_restoreloc(lua_State *L)
 }
 
 static int
+script_changenpc(lua_State *L)
+{
+	lua_Integer npc_index;
+	const char *name;
+
+	npc_index = script_checkinteger(L, 1);
+	name = script_checkstring(L, 2);
+
+	struct npc *npc = serv->npcs[npc_index];
+	if (npc == NULL) {
+		printf("script warning: couldn't find npc index %lld\n", npc_index);
+		lua_pushnil(L);
+		return 1;
+	}
+
+	npc->config = server_find_npc_config(name);
+
+	struct player *players[128];
+	size_t n;
+
+	n = mob_get_nearby_players(&npc->mob, players, 128);
+	for (size_t i = 0; i < n; ++i) {
+		players[i]->known_npc_count = 0;
+	}
+
+	lua_pushinteger(L, npc->mob.id);
+	return 1;
+}
+
+static int
 script_shootplayer(lua_State *L)
 {
 	lua_Integer player_id, target_id;
@@ -2646,6 +2677,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_restoreloc);
 	lua_setglobal(L, "_restoreloc");
+
+	lua_pushcfunction(L, script_changenpc);
+	lua_setglobal(L, "changenpc");
 
 	lua_pushcfunction(L, script_displaybalance);
 	lua_setglobal(L, "displaybalance");
