@@ -19,7 +19,6 @@
 /*
  * TODO: packet logging is incomplete
  * - not detailed enough for trades
- * - doesn't work for private messages
  * - should not just output slot for inventory
  */
 
@@ -351,6 +350,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 	case OP_CLI_PRIVATE_MESSAGE:
 		{
 			int64_t target;
+			char mes[MAX_CHAT_LEN];
 			char name[32];
 
 			if (buf_gets64(data, offset, len, &target) == -1) {
@@ -360,10 +360,18 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			if (len <= 9) {
 				return;
 			}
+			len -= 9;
+			if (p->protocol_rev <= 163) {
+				decode_chat_legacy(p->mob.server->words,
+				    p->mob.server->num_words,
+				    data + offset, len, mes, MAX_CHAT_LEN);
+			} else {
+				chat_decompress(data, offset, len, mes);
+			}
 			mod37_namedec(target, name);
-			packet_log(p, "OP_CLI_PRIVATE_MESSAGE %s\n",
-				    name);
-			server_send_pm(p, target, data + offset, len - 9);
+			packet_log(p, "OP_CLI_PRIVATE_MESSAGE %s %s\n",
+				    name, mes);
+			server_send_pm(p, target, mes);
 		}
 		break;
 	case OP_CLI_ADD_IGNORE:

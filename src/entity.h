@@ -475,7 +475,7 @@ int player_send_client_settings(struct player *);
 int player_send_privacy_settings(struct player *);
 int player_send_init_friends(struct player *);
 int player_send_init_ignore(struct player *);
-int player_send_pm(struct player *, int64_t, uint8_t *, size_t);
+int player_send_pm(struct player *, int64_t, const char *);
 int player_send_death(struct player *);
 int player_send_inv(struct player *);
 int player_send_inv_slot(struct player *, int);

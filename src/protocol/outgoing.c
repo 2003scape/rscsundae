@@ -1253,19 +1253,36 @@ player_notify_friend_offline(struct player *p, int64_t friend)
 }
 
 int
-player_send_pm(struct player *p, int64_t from, uint8_t *encoded, size_t len)
+player_send_pm(struct player *p, int64_t from, const char *mes)
 {
+	uint8_t encoded[MAX_CHAT_LEN];
+	size_t encoded_len = 0;
 	size_t offset = 0;
 
 	(void)buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
 		        OP_SRV_PRIVATE_MESSAGE);
 	(void)buf_putu64(p->tmpbuf, offset, PLAYER_BUFSIZE, from);
 	offset += 8;
+	if (p->protocol_rev <= 163) {
+		encode_chat_legacy(mes, encoded, MAX_CHAT_LEN);
+		encoded_len = strlen(mes);
+	} else {
+		encoded_len = chat_compress(mes, (char *)encoded);
+		/*
+		 * not exactly sure what the purpose of privmes_num is...
+		 * maybe preventing duplicates...
+		 */
+		if (buf_putu32(p->tmpbuf, offset, PLAYER_BUFSIZE,
+				++p->mob.server->privmes_num) == -1) {
+			return -1;
+		}
+		offset += 4;
+	}
 	if (buf_putdata(p->tmpbuf, offset, PLAYER_BUFSIZE,
-			encoded, len) == -1) {
+			encoded, encoded_len) == -1) {
 		return -1;
 	}
-	offset += len;
+	offset += encoded_len;
 	return player_write_packet(p, p->tmpbuf, offset);
 }
 

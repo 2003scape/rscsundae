@@ -92,6 +92,7 @@ struct server {
 	struct pwhash_params hash;
 	size_t num_words;
 	char *words[8192];
+	uint32_t privmes_num;
 };
 
 void server_tick(void);
@@ -101,7 +102,7 @@ void server_register_login(int64_t);
 void server_register_logout(int64_t);
 void server_register_hide_status(struct player *);
 void server_register_unhide_status(struct player *);
-void server_send_pm(struct player *, int64_t, uint8_t *, size_t);
+void server_send_pm(struct player *, int64_t, const char *);
 struct floor_config *server_floor_config_by_id(int);
 struct item_config *server_item_config_by_id(int);
 struct item_config *server_find_item_config(const char *);

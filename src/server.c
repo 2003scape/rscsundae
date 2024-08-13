@@ -197,6 +197,9 @@ struct player *
 server_find_player_name37(int64_t name)
 {
 	for (int i = 0; i < s.max_player_id; ++i) {
+		if (s.players[i] == NULL) {
+			continue;
+		}
 		if (s.players[i]->name == name) {
 			return s.players[i];
 		}
@@ -289,7 +292,7 @@ server_register_unhide_status(struct player *p)
 }
 
 void
-server_send_pm(struct player *from, int64_t target, uint8_t *msg, size_t len)
+server_send_pm(struct player *from, int64_t target, const char *msg)
 {
 	struct player *targetp;
 
@@ -300,7 +303,7 @@ server_send_pm(struct player *from, int64_t target, uint8_t *msg, size_t len)
 	if (player_is_blocked(targetp, from->name, targetp->block_private)) {
 		return;
 	}
-	player_send_pm(targetp, from->name, msg, len);
+	player_send_pm(targetp, from->name, msg);
 }
 
 void
