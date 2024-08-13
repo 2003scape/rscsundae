@@ -182,8 +182,13 @@ player_destroy(struct player *p)
 		close(p->sock);
 		p->sock = -1;
 	}
+	if (p->packet_log != NULL) {
+		fclose(p->packet_log);
+		p->packet_log = NULL;
+	}
 	free(p->variables);
 	free(p->known_bounds);
+	free(p->known_items);
 	free(p->known_locs);
 	free(p);
 }

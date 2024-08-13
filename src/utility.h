@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include "../config.h"
 
+struct player;
+
 void username_sanitize(const char *, char *, size_t);
 int64_t mod37_nameenc(const char *);
 char *mod37_namedec(int64_t, char *);
@@ -28,4 +30,6 @@ uint64_t get_time_ms(void);
 char *buffer_file(const char *);
 
 void gen_salt(unsigned char *, size_t);
+
+void packet_log(struct player *, const char *, ...);
 #endif

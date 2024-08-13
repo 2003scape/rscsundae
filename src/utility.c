@@ -5,11 +5,17 @@
 #ifndef HAVE_ARC4RANDOM_BUF
 #include <openssl/rand.h>
 #endif
+#include <sys/stat.h>
 #include <ctype.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 #include <time.h>
+#include "entity.h"
+#include "server.h"
 #include "utility.h"
 
 #ifndef MAX_CHAT_LEN
@@ -475,4 +481,45 @@ gen_salt(unsigned char *salt, size_t len)
 		salt[i] = '0' + (salt[i] % ('~' - '0'));
 	}
 	salt[len - 1] = '\0';
+}
+
+void
+packet_log(struct player *p, const char *mes, ...)
+{
+	char path[FILENAME_MAX];
+	char str[512];
+	char name[32];
+	struct tm tm = {0};
+	time_t clock;
+	va_list args;
+
+	if (!p->mob.server->log_packets) {
+		return;
+	}
+
+	clock = time(NULL);
+	gmtime_r(&clock, &tm);
+
+	if (p->packet_log == NULL) {
+		(void)mkdir("./logs", S_IRWXU);
+		mod37_namedec(p->name, name);
+		(void)snprintf(path, FILENAME_MAX, "./logs/%s", name);
+		(void)mkdir(path, S_IRWXU);
+		strftime(str, sizeof(str), "%F-%H:%M", &tm);
+		(void)snprintf(path, FILENAME_MAX, "./logs/%s/%s.txt", name, str);
+		p->packet_log = fopen(path, "wa");
+	}
+
+	if (p->packet_log == NULL) {
+		fprintf(stderr, "failed to open file %s: %s\n",
+		    path, strerror(errno));
+		return;
+	}
+
+	strftime(str, sizeof(str), "[%F %H:%M] ", &tm);
+	snprintf(str + strlen(str), sizeof(str), "%s", mes);
+
+	va_start(args, mes);
+	vfprintf(p->packet_log, str, args);
+	va_end(args);
 }

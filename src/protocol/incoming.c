@@ -16,6 +16,13 @@
 #include "../zone.h"
 #include "../persistence/database.h"
 
+/*
+ * TODO: packet logging is incomplete
+ * - not detailed enough for trades
+ * - doesn't work for private messages
+ * - should not just output slot for inventory
+ */
+
 /* roughly one packet per frame at 50fps */
 #define MAX_PACKETS_PER_TICK		(32)
 
@@ -257,6 +264,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 		break;
 	case OP_CLI_LOGOUT:
 		{
+			packet_log(p, "OP_CLI_LOGOUT\n");
 			player_attempt_logout(p);
 		}
 		break;
@@ -271,6 +279,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			memcpy(cmd, data + offset, len);
 			cmd[len] = '\0';
 
+			packet_log(p, "OP_CLI_ADMIN_COMMAND %s\n", cmd);
 			player_parse_admin_command(p, cmd);
 		}
 		break;
@@ -289,7 +298,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				decode_chat_legacy(p->mob.server->words,
 				    p->mob.server->num_words,
 				    data + 1, msglen, mes, MAX_CHAT_LEN);
-				printf("legacy chat message: %s\n", mes);
+				packet_log(p, "OP_CLI_PUBLIC_CHAT %s\n", mes);
 				p->mob.chat_compressed_len = chat_compress(mes,
 				    p->mob.chat_compressed);
 			} else {
@@ -297,7 +306,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				    data + offset, msglen);
 				p->mob.chat_compressed_len = msglen;
 				chat_decompress(data, offset, msglen, mes);
-				printf("compressed chat message: %s\n", mes);
+				packet_log(p, "OP_CLI_PUBLIC_CHAT %s\n", mes);
 				p->mob.chat_len = strlen(mes);
 				encode_chat_legacy(mes,
 				    (uint8_t *)p->mob.chat_enc, p->mob.chat_len);
@@ -311,11 +320,14 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 	case OP_CLI_ADD_FRIEND:
 		{
 			int64_t target;
+			char name[32];
 
 			if (buf_gets64(data, offset, len, &target) == -1) {
 				return;
 			}
 			offset += 8;
+			mod37_namedec(target, name);
+			packet_log(p, "OP_CLI_ADD_FRIEND %s\n", name);
 			if (!player_has_friend(p, target) &&
 					!player_has_ignore(p, target)) {
 				player_add_friend(p, target);
@@ -325,33 +337,46 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 	case OP_CLI_REMOVE_FRIEND:
 		{
 			int64_t target;
+			char name[32];
 
 			if (buf_gets64(data, offset, len, &target) == -1) {
 				return;
 			}
 			offset += 8;
+			mod37_namedec(target, name);
+			packet_log(p, "OP_CLI_REMOVE_FRIEND %s\n", name);
 			player_remove_friend(p, target);
 		}
 		break;
 	case OP_CLI_PRIVATE_MESSAGE:
 		{
 			int64_t target;
+			char name[32];
 
 			if (buf_gets64(data, offset, len, &target) == -1) {
 				return;
 			}
 			offset += 8;
+			if (len <= 9) {
+				return;
+			}
+			mod37_namedec(target, name);
+			packet_log(p, "OP_CLI_PRIVATE_MESSAGE %s\n",
+				    name);
 			server_send_pm(p, target, data + offset, len - 9);
 		}
 		break;
 	case OP_CLI_ADD_IGNORE:
 		{
 			int64_t target;
+			char name[32];
 
 			if (buf_gets64(data, offset, len, &target) == -1) {
 				return;
 			}
 			offset += 8;
+			mod37_namedec(target, name);
+			packet_log(p, "OP_CLI_ADD_IGNORE %s\n", name);
 			if (!player_has_friend(p, target) &&
 					!player_has_ignore(p, target)) {
 				player_add_ignore(p, target);
@@ -361,11 +386,14 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 	case OP_CLI_REMOVE_IGNORE:
 		{
 			int64_t target;
+			char name[32];
 
 			if (buf_gets64(data, offset, len, &target) == -1) {
 				return;
 			}
 			offset += 8;
+			mod37_namedec(target, name);
+			packet_log(p, "OP_CLI_REMOVE_IGNORE %s\n", name);
 			player_remove_ignore(p, target);
 		}
 		break;
@@ -377,6 +405,8 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			uint8_t block_trade;
 			uint8_t block_duel;
 			bool unhide = false;
+
+			packet_log(p, "OP_CLI_PRIVACY_SETTINGS\n");
 
 			if (buf_getu8(data, offset++, len, &hide_online) == -1) {
 				return;
@@ -408,6 +438,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 		}
 		break;
 	case OP_CLI_TRADE_CONFIRM:
+		packet_log(p, "OP_CLI_TRADE_CONFIRM\n");
 		player_trade_confirm(p);
 		break;
 	case OP_CLI_BANK_DEPOSIT:
@@ -423,6 +454,9 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			offset += 2;
+
+			packet_log(p, "OP_CLI_BANK_DEPOSIT %d %d\n",
+			    id, amount);
 			player_deposit(p, id, amount);
 		}
 		break;
@@ -439,11 +473,15 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			offset += 2;
+
+			packet_log(p, "OP_CLI_BANK_WITHDRAW %d %d\n",
+			    id, amount);
 			player_withdraw(p, id, amount);
 		}
 		break;
 	case OP_CLI_BANK_CLOSE:
 		p->ui_bank_open = false;
+		packet_log(p, "OP_CLI_BANK_CLOSE\n");
 		break;
 	case OP_CLI_PRAYER_OFF:
 		{
@@ -452,10 +490,10 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			if (buf_getu8(data, offset++, len, &id) == -1) {
 				return;
 			}
-			if (id >= MAX_PRAYERS) {
-				return;
+			packet_log(p, "OP_CLI_PRAYER_OFF %d\n", id);
+			if (id < MAX_PRAYERS) {
+				player_prayer_disable(p, id);
 			}
-			player_prayer_disable(p, id);
 		}
 		break;
 	case OP_CLI_PRAYER_ON:
@@ -465,10 +503,10 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			if (buf_getu8(data, offset++, len, &id) == -1) {
 				return;
 			}
-			if (id >= MAX_PRAYERS) {
-				return;
+			packet_log(p, "OP_CLI_PRAYER_ON %d\n", id);
+			if (id < MAX_PRAYERS) {
+				player_prayer_enable(p, id);
 			}
-			player_prayer_enable(p, id);
 		}
 		break;
 	case OP_CLI_SAVE_SETTING:
@@ -635,6 +673,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			if (buf_getu8(data, offset, len, &style) == -1) {
 				return;
 			}
+			packet_log(p, "OP_CLI_COMBAT_STYLE %d\n", style);
 			if (style <= COMBAT_STYLE_DEFENSIVE) {
 				p->combat_style = style;
 			}
@@ -649,6 +688,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			}
 			offset += 2;
 			if (id < MAXNPCS) {
+				packet_log(p, "OP_CLI_NPC_ATTACK %d\n", id);
 				p->action = ACTION_NPC_ATTACK;
 				p->action_npc = id;
 			}
@@ -672,6 +712,8 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			}
 			npc = p->mob.server->npcs[id];
 			if (npc != NULL) {
+				packet_log(p, "OP_CLI_NPC_USEWITH %s %d\n",
+				    npc->config->names[0], slot);
 				p->action = ACTION_NPC_USEWITH;
 				p->action_npc = npc->mob.id;
 				p->action_slot = slot;
@@ -691,6 +733,8 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			}
 			npc = p->mob.server->npcs[id];
 			if (npc != NULL) {
+				packet_log(p, "OP_CLI_NPC_TALK %s\n",
+				    npc->config->names[0]);
 				p->action = ACTION_NPC_TALK;
 				p->action_npc = npc->mob.id;
 			}
@@ -703,11 +747,11 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			if (buf_getu16(data, offset, len, &slot) == -1) {
 				return;
 			}
-			if (slot >= p->inv_count) {
-				return;
+			packet_log(p, "OP_CLI_INV_OP1 %d\n", slot);
+			if (slot < p->inv_count) {
+				p->action = ACTION_INV_OP1;
+				p->action_slot = slot;
 			}
-			p->action = ACTION_INV_OP1;
-			p->action_slot = slot;
 		}
 		break;
 	case OP_CLI_INV_WEAR:
@@ -718,6 +762,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			offset += 2;
+			packet_log(p, "OP_CLI_INV_WEAR %d\n", slot);
 			player_wear(p, slot);
 		}
 		break;
@@ -729,6 +774,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			offset += 2;
+			packet_log(p, "OP_CLI_INV_UNWEAR %d\n", slot);
 			player_unwear(p, slot);
 		}
 		break;
@@ -740,6 +786,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			offset += 2;
+			packet_log(p, "OP_CLI_INV_DROP %d\n", slot);
 			p->action = ACTION_INV_DROP;
 			p->action_slot = slot;
 		}
@@ -764,6 +811,8 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			offset += 2;
+			packet_log(p, "OP_CLI_ITEM_USEWITH %d %d %d %d\n",
+			    x, y, id, slot);
 			p->action = ACTION_ITEM_USEWITH;
 			p->action_item = server_find_ground_item(p, x, y, id);
 			p->action_slot = slot;
@@ -850,8 +899,19 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			 */
 			if (p->mob.walk_queue_x[steps] != p->mob.x ||
 			    p->mob.walk_queue_y[steps] != p->mob.y) {
-				p->mob.action_walk =
-				    (opcode == OP_CLI_WALK_ENTITY);
+				if (opcode == OP_CLI_WALK_ENTITY) {
+					p->mob.action_walk = true;
+					packet_log(p,
+					    "OP_CLI_WALK_ENTITY %d %d\n",
+					    p->mob.walk_queue_x[steps],
+					    p->mob.walk_queue_y[steps]);
+				} else {
+					p->mob.action_walk = false;
+					packet_log(p,
+					    "OP_CLI_WALK_TILE %d %d\n",
+					    p->mob.walk_queue_x[steps],
+					    p->mob.walk_queue_y[steps]);
+				}
 				p->mob.walk_queue_len = steps + 1;
 				p->mob.walk_queue_pos = 0;
 			}
@@ -865,6 +925,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			offset += 2;
+			packet_log(p, "OP_CLI_SHOP_SELL %d\n", id);
 			/*
 			 * the client also sends the price but we don't trust it
 			 * and ignore it
@@ -882,6 +943,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			offset += 2;
+			packet_log(p, "OP_CLI_SHOP_BUY %d\n", id);
 			/*
 			 * the client also sends the price but we don't trust it
 			 * and ignore it
@@ -894,6 +956,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 	case OP_CLI_SHOP_CLOSE:
 		{
 			p->shop = NULL;
+			packet_log(p, "OP_CLI_SHOP_CLOSE\n");
 			player_close_ui(p);
 		}
 		break;
@@ -910,6 +973,8 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			offset += 2;
+			packet_log(p,
+			    "OP_CLI_INV_CAST %d %d\n", slot, spell_id);
 			spell = server_spell_config_by_id(spell_id);
 			if (spell != NULL) {
 				p->action = ACTION_INV_CAST;
@@ -919,9 +984,11 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 		}
 		break;
 	case OP_CLI_TRADE_ACCEPT:
+		packet_log(p, "OP_CLI_TRADE_ACCEPT\n");
 		player_trade_accept(p);
 		break;
 	case OP_CLI_TRADE_DECLINE:
+		packet_log(p, "OP_CLI_TRADE_DECLINE\n");
 		player_trade_decline(p);
 		break;
 	case OP_CLI_TRADE_UPDATE:
@@ -969,6 +1036,8 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 		break;
 	case OP_CLI_ACCEPT_DESIGN:
 		{
+			packet_log(p, "OP_CLI_ACCEPT_DESIGN\n");
+
 			uint8_t old_class = p->rpg_class;
 
 			if (!p->ui_design_open) {
@@ -1052,6 +1121,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			if (buf_getu8(data, offset++, len, &option) == -1) {
 				return;
 			}
+			packet_log(p, "OP_CLI_ANSWER_MULTI %d\n", option);
 			p->ui_multi_open = false;
 			script_multi_answer(p->mob.server->lua, p, option);
 		}
@@ -1073,8 +1143,17 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			if (buf_getu8(data, offset++, len, &dir) == -1) {
 				return;
 			}
-			p->action = (opcode == OP_CLI_BOUND_OP1) ?
-			    ACTION_BOUND_OP1 : ACTION_BOUND_OP2;
+			if (opcode == OP_CLI_BOUND_OP1) {
+				packet_log(p,
+				    "OP_CLI_BOUND_OP1 %d %d %d\n",
+				    x, y, dir);
+				p->action = ACTION_BOUND_OP1;
+			} else {
+				packet_log(p,
+				    "OP_CLI_BOUND_OP2 %d %d %d\n",
+				    x, y, dir);
+				p->action = ACTION_BOUND_OP2;
+			}
 			p->action_bound = server_find_bound(x, y, dir);
 		}
 		break;
@@ -1098,6 +1177,9 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			offset += 2;
+			packet_log(p,
+			    "OP_CLI_BOUND_USEWITH %d %d %d %d\n",
+			    x, y, dir, slot);
 			p->action = ACTION_BOUND_USEWITH;
 			p->action_bound = server_find_bound(x, y, dir);
 			p->action_slot = slot;
@@ -1115,6 +1197,8 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			offset += 2;
+			packet_log(p,
+			    "OP_CLI_INV_USEWITH %d %d\n", slot1, slot2);
 			p->action = ACTION_INV_USEWITH;
 			p->action_slot = slot1;
 			p->action_slot2 = slot2;
@@ -1136,6 +1220,8 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			offset += 2;
+			packet_log(p,
+			    "OP_CLI_LOC_USEWITH %d %d %d\n", x, y, slot);
 			p->action = ACTION_LOC_USEWITH;
 			p->action_loc = server_find_loc(x, y);
 			p->action_slot = slot;
@@ -1154,8 +1240,15 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			offset += 2;
-			p->action = (opcode == OP_CLI_LOC_OP1) ?
-			    ACTION_LOC_OP1 : ACTION_LOC_OP2;
+			if (opcode == OP_CLI_LOC_OP1) {
+				packet_log(p,
+				    "OP_CLI_LOC_OP1 %d %d\n", x, y);
+				p->action = ACTION_LOC_OP1;
+			} else {
+				packet_log(p,
+				    "OP_CLI_LOC_OP2 %d %d\n", x, y);
+				p->action = ACTION_LOC_OP2;
+			}
 			p->action_loc = server_find_loc(x, y);
 		}
 		break;

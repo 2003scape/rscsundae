@@ -82,6 +82,7 @@ struct server {
 	bool restrict_npc_aggression;
 	/* the 5 minute idle movement timer */
 	bool movement_timer;
+	bool log_packets;
 	int xp_multiplier;
 	lua_State *lua;
 	struct rsa rsa;

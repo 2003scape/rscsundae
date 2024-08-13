@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 #include "ext/isaac.h"
 
 #define PLAYER_BUFSIZE		(5000)
@@ -365,6 +366,7 @@ struct player {
 	uint16_t player_aggressors[MAX_CACHED_ATTACKERS];
 	uint64_t player_targets_time[MAX_CACHED_ATTACKERS];
 	uint64_t player_aggressors_time[MAX_CACHED_ATTACKERS];
+	FILE *packet_log;
 };
 
 /* mob.c */

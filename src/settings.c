@@ -19,6 +19,8 @@ server_parse_settings(void *user, const char *section,
 			s->rsa_exponent = strdup(value);
 		} else if (strcmp(name, "rsa_modulus") == 0) {
 			s->rsa_modulus = strdup(value);
+		} else if (strcmp(name, "log_packets") == 0) {
+			s->log_packets = (strtol(value, NULL, 10) != 0);
 		} else {
 			return 0;
 		}
@@ -46,7 +48,7 @@ server_parse_settings(void *user, const char *section,
 		if (strcmp(name, "sqlite_filename") == 0) {
 			s->database.filename = strdup(value);
 		} else if (strcmp(name, "sqlite_wal") == 0) {
-			s->database.use_wal = (strtol(value, NULL, 10) == 1);
+			s->database.use_wal = (strtol(value, NULL, 10) != 0);
 		} else {
 			return 0;
 		}
