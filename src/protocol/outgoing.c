@@ -2135,3 +2135,49 @@ player_send_effect(struct player *p, struct effect *e)
 
 	return player_write_packet(p, p->tmpbuf, offset);
 }
+
+int
+player_send_mesbox(struct player *p, const char *mes)
+{
+	/* https://classic.runescape.wiki/w/System_message */
+
+	if (p->protocol_rev > 119) {
+		size_t len;
+		size_t offset = 0;
+		char str[256];
+
+		(void)snprintf(str, sizeof(str),
+		    "@yel@System message: @whi@%s", mes);
+		len = strlen(str);
+
+		if (buf_putu8(p->tmpbuf, offset++, PLAYER_BUFSIZE,
+				OP_SRV_SHOW_MESBOX) == -1) {
+			return -1;
+		}
+
+		if (buf_putdata(p->tmpbuf, offset, PLAYER_BUFSIZE,
+		    (void *)str, len) == -1) {
+			return -1;
+		}
+		offset += len;
+
+		return player_write_packet(p, p->tmpbuf, offset);
+	} else {
+		char str[256];
+
+		(void)snprintf(str, sizeof(str),
+		    "@red@SYSTEM MESSAGE: %s", mes);
+		player_send_message(p, str);
+		(void)snprintf(str, sizeof(str),
+		    "@yel@SYSTEM MESSAGE: %s", mes);
+		player_send_message(p, str);
+		(void)snprintf(str, sizeof(str),
+		    "@gre@SYSTEM MESSAGE: %s", mes);
+		player_send_message(p, str);
+		(void)snprintf(str, sizeof(str),
+		    "@cya@SYSTEM MESSAGE: %s", mes);
+		player_send_message(p, str);
+
+		return 0;
+	}
+}

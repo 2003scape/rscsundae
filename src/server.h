@@ -120,6 +120,7 @@ int server_add_npc(int, int, int);
 int server_add_temp_item(struct player *, int, int, int, uint32_t);
 void server_remove_temp_item(uint64_t);
 int server_parse_settings(void *, const char *, const char *, const char *);
+void server_sysmes(const char *);
 double server_random(void);
 
 #endif

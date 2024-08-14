@@ -1280,3 +1280,13 @@ server_random(void)
 	/* emulation of java's Math.random() */
 	return ranval(&s.ran) / (double)UINT32_MAX;
 }
+
+void
+server_sysmes(const char *mes)
+{
+	for (int i = 0; i < s.max_player_id; ++i) {
+		if (s.players[i] != NULL) {
+			player_send_mesbox(s.players[i], mes);
+		}
+	}
+}

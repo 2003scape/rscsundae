@@ -501,6 +501,7 @@ int player_send_quests(struct player *);
 int player_notify_friend_online(struct player *, int64_t);
 int player_notify_friend_offline(struct player *, int64_t);
 int player_send_effect(struct player *, struct effect *);
+int player_send_mesbox(struct player *, const char *);
 
 /* npc.c */
 void npc_damage(struct npc *, struct player * , int);

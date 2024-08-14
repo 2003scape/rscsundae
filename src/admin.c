@@ -155,6 +155,8 @@ player_parse_mod_command(struct player *p, const char *cmd)
 		(void)snprintf(msg, sizeof(msg),
 		    "@que@coords: x = %u, y = %u", p->mob.x, p->mob.y);
 		player_send_message(p, msg);
+	} else if (strcmp(cmd, "sysmes") == 0) {
+		server_sysmes(cmd + sizeof("sysmes"));
 	} else if (strcmp(cmd, "tempban") == 0) {
 		char *name;
 		int64_t encoded;
