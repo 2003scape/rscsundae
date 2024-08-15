@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <time.h>
 #include "ext/isaac.h"
 
 #define PLAYER_BUFSIZE		(5000)
@@ -305,7 +306,6 @@ struct player {
 	uint8_t quest_points;
 	int64_t friend_list[MAX_FRIENDS];
 	int64_t ignore_list[MAX_IGNORE];
-	int64_t ban_end_date;
 	uint16_t friend_count;
 	uint16_t ignore_count;
 	uint8_t combat_style;
@@ -359,7 +359,9 @@ struct player {
 	struct playervar *variables;
 	size_t variable_count;
 	size_t variable_max;
-	uint64_t login_date;
+	time_t login_date;
+	time_t play_time;
+	time_t ban_end_date;
 	uint16_t chased_by_npc;
 	uint16_t save_timer;
 	uint16_t player_targets[MAX_CACHED_ATTACKERS];

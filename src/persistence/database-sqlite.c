@@ -558,11 +558,11 @@ database_init(struct database *database)
 	}
 
 	char get_query[2048] = "SELECT `id`, `password`, `rpg_class`, "
-	    "`rank`, `login_date`, `ban_end_date`, `x`, `y`, `quest_points`, "
-	    "`camera_auto`, `one_mouse_button`, `block_public`, `block_private`, "
-	    "`block_trade`, `block_duel`, `hair_colour`, `top_colour`, "
-	    "`leg_colour`, `skin_colour`, `head_sprite`, `body_sprite`, "
-	    "`skull_timer`, ";
+	    "`rank`, `play_time`, `login_date`, `ban_end_date`, `x`, `y`, "
+	    "`quest_points`, " "`camera_auto`, `one_mouse_button`, "
+	    "`block_public`, `block_private`, `block_trade`, `block_duel`, "
+	    "`hair_colour`, `top_colour`, `leg_colour`, `skin_colour`, "
+	    "`head_sprite`, `body_sprite`, `skull_timer`, ";
 
 	for (int i = 0; i < MAX_SKILL_ID; i++) {
 		int remaining = sizeof(get_query) - strlen(get_query);
@@ -624,7 +624,7 @@ database_init(struct database *database)
 	}
 
 	char save_query[2048] = "UPDATE `players` SET `rpg_class` = ?, "
-		"`login_date` = ?, `ban_end_date` = ?, "
+		"`play_time` = ?, `login_date` = ?, `ban_end_date` = ?, "
 		"`x` = ?, `y` = ?, `quest_points` = ?, "
 		"`camera_auto` = ?, `one_mouse_button` = ?, `block_public` = ?, "
 		"`block_private` = ?, `block_trade` = ?, `block_duel` = ?, "
@@ -856,10 +856,12 @@ database_load_player(struct database *database, struct player *player)
 		sqlite3_column_int(database->get_player, column_index++);
 	player->rank =
 		sqlite3_column_int(database->get_player, column_index++);
+	player->play_time =
+		(time_t)sqlite3_column_int64(database->get_player, column_index++);
 	player->login_date =
-		(uint64_t)sqlite3_column_int64(database->get_player, column_index++);
+		(time_t)sqlite3_column_int64(database->get_player, column_index++);
 	player->ban_end_date =
-		(uint64_t)sqlite3_column_int64(database->get_player, column_index++);
+		(time_t)sqlite3_column_int64(database->get_player, column_index++);
 	player->mob.x = sqlite3_column_int(database->get_player, column_index++);
 	player->mob.y = sqlite3_column_int(database->get_player, column_index++);
 	player->quest_points = sqlite3_column_int(database->get_player,
@@ -957,6 +959,11 @@ database_save_player(struct database *database, struct player *player)
 
 	if (stmt_bind_int(database->db, database->save_player, bind_index++,
 			player->rpg_class) == -1) {
+		return -1;
+	}
+
+	if (stmt_bind_uint64(database->db, database->save_player, bind_index++,
+			player->play_time) == -1) {
 		return -1;
 	}
 

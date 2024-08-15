@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS "players" (
 	"creation_ip"	TEXT NOT NULL DEFAULT '127.0.0.1',
 	"login_ip"	TEXT NOT NULL DEFAULT '',
 	"creation_date"	INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+	"play_time"	INTEGER NOT NULL DEFAULT 0,
 	"login_date"	INTEGER NOT NULL DEFAULT 0,
 	"ban_end_date"	INTEGER NOT NULL DEFAULT 0,
 	"mute_end_date"	INTEGER NOT NULL DEFAULT 0,
