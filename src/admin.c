@@ -7,6 +7,7 @@
 #include "stat.h"
 #include "utility.h"
 
+void player_parse_command(struct player *, const char *);
 void player_parse_mod_command(struct player *, const char *);
 void player_parse_dev_command(struct player *, const char *);
 
@@ -20,6 +21,8 @@ player_parse_admin_command(struct player *p, char *str)
 		return;
 	}
 	printf("admin command: %s\n", str);
+	player_parse_command(p, cmd);
+
 	if (p->rank > 0) {
 		player_parse_mod_command(p, cmd);
 	}
@@ -29,6 +32,19 @@ player_parse_admin_command(struct player *p, char *str)
 		player_parse_dev_command(p, cmd);
 	}
 #endif
+}
+
+void
+player_parse_command(struct player *p, const char *cmd)
+{
+	if (strcmp(cmd, "online") == 0) {
+		char mes[128];
+
+		(void)snprintf(mes, sizeof(mes),
+		    "There are currently %d players on this world",
+		    p->mob.server->player_count);
+		player_send_message(p, mes);
+	}
 }
 
 void

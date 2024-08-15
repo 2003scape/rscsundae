@@ -91,6 +91,7 @@ player_create(struct server *s, int sock)
 	mob_combat_reset(&p->mob);
 
 	s->players[slot] = p;
+	s->player_count++;
 	loop_add_player(p);
 	return p;
 }

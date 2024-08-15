@@ -380,6 +380,7 @@ server_tick(void)
 			printf("removed player %s\n", name);
 			player_destroy(s.players[i]);
 			s.players[i] = NULL;
+			s.player_count--;
 			continue;
 		}
 		net_player_recv(s.players[i]);
