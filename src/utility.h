@@ -32,4 +32,6 @@ char *buffer_file(const char *);
 void gen_salt(unsigned char *, size_t);
 
 void packet_log(struct player *, const char *, ...);
+
+void duration_to_str(time_t, char *, size_t);
 #endif

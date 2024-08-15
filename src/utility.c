@@ -523,3 +523,54 @@ packet_log(struct player *p, const char *mes, ...)
 	vfprintf(p->packet_log, str, args);
 	va_end(args);
 }
+
+void
+duration_to_str(time_t seconds, char *dest, size_t len)
+{
+	dest[0] = '\0';
+
+	if (seconds >= 31536000) {
+		time_t years = seconds / 31536000;
+		seconds -= (years * 31536000);
+		if (years > 1) {
+			snprintf(dest, len, "%d years ", (int)years);
+		} else {
+			snprintf(dest, len, "1 year ");
+		}
+	}
+	if (seconds >= 2592000) {
+		time_t months = seconds / 2592000;
+		seconds -= (months * 2592000);
+		if (months > 1) {
+			snprintf(dest + strlen(dest),
+			    len, "%d months ", (int)months);
+		} else {
+			snprintf(dest + strlen(dest),
+			    len, "1 month ");
+		}
+	}
+	if (seconds >= 86400) {
+		time_t days = seconds / 86400;
+		seconds -= (days * 86400);
+		if (days > 1) {
+			snprintf(dest + strlen(dest), len,
+			    "%d days ", (int)days);
+		} else {
+			snprintf(dest + strlen(dest), len, "1 day ");
+		}
+	}
+	if (seconds >= 3600) {
+		time_t hours = seconds / 3600;
+		seconds -= (hours * 3600);
+		if (hours > 1) {
+			snprintf(dest + strlen(dest), len,
+			    "%d hours ", (int)hours);
+		} else {
+			snprintf(dest + strlen(dest), len, "1 hour ");
+		}
+	}
+
+	snprintf(dest + strlen(dest), len,
+	    "%d minutes", (int)(seconds / 60));
+}
+

@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include "entity.h"
 #include "inventory.h"
 #include "server.h"
@@ -44,6 +45,45 @@ player_parse_command(struct player *p, const char *cmd)
 		    "There are currently %d players on this world",
 		    p->mob.server->player_count);
 		player_send_message(p, mes);
+	} else if (strcmp(cmd, "time") == 0) {
+		char time_str[64];
+		char mes[128];
+		char *target_name;
+		struct player *target;
+
+		target = p;
+		target_name = strtok(NULL, " ");
+
+		if (target_name != NULL && p->rank > 0) {
+			int64_t encoded = mod37_nameenc(target_name);
+			target = server_find_player_name37(encoded);
+		}
+
+		if (target == NULL) {
+			return;
+		}
+
+		duration_to_str(time(NULL) - p->creation_date,
+		    time_str, sizeof(time_str));
+		snprintf(mes, sizeof(mes),
+		    "This character is %s old.", time_str);
+		player_send_message(p, mes);
+
+		duration_to_str((time(NULL) - p->login_date) + p->play_time,
+		    time_str, sizeof(time_str));
+		snprintf(mes, sizeof(mes), "Time played: %s", time_str);
+		player_send_message(p, mes);
+
+		duration_to_str(time(NULL) - p->login_date,
+		    time_str, sizeof(time_str));
+		snprintf(mes, sizeof(mes), "This session: %s", time_str);
+		player_send_message(p, mes);
+	} else if (strcmp(cmd, "coords") == 0) {
+		char msg[64];
+
+		(void)snprintf(msg, sizeof(msg),
+		    "@que@coords: x = %u, y = %u", p->mob.x, p->mob.y);
+		player_send_message(p, msg);
 	}
 }
 
@@ -165,12 +205,6 @@ player_parse_mod_command(struct player *p, const char *cmd)
 		player_teleport(p,
 		    strtol(x_str, NULL, 10),
 		    strtol(y_str, NULL, 10));
-	} else if (strcmp(cmd, "coords") == 0) {
-		char msg[64];
-
-		(void)snprintf(msg, sizeof(msg),
-		    "@que@coords: x = %u, y = %u", p->mob.x, p->mob.y);
-		player_send_message(p, msg);
 	} else if (strcmp(cmd, "sysmes") == 0) {
 		server_sysmes(cmd + sizeof("sysmes"));
 	} else if (strcmp(cmd, "tempban") == 0) {

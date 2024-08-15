@@ -359,6 +359,7 @@ struct player {
 	struct playervar *variables;
 	size_t variable_count;
 	size_t variable_max;
+	time_t creation_date;
 	time_t login_date;
 	time_t play_time;
 	time_t ban_end_date;

@@ -558,8 +558,8 @@ database_init(struct database *database)
 	}
 
 	char get_query[2048] = "SELECT `id`, `password`, `rpg_class`, "
-	    "`rank`, `play_time`, `login_date`, `ban_end_date`, `x`, `y`, "
-	    "`quest_points`, " "`camera_auto`, `one_mouse_button`, "
+	    "`rank`, `creation_date`, `play_time`, `login_date`, `ban_end_date`, "
+	    " `x`, `y`, `quest_points`, " "`camera_auto`, `one_mouse_button`, "
 	    "`block_public`, `block_private`, `block_trade`, `block_duel`, "
 	    "`hair_colour`, `top_colour`, `leg_colour`, `skin_colour`, "
 	    "`head_sprite`, `body_sprite`, `skull_timer`, ";
@@ -856,6 +856,8 @@ database_load_player(struct database *database, struct player *player)
 		sqlite3_column_int(database->get_player, column_index++);
 	player->rank =
 		sqlite3_column_int(database->get_player, column_index++);
+	player->creation_date =
+		(time_t)sqlite3_column_int64(database->get_player, column_index++);
 	player->play_time =
 		(time_t)sqlite3_column_int64(database->get_player, column_index++);
 	player->login_date =
