@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "trade.h"
@@ -8,17 +9,14 @@
 static void player_trade_finalize(struct player *);
 
 void
-player_trade_request(struct player *p, uint16_t id)
+player_trade_request(struct player *p, struct player *target)
 {
-	struct player *target;
 	char name[32], message[64];
 
-	if (id >= MAXPLAYERS) {
-		return;
-	}
-	target = p->mob.server->players[id];
-	if (target == NULL || player_is_blocked(target,
-	    p->name, target->block_trade)) {
+	assert(p != NULL);
+	assert(target != NULL);
+
+	if (player_is_blocked(target, p->name, target->block_trade)) {
 		return;
 	}
 	/* XXX range needs verifying */
@@ -27,7 +25,7 @@ player_trade_request(struct player *p, uint16_t id)
 		player_send_message(p, "I'm not near enough");
 		return;
 	}
-	p->trading_player = (int16_t)id;
+	p->trading_player = (int16_t)target->mob.id;
 	if (target->trading_player != p->mob.id) {
 		player_send_message(p, "Sending trade request");
 

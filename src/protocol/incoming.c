@@ -18,7 +18,6 @@
 
 /*
  * TODO: packet logging is incomplete
- * - not detailed enough for trades
  * - should not just output slot for inventory
  */
 
@@ -1018,6 +1017,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			if (buf_getu8(data, offset++, len, &count) == -1) {
 				return;
 			}
+			packet_log(p, "OP_CLI_TRADE_UPDATE init\n");
 			for (int i = 0; i < count; ++i) {
 				if (buf_getu16(data, offset, len, &id) == -1) {
 					return;
@@ -1027,6 +1027,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 					return;
 				}
 				offset += 4;
+				packet_log(p, "OP_CLI_TRADE_UPDATE %d %d\n", id, amount);
 				player_trade_offer(p, id, amount);
 			}
 			partner->partner_offer_changed = true;
@@ -1035,11 +1036,22 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 	case OP_CLI_TRADE_PLAYER:
 		{
 			uint16_t id;
+			struct player *target;
+			char name[64];
 
 			if (buf_getu16(data, offset, len, &id) == -1) {
 				return;
 			}
-			player_trade_request(p, id);
+
+			if (id >= p->mob.server->max_player_id) {
+				return;
+			}
+			target = p->mob.server->players[id];
+			if (target != NULL) {
+				mod37_namedec(target->name, name);
+				packet_log(p, "OP_CLI_TRADE_PLAYER %s\n", name);
+				player_trade_request(p, target);
+			}
 		}
 		break;
 	case OP_CLI_ACCEPT_DESIGN:
