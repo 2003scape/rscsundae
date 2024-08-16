@@ -319,6 +319,18 @@ function oploc1_ironrock3(player, x, y)
 	do_mine_empty(player, x, y)
 end
 
+function oploc1_goldrock1(player, x, y)
+	do_mine_gold(player, x, y)
+end
+
+function oploc1_goldrock2(player, x, y)
+	do_mine_gold(player, x, y)
+end
+
+function oploc1_goldrock3(player, x, y)
+	do_mine_empty(player, x, y)
+end
+
 function oploc1_silverrock1(player, x, y)
 	do_mine_silver(player, x, y)
 end
