@@ -5,6 +5,7 @@
 #include "server.h"
 
 static void npc_random_walk(struct npc *);
+static void npc_retreat(struct npc *);
 static int npc_combat_roll(struct npc *, struct player *);
 static void npc_hunt_target(struct npc *);
 static bool npc_init_combat(struct npc *, struct player *);
@@ -100,6 +101,56 @@ npc_damage(struct npc *npc, struct player *p , int roll)
 }
 
 static void
+npc_retreat(struct npc *npc)
+{
+	int attempts = 0;
+	double rx, ry;
+	int min_x, min_y;
+	int x, y;
+
+	if (npc->mob.in_combat && npc->mob.target_player != -1) {
+		struct player *p;
+
+		p = npc->mob.server->players[npc->mob.target_player];
+		if (p != NULL) {
+			player_send_message(p,
+			    "Your opponent is retreating");
+			mob_combat_reset(&npc->mob);
+			mob_combat_reset(&p->mob);
+		}
+	}
+
+	do {
+		rx = server_random();
+		ry = server_random();
+
+		min_x = npc->mob.x - 8;
+		if (min_x < 0) {
+			min_x = 0;
+		}
+		x = min_x + (int)(16 * rx);
+
+		min_y = npc->mob.y - 8;
+		if (min_y < 0) {
+			min_y = 0;
+		}
+		y = min_y + (int)(16 * ry);
+
+		if (mob_check_reachable(&npc->mob, x, y, false)) {
+			break;
+		}
+		x = npc->mob.x;
+		y = npc->mob.y;
+	} while ((attempts++) < 10);
+
+	npc->mob.action_walk = true;
+	npc->mob.walk_queue_x[0] = x;
+	npc->mob.walk_queue_y[0] = y;
+	npc->mob.walk_queue_len = 1;
+	npc->mob.walk_queue_pos = 0;
+}
+
+static void
 npc_random_walk(struct npc *npc)
 {
 	double rx, ry;
@@ -114,20 +165,6 @@ npc_random_walk(struct npc *npc)
 
 	if (npc->config->wander_range == 0) {
 		return;
-	}
-
-	npc->mob.action_walk = false;
-
-	if (npc->mob.in_combat && npc->mob.target_player != -1) {
-		struct player *p;
-
-		p = npc->mob.server->players[npc->mob.target_player];
-		if (p != NULL) {
-			player_send_message(p,
-			    "Your opponent is retreating");
-			mob_combat_reset(&npc->mob);
-			mob_combat_reset(&p->mob);
-		}
 	}
 
 	attempts = 0;
@@ -178,6 +215,14 @@ npc_hunt_target(struct npc *npc)
 	struct player *players[128];
 	bool restrict_hunt = false;
 	size_t n;
+
+	/*
+	 * like players, NPCs appear to be stunned slightly after combat, see
+	 * RSC 2001/replays master archive/Walk around/Misthalin- Lumbridge/walkaround- lumbridge road to varrock- road up to wheatfield digsite- dark mage aggressive - lvl 1-1-1
+	 */
+	if (npc->mob.server->tick_counter < (npc->mob.combat_timer + 6)) {
+		return;
+	}
 
 	if (npc->mob.cur_stats[SKILL_HITS] <= npc->config->bravery) {
 		return;
@@ -353,14 +398,7 @@ npc_combat_roll(struct npc *npc, struct player *defender)
 static bool
 npc_init_combat(struct npc *npc, struct player *target)
 {
-	/*
-	 * like players, NPCs appear to be stunned slightly after combat, see
-	 * RSC 2001/replays master archive/Walk around/Misthalin- Lumbridge/walkaround- lumbridge road to varrock- road up to wheatfield digsite- dark mage aggressive - lvl 1-1-1
-	 */
-
-	if (target->mob.in_combat ||
-	    npc->mob.server->tick_counter <
-	    (target->mob.combat_timer + 6)) {
+	if (target->mob.in_combat) {
 		target->chased_by_npc = UINT16_MAX;
 		npc->mob.walk_queue_pos = 0;
 		npc->mob.walk_queue_len = 0;
@@ -433,21 +471,18 @@ npc_process_combat(struct npc *npc)
 		return;
 	}
 
+	assert(target->mob.in_combat);
+
 	target->chased_by_npc = UINT16_MAX;
 	npc->mob.following_player = -1;
 
-	if (target->mob.dir == MOB_DIR_COMBAT_RIGHT) {
-		if (npc->mob.x != target->mob.x ||
-		    npc->mob.y != target->mob.y) {
-			return;
-		}
-		if (!npc->mob.moved) {
-			npc->mob.dir = MOB_DIR_COMBAT_LEFT;
-		}
+	if (npc->mob.x != target->mob.x ||
+	    npc->mob.y != target->mob.y) {
+		return;
 	}
 
-	if (npc->mob.dir != MOB_DIR_COMBAT_LEFT) {
-		return;
+	if (!npc->mob.moved) {
+		npc->mob.dir = MOB_DIR_COMBAT_LEFT;
 	}
 
 	/*
@@ -458,7 +493,7 @@ npc_process_combat(struct npc *npc)
 	if (npc->mob.combat_rounds >= 3 &&
 	    npc->config->bravery > 0 &&
 	    npc->mob.cur_stats[SKILL_HITS] <= npc->config->bravery) {
-		npc_random_walk(npc);
+		npc_retreat(npc);
 		return;
 	}
 
