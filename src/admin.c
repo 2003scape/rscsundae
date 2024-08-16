@@ -84,6 +84,10 @@ player_parse_command(struct player *p, const char *cmd)
 		(void)snprintf(msg, sizeof(msg),
 		    "@que@coords: x = %u, y = %u", p->mob.x, p->mob.y);
 		player_send_message(p, msg);
+	} else if (strcmp(cmd, "makeover") == 0) {
+		if (!p->script_active && !p->mob.in_combat) {
+			player_send_design_ui(p);
+		}
 	}
 }
 
