@@ -820,15 +820,8 @@ database_load_player(struct database *database, struct player *player)
 
 	/* successful, but no user found */
 	if (res == SQLITE_DONE) {
-		if (stmt_reset(database->db, database->get_player) == -1) {
-			return -1;
-		}
-
-		if (db_transaction(database->db, TRANSACTION_END) == -1) {
-			return -1;
-		}
-
-		return 0;
+		ret = RESP_INVALID;
+		goto end;
 	}
 
 	/* no user and an error occurred */

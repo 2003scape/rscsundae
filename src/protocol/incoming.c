@@ -181,12 +181,6 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 
-			/* username taken */
-			if (res > 0) {
-				net_login_response(p, RESP_INVALID);
-				return;
-			}
-
 			net_login_response(p, RESP_REGISTER_OK);
 		}
 		break;
