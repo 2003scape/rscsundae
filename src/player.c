@@ -804,12 +804,6 @@ player_wilderness_check(struct player *p, struct player *target)
 static bool
 player_init_combat(struct player *p, struct mob *target)
 {
-	if (p->mob.in_combat) {
-		player_send_message(p,
-		    "You are already busy fighting!");
-		return false;
-	}
-
 	if (target->in_combat) {
 		/* XXX message needs verifying */
 		player_send_message(p, "I can't get close enough");
@@ -1674,8 +1668,14 @@ player_process_action(struct player *p)
 
 	switch (p->action) {
 	case ACTION_NPC_ATTACK:
+		if (p->mob.in_combat) {
+			player_send_message(p,
+			    "You are already busy fighting!");
+			p->action = ACTION_NONE;
+			return;
+		}
 		npc = p->mob.server->npcs[p->action_npc];
-		if (npc == NULL) {
+		if (npc == NULL || npc->respawn_time > 0) {
 			p->action = ACTION_NONE;
 			return;
 		}
@@ -1936,6 +1936,12 @@ player_process_action(struct player *p)
 		script_onskillnpc(p->mob.server->lua, p, npc, p->spell);
 		break;
 	case ACTION_PLAYER_ATTACK:
+		if (p->mob.in_combat) {
+			player_send_message(p,
+			    "You are already busy fighting!");
+			p->action = ACTION_NONE;
+			return;
+		}
 		target = p->mob.server->players[p->action_player];
 		if (target == NULL) {
 			p->action = ACTION_NONE;

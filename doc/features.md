@@ -54,10 +54,6 @@ Engine
 - [x] Five minute movement timer (should be optional)
 - [ ] Al Kharid general store should reject silk
 
-### Known engine bugs
-
-* NPC combat can end up one-sided somehow (both remain in-animation).
-
 Content
 -------
 
