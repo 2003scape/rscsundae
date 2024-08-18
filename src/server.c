@@ -484,6 +484,9 @@ server_tick(void)
 	}
 
 	for (int i = 0; i < s.max_npc_id; ++i) {
+		if (s.npcs[i] == NULL) {
+			continue;
+		}
 		if (s.npcs[i]->regen_timer > 0) {
 			s.npcs[i]->regen_timer--;
 		} else {

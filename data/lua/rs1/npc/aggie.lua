@@ -89,23 +89,38 @@ end
 
 function talknpc_aggie(player, npc)
 	npcsay(npc, "What can I help you with?")
-	local resp = multi(player,
-		"What could you make for me",
-		"Cool, do you turn people into frogs?",
-		"You mad old witch, you can't help me",
-		"Can you make dyes for me please")
+	local prince_ali_stage = getvar(player, "prince_ali_stage")
+	local resp
+	if prince_ali_stage == 2 or prince_ali_stage == 3 then
+		resp = multi(player,
+			"Could you think of a way to make pink skin paste",
+			"What could you make for me",
+			"Cool, do you turn people into frogs?",
+			"You mad old witch, you can't help me",
+			"Can you make dyes for me please")
+	else
+		resp = multi(player,
+			"What could you make for me",
+			"Cool, do you turn people into frogs?",
+			"You mad old witch, you can't help me",
+			"Can you make dyes for me please")
+		resp = resp + 1
+	end
 	if resp == 1 then
+		-- defined in ../quest/prince_ali_rescue/aggie.lua
+		aggie_skin_paste(player, npc)
+	elseif resp == 2 then
 		say(player, "What could you make for me")
 		npcsay(npc, "I mostly just make what I find pretty")
 		npcsay(npc, "I sometimes make dye for the womens clothes, brighten the place up")
 		npcsay(npc, "I can make red,yellow and blue dyes would u like some")
 		aggie_dyes(player, npc)
-	elseif resp == 2 then
+	elseif resp == 3 then
 		say(player, "Cool, do you turn people into frogs?")
 		npcsay(npc, "Oh, not for years, but if you met a talking chicken,")
 		npcsay(npc, "You have probably met the professor in the Manor north of here")
 		npcsay(npc, "A few years ago it was flying fish, that machine is a menace")
-	elseif resp == 3 then
+	elseif resp == 4 then
 		say(player, "You mad old witch, you can't help me")
 		npcsay(npc, "Oh, you like to call a witch names, do you?")
 		if held(player, "coins", 1) then
@@ -121,7 +136,7 @@ function talknpc_aggie(player, npc)
 			npcsay(npc, "You should be careful about insulting a Witch")
 			npcsay(npc, "You never know what shape you could wake up in")
 		end
-	elseif resp == 4 then
+	elseif resp == 5 then
 		say(player, "Can you make dyes for me please")
 		npcsay(npc, "What sort of dye would you like? Red, yellow or Blue?")
 		aggie_dyes(player, npc)

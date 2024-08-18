@@ -54,6 +54,7 @@ static int script_changebound(lua_State *);
 static int script_changeloc(lua_State *);
 static int script_restoreloc(lua_State *);
 static int script_changenpc(lua_State *);
+static int script_delnpc(lua_State *);
 static int script_shootplayer(lua_State *);
 static int script_shootnpc(lua_State *);
 static int script_multi(lua_State *);
@@ -578,9 +579,6 @@ script_nearnpc(lua_State *L)
 
 	npc = mob_find_nearby_npc(&p->mob, name);
 	if (npc != NULL) {
-		npc->talk_target = p->mob.id;
-		mob_face(&npc->mob, p->mob.x, p->mob.y);
-		mob_face(&p->mob, npc->mob.x, npc->mob.y);
 		lua_pushinteger(L, npc->mob.id);
 		return 1;
 	}
@@ -1820,15 +1818,15 @@ script_restoreloc(lua_State *L)
 static int
 script_changenpc(lua_State *L)
 {
-	lua_Integer npc_index;
+	lua_Integer id;
 	const char *name;
 
-	npc_index = script_checkinteger(L, 1);
+	id = script_checkinteger(L, 1);
 	name = script_checkstring(L, 2);
 
-	struct npc *npc = serv->npcs[npc_index];
+	struct npc *npc = id_to_npc(id);
 	if (npc == NULL) {
-		printf("script warning: couldn't find npc index %lld\n", npc_index);
+		printf("script warning: npc %lld is undefined\n", id);
 		lua_pushnil(L);
 		return 1;
 	}
@@ -1845,6 +1843,50 @@ script_changenpc(lua_State *L)
 
 	lua_pushinteger(L, npc->mob.id);
 	return 1;
+}
+
+static int
+script_delnpc(lua_State *L)
+{
+	const char *name = script_checkstring(L, 1);
+	struct npc *npc = NULL;
+
+	for (size_t i = 0; i < serv->max_npc_id; ++i) {
+		struct npc *n = serv->npcs[i];
+
+		if (n == NULL) {
+			continue;
+		}
+
+		for (size_t j = 0; j < n->config->name_count; ++j) {
+			if (strcasecmp(name, n->config->names[j]) == 0) {
+				npc = n;
+				break;
+			}
+		}
+	}
+
+	if (npc == NULL) {
+		printf("script warning: couldn't find npc %s\n", name);
+		return 0;
+	}
+
+	struct player *players[128];
+	size_t n;
+
+	n = mob_get_nearby_players(&npc->mob, players, 128);
+
+	struct zone *zone = server_find_zone(npc->mob.x, npc->mob.y);
+	zone_remove_npc(zone, npc->mob.id);
+
+	serv->npcs[npc->mob.id] = NULL;
+	free(npc);
+
+	for (size_t i = 0; i < n; ++i) {
+		players[i]->known_npc_count = 0;
+	}
+
+	return 0;
 }
 
 static int
@@ -2680,6 +2722,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_changenpc);
 	lua_setglobal(L, "changenpc");
+
+	lua_pushcfunction(L, script_delnpc);
+	lua_setglobal(L, "delnpc");
 
 	lua_pushcfunction(L, script_displaybalance);
 	lua_setglobal(L, "displaybalance");
