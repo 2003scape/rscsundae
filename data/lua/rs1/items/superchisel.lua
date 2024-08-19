@@ -173,10 +173,11 @@ local function superchisel_event(player)
 	elseif resp == 3 then
 		item = "slice of cake"
 	end
-	for x=50,400,6 do
-		for y=100,750,6 do
+	for x=50,400,4 do
+		for y=100,740,4 do
 			if not blocked(x, y) then
-				addobject(player, item, 1, x, y)
+				addobject(player, item, 1,
+					x + randomvar(8), y + randomvar(8))
 			end
 		end
 	end
