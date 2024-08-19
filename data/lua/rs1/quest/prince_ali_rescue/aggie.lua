@@ -29,7 +29,7 @@ function aggie_skin_paste(player, npc)
 		if resp == 1 then
 			say(player, "Yes please, mix me some skin paste")
 			npcsay(npc, "That should be simple, hand the things to Aggie then")
-			remove(player, water, 1)
+			remove(player, "water", 1)
 			remove(player, "ashes", 1)
 			remove(player, "redberries", 1)
 			remove(player, "flourpot", 1)
