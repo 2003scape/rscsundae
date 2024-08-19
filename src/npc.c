@@ -17,6 +17,10 @@ npc_die(struct npc *npc, struct player *p)
 	struct zone *zone_new;
 
 	if (p != NULL) {
+		if (p->chased_by_npc == npc->mob.id) {
+			p->chased_by_npc = UINT16_MAX;
+		}
+
 		if (p->script_active || p->ui_multi_open) {
 			/* might be waiting on an existing killnpc script */
 			return;
@@ -93,6 +97,7 @@ npc_damage(struct npc *npc, struct player *p , int roll)
 	    npc->mob.cur_stats[SKILL_HITS] > npc->config->bravery &&
 	    npc->mob.target_player == -1) {
 		npc->mob.target_player = p->mob.id;
+		npc->mob.following_player = p->mob.id;
 	}
 
 	npc->mob.cur_stats[SKILL_HITS] -= roll;
@@ -327,6 +332,7 @@ npc_process_movement(struct npc *npc)
 				npc->mob.target_player = -1;
 				return;
 			}
+			goto walk;
 		} else if (npc->config->aggression > 2) {
 			npc_hunt_target(npc);
 		}
@@ -371,6 +377,7 @@ npc_process_movement(struct npc *npc)
 		break;
 	}
 
+walk:
 	mob_process_walk_queue(&npc->mob);
 
 	zone_new = server_find_zone(npc->mob.x, npc->mob.y);
