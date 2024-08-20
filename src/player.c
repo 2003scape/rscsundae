@@ -1841,8 +1841,12 @@ player_process_action(struct player *p)
 		    p->action_item->id);
 		item_config = server_item_config_by_id(p->action_item->id);
 		if (item == NULL || item_config == NULL ||
-		    p->inv_count >= MAX_INV_SIZE ||
 		    !player_can_see_item(p, item)) {
+			p->action = ACTION_NONE;
+			return;
+		}
+		if (p->inv_count >= MAX_INV_SIZE &&
+		    (!item->stackable || !player_inv_held(p, item_config, 1)) {
 			p->action = ACTION_NONE;
 			return;
 		}
