@@ -1691,7 +1691,7 @@ player_process_action(struct player *p)
 		break;
 	case ACTION_NPC_USEWITH:
 		npc = p->mob.server->npcs[p->action_npc];
-		if (npc == NULL) {
+		if (npc == NULL || npc->respawn_time > 0) {
 			p->action = ACTION_NONE;
 			return;
 		}
@@ -1723,7 +1723,7 @@ player_process_action(struct player *p)
 		break;
 	case ACTION_NPC_TALK:
 		npc = p->mob.server->npcs[p->action_npc];
-		if (npc == NULL) {
+		if (npc == NULL || npc->respawn_time > 0) {
 			p->action = ACTION_NONE;
 			return;
 		}
@@ -1902,7 +1902,7 @@ player_process_action(struct player *p)
 		break;
 	case ACTION_NPC_CAST:
 		npc = p->mob.server->npcs[p->action_npc];
-		if (npc == NULL) {
+		if (npc == NULL || npc->respawn_time > 0) {
 			p->action = ACTION_NONE;
 			p->mob.walk_queue_len = 0;
 			p->mob.walk_queue_pos = 0;
