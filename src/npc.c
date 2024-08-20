@@ -360,21 +360,27 @@ npc_process_movement(struct npc *npc)
 	if ((npc->mob.walk_queue_len - pos) <= 0) {
 		return;
 	}
-	int x = npc->mob.walk_queue_x[pos];
-	int y = npc->mob.walk_queue_y[pos];
-	switch (npc->config->move_restrict) {
-	case MOVE_RESTRICT_OUTDOORS:
-		if (y < PLANE_LEVEL_INC && npc->mob.server->roofs[x][y] != 0) {
-			npc->mob.walk_queue_len = 0;
-			npc->mob.walk_queue_pos = 0;
+
+	if (!npc->mob.action_walk) {
+		int x = npc->mob.walk_queue_x[pos];
+		int y = npc->mob.walk_queue_y[pos];
+
+		switch (npc->config->move_restrict) {
+		case MOVE_RESTRICT_OUTDOORS:
+			if (y < PLANE_LEVEL_INC &&
+			    npc->mob.server->roofs[x][y] != 0) {
+				npc->mob.walk_queue_len = 0;
+				npc->mob.walk_queue_pos = 0;
+			}
+			break;
+		case MOVE_RESTRICT_INDOORS:
+			if (y < PLANE_LEVEL_INC &&
+			    npc->mob.server->roofs[x][y] == 0) {
+				npc->mob.walk_queue_len = 0;
+				npc->mob.walk_queue_pos = 0;
+			}
+			break;
 		}
-		break;
-	case MOVE_RESTRICT_INDOORS:
-		if (y < PLANE_LEVEL_INC && npc->mob.server->roofs[x][y] == 0) {
-			npc->mob.walk_queue_len = 0;
-			npc->mob.walk_queue_pos = 0;
-		}
-		break;
 	}
 
 walk:
