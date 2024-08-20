@@ -1666,6 +1666,11 @@ player_process_action(struct player *p)
 		return;
 	}
 
+	if (p->script_active) {
+		p->action = ACTION_NONE;
+		return;
+	}
+
 	switch (p->action) {
 	case ACTION_NPC_ATTACK:
 		if (p->mob.in_combat) {
