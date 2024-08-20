@@ -1846,7 +1846,8 @@ player_process_action(struct player *p)
 			return;
 		}
 		if (p->inv_count >= MAX_INV_SIZE &&
-		    (!item->stackable || !player_inv_held(p, item_config, 1)) {
+		    (item_config->weight > 0 ||
+		    !player_inv_held(p, item_config, 1))) {
 			p->action = ACTION_NONE;
 			return;
 		}
