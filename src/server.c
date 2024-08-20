@@ -1201,6 +1201,8 @@ server_add_npc(int id, int x, int y)
 		npc->mob.damage = UINT8_MAX;
 		npc->mob.following_player = -1;
 		npc->mob.following_npc = -1;
+		npc->mob.target_player = -1;
+		npc->mob.target_npc = -1;
 		npc->mob.cur_stats[SKILL_ATTACK] =
 		    npc->mob.base_stats[SKILL_ATTACK] = npc->config->attack;
 		npc->mob.cur_stats[SKILL_DEFENSE] =
