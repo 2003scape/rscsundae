@@ -371,7 +371,7 @@ server_tick(void)
 			 * Zephyr (redacted chat) replays/1m d4 r4ng3r/06-14-2018 10.47.53 testing 5 minute logout bug
 			 * he gets kicked roughly 100 ticks after the warning
 			 */
-			player_attempt_logout(s.players[i]);
+			player_attempt_logout(s.players[i], false);
 		}
 		net_player_recv(s.players[i]);
 		player_parse_incoming(s.players[i]);

@@ -257,7 +257,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 	case OP_CLI_LOGOUT:
 		{
 			packet_log(p, "OP_CLI_LOGOUT\n");
-			player_attempt_logout(p);
+			player_attempt_logout(p, true);
 		}
 		break;
 	case OP_CLI_ADMIN_COMMAND:
