@@ -8,11 +8,7 @@ static uint32_t player_bank_remove(struct player *, uint16_t, uint32_t);
 void
 player_deposit(struct player *p, uint16_t id, uint32_t amount)
 {
-	struct item_config *config;
-
-	config = server_item_config_by_id(id);
-	if (!p->ui_bank_open || config == NULL ||
-	    !player_inv_held(p, config, amount)) {
+	if (!p->ui_bank_open || !player_inv_held_id(p, id, amount)) {
 		return;
 	}
 	for (size_t i = 0; i < p->bank_count; ++i) {
@@ -20,14 +16,14 @@ player_deposit(struct player *p, uint16_t id, uint32_t amount)
 			if ((MAX_STACK_SIZE - p->bank[i].amount) < amount) {
 				return;
 			}
-			player_inv_remove(p, config, amount);
+			player_inv_remove_id(p, id, amount);
 			p->bank[i].amount += amount;
 			player_send_show_bank(p);
 			return;
 		}
 	}
 	if (p->bank_count < MAX_BANK_SIZE) {
-		player_inv_remove(p, config, amount);
+		player_inv_remove_id(p, id, amount);
 		p->bank[p->bank_count].id = id;
 		p->bank[p->bank_count++].amount = amount;
 		player_send_show_bank(p);

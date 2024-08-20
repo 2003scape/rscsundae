@@ -68,7 +68,7 @@ shop_sell(struct shop_config *shop, struct player *p, uint16_t id)
 
 	item = server_item_config_by_id(id);
 	if (p->shop == NULL || item == NULL ||
-	    !player_inv_held(p, item, 1)) {
+	    !player_inv_held_id(p, id, 1)) {
 		return;
 	}
 	for (size_t i = 0; i < shop->item_count; ++i) {
@@ -76,7 +76,7 @@ shop_sell(struct shop_config *shop, struct player *p, uint16_t id)
 			if (shop->items[i].cur_quantity == MAX_SHOP_STACK) {
 				return;
 			}
-			player_inv_remove(p, item, 1);
+			player_inv_remove_id(p, id, 1);
 			price = shop_price(shop, &shop->items[i], false);
 			if (price > 0) {
 				player_inv_give(p, coins, price);
@@ -91,7 +91,7 @@ shop_sell(struct shop_config *shop, struct player *p, uint16_t id)
 			return;
 		}
 		price = (shop->buy_modifier * item->value) / 100;
-		player_inv_remove(p, item, 1);
+		player_inv_remove_id(p, id, 1);
 		if (price > 0) {
 			player_inv_give(p, coins, price);
 		}
@@ -109,10 +109,6 @@ static int
 shop_remove(struct shop_config *shop, struct player *p, uint16_t id)
 {
 	uint32_t price;
-	struct item_config *coins;
-
-	coins = server_item_config_by_id(ITEM_COINS);
-	assert(coins != NULL);
 
 	for (size_t i = 0; i < shop->item_count; ++i) {
 		if (shop->items[i].id != id) {
@@ -123,12 +119,12 @@ shop_remove(struct shop_config *shop, struct player *p, uint16_t id)
 		}
 		if (p != NULL) {
 			price = shop_price(shop, &shop->items[i], true);
-			if (!player_inv_held(p, coins, price)) {
+			if (!player_inv_held(p, "coins", price)) {
 				player_send_message(p,
 				    "You don't have enough money!");
 				return -1;
 			}
-			player_inv_remove(p, coins, price);
+			player_inv_remove(p, "coins", price);
 		}
 		if (shop->items[i].cur_quantity == 1 && !shop->items[i].restock) {
 			shop->item_count--;

@@ -87,14 +87,14 @@ player_trade_offer(struct player *p, uint16_t id, uint32_t amount)
 			} else {
 				stack = stack + amount;
 			}
-			if (!player_inv_held(p, config, stack)) {
+			if (!player_inv_held_id(p, id, stack)) {
 				return;
 			}
 			p->trade_offer[i].stack = stack;
 			break;
 		}
 	}
-	if (!player_inv_held(p, config, amount)) {
+	if (!player_inv_held_id(p, id, amount)) {
 		return;
 	}
 	if (config->weight != 0) {
@@ -204,12 +204,13 @@ player_trade_finalize(struct player *p)
 	}
 
 	for (int i = 0; i < p->offer_count; ++i) {
-		config = server_item_config_by_id(p->trade_offer[i].id);
-		player_inv_remove(p, config, p->trade_offer[i].stack);
+		player_inv_remove_id(p,
+		    p->trade_offer[i].id,
+		    p->trade_offer[i].stack);
 	}
 	for (int i = 0; i < partner->offer_count; ++i) {
-		config = server_item_config_by_id(partner->trade_offer[i].id);
-		player_inv_remove(partner, config,
+		player_inv_remove_id(partner,
+		    partner->trade_offer[i].id,
 		    partner->trade_offer[i].stack);
 	}
 	for (int i = 0; i < p->offer_count; ++i) {

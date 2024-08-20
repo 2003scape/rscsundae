@@ -509,13 +509,13 @@ player_die(struct player *p, struct player *victor)
 		}
 		item = server_item_config_by_id(p->inventory[slot].id);
 		if (item->weight == 0) {
-			player_inv_remove(p, item,
+			player_inv_remove_id(p, item->id,
 			    p->inventory[slot].stack);
 			server_add_temp_item(victor,
 			    p->mob.x, p->mob.y, item->id,
 				p->inventory[slot].stack);
 		} else {
-			player_inv_remove(p, item, 1);
+			player_inv_remove_id(p, item->id, 1);
 			server_add_temp_item(victor,
 			    p->mob.x, p->mob.y, item->id, 1);
 		}
@@ -524,8 +524,9 @@ player_die(struct player *p, struct player *victor)
 	for (int i = 0; i < p->inv_count; ++i) {
 		struct item_config *item =
 		    server_item_config_by_id(p->inventory[i].id);
+		assert(item != NULL);
 		if (item->weight == 0 && p->inventory[i].stack > 1) {
-			player_inv_remove(p, item,
+			player_inv_remove_id(p, item->id,
 			    p->inventory[i].stack - 1);
 		}
 	}
@@ -573,8 +574,8 @@ player_consume_ammo(struct player *p,
 	if (ammo_config == NULL) {
 		return true;
 	}
-	if (player_inv_held(p, ammo_config, 1)) {
-		player_inv_remove(p, ammo_config, 1);
+	if (player_inv_held(p, projectile->item, 1)) {
+		player_inv_remove(p, projectile->item, 1);
 		/* XXX verify chance of breaking arrows */
 		if (server_random() >= 0.5) {
 			struct ground_item *item;
@@ -1781,7 +1782,7 @@ player_process_action(struct player *p)
 		stack = p->inventory[p->action_slot].stack;
 		item_config = server_item_config_by_id(id);
 		assert(item_config != NULL);
-		player_inv_remove(p, item_config, stack);
+		player_inv_remove_id(p, id, stack);
 		server_add_temp_item(p, p->mob.x, p->mob.y, id, stack);
 		p->action = ACTION_NONE;
 		break;
@@ -1847,7 +1848,7 @@ player_process_action(struct player *p)
 		}
 		if (p->inv_count >= MAX_INV_SIZE &&
 		    (item_config->weight > 0 ||
-		    !player_inv_held(p, item_config, 1))) {
+		    !player_inv_held_id(p, p->action_item->id, 1))) {
 			p->action = ACTION_NONE;
 			return;
 		}
@@ -2119,36 +2120,34 @@ player_process_action(struct player *p)
 bool
 player_has_reagents(struct player *p, struct spell_config *spell)
 {
-	struct item_config *config;
-	struct item_config *staff;
-
 	if (p->mob.server->cast_without_runes) {
 		return true;
 	}
 	for (int i = 0; i < spell->reagent_count; ++i) {
 		switch (spell->reagents[i].item_id) {
 		case ITEM_FIRE_RUNE:
-			staff = server_find_item_config("staff of fire");
+			if (player_inv_worn(p, "staff of fire")) {
+				continue;
+			}
 			break;
 		case ITEM_WATER_RUNE:
-			staff = server_find_item_config("staff of water");
+			if (player_inv_worn(p, "staff of water")) {
+				continue;
+			}
 			break;
 		case ITEM_AIR_RUNE:
-			staff = server_find_item_config("staff of air");
+			if (player_inv_worn(p, "staff of air")) {
+				continue;
+			}
 			break;
 		case ITEM_EARTH_RUNE:
-			staff = server_find_item_config("staff of earth");
-			break;
-		default:
-			staff = NULL;
+			if (player_inv_worn(p, "staff of earth")) {
+				continue;
+			}
 			break;
 		}
-		if (staff != NULL && player_inv_worn(p, staff)) {
-			continue;
-		}
-		config = server_item_config_by_id(spell->reagents[i].item_id);
-		assert(config != NULL);
-		if (!player_inv_held(p, config, spell->reagents[i].amount)) {
+		if (!player_inv_held_id(p,
+		    spell->reagents[i].item_id, spell->reagents[i].amount)) {
 			return false;
 		}
 	}

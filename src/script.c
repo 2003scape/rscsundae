@@ -1178,7 +1178,6 @@ script_remove(lua_State *L)
 	lua_Integer amount;
 	lua_Integer player_id;
 	struct player *p;
-	struct item_config *item;
 
 	player_id = script_checkinteger(L, 1);
 	item_name = script_checkstring(L, 2);
@@ -1191,14 +1190,7 @@ script_remove(lua_State *L)
 		return 0;
 	}
 
-	item = server_find_item_config(item_name);
-	if (item == NULL) {
-		printf("script warning: item %s is undefined\n", item_name);
-		script_cancel(L, player_id);
-		return 0;
-	}
-
-	player_inv_remove(p, item, amount);
+	player_inv_remove(p, item_name, amount);
 	return 0;
 }
 
@@ -1239,12 +1231,14 @@ script_sellinv(lua_State *L)
 	 * Logg/Tylerbeg/06-13-2018 20.09.59 high alch from 55 to 60 and I got a dmed lol
 	 */
 	if (item->weight > 0) {
-		player_inv_remove(p, item, 1);
-		player_inv_give(p, coins, value);
+		if (player_inv_held_id(p, item->id, 1)) {
+			player_inv_remove_id(p, item->id, 1);
+			player_inv_give(p, coins, value);
+		}
 	} else {
 		for (int i = 0; i < p->inv_count; ++i) {
 			if (p->inventory[i].id == item->id) {
-				player_inv_remove(p, item,
+				player_inv_remove_id(p, item->id,
 				    p->inventory[i].stack);
 				player_inv_give(p, coins,
 				    p->inventory[i].stack * value);
@@ -1281,7 +1275,6 @@ script_held(lua_State *L)
 	lua_Integer amount;
 	lua_Integer player_id;
 	struct player *p;
-	struct item_config *item;
 	int result;
 
 	player_id = script_checkinteger(L, 1);
@@ -1295,14 +1288,7 @@ script_held(lua_State *L)
 		return 0;
 	}
 
-	item = server_find_item_config(item_name);
-	if (item == NULL) {
-		printf("script warning: item %s is undefined\n", item_name);
-		script_cancel(L, player_id);
-		return 0;
-	}
-
-	result = player_inv_held(p, item, amount);
+	result = player_inv_held(p, item_name, amount);
 	lua_pushboolean(L, result);
 	return 1;
 }
@@ -1313,7 +1299,6 @@ script_worn(lua_State *L)
 	const char *item_name;
 	lua_Integer player_id;
 	struct player *p;
-	struct item_config *item;
 	int result;
 
 	player_id = script_checkinteger(L, 1);
@@ -1326,14 +1311,7 @@ script_worn(lua_State *L)
 		return 0;
 	}
 
-	item = server_find_item_config(item_name);
-	if (item == NULL) {
-		printf("script warning: item %s is undefined\n", item_name);
-		script_cancel(L, player_id);
-		return 0;
-	}
-
-	result = player_inv_worn(p, item);
+	result = player_inv_worn(p, item_name);
 	lua_pushboolean(L, result);
 	return 1;
 }

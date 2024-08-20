@@ -7,13 +7,19 @@ void
 player_inv_give(struct player *, struct item_config *, uint32_t);
 
 void
-player_inv_remove(struct player *, struct item_config *, uint32_t);
+player_inv_remove(struct player *, const char *, uint32_t);
+
+void
+player_inv_remove_id(struct player *, int, uint32_t);
 
 bool
-player_inv_held(struct player *, struct item_config *, uint32_t);
+player_inv_held(struct player *, const char *, uint32_t);
 
 bool
-player_inv_worn(struct player *, struct item_config *);
+player_inv_held_id(struct player *, int, uint32_t);
+
+bool
+player_inv_worn(struct player *, const char *);
 
 int
 player_inv_clear(struct player *);
