@@ -174,12 +174,18 @@ player_close_ui(struct player *p)
 }
 
 void
-player_destroy(struct player *p)
+player_save(struct player *p)
 {
 	if (p->login_date != 0) {
 		p->play_time += (time(NULL) - p->login_date);
 		(void)database_save_player(&p->mob.server->database, p);
 	}
+}
+
+void
+player_destroy(struct player *p)
+{
+	player_save(p);
 	if (p->sock != -1) {
 		close(p->sock);
 		p->sock = -1;

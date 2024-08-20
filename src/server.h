@@ -39,9 +39,10 @@ struct server {
 	uint16_t max_player_id;
 	uint16_t max_npc_id;
 	uint64_t tick_counter;
-	uint64_t next_prayer_drain;
-	uint64_t next_restore;
-	uint64_t next_rapid_restore;
+	int prayer_drain_timer;
+	int restore_timer;
+	int rapid_restore_timer;
+	int save_timer;
 	uint64_t last_tick;
 	uint8_t adjacency[ZONE_MAX_PLANE][ZONE_MAX_X][ZONE_MAX_Y];
 	uint8_t roofs[ZONE_MAX_X][ZONE_MAX_Y];

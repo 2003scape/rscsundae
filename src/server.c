@@ -83,9 +83,6 @@ main(int argc, char **argv)
 	s.name = "RSC Sundae";
 	s.bind_addr = "127.0.0.1";
 	s.port = 43594;
-	s.next_restore = 0;
-	s.next_rapid_restore = 0;
-	s.next_prayer_drain = 0;
 
 	(void)signal(SIGPIPE, on_signal_do_nothing);
 
@@ -309,19 +306,12 @@ server_send_pm(struct player *from, int64_t target, const char *msg)
 void
 server_tick(void)
 {
-	bool drain_tick;
-	bool restore_tick;
-	bool rapid_restore_tick;
 	uint64_t start_time;
 	uint64_t time_delay = 0;
 
 	start_time = get_time_ms();
 
 	s.tick_counter++;
-
-	drain_tick = s.tick_counter >= s.next_prayer_drain;
-	restore_tick = s.tick_counter >= s.next_restore;
-	rapid_restore_tick = s.tick_counter >= s.next_rapid_restore;
 
 	if (s.last_tick != 0) {
 		int64_t difference = start_time - s.last_tick;
@@ -389,14 +379,17 @@ server_tick(void)
 		player_process_action(s.players[i]);
 		player_process_movement(s.players[i]);
 		script_process(s.lua, s.players[i]);
-		if (drain_tick) {
+		if (s.prayer_drain_timer == 0) {
 			player_prayer_drain(s.players[i]);
 		}
-		if (restore_tick) {
+		if (s.restore_timer == 0) {
 			player_slow_restore(s.players[i]);
 		}
-		if (rapid_restore_tick) {
+		if (s.rapid_restore_timer == 0) {
 			player_rapid_restore(s.players[i]);
+		}
+		if (s.save_timer == 0) {
+			player_save(s.players[i]);
 		}
 		if (s.players[i]->skull_timer > 0) {
 			s.players[i]->skull_timer--;
@@ -512,16 +505,28 @@ server_tick(void)
 		s.shop_config[i].changed = false;
 	}
 
-	if (drain_tick) {
-		s.next_prayer_drain = s.tick_counter + 3;
+	if (s.prayer_drain_timer > 0) {
+		s.prayer_drain_timer--;
+	} else {
+		s.prayer_drain_timer = 3;
 	}
 
-	if (restore_tick) {
-		s.next_restore = s.tick_counter + 100;
+	if (s.restore_timer > 0) {
+		s.restore_timer--;
+	} else {
+		s.restore_timer = 100;
 	}
 
-	if (rapid_restore_tick) {
-		s.next_rapid_restore = s.tick_counter + 50;
+	if (s.rapid_restore_timer > 0) {
+		s.rapid_restore_timer--;
+	} else {
+		s.rapid_restore_timer = 50;
+	}
+
+	if (s.save_timer > 0) {
+		s.save_timer--;
+	} else {
+		s.save_timer = 500;
 	}
 
 	s.last_tick = get_time_ms();
