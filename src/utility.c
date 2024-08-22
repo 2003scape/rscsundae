@@ -511,7 +511,7 @@ packet_log(struct player *p, const char *mes, ...)
 		mod37_namedec(p->name, name);
 		(void)snprintf(path, FILENAME_MAX, "./logs/%s", name);
 		(void)mkdir_port(path);
-		strftime(str, sizeof(str), "%F-%H:%M", &tm);
+		strftime(str, sizeof(str), "%Y-%m-%d-%H:%M", &tm);
 		(void)snprintf(path, FILENAME_MAX, "./logs/%s/%s.txt", name, str);
 		p->packet_log = fopen(path, "wa");
 	}
@@ -522,7 +522,7 @@ packet_log(struct player *p, const char *mes, ...)
 		return;
 	}
 
-	strftime(str, sizeof(str), "[%F %H:%M:%S] ", &tm);
+	strftime(str, sizeof(str), "[%Y-%m-%d %H:%M:%S] ", &tm);
 	snprintf(str + strlen(str), sizeof(str), "%s", mes);
 
 	va_start(args, mes);
