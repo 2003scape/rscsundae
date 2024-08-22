@@ -1,4 +1,6 @@
+#ifndef _WIN32
 #include <sys/socket.h>
+#endif
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -15,6 +17,14 @@
 #include "../utility.h"
 #include "../zone.h"
 #include "../persistence/database.h"
+
+#ifdef _WIN32
+#include <sys/fcntl.h>
+#include <winsock2.h>
+#include <wspiapi.h>
+#define close closesocket
+#define ioctl ioctlsocket
+#endif
 
 /*
  * TODO: packet logging is incomplete

@@ -1,4 +1,6 @@
+#ifndef _WIN32
 #include <sys/socket.h>
+#endif
 #include <assert.h>
 #include <limits.h>
 #include <stdlib.h>
@@ -18,6 +20,10 @@
 #include "stat.h"
 #include "utility.h"
 #include "zone.h"
+
+#ifdef _WIN32
+#include "platform/win32_compat.h"
+#endif
 
 static void player_stat_changed(struct player *, int);
 static void player_restore_stat(struct player *, int);

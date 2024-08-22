@@ -1,12 +1,18 @@
+#ifndef _WIN32
 #include <sys/socket.h>
-#include <fcntl.h>
 #include <netdb.h>
+#include <unistd.h>
+#endif
 #include <stdio.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <string.h>
-#include <unistd.h>
 #include "server.h"
 #include "netio.h"
+
+#ifdef _WIN32
+#include "platform/win32_compat.h"
+#endif
 
 static int net_set_flags(int);
 
@@ -133,6 +139,7 @@ net_set_flags(int s)
 {
 	int flags;
 
+#ifdef F_GETFL
 	flags = fcntl(s, F_GETFL, 0);
 	if (flags == -1) {
 		fprintf(stderr,
@@ -145,6 +152,13 @@ net_set_flags(int s)
 		    "failed to set O_NONBLOCK: %s\n", strerror(errno));
 		return -1;
 	}
+#else
+	flags = 1;
+	if (ioctl(socket, FIONBIO, &flags) != 0) {
+		fprintf(stderr, "failed to set non-blocking\n");
+		return -1;
+	}
+#endif
 
 #ifdef TCP_NODELAY
 	flags = 1;

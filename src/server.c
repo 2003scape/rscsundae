@@ -60,7 +60,9 @@ main(int argc, char **argv)
 			assert(basedir != NULL);
 			break;
 		case 'd':
+#ifndef _WIN32
 			daemon(1, 0);
+#endif
 			break;
 		case 'f':
 			conffile = strdup(optarg);
@@ -84,7 +86,9 @@ main(int argc, char **argv)
 	s.bind_addr = "127.0.0.1";
 	s.port = 43594;
 
+#ifdef SIGPIPE
 	(void)signal(SIGPIPE, on_signal_do_nothing);
+#endif
 
 	/* init random number generator */
 	raninit(&s.ran, time(NULL));

@@ -1,5 +1,7 @@
 #include <ev.h>
+#ifndef _WIN32
 #include <sys/socket.h>
+#endif
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -11,6 +13,10 @@
 #include "loop.h"
 #include "server.h"
 #include "netio.h"
+
+#ifdef _WIN32
+#include "platform/win32_compat.h"
+#endif
 
 struct server *serv;
 

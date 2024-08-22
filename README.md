@@ -41,6 +41,8 @@ RSC Sundae is developed on NetBSD. I occasionally test it on
 Mac OS X 10.4 and Alpine Linux. If I break something on another
 UNIX-like platform, please send a patch.
 
+For Windows, instead refer to `platform/win32/README.md`.
+
 Dependencies:
 
 * BZip2 (for decompressing Jagex Archives to load the original game data)

@@ -18,6 +18,12 @@
 #include "server.h"
 #include "utility.h"
 
+#ifdef _WIN32
+#define mkdir_port(s) mkdir(s)
+#else
+#define mkdir_port(s) mkdir(s, S_IRWXU)
+#endif
+
 #ifndef MAX_CHAT_LEN
 #define MAX_CHAT_LEN	(80)
 #endif
@@ -501,10 +507,10 @@ packet_log(struct player *p, const char *mes, ...)
 	gmtime_r(&clock, &tm);
 
 	if (p->packet_log == NULL) {
-		(void)mkdir("./logs", S_IRWXU);
+		(void)mkdir_port("./logs");
 		mod37_namedec(p->name, name);
 		(void)snprintf(path, FILENAME_MAX, "./logs/%s", name);
-		(void)mkdir(path, S_IRWXU);
+		(void)mkdir_port(path);
 		strftime(str, sizeof(str), "%F-%H:%M", &tm);
 		(void)snprintf(path, FILENAME_MAX, "./logs/%s/%s.txt", name, str);
 		p->packet_log = fopen(path, "wa");
