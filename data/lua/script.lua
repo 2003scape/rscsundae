@@ -47,6 +47,7 @@ function new_player_script(player)
 	ps.delay = 0
 	ps.option_count = 0
 	ps.npc = nil
+	ps.paused = false
 	return ps
 end
 
@@ -283,8 +284,10 @@ function script_engine_attacknpc(player, npc, name, x, y)
 		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, npc, x, y)
-			player_scripts[player] = nil
-			playerunbusy(player)
+			if not ps.paused then
+				player_scripts[player] = nil
+				playerunbusy(player)
+			end
 		end)
 		player_scripts[player] = ps
 		playerbusy(player)
@@ -304,8 +307,10 @@ function script_engine_takeobj(player, name, x, y)
 		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, x, y)
-			player_scripts[player] = nil
-			playerunbusy(player)
+			if not ps.paused then
+				player_scripts[player] = nil
+				playerunbusy(player)
+			end
 		end)
 		player_scripts[player] = ps
 		playerbusy(player)
@@ -324,14 +329,16 @@ function script_engine_killnpc(player, npc, name, x, y)
 		ps.npc = npc
 		ps.co = coroutine.create(function()
 			script(player, npc, x, y)
-			player_scripts[player] = nil
-			playerunbusy(player)
-			npcunbusy(player)
+			if not ps.paused then
+				player_scripts[player] = nil
+				playerunbusy(player)
+				npcunbusy(npc)
+			end
 		end)
 		-- need to run the script in this context for invincible
 		-- NPCs to work properly
 		playerbusy(player)
-		npcbusy(player)
+		npcbusy(npc)
 		local result, err = coroutine.resume(ps.co)
 		if not result then
 			print("Script error inside coroutine: " .. err)
@@ -356,9 +363,11 @@ function script_engine_talknpc(player, name, npc)
 		ps.npc = npc
 		ps.co = coroutine.create(function()
 			script(player, npc)
-			player_scripts[player] = nil
-			npcunbusy(npc)
-			playerunbusy(player)
+			if not ps.paused then
+				player_scripts[player] = nil
+				npcunbusy(npc)
+				playerunbusy(player)
+			end
 		end)
 		player_scripts[player] = ps
 		npcbusy(npc)
@@ -386,8 +395,10 @@ function script_engine_skillnpc(player, name, npc, spell)
 		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, npc)
-			player_scripts[player] = nil
-			playerunbusy(player)
+			if not ps.paused then
+				player_scripts[player] = nil
+				playerunbusy(player)
+			end
 		end)
 		player_scripts[player] = ps
 		playerbusy(player)
@@ -407,8 +418,10 @@ function script_engine_spellself(player, spell)
 		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player)
-			player_scripts[player] = nil
-			playerunbusy(player)
+			if not ps.paused then
+				player_scripts[player] = nil
+				playerunbusy(player)
+			end
 		end)
 		player_scripts[player] = ps
 		playerbusy(player)
@@ -434,8 +447,10 @@ function script_engine_spellinv(player, name, spell)
 		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, name)
-			player_scripts[player] = nil
-			playerunbusy(player)
+			if not ps.paused then
+				player_scripts[player] = nil
+				playerunbusy(player)
+			end
 		end)
 		player_scripts[player] = ps
 		playerbusy(player)
@@ -462,8 +477,10 @@ function script_engine_spellobj(player, spell, name, x, y)
 		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, name, x, y)
-			player_scripts[player] = nil
-			playerunbusy(player)
+			if not ps.paused then
+				player_scripts[player] = nil
+				playerunbusy(player)
+			end
 		end)
 		player_scripts[player] = ps
 		playerbusy(player)
@@ -494,8 +511,10 @@ function script_engine_opinv(player, name)
 		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player)
-			player_scripts[player] = nil
-			playerunbusy(player)
+			if not ps.paused then
+				player_scripts[player] = nil
+				playerunbusy(player)
+			end
 		end)
 		player_scripts[player] = ps
 		playerbusy(player)
@@ -515,8 +534,10 @@ function script_engine_skillplayer(player, target, name)
 		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, target)
-			player_scripts[player] = nil
-			playerunbusy(player)
+			if not ps.paused then
+				player_scripts[player] = nil
+				playerunbusy(player)
+			end
 		end)
 		player_scripts[player] = ps
 		playerbusy(player)
@@ -536,8 +557,10 @@ function script_engine_opbound1(player, name, x, y, dir)
 		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, x, y, dir)
-			player_scripts[player] = nil
-			playerunbusy(player)
+			if not ps.paused then
+				player_scripts[player] = nil
+				playerunbusy(player)
+			end
 		end)
 		player_scripts[player] = ps
 		playerbusy(player)
@@ -557,8 +580,10 @@ function script_engine_opbound2(player, name, x, y, dir)
 		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, x, y, dir)
-			player_scripts[player] = nil
-			playerunbusy(player)
+			if not ps.paused then
+				player_scripts[player] = nil
+				playerunbusy(player)
+			end
 		end)
 		player_scripts[player] = ps
 		playerbusy(player)
@@ -578,8 +603,10 @@ function script_engine_oploc1(player, name, x, y)
 		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, x, y)
-			player_scripts[player] = nil
-			playerunbusy(player)
+			if not ps.paused then
+				player_scripts[player] = nil
+				playerunbusy(player)
+			end
 		end)
 		player_scripts[player] = ps
 		playerbusy(player)
@@ -599,8 +626,10 @@ function script_engine_oploc2(player, name, x, y)
 		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, x, y)
-			player_scripts[player] = nil
-			playerunbusy(player)
+			if not ps.paused then
+				player_scripts[player] = nil
+				playerunbusy(player)
+			end
 		end)
 		player_scripts[player] = ps
 		playerbusy(player)
@@ -625,8 +654,10 @@ function script_engine_useloc(player, name, x, y, item)
 		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, x, y)
-			player_scripts[player] = nil
-			playerunbusy(player)
+			if not ps.paused then
+				player_scripts[player] = nil
+				playerunbusy(player)
+			end
 		end)
 		player_scripts[player] = ps
 		playerbusy(player)
@@ -651,8 +682,10 @@ function script_engine_usebound(player, name, x, y, dir, item)
 		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, x, y, dir)
-			player_scripts[player] = nil
-			playerunbusy(player)
+			if not ps.paused then
+				player_scripts[player] = nil
+				playerunbusy(player)
+			end
 		end)
 		player_scripts[player] = ps
 		playerbusy(player)
@@ -678,9 +711,11 @@ function script_engine_usenpc(player, npc, name, item)
 		ps.npc = npc
 		ps.co = coroutine.create(function()
 			script(player, npc)
-			player_scripts[player] = nil
-			npcunbusy(npc)
-			playerunbusy(player)
+			if not ps.paused then
+				player_scripts[player] = nil
+				npcunbusy(npc)
+				playerunbusy(player)
+			end
 		end)
 		player_scripts[player] = ps
 		npcbusy(npc)
@@ -706,8 +741,10 @@ function script_engine_useobj(player, name, x, y, item)
 		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, x, y)
-			player_scripts[player] = nil
-			playerunbusy(player)
+			if not ps.paused then
+				player_scripts[player] = nil
+				playerunbusy(player)
+			end
 		end)
 		player_scripts[player] = ps
 		playerbusy(player)
@@ -737,8 +774,10 @@ function script_engine_useinv(player, name, item)
 		ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player)
-			player_scripts[player] = nil
-			playerunbusy(player)
+			if not ps.paused then
+				player_scripts[player] = nil
+				playerunbusy(player)
+			end
 		end)
 		player_scripts[player] = ps
 		playerbusy(player)
@@ -754,6 +793,7 @@ function pause(min, max)
 	player_scripts[active_script.player] = nil
 	playerunbusy(active_script.player)
 	delay(amount)
+	active_script.paused = true
 end
 
 function delay(length)
