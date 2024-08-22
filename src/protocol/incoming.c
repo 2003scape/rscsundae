@@ -19,11 +19,7 @@
 #include "../persistence/database.h"
 
 #ifdef _WIN32
-#include <sys/fcntl.h>
-#include <winsock2.h>
-#include <wspiapi.h>
-#define close closesocket
-#define ioctl ioctlsocket
+#include "../platform/win32_compat.h"
 #endif
 
 /*
