@@ -24,6 +24,9 @@ CFLAGS+=	-I${SRCDIR}/ext/libjag/include
 CFLAGS+=	-D_POSIX_C_SOURCE=199309L
 CFLAGS+=	-DWITH_RSA_OPENSSL=1
 CFLAGS+=	-DHAVE_SYS_TIME_H=1
+CFLAGS+=	-DARGON2_NO_THREADS=1
+CFLAGS+=	-DEV_NO_SMP=1
+CFLAGS+=	-DEV_NO_THREADS=1
 CFLAGS+=	-DSQLITE_MUTEX_NOOP=1
 
 OBJS+=		${SRCDIR}/admin.o
@@ -79,7 +82,6 @@ OBJS+=		./phc-winner-argon2-20190702/src/blake2/blake2b.o
 OBJS+=		./phc-winner-argon2-20190702/src/core.o
 OBJS+=		./phc-winner-argon2-20190702/src/encoding.o
 OBJS+=		./phc-winner-argon2-20190702/src/ref.o
-OBJS+=		./phc-winner-argon2-20190702/src/thread.o
 
 all: rscsundae.exe
 
