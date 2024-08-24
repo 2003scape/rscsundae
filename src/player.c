@@ -1769,9 +1769,38 @@ player_process_action(struct player *p)
 			    "%s is busy at the moment", npc->config->names[0]);
 			player_send_message(p, mes);
 		} else {
-			npc->talk_target = p->mob.id;
-			mob_face(&p->mob, npc->mob.x, npc->mob.y);
-			script_onnpctalk(p->mob.server->lua, p, npc);
+			uint16_t npc_x = npc->mob.x;
+			uint16_t npc_y = npc->mob.y;
+
+			if (script_onnpctalk(p->mob.server->lua, p, npc)) {
+				npc->talk_target = p->mob.id;
+
+				if (p->mob.x == npc_x && p->mob.y == npc_y) {
+					if (mob_check_reachable(&npc->mob, npc_x + 1, npc_y,
+					    false)) {
+						npc_x++;
+					} else if (mob_check_reachable(&npc->mob, npc_x - 1, npc_y,
+					           false)) {
+						npc_x--;
+					} else if (mob_check_reachable(&npc->mob, npc_x, npc_y + 1,
+					           false)) {
+						npc_y++;
+					} else if (mob_check_reachable(&npc->mob, npc_x, npc_y - 1,
+					           false)) {
+						npc_y--;
+					}
+
+					if (npc->mob.x != npc_x || npc->mob.y != npc_y) {
+						npc->mob.walk_queue_x[0] = npc_x;
+						npc->mob.walk_queue_y[0] = npc_y;
+						npc->mob.walk_queue_len = 1;
+						npc->mob.walk_queue_pos = 0;
+						mob_process_walk_queue(&npc->mob);
+					}
+				}
+			}
+
+			mob_face(&p->mob, npc_x, npc_y);
 		}
 		break;
 	case ACTION_INV_DROP:

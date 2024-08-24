@@ -338,6 +338,32 @@ script_takeobject(lua_State *L)
 }
 
 static int
+script_face(lua_State *L)
+{
+	lua_Integer player_id = script_checkinteger(L, 1);
+	lua_Integer npc_id = script_checkinteger(L, 2);
+
+	struct player *p;
+	struct npc *npc;
+
+	p = id_to_player(player_id);
+	if (p == NULL) {
+		printf("script warning: player %lld is undefined\n", player_id);
+		return 0;
+	}
+
+	npc = id_to_npc(npc_id);
+	if (npc == NULL) {
+		printf("script warning: npc %lld is undefined\n", npc_id);
+		return 0;
+	}
+
+	mob_face(&npc->mob, p->mob.x, p->mob.y);
+
+	return 0;
+}
+
+static int
 script_say(lua_State *L)
 {
 	lua_Integer id = script_checkinteger(L, 1);
@@ -523,12 +549,19 @@ script_npcsay(lua_State *L)
 
 	player = id_to_player(npc->talk_target);
 	if (player != NULL) {
-		/*
-		 * XXX: maybe too quick at the moment -
-		 * seems should be delayed by 1 tick
-		 */
-		mob_face(&npc->mob, player->mob.x, player->mob.y);
 		mob_face(&player->mob, npc->mob.x, npc->mob.y);
+
+#if 1
+		lua_getglobal(L, "script_engine_npc_face_player");
+		if (!lua_isfunction(L, -1)) {
+			puts("script error: can't find essential function "
+				"script_engine_npc_face_player");
+			return false;
+		}
+		lua_pushnumber(L, player->mob.id);
+		lua_pushnumber(L, npc->mob.id);
+		safe_call(L, 2, 0, -1);
+#endif
 	}
 
 	encode_chat_legacy(mes, (uint8_t *)npc->mob.chat_enc, len);
@@ -1968,7 +2001,7 @@ script_process(lua_State *L, struct player *p)
 	safe_call(L, 1, 0, p->mob.id);
 }
 
-void
+bool
 script_onnpctalk(lua_State *L, struct player *p, struct npc *npc)
 {
 	char mes[128];
@@ -1978,7 +2011,7 @@ script_onnpctalk(lua_State *L, struct player *p, struct npc *npc)
 		lua_getglobal(L, "script_engine_talknpc");
 		if (!lua_isfunction(L, -1)) {
 			puts("script error: can't find essential function script_engine_talknpc");
-			return;
+			return false;
 		}
 		lua_pushnumber(L, p->mob.id);
 		lua_pushstring(L, npc->config->names[i]);
@@ -1986,13 +2019,14 @@ script_onnpctalk(lua_State *L, struct player *p, struct npc *npc)
 		safe_call(L, 3, 1, p->mob.id);
 		result = lua_toboolean(L, -1);
 		if (result != 0) {
-			return;
+			return true;
 		}
 	}
 	(void)snprintf(mes, sizeof(mes),
 	    "The %s does not appear interested in talking",
 	    npc->config->names[0]);
 	player_send_message(p, mes);
+	return false;
 }
 
 void
@@ -2562,6 +2596,9 @@ script_init(struct server *s)
 
 	lua_pushcfunction(L, script_say);
 	lua_setglobal(L, "_say");
+
+	lua_pushcfunction(L, script_face);
+	lua_setglobal(L, "_face");
 
 	lua_pushcfunction(L, script_addloc);
 	lua_setglobal(L, "_addloc");
