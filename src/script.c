@@ -551,7 +551,6 @@ script_npcsay(lua_State *L)
 	if (player != NULL) {
 		mob_face(&player->mob, npc->mob.x, npc->mob.y);
 
-#if 1
 		lua_getglobal(L, "script_engine_npc_face_player");
 		if (!lua_isfunction(L, -1)) {
 			puts("script error: can't find essential function "
@@ -561,7 +560,6 @@ script_npcsay(lua_State *L)
 		lua_pushnumber(L, player->mob.id);
 		lua_pushnumber(L, npc->mob.id);
 		safe_call(L, 2, 0, -1);
-#endif
 	}
 
 	encode_chat_legacy(mes, (uint8_t *)npc->mob.chat_enc, len);
