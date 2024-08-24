@@ -6,11 +6,13 @@ LDFLAGS+=	-L./openssl-3/x86/lib
 LDFLAGS+=	-L.
 LDFLAGS+=	-lcrypto -llua54
 LDFLAGS+=	-lm -lwsock32 -lws2_32
+LDFLAGS+=	-s
 
 CFLAGS+=	-O2 -Wall -std=c99
 CFLAGS+=	-fno-set-stack-executable
 CFLAGS+=	-fstack-protector-strong
 CFLAGS+=	-D_FORTIFY_SOURCE=2
+CFLAGS+=	-s
 
 CFLAGS+=	-I./phc-winner-argon2-20190702/include
 CFLAGS+=	-I./openssl-3/x86/include
@@ -20,6 +22,9 @@ CFLAGS+=	-I./libev-4.33
 CFLAGS+=	-I./include
 CFLAGS+=	-I${SRCDIR}/ext/inih
 CFLAGS+=	-I${SRCDIR}/ext/libjag/include
+
+# target Windows XP
+CFLAGS+=	-D_WIN32_WINNT=0x0501
 
 CFLAGS+=	-D_POSIX_C_SOURCE=199309L
 CFLAGS+=	-DWITH_RSA_OPENSSL=1
