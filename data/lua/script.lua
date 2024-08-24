@@ -351,6 +351,14 @@ function script_engine_killnpc(player, npc, name, x, y)
 	return false
 end
 
+function script_engine_npc_face_player(player, npc)
+	local fs = new_player_script(player)
+	fs.co = coroutine.create(function()
+		_face(player, npc)
+	end)
+	table.insert(paused_scripts, fs)
+end
+
 function script_engine_talknpc(player, name, npc)
 	local script = player_scripts[player]
 	if script then
@@ -372,6 +380,7 @@ function script_engine_talknpc(player, name, npc)
 		player_scripts[player] = ps
 		npcbusy(npc)
 		playerbusy(player)
+		script_engine_npc_face_player(player, npc)
 		return true
 	end
 	return false
