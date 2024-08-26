@@ -529,160 +529,159 @@ mob_check_collision(struct mob *mob,
 		block_h = ADJ_BLOCK_HORIZ;
 	}
 
-	/* verify reachability */
-	if (x < ZONE_MAX_X && ty < ZONE_MAX_Y && plane < ZONE_MAX_PLANE) {
-		struct server *s = mob->server;
-
-		if ((s->adjacency[plane][x][ty] & block) != 0) {
-			return true;
-		}
-
-		/*
-		 * Players are prevented from walking through other players,
-		 * UNLESS they have an action to perform on the tile. This can
-		 * be seen in the documentation for ixBot (it used a strategy
-		 * of keeping bones in inventory, to drop and pick up to regain
-		 * access to occupied tiles).
-		 *
-		 * The same applies to aggressive NPCs.
-		 */
-		if (!sight && !mob->action_walk &&
-		    (server_npc_on_tile(mob->server, x, y, true) ||
-		    server_player_on_tile(mob->server, x, y))) {
-			return true;
-		}
-
-		if (mob->is_npc && !sight && !mob->action_walk &&
-		    server_npc_on_tile(mob->server, x, y, false)) {
-			return true;
-		}
-
-		switch (dir) {
-		case MOB_DIR_NORTH:
-			if ((s->adjacency[plane][x][ty] & block_v) != 0) {
-				return true;
-			}
-			break;
-		case MOB_DIR_SOUTH:
-			if ((s->adjacency[plane][x][cy] & block_v) != 0) {
-				return true;
-			}
-			break;
-		case MOB_DIR_EAST:
-			if ((s->adjacency[plane][x][ty] & block_h) != 0) {
-				return true;
-			}
-			break;
-		case MOB_DIR_WEST:
-			if ((s->adjacency[plane][cur_x][ty] & block_h) != 0) {
-				return true;
-			}
-			break;
-		case MOB_DIR_NORTHWEST:
-			/* check for cutting across two blocked tiles */
-			if ((s->adjacency[plane][cur_x + 1][cy] & block) != 0) {
-				return true;
-			}
-			if ((s->adjacency[plane][cur_x][cy - 1] & block) != 0) {
-				return true;
-			}
-			if ((s->adjacency[plane][cur_x][cy] & block_h) != 0 &&
-			    (s->adjacency[plane][cur_x][cy - 1] & block_v) != 0) {
-				return true;
-			}
-			if ((s->adjacency[plane][cur_x][cy] & block_h) != 0 &&
-			    (s->adjacency[plane][cur_x][cy - 1] & block_h) != 0) {
-				return true;
-			}
-			if ((s->adjacency[plane][cur_x + 1][cy - 1] & block_v) != 0 &&
-			    (s->adjacency[plane][cur_x][cy - 1] & block_h) != 0) {
-				return true;
-			}
-			if ((s->adjacency[plane][cur_x + 1][cy - 1] & block_v) != 0 &&
-			    (s->adjacency[plane][cur_x][cy - 1] & block_v) != 0) {
-				return true;
-			}
-			break;
-		case MOB_DIR_NORTHEAST:
-			/* check for cutting across two blocked tiles */
-			if ((s->adjacency[plane][cur_x - 1][cy] & block) != 0) {
-				return true;
-			}
-			if ((s->adjacency[plane][cur_x][cy - 1] & block) != 0) {
-				return true;
-			}
-			if ((s->adjacency[plane][cur_x - 1][cy - 1] & block_h) != 0 &&
-			    (s->adjacency[plane][cur_x - 1][cy - 1] & block_v) != 0) {
-				return true;
-			}
-			if ((s->adjacency[plane][cur_x - 1][cy] & block_h) != 0 &&
-			    (s->adjacency[plane][cur_x - 1][cy - 1] & block_h) != 0) {
-				return true;
-			}
-			if ((s->adjacency[plane][cur_x - 1][cy - 1] & block_v) != 0 &&
-			    (s->adjacency[plane][cur_x][cy - 1] & block_v) != 0) {
-				return true;
-			}
-			if ((s->adjacency[plane][cur_x][cy - 1] & block_v) != 0 &&
-			    (s->adjacency[plane][cur_x - 1][cy] & block_h) != 0) {
-				return true;
-			}
-			break;
-		case MOB_DIR_SOUTHWEST:
-			/* check for cutting across two blocked tiles */
-			if ((s->adjacency[plane][cur_x + 1][cy] & block) != 0) {
-				return true;
-			}
-			if ((s->adjacency[plane][cur_x][cy + 1] & block) != 0) {
-				return true;
-			}
-			if ((s->adjacency[plane][cur_x][cy] & block_h) != 0 &&
-			    (s->adjacency[plane][cur_x][cy] & block_v) != 0) {
-				return true;
-			}
-			if ((s->adjacency[plane][cur_x][cy] & block_v) != 0 &&
-			    (s->adjacency[plane][cur_x + 1][cy] & block_v) != 0) {
-				return true;
-			}
-			if ((s->adjacency[plane][cur_x][cy] & block_h) != 0 &&
-			    (s->adjacency[plane][cur_x][cy + 1] & block_h) != 0) {
-				return true;
-			}
-			if ((s->adjacency[plane][cur_x + 1][cy] & block_v) != 0 &&
-			    (s->adjacency[plane][cur_x][cy + 1] & block_h) != 0) {
-				return true;
-			}
-			break;
-		case MOB_DIR_SOUTHEAST:
-			/* check for cutting across two blocked tiles */
-			if ((s->adjacency[plane][cur_x - 1][cy] & block) != 0) {
-				return true;
-			}
-			if ((s->adjacency[plane][cur_x][cy + 1] & block) != 0) {
-				return true;
-			}
-			if ((s->adjacency[plane][cur_x - 1][cy + 1] & block_h) != 0 &&
-			    (s->adjacency[plane][cur_x - 1][cy] & block_v) != 0) {
-				return true;
-			}
-			if ((s->adjacency[plane][cur_x][cy] & block_v) != 0 &&
-			    (s->adjacency[plane][cur_x - 1][cy] & block_v) != 0) {
-				return true;
-			}
-			if ((s->adjacency[plane][cur_x - 1][cy] & block_h) != 0 &&
-			    (s->adjacency[plane][cur_x - 1][cy + 1] & block_h) != 0) {
-				return true;
-			}
-			if ((s->adjacency[plane][cur_x][cy] & block_v) != 0 &&
-			    (s->adjacency[plane][cur_x - 1][cy] & block_h) != 0) {
-				return true;
-			}
-			break;
-		}
-		return false;
-	} else {
+	if (x >= ZONE_MAX_X || ty >= ZONE_MAX_Y || plane >= ZONE_MAX_PLANE) {
 		return true;
 	}
+
+	struct server *s = mob->server;
+
+	if ((s->adjacency[plane][x][ty] & block) != 0) {
+		return true;
+	}
+
+	/*
+	 * Players are prevented from walking through other players,
+	 * UNLESS they have an action to perform on the tile. This can
+	 * be seen in the documentation for ixBot (it used a strategy
+	 * of keeping bones in inventory, to drop and pick up to regain
+	 * access to occupied tiles).
+	 *
+	 * The same applies to aggressive NPCs.
+	 */
+	if (!sight && !mob->action_walk &&
+	    (server_npc_on_tile(mob->server, x, y, true) ||
+	    server_player_on_tile(mob->server, x, y))) {
+		return true;
+	}
+
+	if (mob->is_npc && !sight && !mob->action_walk &&
+	    server_npc_on_tile(mob->server, x, y, false)) {
+		return true;
+	}
+
+	switch (dir) {
+	case MOB_DIR_NORTH:
+		if ((s->adjacency[plane][x][ty] & block_v) != 0) {
+			return true;
+		}
+		break;
+	case MOB_DIR_SOUTH:
+		if ((s->adjacency[plane][x][cy] & block_v) != 0) {
+			return true;
+		}
+		break;
+	case MOB_DIR_EAST:
+		if ((s->adjacency[plane][x][ty] & block_h) != 0) {
+			return true;
+		}
+		break;
+	case MOB_DIR_WEST:
+		if ((s->adjacency[plane][cur_x][ty] & block_h) != 0) {
+			return true;
+		}
+		break;
+	case MOB_DIR_NORTHWEST:
+		/* check for cutting across two blocked tiles */
+		if ((s->adjacency[plane][cur_x + 1][cy] & block) != 0) {
+			return true;
+		}
+		if ((s->adjacency[plane][cur_x][cy - 1] & block) != 0) {
+			return true;
+		}
+		if ((s->adjacency[plane][cur_x][cy] & block_h) != 0 &&
+		    (s->adjacency[plane][cur_x][cy - 1] & block_v) != 0) {
+			return true;
+		}
+		if ((s->adjacency[plane][cur_x][cy] & block_h) != 0 &&
+		    (s->adjacency[plane][cur_x][cy - 1] & block_h) != 0) {
+			return true;
+		}
+		if ((s->adjacency[plane][cur_x + 1][cy - 1] & block_v) != 0 &&
+		    (s->adjacency[plane][cur_x][cy - 1] & block_h) != 0) {
+			return true;
+		}
+		if ((s->adjacency[plane][cur_x + 1][cy - 1] & block_v) != 0 &&
+		    (s->adjacency[plane][cur_x][cy - 1] & block_v) != 0) {
+			return true;
+		}
+		break;
+	case MOB_DIR_NORTHEAST:
+		/* check for cutting across two blocked tiles */
+		if ((s->adjacency[plane][cur_x - 1][cy] & block) != 0) {
+			return true;
+		}
+		if ((s->adjacency[plane][cur_x][cy - 1] & block) != 0) {
+			return true;
+		}
+		if ((s->adjacency[plane][cur_x - 1][cy - 1] & block_h) != 0 &&
+		    (s->adjacency[plane][cur_x - 1][cy - 1] & block_v) != 0) {
+			return true;
+		}
+		if ((s->adjacency[plane][cur_x - 1][cy] & block_h) != 0 &&
+		    (s->adjacency[plane][cur_x - 1][cy - 1] & block_h) != 0) {
+			return true;
+		}
+		if ((s->adjacency[plane][cur_x - 1][cy - 1] & block_v) != 0 &&
+		    (s->adjacency[plane][cur_x][cy - 1] & block_v) != 0) {
+			return true;
+		}
+		if ((s->adjacency[plane][cur_x][cy - 1] & block_v) != 0 &&
+		    (s->adjacency[plane][cur_x - 1][cy] & block_h) != 0) {
+			return true;
+		}
+		break;
+	case MOB_DIR_SOUTHWEST:
+		/* check for cutting across two blocked tiles */
+		if ((s->adjacency[plane][cur_x + 1][cy] & block) != 0) {
+			return true;
+		}
+		if ((s->adjacency[plane][cur_x][cy + 1] & block) != 0) {
+			return true;
+		}
+		if ((s->adjacency[plane][cur_x][cy] & block_h) != 0 &&
+		    (s->adjacency[plane][cur_x][cy] & block_v) != 0) {
+			return true;
+		}
+		if ((s->adjacency[plane][cur_x][cy] & block_v) != 0 &&
+		    (s->adjacency[plane][cur_x + 1][cy] & block_v) != 0) {
+			return true;
+		}
+		if ((s->adjacency[plane][cur_x][cy] & block_h) != 0 &&
+		    (s->adjacency[plane][cur_x][cy + 1] & block_h) != 0) {
+			return true;
+		}
+		if ((s->adjacency[plane][cur_x + 1][cy] & block_v) != 0 &&
+		    (s->adjacency[plane][cur_x][cy + 1] & block_h) != 0) {
+			return true;
+		}
+		break;
+	case MOB_DIR_SOUTHEAST:
+		/* check for cutting across two blocked tiles */
+		if ((s->adjacency[plane][cur_x - 1][cy] & block) != 0) {
+			return true;
+		}
+		if ((s->adjacency[plane][cur_x][cy + 1] & block) != 0) {
+			return true;
+		}
+		if ((s->adjacency[plane][cur_x - 1][cy + 1] & block_h) != 0 &&
+		    (s->adjacency[plane][cur_x - 1][cy] & block_v) != 0) {
+			return true;
+		}
+		if ((s->adjacency[plane][cur_x][cy] & block_v) != 0 &&
+		    (s->adjacency[plane][cur_x - 1][cy] & block_v) != 0) {
+			return true;
+		}
+		if ((s->adjacency[plane][cur_x - 1][cy] & block_h) != 0 &&
+		    (s->adjacency[plane][cur_x - 1][cy + 1] & block_h) != 0) {
+			return true;
+		}
+		if ((s->adjacency[plane][cur_x][cy] & block_v) != 0 &&
+		    (s->adjacency[plane][cur_x - 1][cy] & block_h) != 0) {
+			return true;
+		}
+		break;
+	}
+	return false;
 }
 
 static void
