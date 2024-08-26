@@ -1244,7 +1244,7 @@ server_add_npc(int id, int x, int y)
 		if (zone != NULL) {
 			zone_add_npc(zone, i);
 		}
-		if (i > s.max_npc_id) {
+		if (i >= s.max_npc_id) {
 			s.max_npc_id = i + 1;
 		}
 		return i;
