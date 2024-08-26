@@ -679,8 +679,10 @@ mob_check_collision(struct mob *mob,
 			}
 			break;
 		}
+		return false;
+	} else {
+		return true;
 	}
-	return false;
 }
 
 static void

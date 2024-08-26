@@ -35,6 +35,7 @@ static void on_signal_do_nothing(int);
 static int load_config_jag(void);
 static void load_map_chunk(struct jag_map *, int, int, int);
 static void load_map_tile(struct jag_map *, int, int, int, int, int);
+static void fill_map_chunk(int, int, int);
 static int load_maps_jag(void);
 static void usage(void);
 
@@ -991,6 +992,23 @@ load_map_chunk(struct jag_map *chunk, int chunk_x, int chunk_y, int plane)
 	}
 }
 
+static void
+fill_map_chunk(int chunk_x, int chunk_y, int plane)
+{
+	int w_x, w_y;
+
+	for (int x = 0; x < JAG_MAP_CHUNK_SIZE; ++x) {
+		for (int y = 0; y < JAG_MAP_CHUNK_SIZE; ++y) {
+			w_x = ((chunk_x - JAG_MAP_CHUNK_SIZE) *
+			    JAG_MAP_CHUNK_SIZE) + x;
+			w_y = ((chunk_y - 37) * JAG_MAP_CHUNK_SIZE) + y;
+			if (w_x < ZONE_MAX_X && w_y < ZONE_MAX_Y) {
+				s.adjacency[plane][w_x][w_y] |= ADJ_BLOCK;
+			}
+		}
+	}
+}
+
 static int
 load_maps_jag(void)
 {
@@ -1019,6 +1037,7 @@ load_maps_jag(void)
 				if (jag_find_entry(&archive,
 					file, &entry) == -1 ||
 				    jag_unpack_entry(&entry) == -1) {
+					fill_map_chunk(x, y, plane);
 					continue;
 				}
 
