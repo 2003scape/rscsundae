@@ -493,6 +493,16 @@ mob_process_walk_queue(struct mob *mob)
 
 	if (x == mob->walk_queue_x[pos] &&
 	    y == mob->walk_queue_y[pos]) {
+		if (mob->walk_queue_pos + 1 == mob->walk_queue_len &&
+		    !mob->is_npc && !mob->action_walk &&
+		    (server_npc_on_tile(mob->server, x, y, false) ||
+		    server_player_on_tile(mob->server, x, y))) {
+			mob->walk_queue_pos = 0;
+			mob->walk_queue_len = 0;
+			mob_face(mob, x, y);
+			return;
+		}
+
 		mob->walk_queue_pos++;
 	}
 
@@ -549,13 +559,13 @@ mob_check_collision(struct mob *mob,
 	 * The same applies to aggressive NPCs.
 	 */
 	if (!sight && !mob->action_walk &&
-	    (server_npc_on_tile(mob->server, x, y, true) ||
-	    server_player_on_tile(mob->server, x, y))) {
+	    (server_npc_on_tile(mob->server, x, y, true))) {
 		return true;
 	}
 
 	if (mob->is_npc && !sight && !mob->action_walk &&
-	    server_npc_on_tile(mob->server, x, y, false)) {
+	    (server_npc_on_tile(mob->server, x, y, false) ||
+	    server_player_on_tile(mob->server, x, y))) {
 		return true;
 	}
 
