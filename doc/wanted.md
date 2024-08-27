@@ -24,3 +24,4 @@ recordings would be very useful for RSC Sundae:
 * Attempting to enter Ali's door if another player has tied up Lady Keli
 * Talking to Joe with exactly 2 beers before he's drunk
 * Talking to Osman after Leela has said the 3 beer plan should work
+* Talking to wartface while Bentnoze is busy
