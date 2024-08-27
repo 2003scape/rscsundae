@@ -44,6 +44,9 @@ function killnpc_goblin2(player, npc, x, y)
 			if drop[1] == "bronze spear" then
 				addobject(player, "hammer", 1, x, y)
 				break
+			elseif drop[1] == "randomherb" then
+				randomherb(player, x, y)
+				break
 			else
 				addobject(player, drop[1], drop[2], x, y)
 				break
