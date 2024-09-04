@@ -3,7 +3,7 @@
 function opbound1_dragondoor(player, x, y, dir)
 	local player_x = playercoord(player)
 
-    -- TODO not sure if you could leave the door after entering
+	-- TODO not sure if you could leave the door after entering
 	if player_x >= x or getvar(player, "dragon_stage") == 3 then
 		mes(player, "@que@")
 		boundaryteleport(player, x, y, dir)
