@@ -5,10 +5,7 @@ local joe_life_of_guard, joe_boy
 local function joe_leave(player, npc)
 	say(player, "I had better leave, I don't want trouble")
 	npcsay(npc, "Thanks I appreciate that")
-	npcsay(
-		npc,
-		"Talking on duty can be punishable by having your mouth stitched up"
-	)
+	npcsay(npc, "Talking on duty can be punishable by having your mouth stitched up")
 	npcsay(npc, "These are tough people, no mistake")
 end
 
@@ -25,10 +22,7 @@ local function joe_beer(player, npc)
 	if held(player, "beer", 2) then
 		say(player, "Would you care for another, my friend?")
 		npcsay(npc, "I better not, I don't want to be drunk on duty")
-		say(
-			player,
-			"Here, just keep these for later, I hate to see a thirsty guard"
-		)
+		say(player, "Here, just keep these for later, I hate to see a thirsty guard")
 
 		remove(player, "beer", 2)
 
@@ -53,11 +47,7 @@ local function joe_chill_out(player, npc)
 
 	say(player, "Hey, chill out, I wont cause you trouble")
 	say(player, "I was just wondering what you do to relax")
-	npcsay(
-		npc,
-		"You never relax with these people, but its a good career for a "
-			.. "young man"
-	)
+	npcsay(npc, "You never relax with these people, but its a good career for a young man")
 	npcsay(npc, "And some of the shouting I rather like")
 	npcsay(npc, "RESISTANCE IS USELESS!")
 
@@ -88,20 +78,16 @@ local function joe_chill_out(player, npc)
 		local stage = getvar(player, "prince_ali_stage")
 
 		if stage >= 3 and held(player, "beer", 1) then
-			resp = multi(
-				player,
+			resp = multi(player,
 				"I have some beer here, fancy one?",
 				"Tell me about the life of a guard",
 				"What did you want to be when you were a boy",
-				"I had better leave, I don't want trouble"
-			)
+				"I had better leave, I don't want trouble")
 		else
-			resp = multi(
-				player,
+			resp = multi(player,
 				"Tell me about the life of a guard",
 				"What did you want to be when you were a boy",
-				"I had better leave, I don't want trouble"
-			)
+				"I had better leave, I don't want trouble")
 
 			resp = resp + 1
 		end
@@ -123,19 +109,14 @@ local function joe_chill_out(player, npc)
 		npcsay(npc, "I may not be a great guard, but I am loyal")
 		npcsay(npc, "How DARE you try to bribe me!")
 		say(player, "No,no, you got the wrong idea, totally")
-		say(
-			player,
-			"I just wondered if you wanted some part-time bodyguard work"
-		)
+		say(player, "I just wondered if you wanted some part-time bodyguard work")
 		npcsay(npc, "Oh. sorry. no, I don't need money")
 		npcsay(npc, "As long as you were not offering me a bribe")
 
-		resp = multi(
-			player,
+		resp = multi(player,
 			"Tell me about the life of a guard",
 			"What did you want to be when you were a boy",
-			"I had better leave, I don't want trouble"
-		)
+			"I had better leave, I don't want trouble")
 
 		if resp == 1 then
 			joe_life_of_guard(player, npc)
@@ -153,18 +134,13 @@ joe_life_of_guard = function(player, npc)
 	say(player, "Tell me about the life of a guard")
 	npcsay(npc, "Well, the hours are good.....")
 	npcsay(npc, ".... But most of those hours are a drag")
-	npcsay(
-		npc,
-		"If only I had spent more time in Knight school when I was a young boy"
-	)
+	npcsay(npc, "If only I had spent more time in Knight school when I was a young boy")
 	npcsay(npc, "Maybe I wouldn't be here now, scared of Keli")
 
-	local resp = multi(
-		player,
+	local resp = multi(player,
 		"Hey, chill out, I won't cause you trouble",
 		"What did you want to be when you were a boy",
-		"I had better leave, I don't want trouble"
-	)
+		"I had better leave, I don't want trouble")
 
 	if resp == 1 then
 		joe_chill_out(player, npc)
@@ -183,12 +159,10 @@ joe_boy = function(player, npc)
 	npcsay(npc, "It kept us from goblin hunting, which was what most boys did")
 	npcsay(npc, "What are you here for?")
 
-	local resp = multi(
-		player,
+	local resp = multi(player,
 		"Chill out, I wont cause you trouble",
 		"Tell me about the life of a guard",
-		"I had better leave, I don't want trouble"
-	)
+		"I had better leave, I don't want trouble")
 
 	if resp == 1 then
 		joe_chill_out(player, npc)
@@ -222,20 +196,15 @@ function talknpc_joe(player, npc)
 		else
 			npcsay(npc, "Hi, I'm Joe, door guard for Lady Keli")
 			say(player, "Hi, who are you guarding here?")
-			npcsay(
-				npc,
-				"Can't say, all very secret. you should get out of here"
-			)
+			npcsay(npc, "Can't say, all very secret. you should get out of here")
 			npcsay(npc, "I am not supposed to talk while I guard")
 		end
 
-		local resp = multi(
-			player,
+		local resp = multi(player,
 			first_choice,
 			"Tell me about the life of a guard",
 			"What did you want to be when you were a boy",
-			"I had better leave, I don't want trouble"
-		)
+			"I had better leave, I don't want trouble")
 
 		if resp == 1 then
 			if offer_beer then

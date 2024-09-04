@@ -9,11 +9,9 @@ function talknpc_veronica(player, npc)
 		npcsay(npc, "Can you please help me?")
 		npcsay(npc, "I'm in a terrible spot of trouble")
 
-		resp = multi(
-			player,
+		resp = multi(player,
 			"Aha, sounds like a quest. I'll help",
-			"No, I'm looking for something to kill"
-		)
+			"No, I'm looking for something to kill")
 
 		if resp == 1 then
 			say(player, "Aha, sounds like a quest")

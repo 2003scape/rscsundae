@@ -12,11 +12,7 @@ local function check_keli(player)
 	local keli = nearnpc(player, "lady keli")
 
 	if keli then
-		mes(
-			player,
-			"You'd better get rid of Lady Keli before trying to go through "
-				.. "there"
-		)
+		mes(player, "You'd better get rid of Lady Keli before trying to go through there")
 
 		return true
 	end

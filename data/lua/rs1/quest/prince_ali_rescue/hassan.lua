@@ -6,29 +6,18 @@ function talknpc_hassan(player, npc)
 	local resp
 
 	if stage == 0 then
-		npcsay(
-			npc,
-			"Greetings. I am Hassan, Chancellor to the Emir of Al Kharid"
-		)
+		npcsay(npc, "Greetings. I am Hassan, Chancellor to the Emir of Al Kharid")
 
-		resp = multi(
-			player,
+		resp = multi(player,
 			"Can I help you? You must need some help here in the desert.",
 			"Its just too hot here. How can you stand it?",
-			"Do you mind if I just kill your Warriors?"
-		)
+			"Do you mind if I just kill your Warriors?")
 
 		if resp == 1 then
-			say(
-				player,
-				"Can I help you? You must need some help here in the desert"
-			)
+			say(player, "Can I help you? You must need some help here in the desert")
 			npcsay(npc, "I need the services of someone, yes.")
 			npcsay(npc, "If you are interested, see the spymaster, Osman")
-			npcsay(
-				npc,
-				"I manage the finances here. come to me when you need payment"
-			)
+			npcsay(npc, "I manage the finances here. come to me when you need payment")
 			setvar(player, "prince_ali_stage", 1)
 		elseif resp == 2 then
 			say(player, "Its just too hot here. How can you stand it?")
@@ -39,10 +28,7 @@ function talknpc_hassan(player, npc)
 		elseif resp == 3 then
 			say(player, "Do you mind if I just kill your warriors?")
 			npcsay(npc, "You are welcome. They are not expensive.")
-			npcsay(
-				npc,
-				"We have them here to stop the elite guard being bothered"
-			)
+			npcsay(npc, "We have them here to stop the elite guard being bothered")
 			npcsay(npc, "They are a little harder to kill.")
 		end
 	elseif stage == 1 then
@@ -75,10 +61,7 @@ function talknpc_hassan(player, npc)
 			)
 		end
 	elseif stage == 4 then
-		npcsay(
-			npc,
-			"You have the eternal gratitude of the Emir for rescuing his son"
-		)
+		npcsay(npc, "You have the eternal gratitude of the Emir for rescuing his son")
 		npcsay(npc, "I am authorised to pay you 700 coins")
 
 		if key_paid ~= 0 then
@@ -102,9 +85,6 @@ function talknpc_hassan(player, npc)
 		giveqp(player, 3)
 	elseif stage == 5 then
 		npcsay(npc, "You are a friend of the town of Al Kharid")
-		npcsay(
-			npc,
-			"Please, keep in contact. Good employees are not easy to find"
-		)
+		npcsay(npc, "Please, keep in contact. Good employees are not easy to find")
 	end
 end

@@ -11,18 +11,12 @@ end
 
 local function osman_first_thing(player, npc)
 	say(player, "What is the first thing I must do?")
-	npcsay(
-		npc,
-		"The prince is guarded by some stupid guards, and a clever woman"
-	)
+	npcsay(npc, "The prince is guarded by some stupid guards, and a clever woman")
 	npcsay(npc, "The woman is our only way to get the prince out")
 	npcsay(npc, "Only she can walk freely about the area")
 	npcsay(npc, "I think you will need to tie her up")
 	npcsay(npc, "one coil of rope should do for that")
-	npcsay(
-		npc,
-		"And then disguise the prince as her to get him out without suspicion"
-	)
+	npcsay(npc, "And then disguise the prince as her to get him out without suspicion")
 	say(player, "How good must the disguise must be?")
 	npcsay(npc, "Only good enough to fool the guards at a distance")
 	npcsay(npc, "Get a skirt like hers. Same colour, same style")
@@ -31,13 +25,11 @@ local function osman_first_thing(player, npc)
 	npcsay(npc, "Something to colour the skin of the prince")
 	npcsay(npc, "My daughter and top spy, leela, can help you there")
 
-	local resp = multi(
-		player,
+	local resp = multi(player,
 		"Explain the first thing again",
 		"What is needed second?",
 		"And the final thing you need?",
-		"Okay, I better go find some things"
-	)
+		"Okay, I better go find some things")
 
 	if resp == 1 then
 		osman_first_thing(player, npc)
@@ -58,13 +50,11 @@ osman_second_thing = function(player, npc)
 	npcsay(npc, "She is very boastful. It should not be too hard")
 	npcsay(npc, "Bring the imprint to me, with a bar of bronze.")
 
-	local resp = multi(
-		player,
+	local resp = multi(player,
 		"What is the first thing I must do?",
 		"What exactly is needed second?",
 		"And the final thing you need?",
-		"Okay, I better go find some things"
-	)
+		"Okay, I better go find some things")
 
 	if resp == 1 then
 		osman_first_thing(player, npc)
@@ -82,12 +72,10 @@ osman_final_thing = function(player, npc)
 	npcsay(npc, "You will need to stop the guard at the door")
 	npcsay(npc, "Find out if he has any weaknesses, and use them")
 
-	local resp = multi(
-		player,
+	local resp = multi(player,
 		"What is the first thing I must do?",
 		"What exactly is needed second?",
-		"Okay, I better go find some things"
-	)
+		"Okay, I better go find some things")
 
 	if resp == 1 then
 		osman_first_thing(player, npc)
@@ -149,12 +137,10 @@ function talknpc_osman(player, npc)
 		npcsay(npc, "Hello, I am Osman")
 		npcsay(npc, "What can I assist you with")
 
-		resp = multi(
-			player,
+		resp = multi(player,
 			"You don't seem very tough. Who are you?",
 			"I hear wild rumours about a Prince",
-			"I am just being nosy."
-		)
+			"I am just being nosy.")
 
 		if resp == 1 then
 			say(player, "You don't seem very tough. Who are you?")
@@ -163,10 +149,7 @@ function talknpc_osman(player, npc)
 		elseif resp == 2 then
 			say(player, "I hear wild rumours about a Prince")
 			npcsay(npc, "The prince is not here. He is... away")
-			npcsay(
-				npc,
-				"If you can be trusted, speak to the chancellor, Hassan"
-			)
+			npcsay(npc, "If you can be trusted, speak to the chancellor, Hassan")
 		elseif resp == 3 then
 			say(player, "I am just being nosy") -- no period
 			npcsay(npc, "That bothers me not")
@@ -178,12 +161,10 @@ function talknpc_osman(player, npc)
 		npcsay(npc, "We just need to make the rescue")
 		npcsay(npc, "There are three things we need you to do")
 
-		resp = multi(
-			player,
+		resp = multi(player,
 			"What is the first thing I must do?",
 			"What is needed second?",
-			"And the final things you need?"
-		)
+			"And the final things you need?")
 
 		if resp == 1 then
 			osman_first_thing(player, npc)
@@ -198,17 +179,11 @@ function talknpc_osman(player, npc)
 		local key_paid = getvar(player, "prince_ali_key_paid")
 
 		if held(player, "princeskey", 1) and key_paid == 0 then
-			npcsay(
-				npc,
-				"You can get your part payment from the chancellor if you "
-					.. "need to"
-			)
+			npcsay(npc, "You can get your part payment from the chancellor if you need to")
 
-			resp = multi(
-				player,
+			resp = multi(player,
 				"I will get it now. I have some things to buy",
-				"Can you tell me what I still need to get?"
-			)
+				"Can you tell me what I still need to get?")
 
 			if resp == 1 then
 				say(player, "I will get it now. I have some things to buy")
@@ -222,11 +197,7 @@ function talknpc_osman(player, npc)
 			and not held(player, "keyprint", 1)
 		then
 			npcsay(npc, "You have lost the key for the Princes cell")
-			npcsay(
-				npc,
-				"Get me the imprint and some more bronze, and I can get "
-					.. "another made"
-			)
+			npcsay(npc, "Get me the imprint and some more bronze, and I can get another made")
 			say(player, "I will go and get they key imprint again.")
 		elseif
 			key_made == 0
@@ -247,11 +218,7 @@ function talknpc_osman(player, npc)
 			npcsay(npc, "Pick the key up from Leela.")
 
 			if key_paid == 0 then
-				npcsay(
-					npc,
-					"I will let you get 80 coins from the chancellor for "
-						.. "getting this key"
-				)
+				npcsay(npc, "I will let you get 80 coins from the chancellor for getting this key")
 			end
 		elseif
 			key_made == 0
@@ -261,11 +228,9 @@ function talknpc_osman(player, npc)
 			npcsay(npc, "Good, you have the print of the key")
 			npcsay(npc, "Get a bar of Bronze too, and I can get the key made")
 
-			resp = multi(
-				player,
+			resp = multi(player,
 				"I will get one, and come back",
-				"Can you tell me what I still need to get?"
-			)
+				"Can you tell me what I still need to get?")
 
 			if resp == 1 then
 				say(player, "I will get one, and come back")

@@ -14,9 +14,7 @@ function talknpc_duke_of_lumbridge(player, npc)
 	}
 
 	if seek_shield then
-		table.insert(
-			choices,
-			1,
+		table.insert(choices, 1,
 			"I seek a shield that will protect me from dragon breath"
 		)
 	end

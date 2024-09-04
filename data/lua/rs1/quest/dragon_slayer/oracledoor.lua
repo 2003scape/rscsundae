@@ -1,7 +1,11 @@
 -- https://classic.runescape.wiki/w/Door_(Oracle_Map_Piece)
 
-local key_items =
-	{ "silk", "unfired bowl", "lobster pot", "wizard's mind bomb" }
+local key_items = {
+	"silk",
+	"unfired bowl",
+	"lobster pot",
+	"wizard's mind bomb"
+}
 
 function opbound1_oracledoor(player, x, y, dir)
 	local function enter_door()

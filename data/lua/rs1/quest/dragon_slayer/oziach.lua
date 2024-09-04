@@ -14,11 +14,9 @@ local function oziach_shield(player, npc)
 		"I believe the Duke of Lumbrige Castle may have one in his armoury"
 	)
 
-	local resp = multi(
-		player,
+	local resp = multi(player,
 		"So where can I find this dragon?",
-		"Ok, I'll try and get everything together"
-	)
+		"Ok, I'll try and get everything together")
 
 	if resp == 1 then
 		oziach_dragon(player, npc)
@@ -33,13 +31,11 @@ local function oziach_third_map_piece(player, npc)
 	say(player, "Where is the third piece of map?")
 	npcsay(npc, "That was stolen by one of the goblins from the goblin village")
 
-	local resp = multi(
-		player,
+	local resp = multi(player,
 		"Where can I get an antidragon shield?",
 		"Where is the first piece of map?",
 		"Where is the second piece of map?",
-		"Ok, I'll try and get everything together"
-	)
+		"Ok, I'll try and get everything together")
 
 	if resp == 1 then
 		oziach_sheld(player, npc)
@@ -87,13 +83,11 @@ oziach_first_map_piece = function(player, npc)
 		give(player, "melzarkey", 1)
 	end
 
-	local resp = multi(
-		player,
+	local resp = multi(player,
 		"Where can I get an antidragon shield?",
 		"Where is the second piece of map?",
 		"Where is the third piece of map?",
-		"Ok. I'll try and get everything together"
-	)
+		"Ok. I'll try and get everything together")
 
 	if resp == 1 then
 		oziach_shield(player, npc)
@@ -113,11 +107,7 @@ oziach_dragon = function(player, npc)
 	npcsay(npc, "There was a map")
 	npcsay(npc, "But it was torn up into three pieces")
 	npcsay(npc, "Which are now scattered across Asgarnia")
-	npcsay(
-		npc,
-		"You'll also struggle to find someone bold enough to take a ship to "
-			.. "Crandor Island"
-	)
+	npcsay(npc, "You'll also struggle to find someone bold enough to take a ship to Crandor Island")
 
 	local resp = multi(
 		player,
@@ -139,11 +129,9 @@ oziach_dragon = function(player, npc)
 end
 
 local function oziach_find(player, npc)
-	local resp = multi(
-		player,
+	local resp = multi(player,
 		"So where can I find this dragon?",
-		"Where can I get an antidragon shield?"
-	)
+		"Where can I get an antidragon shield?")
 
 	if resp == 1 then
 		oziach_dragon(player, npc)
@@ -154,10 +142,7 @@ end
 
 local function oziach_equipment(player, npc)
 	npcsay(npc, "Elvarg really is one of the most powerful dragons")
-	npcsay(
-		npc,
-		"I really wouldn't recommend charging in without special equipment"
-	)
+	npcsay(npc, "I really wouldn't recommend charging in without special equipment")
 	npcsay(npc, "Her breath is the main thing to watch out for")
 	npcsay(npc, "You can get fried very fast")
 	npcsay(npc, "Unless you have a special flameproof antidragon shield")
@@ -171,33 +156,21 @@ local function oziach_prove(player, npc)
 	local resp
 
 	npcsay(npc, "This is armour fit for a hero to be sure")
-	npcsay(
-		npc,
-		"So you'll need to prove to me that you're a hero before you can "
-			.. "buy some"
-	)
+	npcsay(npc, "So you'll need to prove to me that you're a hero before you can buy some")
 
-	resp = multi(
-		player,
+	resp = multi(player,
 		"So how am I meant to prove that?",
-		"That's a pity, I'm not a hero"
-	)
+		"That's a pity, I'm not a hero")
 
 	if resp == 1 then
 		say(player, "So how am I meant to prove that?")
 		npcsay(npc, "Well if you want to prove yourself")
-		npcsay(
-			npc,
-			"You could try and defeat Elvarg the dragon of the Isle of Crandor"
-		)
+		npcsay(npc, "You could try and defeat Elvarg the dragon of the Isle of Crandor")
 
-		resp = multi(
-			player,
+		resp = multi(player,
 			"A dragon, that sounds like fun",
 			"And will i need anything to defeat this dragon",
-			"I may be a champion, but I don't think I'm up to dragon "
-				.. "killing yet"
-		)
+			"I may be a champion, but I don't think I'm up to dragon killing yet")
 
 		if resp == 1 then
 			say(player, "A dragon, that sounds like fun")
@@ -207,11 +180,7 @@ local function oziach_prove(player, npc)
 			npcsay(npc, "It's funny you shoud say that")
 			oziach_equipment(player, npc)
 		elseif resp == 3 then
-			say(
-				player,
-				"I may be a champion, but I don't think I'm up to dragon "
-					.. "killing yet"
-			)
+			say(player, "I may be a champion, but I don't think I'm up to dragon killing yet")
 			npcsay(npc, "Yes I can understand that")
 		end
 	elseif resp == 2 then
@@ -239,25 +208,16 @@ function talknpc_oziach(player, npc)
 			say(player, "Can you sell me some rune plate mail?")
 			npcsay(npc, "Soo how does thee know I'ave some?")
 
-			resp = multi(
-				player,
+			resp = multi(player,
 				"The guildmaster of the champion guild told me",
-				"I am a master detective"
-			)
+				"I am a master detective")
 
 			if resp == 1 then
 				say(player, "The guildmaster of the champion guild told me")
 				npcsay(npc, "Well if you're worthy of his advise")
 				npcsay(npc, "You must have something going for you")
-				npcsay(
-					npc,
-					"He has been known to let some weeklin's into his guild "
-						.. "though"
-				)
-				npcsay(
-					npc,
-					"I don't want just any old pumpkinmush to have this armour"
-				)
+				npcsay(npc, "He has been known to let some weeklin's into his guild though")
+				npcsay(npc, "I don't want just any old pumpkinmush to have this armour")
 				npcsay(npc, "jus cos they have a large amount of cash")
 				oziach_prove(player, npc)
 			elseif resp == 2 then
@@ -267,11 +227,8 @@ function talknpc_oziach(player, npc)
 			end
 		elseif resp == 2 then
 			say(player, "I'm not your friend")
-			npcsay(
-				npc,
-				"I'd be surprised if your anyone's friend with that sort of "
-					.. "manners"
-			)
+			npcsay(npc,
+			    "I'd be surprised if your anyone's friend with that sort of manners")
 		elseif resp == 3 then
 			say(player, "Yes it's a very nice day")
 			npcsay(npc, "Aye may the Gods walk by your side")
@@ -283,8 +240,9 @@ function talknpc_oziach(player, npc)
 		say(player, "I have slain the dragon")
 		npcsay(npc, "Well done")
 
-		resp =
-			multi(player, "Can I buy a rune mail body now please?", "Thank you")
+		resp = multi(player,
+			"Can I buy a rune mail body now please?",
+			"Thank you")
 
 		if resp == 1 then
 			say(player, "Can I buy a rune mail body now please?")

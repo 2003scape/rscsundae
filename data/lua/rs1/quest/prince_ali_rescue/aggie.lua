@@ -20,11 +20,9 @@ function aggie_skin_paste(player, npc)
 		npcsay(npc, "Yes I can, you have the ingredients for it already")
 		npcsay(npc, "Would you like me to mix you some?")
 
-		local resp = multi(
-			player,
+		local resp = multi(player,
 			"Yes please, mix me some skin paste",
-			"No thankyou, I don't need paste"
-		)
+			"No thankyou, I don't need paste")
 
 		if resp == 1 then
 			say(player, "Yes please, mix me some skin paste")
@@ -35,10 +33,7 @@ function aggie_skin_paste(player, npc)
 			remove(player, "flourpot", 1)
 			mes(player, "You hand ash, flour, water, and redberries to Aggie")
 			mes(player, "She tips it into a cauldron and mutters some words")
-			npcsay(
-				npc,
-				"Tourniquet, Fenderbaum, Tottenham, MonsterMunch, MarbleArch"
-			)
+			npcsay(npc, "Tourniquet, Fenderbaum, Tottenham, MonsterMunch, MarbleArch")
 			delay(3)
 			mes(player, "Aggie hands you the skin paste")
 			give(player, "skinpaste", 1)

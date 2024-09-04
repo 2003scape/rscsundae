@@ -52,11 +52,7 @@ function talknpc_professor_oddenstein(player, npc)
 
 			npcsay(npc, "Give em here then")
 
-			mes(
-				player,
-				"You give a rubber tube, a pressure gauge and a can of oil "
-					.. "to the Professer"
-			)
+			mes(player, "You give a rubber tube, a pressure gauge and a can of oil to the Professer")
 
 			delay(3)
 
@@ -68,10 +64,7 @@ function talknpc_professor_oddenstein(player, npc)
 			delay(3)
 			mes(player, "The machine hums and shakes")
 			delay(3)
-			mes(
-				player,
-				"Suddenly a ray shoots out of the machine at the chicken"
-			)
+			mes(player, "Suddenly a ray shoots out of the machine at the chicken")
 			delay(3)
 
 			npcunbusy(npc)
@@ -98,10 +91,7 @@ function talknpc_professor_oddenstein(player, npc)
 			delay(3)
 
 			give(player, "coins", 300)
-			mes(
-				player,
-				"Well done. You have completed the Ernest the chicken quest"
-			)
+			mes(player, "Well done. You have completed the Ernest the chicken quest")
 			setvar(player, "ernest_killed_piranhas", 0)
 			setvar(player, "ernest_stage", 3)
 			giveqp(player, 4)
@@ -145,10 +135,7 @@ function talknpc_professor_oddenstein(player, npc)
 		else
 			say(player, "I'm afraid I don't have any yet!")
 
-			npcsay(
-				npc,
-				"I need a rubber tube, a pressure gauge and a can of oil"
-			)
+			npcsay(npc, "I need a rubber tube, a pressure gauge and a can of oil")
 			npcsay(npc, "Then your friend can stop being a chicken")
 		end
 	else
@@ -156,18 +143,14 @@ function talknpc_professor_oddenstein(player, npc)
 		npcsay(npc, "Lots of dangerous equipment in here")
 
 		if stage == 1 then
-			resp = multi(
-				player,
+			resp = multi(player,
 				"I'm looking for a guy called Ernest",
 				"What do this machine do?", -- sic - only for this stage
-				"Is this your house?"
-			)
+				"Is this your house?")
 		else
-			resp = multi(
-				player,
+			resp = multi(player,
 				"What does this machine do?",
-				"Is this your house?"
-			)
+				"Is this your house?")
 
 			resp = resp + 1
 		end
@@ -188,23 +171,15 @@ function talknpc_professor_oddenstein(player, npc)
 			npcsay(npc, "Oh he isn't normally a chicken")
 			npcsay(npc, "Or at least he wasn't")
 			npcsay(npc, "Until he helped me test my pouletmorph machine")
-			npcsay(
-				npc,
-				"It was originally going to be called a transmutation machine"
-			)
+			npcsay(npc, "It was originally going to be called a transmutation machine")
 			npcsay(npc, "But after testing Pouletmorph seems more appropriate")
 
-			resp = multi(
-				player,
+			resp = multi(player,
 				"I'm glad Veronica didn't actually get engaged to a chicken",
-				"Change him back this instant"
-			)
+				"Change him back this instant")
 
 			if resp == 1 then
-				say(
-					player,
-					"I'm glad Veronica didn't actually get engaged to a chicken"
-				)
+				say(player, "I'm glad Veronica didn't actually get engaged to a chicken")
 
 				npcsay(npc, "Who's Veronica?")
 

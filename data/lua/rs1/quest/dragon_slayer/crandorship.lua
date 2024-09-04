@@ -74,10 +74,7 @@ function useloc_shiphole_plank(player, x, y)
 			mes(player, "You board up the hole in the ship")
 			enter_ship(player)
 		else
-			mes(
-				player,
-				"You still need more planks to close the hole completely"
-			)
+			mes(player, "You still need more planks to close the hole completely")
 		end
 	end
 end

@@ -2,11 +2,9 @@
 -- https://classic.runescape.wiki/w/Map_Piece
 
 local function combine_map(player)
-	if
-		held(player, "mappart1", 1)
-		and held(player, "mappart2", 1)
-		and held(player, "mappart3", 1)
-	then
+	if held(player, "mappart1", 1)
+	    and held(player, "mappart2", 1)
+	    and held(player, "mappart3", 1) then
 		mes(player, "You put all the pieces of map together")
 		remove(player, "mappart1", 1)
 		remove(player, "mappart2", 1)
