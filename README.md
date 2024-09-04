@@ -11,14 +11,13 @@ based on public documents.
 
 It was inspired by the RSC-C client's lack of a native server.
 Since RSC-C runs on old and low-power mobile devices, RSC Sundae
-should target similar devices.
+targets similar devices.
 
-An initial target for RSC Sundae should be to accurately replicate
-all RS Classic content from the final F2P-only version of the game
-(10th December 2001), since lots of preserved data exists for this
-revision.  This should be accomplished using the original game's
-unmodified free data files.  By using the same API and data sources as
-the original game, the hope is that it becomes more difficult to
+RSC Sundae accurately replicates all RS Classic content from the final
+F2P-only version of the game (10th December 2001) - lots of preserved
+data exists for this revision.  This is accomplished using the original
+game's unmodified free data files.  By using the same API and data
+sources as the original game, the hope is that it is more difficult to
 implement content inaccurately.
 
 For clients, RSC Sundae supports the 110 protocol (the original
@@ -91,7 +90,8 @@ Credits
 
 * Stormy wrote the bulk of the engine and most of the content.
 * Mister Hat (frogdoubler) contributed player persistence support via SQLite,
-  the Vampire Slayer quest, Prince Ali rescue, and the Ernest the Chicken quest.
+  the Dragon Slayer quest, Vampire Slayer, Prince Ali rescue, and
+  Ernest the Chicken.
 * Zachary Penn (Hikilaka) contributed many enhancements to the scripting API,
   teleportation spells, mixing dyes and capes, and player variables support.
 * Pazaz served as an influence with their 2004scape project, listened to

@@ -111,7 +111,7 @@ These should all be implemented in Lua script:
 - [x] The knight's sword
 - [x] Goblin diplomacy
 - [x] Pirate's treasure
-- [ ] Dragon slayer
+- [x] Dragon slayer
 
 ### Miscellaneous
 
