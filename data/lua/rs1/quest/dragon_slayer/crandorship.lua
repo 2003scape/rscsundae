@@ -27,9 +27,9 @@ function oploc1_crandorship(player, x, y)
 		local klarense = nearnpc(player, "klarense")
 
 		if klarense then
-            npcbusy(klarense)
+			npcbusy(klarense)
 			talknpc_klarense(player, klarense)
-            npcunbusy(klarense)
+			npcunbusy(klarense)
 		else
 			mes(player, "You must talk to the owner about this.")
 		end
@@ -72,7 +72,7 @@ function useloc_shiphole_plank(player, x, y)
 
 		if fix_stage == 3 then
 			mes(player, "You board up the hole in the ship")
-            enter_ship(player)
+			enter_ship(player)
 		else
 			mes(
 				player,

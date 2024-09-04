@@ -19,7 +19,7 @@ function wartface_wormbrain(player, npc)
 		npcsay(npc, "Now he lives in Port Sarim town jail")
 		return true
 	elseif resp == 2 then
-        say(player, "So how is life for the goblins?")
+		say(player, "So how is life for the goblins?")
 		return false
 	end
 end
