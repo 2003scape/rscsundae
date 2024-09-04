@@ -2,7 +2,6 @@
 -- https://github.com/2004Scape/Server/blob/main/data/src/scripts/drop%20tables/scripts/black_knight.rs2
 
 function killnpc_black_knight(player, npc, x, y)
-	addobject(player, "bones", 1, x, y)
 	local ran = randomvar(128)
 	if ran < 3 then
 		addobject(player, "body-rune", 6, x, y)

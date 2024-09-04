@@ -35,8 +35,6 @@ function killnpc_pirate(player, npc, x, y)
 
 	local weight = 0
 
-	addobject(player, "bones", 1, x, y)
-
 	for _, drop in ipairs(drops) do
 		weight = weight + drop[3]
 

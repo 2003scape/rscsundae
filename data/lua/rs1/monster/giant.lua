@@ -38,8 +38,6 @@ function killnpc_giant(player, npc, x, y)
 
 	local weight = 0
 
-	addobject(player, "big bones", 1, x, y)
-
 	for _, drop in ipairs(drops) do
 		weight = weight + drop[3]
 

@@ -26,22 +26,22 @@ npc_die(struct npc *npc, struct player *p)
 			return;
 		}
 
-		if (!script_onkillnpc(npc->mob.server->lua, p, npc)) {
-			for (int i = 0; i < npc->config->drop_count; ++i) {
-				struct item_config *item_config;
-				uint16_t id;
-
-				id = npc->config->drops[i].id;
-				item_config = server_item_config_by_id(id);
-				assert(item_config != NULL);
-				server_add_temp_item(p, npc->mob.x, npc->mob.y,
-				    id, npc->config->drops[i].amount);
-			}
-		} else {
+		if (script_onkillnpc(npc->mob.server->lua, p, npc)) {
 			if (npc->mob.cur_stats[SKILL_HITS] > 0) {
 				/* the killnpc trigger can restore hits */
 				return;
 			}
+		}
+
+		for (int i = 0; i < npc->config->drop_count; ++i) {
+			struct item_config *item_config;
+			uint16_t id;
+
+			id = npc->config->drops[i].id;
+			item_config = server_item_config_by_id(id);
+			assert(item_config != NULL);
+			server_add_temp_item(p, npc->mob.x, npc->mob.y,
+			    id, npc->config->drops[i].amount);
 		}
 
 		if (p->script_active || p->ui_multi_open) {
