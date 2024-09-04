@@ -22,6 +22,16 @@ local function generals_talk(player, npc, is_wartface)
 		npcbusy(wartface)
 	end
 
+	-- defined in ../../dragon_slayer/wartface.lua
+	if
+		getvar(player, "dragon_stage") == 2
+		and wartface_wormbrain(player, wartface)
+	then
+		npcunbusy(wartface)
+		npcunbusy(bentnoze)
+		return
+	end
+
 	local stage = getvar(player, "goblin_stage")
 
 	if stage == 0 then

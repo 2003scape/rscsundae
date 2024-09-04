@@ -35,5 +35,6 @@ function talknpc_guildmaster(player, npc)
 		npcsay(npc, "I have a friend called Oziach who lives by the cliffs")
 		npcsay(npc, "He has a supply of rune plate mail")
 		npcsay(npc, "He may sell you some if you're lucky, he can be a little strange though")
+		setvar(player, "dragon_stage", 1)
 	end
 end
