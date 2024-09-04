@@ -1,30 +1,44 @@
 -- https://classic.runescape.wiki/w/Transcript:Ned
 
-function talknpc_ned(player, npc)
+function talknpc_ned1(player, npc)
 	local resp
 
 	npcsay(npc, "Why hello there, me friends call me Ned")
 	npcsay(npc, "I was a man of the sea, but its past me now")
 	npcsay(npc, "Could I be making or selling you some Rope?")
 
-	local prince_ali_stage = getvar(player, "prince_ali_stage")
+	local choices = {
+		"Yes, I would like some Rope",
+		"No thanks Ned, I don't need any",
+	}
 
-	if prince_ali_stage == 2 or prince_ali_stage == 3 then
-		resp = multi(
-			player,
-			"Yes, I would like some Rope",
-			"No thanks Ned, I don't need any",
-			"Ned, could you make other things from wool?"
-		)
-	else
-		resp = multi(
-			player,
-			"Yes, I would like some Rope",
-			"No thanks Ned, I don't need any"
+	local ask_crandor = getvar(player, "dragon_stage") == 2
+		and getvar(player, "dragon_ned_in_ship") == 0
+
+	if ask_crandor then
+		table.insert(
+			choices,
+			1,
+			"You're a sailor? Could you take me to the Isle of Crandor"
 		)
 	end
 
+	local prince_ali_stage = getvar(player, "prince_ali_stage")
+
+	if prince_ali_stage == 2 or prince_ali_stage == 3 then
+		table.insert(choices, "Ned, could you make other things from wool?")
+	end
+
+	resp = multi(player, table.unpack(choices))
+
+	if not ask_crandor then
+		resp = resp + 1
+	end
+
 	if resp == 1 then
+		-- defined in ../quest/dragon_slayer/ned.lua
+		ned_take_me_to_crandor(player, npc)
+	elseif resp == 2 then
 		say(player, "Yes, I would like some Rope")
 		npcsay(npc, "Well, I can sell you some rope for 15 coins")
 		npcsay(
@@ -78,11 +92,11 @@ function talknpc_ned(player, npc)
 				)
 			end
 		end
-	elseif resp == 2 then
+	elseif resp == 3 then
 		say(player, "No thanks Ned, I don't need any")
 		npcsay(npc, "Well, old Neddy is always here if you do")
 		npcsay(npc, "Tell your friends, I can always be using the business")
-	elseif resp == 3 then
+	elseif resp == 4 then
 		-- defined in ../quest/prince_ali_rescue/ned.lua
 		ned_other_things(player, npc)
 	end
