@@ -1,5 +1,6 @@
 -- https://classic.runescape.wiki/w/Transcript:Man
 -- https://github.com/2004Scape/Server/blob/main/data/src/scripts/npc/scripts/man.rs2#L29
+-- frequencies from https://chisel.weirdgloop.org/dialogue/npcs/Man
 -- This was the first script ever written for RSC Sundae.
 
 local function man1_trade(player, npc)
@@ -96,7 +97,7 @@ function talknpc_man1(player, npc)
 		npcattack(npc, player)
 	elseif rand < 255 then
 		npcsay(npc, "That is classified information")
-	elseif rand < 256 then
+	else
 		npcsay(npc, "Have this flier")
 		give(player, "flier", 1)
 	end
