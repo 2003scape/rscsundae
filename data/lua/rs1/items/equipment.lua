@@ -1,5 +1,4 @@
 -- 1e_Luis/Effect testing/Not meeting reqs to wear quest stuff
--- TODO: rune plate mail body requires quest
 
 local function fail_req(player, stat, name, level)
 	-- maybe later versions (after attack/defense potions) had a
@@ -235,7 +234,6 @@ local tier40_armour = {
 	"large rune helmet",
 	"medium rune helmet",
 	"rune chain mail body",
-	"rune plate mail body",
 	"rune plate mail legs",
 	"rune square shield",
 	"rune kite shield",
@@ -254,7 +252,26 @@ for i, item in ipairs(tier40_armour) do
 	end)
 end
 
+register_wearobj("rune plate mail body", function(player)
+	if getvar(player, "dragon_stage") < 4 then
+		-- RSC 2001/replays master archive/Stat effects/Equipment Stat effects/Worn -equipping/rune plate mail body- equipping- fail- you must complete dragon slayer.pcap
+		mes(player, "@que@you have not earned the right to wear this yet")
+		mes(player, "@que@you need to complete the dragon slayer quest")
+		return false
+	end
+	if fail_req(player, STAT_DEFENSE, "defense", 40) then
+		return false
+	end
+	return true
+end)
+
 register_wearobj("rune plate mail top", function(player)
+	if getvar(player, "dragon_stage") < 4 then
+		-- RSC 2001/replays master archive/Stat effects/Equipment Stat effects/Worn -equipping/rune plate mail body- equipping- fail- you must complete dragon slayer.pcap
+		mes(player, "@que@you have not earned the right to wear this yet")
+		mes(player, "@que@you need to complete the dragon slayer quest")
+		return false
+	end
 	local fail = false
 	if fail_req(player, STAT_DEFENSE, "defense", 40) then
 		fail = true
