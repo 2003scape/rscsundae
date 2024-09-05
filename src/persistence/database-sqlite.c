@@ -553,7 +553,8 @@ database_init(struct database *database)
 
 	/* selects */
 	if (db_prepare_query(database->db, &database->check_username,
-			"SELECT 1 FROM `players` WHERE `username` = ?") == -1) {
+			"SELECT 1 FROM `players` "
+			"WHERE lower(username) = lower(?)") == -1) {
 		return -1;
 	}
 
@@ -575,7 +576,7 @@ database_init(struct database *database)
 
 	snprintf(get_query + strlen(get_query),
 		sizeof(get_query) - strlen(get_query),
-		"FROM `players` WHERE `username` = ?");
+		"FROM `players` WHERE lower(username) = lower(?)");
 
 	if (db_prepare_query(database->db, &database->get_player,
 			get_query) == -1){
@@ -643,7 +644,7 @@ database_init(struct database *database)
 
 	snprintf(save_query + strlen(save_query),
 		sizeof(save_query) - strlen(save_query),
-		" WHERE `username` = ? RETURNING `id`");
+		" WHERE lower(username) = lower(?) RETURNING `id`");
 
 	if (db_prepare_query(database->db, &database->save_player,
 			save_query) == -1) {
