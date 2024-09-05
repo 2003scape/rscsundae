@@ -475,7 +475,7 @@ server_tick(void)
 		if (s.players[i]->login_date != 0) {
 			s.players[i]->save_timer++;
 			if (s.players[i]->save_timer == 500) {
-				(void)database_save_player(&s.database, s.players[i]);
+				player_save(s.players[i]);
 				s.players[i]->save_timer = 0;
 			}
 		}
