@@ -1868,14 +1868,10 @@ player_process_action(struct player *p)
 		p->action = ACTION_NONE;
 		break;
 	case ACTION_ITEM_TAKE:
-		if (p->action_item == NULL) {
-			p->action = ACTION_NONE;
-			return;
-		}
 		item = server_find_ground_item(p,
-		    p->action_item->x, p->action_item->y,
-		    p->action_item->id);
-		item_config = server_item_config_by_id(p->action_item->id);
+		    p->action_item.x, p->action_item.y,
+		    p->action_item.id);
+		item_config = server_item_config_by_id(p->action_item.id);
 		if (item == NULL || item_config == NULL ||
 		    !player_can_see_item(p, item)) {
 			p->action = ACTION_NONE;
@@ -1883,7 +1879,7 @@ player_process_action(struct player *p)
 		}
 		if (p->inv_count >= MAX_INV_SIZE &&
 		    (item_config->weight > 0 ||
-		    !player_inv_held_id(p, p->action_item->id, 1))) {
+		    !player_inv_held_id(p, p->action_item.id, 1))) {
 			p->action = ACTION_NONE;
 			return;
 		}
@@ -1897,8 +1893,8 @@ player_process_action(struct player *p)
 		break;
 	case ACTION_ITEM_USEWITH:
 		item = server_find_ground_item(p,
-		    p->action_item->x, p->action_item->y,
-		    p->action_item->id);
+		    p->action_item.x, p->action_item.y,
+		    p->action_item.id);
 		if (p->action_slot >= p->inv_count || item == NULL) {
 			p->action = ACTION_NONE;
 			return;
@@ -1914,14 +1910,14 @@ player_process_action(struct player *p)
 			return;
 		}
 		script_onuseobj(p->mob.server->lua, p,
-		    item_config, p->action_item->x, p->action_item->y,
+		    item_config, p->action_item.x, p->action_item.y,
 		    item_config2);
 		p->action = ACTION_NONE;
 		break;
 	case ACTION_ITEM_CAST:
 		item = server_find_ground_item(p,
-		    p->action_item->x, p->action_item->y,
-		    p->action_item->id);
+		    p->action_item.x, p->action_item.y,
+		    p->action_item.id);
 		if (item == NULL || p->spell == NULL) {
 			p->action = ACTION_NONE;
 			return;
@@ -2044,14 +2040,8 @@ player_process_action(struct player *p)
 		break;
 	case ACTION_BOUND_OP1:
 	case ACTION_BOUND_OP2:
-		if (p->action_bound == NULL) {
-			p->action = ACTION_NONE;
-			p->mob.walk_queue_len = 0;
-			p->mob.walk_queue_pos = 0;
-			return;
-		}
-		bound = server_find_bound(p->action_bound->x, p->action_bound->y,
-		    p->action_bound->dir);
+		bound = server_find_bound(p->action_bound.x, p->action_bound.y,
+		    p->action_bound.dir);
 		if (bound == NULL) {
 			p->action = ACTION_NONE;
 			p->mob.walk_queue_len = 0;
@@ -2071,14 +2061,14 @@ player_process_action(struct player *p)
 		p->action = ACTION_NONE;
 		break;
 	case ACTION_BOUND_USEWITH:
-		if (p->action_bound == NULL || p->action_slot >= p->inv_count) {
+		if (p->action_slot >= p->inv_count) {
 			p->action = ACTION_NONE;
 			p->mob.walk_queue_len = 0;
 			p->mob.walk_queue_pos = 0;
 			return;
 		}
-		bound = server_find_bound(p->action_bound->x, p->action_bound->y,
-		    p->action_bound->dir);
+		bound = server_find_bound(p->action_bound.x, p->action_bound.y,
+		    p->action_bound.dir);
 		if (bound == NULL) {
 			p->action = ACTION_NONE;
 			p->mob.walk_queue_len = 0;
@@ -2094,13 +2084,13 @@ player_process_action(struct player *p)
 		script_onusebound(p->mob.server->lua, p, bound, item_config);
 		break;
 	case ACTION_LOC_USEWITH:
-		if (p->action_loc == NULL || p->action_slot >= p->inv_count) {
+		if (p->action_slot >= p->inv_count) {
 			p->action = ACTION_NONE;
 			p->mob.walk_queue_len = 0;
 			p->mob.walk_queue_pos = 0;
 			return;
 		}
-		loc = server_find_loc(p->action_loc->x, p->action_loc->y);
+		loc = server_find_loc(p->action_loc.x, p->action_loc.y);
 		if (loc == NULL) {
 			p->action = ACTION_NONE;
 			p->mob.walk_queue_len = 0;
@@ -2118,13 +2108,7 @@ player_process_action(struct player *p)
 		break;
 	case ACTION_LOC_OP1:
 	case ACTION_LOC_OP2:
-		if (p->action_loc == NULL) {
-			p->action = ACTION_NONE;
-			p->mob.walk_queue_len = 0;
-			p->mob.walk_queue_pos = 0;
-			return;
-		}
-		loc = server_find_loc(p->action_loc->x, p->action_loc->y);
+		loc = server_find_loc(p->action_loc.x, p->action_loc.y);
 		if (loc == NULL) {
 			p->action = ACTION_NONE;
 			p->mob.walk_queue_len = 0;

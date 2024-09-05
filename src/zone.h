@@ -35,6 +35,10 @@
 #define ZONE_MAX_PLANE	(4)
 #endif
 
+struct server;
+struct player;
+struct npc;
+
 /* 3d object in 2-dimensional space */
 struct loc {
 	uint16_t id;

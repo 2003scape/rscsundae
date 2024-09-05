@@ -583,8 +583,9 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			if (spell != NULL && item != NULL &&
 			    spell->type == SPELL_CAST_ON_ITEM) {
 				p->action = ACTION_ITEM_CAST;
-				p->action_item = item;
 				p->spell = spell;
+				memcpy(&p->action_item, item,
+					sizeof(struct ground_item));
 			}
 		}
 		break;
@@ -801,6 +802,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 	case OP_CLI_ITEM_USEWITH:
 		{
 			uint16_t x, y, id, slot;
+			struct ground_item *item;
 
 			if (buf_getu16(data, offset, len, &x) == -1) {
 				return;
@@ -820,14 +822,19 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			offset += 2;
 			packet_log(p, "OP_CLI_ITEM_USEWITH %d %d %d %d\n",
 			    x, y, id, slot);
-			p->action = ACTION_ITEM_USEWITH;
-			p->action_item = server_find_ground_item(p, x, y, id);
-			p->action_slot = slot;
+			item = server_find_ground_item(p, x, y, id);
+			if (item != NULL) {
+				p->action = ACTION_ITEM_USEWITH;
+				p->action_slot = slot;
+				memcpy(&p->action_item, item,
+					sizeof(struct ground_item));
+			}
 		}
 		break;
 	case OP_CLI_ITEM_TAKE:
 		{
 			uint16_t x, y, id;
+			struct ground_item *item;
 
 			if (buf_getu16(data, offset, len, &x) == -1) {
 				return;
@@ -841,8 +848,12 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			offset += 2;
-			p->action = ACTION_ITEM_TAKE;
-			p->action_item = server_find_ground_item(p, x, y, id);
+			item = server_find_ground_item(p, x, y, id);
+			if (item != NULL) {
+				p->action = ACTION_ITEM_TAKE;
+				memcpy(&p->action_item, item,
+					sizeof(struct ground_item));
+			}
 		}
 		break;
 	case OP_CLI_WALK_TILE:
@@ -1149,6 +1160,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 	case OP_CLI_BOUND_OP1:
 	case OP_CLI_BOUND_OP2:
 		{
+			struct bound *bound;
 			uint16_t x, y;
 			uint8_t dir;
 
@@ -1163,22 +1175,27 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			if (buf_getu8(data, offset++, len, &dir) == -1) {
 				return;
 			}
-			if (opcode == OP_CLI_BOUND_OP1) {
-				packet_log(p,
-				    "OP_CLI_BOUND_OP1 %d %d %d\n",
-				    x, y, dir);
-				p->action = ACTION_BOUND_OP1;
-			} else {
-				packet_log(p,
-				    "OP_CLI_BOUND_OP2 %d %d %d\n",
-				    x, y, dir);
-				p->action = ACTION_BOUND_OP2;
+			bound = server_find_bound(x, y, dir);
+			if (bound != NULL) {
+				if (opcode == OP_CLI_BOUND_OP1) {
+					packet_log(p,
+					    "OP_CLI_BOUND_OP1 %d %d %d\n",
+					    x, y, dir);
+					p->action = ACTION_BOUND_OP1;
+				} else {
+					packet_log(p,
+					    "OP_CLI_BOUND_OP2 %d %d %d\n",
+					    x, y, dir);
+					p->action = ACTION_BOUND_OP2;
+				}
+				memcpy(&p->action_bound, bound,
+				    sizeof(struct bound));
 			}
-			p->action_bound = server_find_bound(x, y, dir);
 		}
 		break;
 	case OP_CLI_BOUND_USEWITH:
 		{
+			struct bound *bound;
 			uint16_t x, y, slot;
 			uint8_t dir;
 
@@ -1200,9 +1217,13 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			packet_log(p,
 			    "OP_CLI_BOUND_USEWITH %d %d %d %d\n",
 			    x, y, dir, slot);
-			p->action = ACTION_BOUND_USEWITH;
-			p->action_bound = server_find_bound(x, y, dir);
-			p->action_slot = slot;
+			bound = server_find_bound(x, y, dir);
+			if (bound != NULL) {
+				p->action = ACTION_BOUND_USEWITH;
+				p->action_slot = slot;
+				memcpy(&p->action_bound, bound,
+				    sizeof(struct bound));
+			}
 		}
 		break;
 	case OP_CLI_INV_USEWITH:
@@ -1227,6 +1248,7 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 	case OP_CLI_LOC_USEWITH:
 		{
 			uint16_t x, y, slot;
+			struct loc *loc;
 
 			if (buf_getu16(data, offset, len, &x) == -1) {
 				return;
@@ -1242,15 +1264,19 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 			offset += 2;
 			packet_log(p,
 			    "OP_CLI_LOC_USEWITH %d %d %d\n", x, y, slot);
-			p->action = ACTION_LOC_USEWITH;
-			p->action_loc = server_find_loc(x, y);
-			p->action_slot = slot;
+			loc = server_find_loc(x, y);
+			if (loc != NULL) {
+				p->action = ACTION_LOC_USEWITH;
+				p->action_slot = slot;
+				memcpy(&p->action_loc, loc, sizeof(struct loc));
+			}
 		}
 		break;
 	case OP_CLI_LOC_OP1:
 	case OP_CLI_LOC_OP2:
 		{
 			uint16_t x, y;
+			struct loc *loc;
 
 			if (buf_getu16(data, offset, len, &x) == -1) {
 				return;
@@ -1260,16 +1286,19 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 				return;
 			}
 			offset += 2;
-			if (opcode == OP_CLI_LOC_OP1) {
-				packet_log(p,
-				    "OP_CLI_LOC_OP1 %d %d\n", x, y);
-				p->action = ACTION_LOC_OP1;
-			} else {
-				packet_log(p,
-				    "OP_CLI_LOC_OP2 %d %d\n", x, y);
-				p->action = ACTION_LOC_OP2;
+			loc = server_find_loc(x, y);
+			if (loc != NULL) {
+				if (opcode == OP_CLI_LOC_OP1) {
+					packet_log(p,
+					    "OP_CLI_LOC_OP1 %d %d\n", x, y);
+					p->action = ACTION_LOC_OP1;
+				} else {
+					packet_log(p,
+					    "OP_CLI_LOC_OP2 %d %d\n", x, y);
+					p->action = ACTION_LOC_OP2;
+				}
+				memcpy(&p->action_loc, loc, sizeof(struct loc));
 			}
-			p->action_loc = server_find_loc(x, y);
 		}
 		break;
 	}

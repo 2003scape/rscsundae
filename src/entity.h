@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <time.h>
+#include "zone.h"
 #include "ext/isaac.h"
 
 #define PLAYER_BUFSIZE		(5000)
@@ -342,9 +343,9 @@ struct player {
 	uint16_t action_player;
 	uint16_t action_slot;
 	uint16_t action_slot2;
-	struct ground_item *action_item;
-	struct bound *action_bound;
-	struct loc *action_loc;
+	struct ground_item action_item;
+	struct bound action_bound;
+	struct loc action_loc;
 	uint16_t bubble_id;
 	uint8_t ranged_timer;
 	uint8_t spell_timer;
