@@ -1,0 +1,3 @@
+Error in Lua script: ./lua/script.lua:746: stack overflow
+assertion "0" failed: file "script.c", line 124, function "safe_call"
+[1]   Abort trap (core dumped) ./src/rscsundae
