@@ -284,7 +284,7 @@ function script_engine_attacknpc(player, npc, name, x, y)
 	name = string.lower(name)
 	script = attacknpc_scripts[name]
 	if script then
-		ps = new_player_script(player)
+		local ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, npc, x, y)
 			if not ps.paused then
@@ -307,7 +307,7 @@ function script_engine_takeobj(player, name, x, y)
 	name = string.lower(name)
 	script = takeobj_scripts[name]
 	if script then
-		ps = new_player_script(player)
+		local ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, x, y)
 			if not ps.paused then
@@ -328,7 +328,7 @@ function script_engine_killnpc(player, npc, name, x, y)
 	local ps = player_scripts[player]
 	local script = killnpc_scripts[name]
 	if script then
-		ps = new_player_script(player)
+		local ps = new_player_script(player)
 		ps.npc = npc
 		ps.co = coroutine.create(function()
 			script(player, npc, x, y)
@@ -370,7 +370,7 @@ function script_engine_talknpc(player, name, npc)
 	name = string.lower(name)
 	script = talknpc_scripts[name]
 	if script then
-		ps = new_player_script(player)
+		local ps = new_player_script(player)
 		ps.npc = npc
 		ps.co = coroutine.create(function()
 			script(player, npc)
@@ -404,7 +404,7 @@ function script_engine_skillnpc(player, name, npc, spell)
 		script = skillnpc_scripts[spell]["_"]
 	end
 	if script then
-		ps = new_player_script(player)
+		local ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, npc)
 			if not ps.paused then
@@ -427,7 +427,7 @@ function script_engine_spellself(player, spell)
 	spell = string.lower(spell)
 	script = spellself_scripts[spell]
 	if script then
-		ps = new_player_script(player)
+		local ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player)
 			if not ps.paused then
@@ -456,7 +456,7 @@ function script_engine_spellinv(player, name, spell)
 		script = spellinv_scripts[spell]["_"]
 	end
 	if script then
-		ps = new_player_script(player)
+		local ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, name)
 			if not ps.paused then
@@ -486,7 +486,7 @@ function script_engine_spellobj(player, spell, name, x, y)
 		script = spellobj_scripts[spell]["_"]
 	end
 	if script then
-		ps = new_player_script(player)
+		local ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, name, x, y)
 			if not ps.paused then
@@ -520,7 +520,7 @@ function script_engine_opinv(player, name)
 	name = string.lower(name)
 	script = opinv_scripts[name]
 	if script then
-		ps = new_player_script(player)
+		local ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player)
 			if not ps.paused then
@@ -543,7 +543,7 @@ function script_engine_skillplayer(player, target, name)
 	name = string.lower(name)
 	script = skillplayer_scripts[name]
 	if script then
-		ps = new_player_script(player)
+		local ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, target)
 			if not ps.paused then
@@ -566,7 +566,7 @@ function script_engine_opbound1(player, name, x, y, dir)
 	name = string.lower(name)
 	script = opbound1_scripts[name]
 	if script then
-		ps = new_player_script(player)
+		local ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, x, y, dir)
 			if not ps.paused then
@@ -589,7 +589,7 @@ function script_engine_opbound2(player, name, x, y, dir)
 	name = string.lower(name)
 	script = opbound2_scripts[name]
 	if script then
-		ps = new_player_script(player)
+		local ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, x, y, dir)
 			if not ps.paused then
@@ -612,7 +612,7 @@ function script_engine_oploc1(player, name, x, y)
 	name = string.lower(name)
 	script = oploc1_scripts[name]
 	if script then
-		ps = new_player_script(player)
+		local ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, x, y)
 			if not ps.paused then
@@ -635,7 +635,7 @@ function script_engine_oploc2(player, name, x, y)
 	name = string.lower(name)
 	script = oploc2_scripts[name]
 	if script then
-		ps = new_player_script(player)
+		local ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, x, y)
 			if not ps.paused then
@@ -663,7 +663,7 @@ function script_engine_useloc(player, name, x, y, item)
 	end
 	script = useloc_scripts[name][item]
 	if script then
-		ps = new_player_script(player)
+		local ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, x, y)
 			if not ps.paused then
@@ -691,7 +691,7 @@ function script_engine_usebound(player, name, x, y, dir, item)
 	end
 	script = usebound_scripts[name][item]
 	if script then
-		ps = new_player_script(player)
+		local ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, x, y, dir)
 			if not ps.paused then
@@ -719,7 +719,7 @@ function script_engine_usenpc(player, npc, name, item)
 	end
 	script = usenpc_scripts[name][item]
 	if script then
-		ps = new_player_script(player)
+		local ps = new_player_script(player)
 		ps.npc = npc
 		ps.co = coroutine.create(function()
 			script(player, npc)
@@ -750,7 +750,7 @@ function script_engine_useobj(player, name, x, y, item)
 	end
 	script = useobj_scripts[name][item]
 	if script then
-		ps = new_player_script(player)
+		local ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player, x, y)
 			if not ps.paused then
@@ -783,7 +783,7 @@ function script_engine_useinv(player, name, item)
 		script = useinv_scripts[item][name]
 	end
 	if script then
-		ps = new_player_script(player)
+		local ps = new_player_script(player)
 		ps.co = coroutine.create(function()
 			script(player)
 			if not ps.paused then
