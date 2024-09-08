@@ -2482,7 +2482,11 @@ player_process_movement(struct player *p)
 void
 player_attempt_logout(struct player *p, bool requested)
 {
-	if (p->mob.in_combat || p->script_active) {
+	/*
+	 * ui_design sets script_active but we want to garbage collect
+	 * players who x-log in the design screen
+	 */
+	if (p->mob.in_combat || (p->script_active && !p->ui_design_open)) {
 		if (requested) {
 			player_send_logout_reject(p);
 		}
