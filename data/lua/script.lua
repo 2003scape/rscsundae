@@ -224,6 +224,8 @@ function script_engine_process(player)
 			if not result then
 				print("Script error inside coroutine: " .. err)
 				script_engine_cancel(player)
+			elseif (not player_scripts[player]) and not ps.paused then
+				coroutine.close(ps.co)
 			end
 		end
 	end
@@ -802,8 +804,8 @@ function pause(min, max)
 	table.insert(paused_scripts, active_script)
 	player_scripts[active_script.player] = nil
 	playerunbusy(active_script.player)
-	delay(amount)
 	active_script.paused = true
+	delay(amount)
 end
 
 function delay(length)
@@ -819,6 +821,8 @@ function addloc(name, x, y, timer)
 	target.y = y
 	target.timer = timer
 	target.co = active_script.co
+
+	active_script.paused = true
 
 	table.insert(delete_locs, target)
 	player_scripts[active_script.player] = nil
