@@ -1,3 +1,2 @@
-- block public chat doesn't work with 204
 - lua stack overflow when creating coroutines with massive number of
   active scripts

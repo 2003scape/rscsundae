@@ -406,17 +406,20 @@ process_packet(struct player *p, uint8_t *data, size_t len)
 		break;
 	case OP_CLI_PRIVACY_SETTINGS:
 		{
-			uint8_t hide_online;
-			uint8_t block_public;
-			uint8_t block_private;
-			uint8_t block_trade;
-			uint8_t block_duel;
+			uint8_t hide_online = false;
+			uint8_t block_public = false;
+			uint8_t block_private = false;
+			uint8_t block_trade = false;
+			uint8_t block_duel = false;
 			bool unhide = false;
 
 			packet_log(p, "OP_CLI_PRIVACY_SETTINGS\n");
 
-			if (buf_getu8(data, offset++, len, &hide_online) == -1) {
-				return;
+			if (p->protocol_rev < 115) {
+				if (buf_getu8(data, offset++, len,
+				    &hide_online) == -1) {
+					return;
+				}
 			}
 			if (buf_getu8(data, offset++, len, &block_public) == -1) {
 				return;
