@@ -1,1 +1,4 @@
-None known, maybe some lurking.
+- block public chat doesn't work with 204
+- possible to stay logged forever by x'ing out of makeover mage
+- lua stack overflow when creating coroutines with massive number of
+  active scripts
