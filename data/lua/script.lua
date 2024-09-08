@@ -325,7 +325,6 @@ end
 function script_engine_killnpc(player, npc, name, x, y)
 	name = string.lower(name)
 
-	local ps = player_scripts[player]
 	local script = killnpc_scripts[name]
 	if script then
 		local ps = new_player_script(player)
