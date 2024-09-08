@@ -195,6 +195,7 @@ function script_engine_tick()
 			end
 			_delloc(event.x, event.y)
 			table.remove(delete_locs, i)
+			coroutine.close(event.co)
 		end
 	end
 end
